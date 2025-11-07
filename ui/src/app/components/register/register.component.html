@@ -1,0 +1,98 @@
+<div class="register-container">
+  <div class="register-card">
+    <h1>Join ClearSkies</h1>
+    <h2>Create Your Adventure</h2>
+
+    @if (errorMessage()) {
+      <div class="error-message">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input
+          id="username"
+          type="text"
+          formControlName="username"
+          placeholder="Choose a username"
+          [class.invalid]="registerForm.get('username')?.invalid && registerForm.get('username')?.touched"
+        />
+        @if (registerForm.get('username')?.invalid && registerForm.get('username')?.touched) {
+          <span class="error">{{ getFieldError('username') }}</span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          placeholder="Enter your email"
+          [class.invalid]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
+        />
+        @if (registerForm.get('email')?.invalid && registerForm.get('email')?.touched) {
+          <span class="error">{{ getFieldError('email') }}</span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          placeholder="Choose a password"
+          [class.invalid]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched"
+        />
+        @if (registerForm.get('password')?.invalid && registerForm.get('password')?.touched) {
+          <span class="error">{{ getFieldError('password') }}</span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <input
+          id="confirmPassword"
+          type="password"
+          formControlName="confirmPassword"
+          placeholder="Confirm your password"
+          [class.invalid]="registerForm.get('confirmPassword')?.invalid && registerForm.get('confirmPassword')?.touched"
+        />
+        @if (registerForm.get('confirmPassword')?.invalid && registerForm.get('confirmPassword')?.touched) {
+          <span class="error">{{ getFieldError('confirmPassword') }}</span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="characterName">Character Name (Optional)</label>
+        <input
+          id="characterName"
+          type="text"
+          formControlName="characterName"
+          placeholder="Enter character name or use username"
+          [class.invalid]="registerForm.get('characterName')?.invalid && registerForm.get('characterName')?.touched"
+        />
+        @if (registerForm.get('characterName')?.invalid && registerForm.get('characterName')?.touched) {
+          <span class="error">{{ getFieldError('characterName') }}</span>
+        }
+        <span class="hint">Leave blank to use your username as character name</span>
+      </div>
+
+      <button type="submit" [disabled]="loading()">
+        @if (loading()) {
+          <span>Creating Account...</span>
+        } @else {
+          <span>Create Account</span>
+        }
+      </button>
+    </form>
+
+    <div class="login-link">
+      Already have an account?
+      <a routerLink="/login">Login here</a>
+    </div>
+  </div>
+</div>

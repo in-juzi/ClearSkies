@@ -1,0 +1,105 @@
+<div class="game-container">
+  <header class="game-header">
+    <div class="header-left">
+      <h1>ClearSkies</h1>
+    </div>
+    <div class="header-right">
+      @if (currentUser()) {
+        <span class="username">{{ currentUser()!.username }}</span>
+        <button class="logout-btn" (click)="onLogout()">Logout</button>
+      }
+    </div>
+  </header>
+
+  <main class="game-main">
+    @if (currentPlayer()) {
+      <div class="player-info">
+        <h2>Welcome, {{ currentPlayer()!.characterName }}!</h2>
+
+        <div class="stats-panel">
+          <h3>Character Stats</h3>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <span class="stat-label">Level:</span>
+              <span class="stat-value">{{ currentPlayer()!.level }}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Experience:</span>
+              <span class="stat-value">{{ currentPlayer()!.experience }}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Gold:</span>
+              <span class="stat-value">{{ currentPlayer()!.gold }}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Location:</span>
+              <span class="stat-value">{{ currentPlayer()!.location.currentZone }}</span>
+            </div>
+          </div>
+
+          <div class="stats-detailed">
+            <h4>Attributes</h4>
+            <div class="attribute-grid">
+              <div class="attribute-item">
+                <span class="attribute-label">Health:</span>
+                <div class="bar-container">
+                  <div class="bar health-bar"
+                       [style.width.%]="(currentPlayer()!.stats.health.current / currentPlayer()!.stats.health.max) * 100">
+                  </div>
+                  <span class="bar-text">
+                    {{ currentPlayer()!.stats.health.current }} / {{ currentPlayer()!.stats.health.max }}
+                  </span>
+                </div>
+              </div>
+              <div class="attribute-item">
+                <span class="attribute-label">Mana:</span>
+                <div class="bar-container">
+                  <div class="bar mana-bar"
+                       [style.width.%]="(currentPlayer()!.stats.mana.current / currentPlayer()!.stats.mana.max) * 100">
+                  </div>
+                  <span class="bar-text">
+                    {{ currentPlayer()!.stats.mana.current }} / {{ currentPlayer()!.stats.mana.max }}
+                  </span>
+                </div>
+              </div>
+              <div class="attribute-item">
+                <span class="attribute-label">Strength:</span>
+                <span class="attribute-value">{{ currentPlayer()!.stats.strength }}</span>
+              </div>
+              <div class="attribute-item">
+                <span class="attribute-label">Dexterity:</span>
+                <span class="attribute-value">{{ currentPlayer()!.stats.dexterity }}</span>
+              </div>
+              <div class="attribute-item">
+                <span class="attribute-label">Intelligence:</span>
+                <span class="attribute-value">{{ currentPlayer()!.stats.intelligence }}</span>
+              </div>
+              <div class="attribute-item">
+                <span class="attribute-label">Vitality:</span>
+                <span class="attribute-value">{{ currentPlayer()!.stats.vitality }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="game-content">
+          <div class="info-box">
+            <h3>Your Adventure Begins!</h3>
+            <p>Welcome to the world of ClearSkies, a medieval fantasy realm filled with mystery and adventure.</p>
+            <p>This is where your game interface will be. Future features will include:</p>
+            <ul>
+              <li>Interactive world map</li>
+              <li>Quest system</li>
+              <li>Combat encounters</li>
+              <li>Inventory management</li>
+              <li>Character progression</li>
+              <li>Multiplayer features</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    } @else {
+      <div class="loading">Loading player data...</div>
+    }
+  </main>
+</div>

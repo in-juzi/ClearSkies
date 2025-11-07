@@ -1,0 +1,27 @@
+{
+  "name": "clearskies",
+  "version": "1.0.0",
+  "description": "Medieval fantasy browser game",
+  "scripts": {
+    "dev": "npm run dev:be & npm run dev:ui",
+    "dev:be": "cd be && npm run dev",
+    "dev:ui": "cd ui && npm start",
+    "start": "npm run dev",
+    "start:be": "cd be && npm start",
+    "start:ui": "cd ui && npm start",
+    "build": "npm run build:ui",
+    "build:ui": "cd ui && npm run build",
+    "test": "npm run test:be && npm run test:ui",
+    "test:be": "cd be && npm test",
+    "test:ui": "cd ui && npm test",
+    "install:all": "npm install && cd be && npm install && cd ../ui && npm install"
+  },
+  "keywords": [
+    "game",
+    "medieval",
+    "fantasy",
+    "browser-game"
+  ],
+  "author": "",
+  "license": "ISC"
+}
