@@ -188,6 +188,13 @@
     flex: 1;
     overflow-y: auto;
     padding: var(--spacing-3xl);
+
+    .placeholder-text {
+      text-align: center;
+      color: var(--color-text-muted);
+      font-size: var(--font-size-xl);
+      padding: var(--spacing-3xl);
+    }
   }
 }
 
@@ -215,12 +222,65 @@
   }
 }
 
-// Right Sidebar - Stats
+// Right Sidebar - Character/Skills/Attributes
 .right-sidebar {
   border-left: var(--border-width-medium) solid var(--color-bg-tertiary);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  // Tab Navigation
+  .sidebar-nav {
+    display: flex;
+    background: var(--color-bg-overlay-strong);
+    border-bottom: var(--border-width-medium) solid var(--color-bg-tertiary);
+    flex-shrink: 0;
+
+    .nav-tab {
+      flex: 1;
+      padding: var(--spacing-m) var(--spacing-s);
+      background: transparent;
+      border: none;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      font-size: var(--font-size-s);
+      font-weight: var(--font-weight-semibold);
+      transition: all var(--transition-normal);
+      position: relative;
+
+      &:hover {
+        background: var(--color-bg-tertiary);
+        color: var(--color-text-secondary);
+      }
+
+      &.active {
+        color: var(--color-primary);
+        background: var(--color-bg-secondary);
+
+        &::after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          height: 3px;
+          background: var(--color-primary);
+        }
+      }
+    }
+  }
+
+  // Tab Content
+  .sidebar-content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
 
   .panel {
     padding-bottom: var(--spacing-xl);
+    height: auto;
+    overflow: visible;
   }
 
   .character-info {
@@ -271,7 +331,7 @@
     }
   }
 
-  .attributes {
+  .attributes-summary {
     padding: var(--spacing-xl);
 
     .attribute-list {

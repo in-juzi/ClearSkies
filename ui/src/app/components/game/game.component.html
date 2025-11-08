@@ -23,83 +23,105 @@
 
         <!-- Center: Main Game Area -->
         <section class="center-content">
-          <div class="location-header">
-            <h2>{{ currentPlayer()!.location.currentZone }}</h2>
-            <div class="coordinates">
-              X: {{ currentPlayer()!.location.coordinates.x }},
-              Y: {{ currentPlayer()!.location.coordinates.y }}
-            </div>
-          </div>
-
-          <div class="game-area">
-            <!-- Attributes Component -->
-            <app-attributes></app-attributes>
-
-            <!-- Skills Component -->
-            <app-skills></app-skills>
-          </div>
+          <app-location></app-location>
         </section>
 
-        <!-- Right Sidebar: Stats -->
+        <!-- Right Sidebar: Character/Skills/Attributes -->
         <aside class="right-sidebar">
-          <div class="panel">
-            <h3>Character</h3>
+          <!-- Tab Navigation -->
+          <div class="sidebar-nav">
+            <button
+              class="nav-tab"
+              [class.active]="rightSidebarTab() === 'character'"
+              (click)="rightSidebarTab.set('character')">
+              Character
+            </button>
+            <button
+              class="nav-tab"
+              [class.active]="rightSidebarTab() === 'skills'"
+              (click)="rightSidebarTab.set('skills')">
+              Skills
+            </button>
+            <button
+              class="nav-tab"
+              [class.active]="rightSidebarTab() === 'attributes'"
+              (click)="rightSidebarTab.set('attributes')">
+              Attributes
+            </button>
+          </div>
 
-            <div class="character-info">
-              <div class="level-badge">
-                Level {{ currentPlayer()!.level }}
-              </div>
-              <div class="experience-bar">
-                <div class="bar-label">Experience</div>
-                <div class="bar-container">
-                  <div class="bar exp-bar" [style.width.%]="(currentPlayer()!.experience % 100)">
+          <!-- Tab Content -->
+          <div class="sidebar-content">
+            <!-- Character Tab -->
+            @if (rightSidebarTab() === 'character') {
+              <div class="panel">
+                <div class="character-info">
+                  <div class="level-badge">
+                    Level {{ currentPlayer()!.level }}
                   </div>
-                  <span class="bar-text">{{ currentPlayer()!.experience }} XP</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="vital-stats">
-              <div class="stat-bar">
-                <div class="bar-label">Health</div>
-                <div class="bar-container">
-                  <div class="bar health-bar"
-                       [style.width.%]="(currentPlayer()!.stats.health.current / currentPlayer()!.stats.health.max) * 100">
-                  </div>
-                  <span class="bar-text">
-                    {{ currentPlayer()!.stats.health.current }} / {{ currentPlayer()!.stats.health.max }}
-                  </span>
-                </div>
-              </div>
-
-              <div class="stat-bar">
-                <div class="bar-label">Mana</div>
-                <div class="bar-container">
-                  <div class="bar mana-bar"
-                       [style.width.%]="(currentPlayer()!.stats.mana.current / currentPlayer()!.stats.mana.max) * 100">
-                  </div>
-                  <span class="bar-text">
-                    {{ currentPlayer()!.stats.mana.current }} / {{ currentPlayer()!.stats.mana.max }}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div class="attributes">
-              <h4>Attributes</h4>
-              @if (attributes()) {
-                <div class="attribute-list">
-                  @for (attrName of getAttributeNames(); track attrName) {
-                    <div class="attribute-item">
-                      <span class="attribute-label">{{ capitalize(attrName) }}</span>
-                      <span class="attribute-value">Lv {{ attributes()![attrName].level }}</span>
+                  <div class="experience-bar">
+                    <div class="bar-label">Experience</div>
+                    <div class="bar-container">
+                      <div class="bar exp-bar" [style.width.%]="(currentPlayer()!.experience % 100)">
+                      </div>
+                      <span class="bar-text">{{ currentPlayer()!.experience }} XP</span>
                     </div>
+                  </div>
+                </div>
+
+                <div class="vital-stats">
+                  <div class="stat-bar">
+                    <div class="bar-label">Health</div>
+                    <div class="bar-container">
+                      <div class="bar health-bar"
+                           [style.width.%]="(currentPlayer()!.stats.health.current / currentPlayer()!.stats.health.max) * 100">
+                      </div>
+                      <span class="bar-text">
+                        {{ currentPlayer()!.stats.health.current }} / {{ currentPlayer()!.stats.health.max }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="stat-bar">
+                    <div class="bar-label">Mana</div>
+                    <div class="bar-container">
+                      <div class="bar mana-bar"
+                           [style.width.%]="(currentPlayer()!.stats.mana.current / currentPlayer()!.stats.mana.max) * 100">
+                      </div>
+                      <span class="bar-text">
+                        {{ currentPlayer()!.stats.mana.current }} / {{ currentPlayer()!.stats.mana.max }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="attributes-summary">
+                  <h4>Attributes</h4>
+                  @if (attributes()) {
+                    <div class="attribute-list">
+                      @for (attrName of getAttributeNames(); track attrName) {
+                        <div class="attribute-item">
+                          <span class="attribute-label">{{ capitalize(attrName) }}</span>
+                          <span class="attribute-value">Lv {{ attributes()![attrName].level }}</span>
+                        </div>
+                      }
+                    </div>
+                  } @else {
+                    <div class="loading-attributes">Loading...</div>
                   }
                 </div>
-              } @else {
-                <div class="loading-attributes">Loading...</div>
-              }
-            </div>
+              </div>
+            }
+
+            <!-- Skills Tab -->
+            @if (rightSidebarTab() === 'skills') {
+              <app-skills></app-skills>
+            }
+
+            <!-- Attributes Tab -->
+            @if (rightSidebarTab() === 'attributes') {
+              <app-attributes></app-attributes>
+            }
           </div>
         </aside>
       </div>

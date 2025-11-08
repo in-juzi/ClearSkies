@@ -36,12 +36,12 @@
           {{ item.definition.name }}
         </div>
         <div class="item-quantity" *ngIf="item.quantity > 1">x{{ item.quantity }}</div>
-      </div>
-      <!-- Trait indicators -->
-      <div class="item-traits" *ngIf="item.traits && item.traits.length > 0">
-        <span class="trait-badge" *ngFor="let trait of item.traits">
-          {{ trait.charAt(0).toUpperCase() }}
-        </span>
+        <!-- Trait indicators inline -->
+        <div class="item-traits-inline" *ngIf="item.traits && item.traits.length > 0">
+          <span class="trait-badge" *ngFor="let trait of item.traits">
+            {{ trait.charAt(0).toUpperCase() }}
+          </span>
+        </div>
       </div>
     </div>
 
