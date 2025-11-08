@@ -19,7 +19,7 @@ const register = async (req, res) => {
       });
     }
 
-    const { username, email, password, characterName } = req.body;
+    const { username, email, password } = req.body;
 
     // Check if user already exists
     const existingUser = await User.findOne({
@@ -33,15 +33,6 @@ const register = async (req, res) => {
       });
     }
 
-    // Check if character name is taken
-    const existingCharacter = await Player.findOne({ characterName });
-    if (existingCharacter) {
-      return res.status(400).json({
-        success: false,
-        message: 'Character name is already taken'
-      });
-    }
-
     // Create user
     const user = await User.create({
       username,
@@ -51,8 +42,7 @@ const register = async (req, res) => {
 
     // Create player profile
     const player = await Player.create({
-      userId: user._id,
-      characterName: characterName || username
+      userId: user._id
     });
 
     // Generate token
@@ -70,7 +60,6 @@ const register = async (req, res) => {
         },
         player: {
           id: player._id,
-          characterName: player.characterName,
           level: player.level
         },
         token
@@ -157,7 +146,6 @@ const login = async (req, res) => {
         },
         player: player ? {
           id: player._id,
-          characterName: player.characterName,
           level: player.level,
           gold: player.gold,
           location: player.location
@@ -201,11 +189,11 @@ const getMe = async (req, res) => {
         },
         player: player ? {
           id: player._id,
-          characterName: player.characterName,
           level: player.level,
           experience: player.experience,
           gold: player.gold,
           stats: player.stats,
+          skills: player.skills,
           location: player.location,
           lastPlayed: player.lastPlayed
         } : null

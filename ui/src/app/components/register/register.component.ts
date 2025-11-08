@@ -30,11 +30,7 @@ export class RegisterComponent {
       ]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', [Validators.required]],
-      characterName: ['', [
-        Validators.minLength(3),
-        Validators.maxLength(20)
-      ]]
+      confirmPassword: ['', [Validators.required]]
     }, {
       validators: this.passwordMatchValidator
     });
@@ -103,7 +99,6 @@ export class RegisterComponent {
 
   private capitalize(str: string): string {
     if (str === 'confirmPassword') return 'Confirm Password';
-    if (str === 'characterName') return 'Character Name';
     return str.charAt(0).toUpperCase() + str.slice(1);
   }
 }

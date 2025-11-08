@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 
@@ -15,16 +15,21 @@ export class LoginComponent {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   loginForm: FormGroup;
   errorMessage = signal<string>('');
   loading = this.authService.loading;
+  private returnUrl: string;
 
   constructor() {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
+
+    // Get return URL from query params or default to /game
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/game';
   }
 
   onSubmit(): void {
@@ -33,11 +38,10 @@ export class LoginComponent {
 
       this.authService.login(this.loginForm.value).subscribe({
         next: (response) => {
-          console.log('Login successful:', response);
-          this.router.navigate(['/game']);
+          // Navigate to the return URL after successful login
+          this.router.navigateByUrl(this.returnUrl);
         },
         error: (error) => {
-          console.error('Login error:', error);
           this.errorMessage.set(
             error.error?.message || 'Login failed. Please check your credentials.'
           );
