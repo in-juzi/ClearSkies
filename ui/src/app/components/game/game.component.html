@@ -47,6 +47,9 @@
           </div>
 
           <div class="game-area">
+            <!-- Attributes Component -->
+            <app-attributes></app-attributes>
+
             <!-- Skills Component -->
             <app-skills></app-skills>
           </div>
@@ -99,24 +102,18 @@
 
             <div class="attributes">
               <h4>Attributes</h4>
-              <div class="attribute-list">
-                <div class="attribute-item">
-                  <span class="attribute-label">Strength</span>
-                  <span class="attribute-value">{{ currentPlayer()!.stats.strength }}</span>
+              @if (attributes()) {
+                <div class="attribute-list">
+                  @for (attrName of getAttributeNames(); track attrName) {
+                    <div class="attribute-item">
+                      <span class="attribute-label">{{ capitalize(attrName) }}</span>
+                      <span class="attribute-value">Lv {{ attributes()![attrName].level }}</span>
+                    </div>
+                  }
                 </div>
-                <div class="attribute-item">
-                  <span class="attribute-label">Dexterity</span>
-                  <span class="attribute-value">{{ currentPlayer()!.stats.dexterity }}</span>
-                </div>
-                <div class="attribute-item">
-                  <span class="attribute-label">Intelligence</span>
-                  <span class="attribute-value">{{ currentPlayer()!.stats.intelligence }}</span>
-                </div>
-                <div class="attribute-item">
-                  <span class="attribute-label">Vitality</span>
-                  <span class="attribute-value">{{ currentPlayer()!.stats.vitality }}</span>
-                </div>
-              </div>
+              } @else {
+                <div class="loading-attributes">Loading...</div>
+              }
             </div>
           </div>
         </aside>

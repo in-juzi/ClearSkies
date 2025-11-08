@@ -67,8 +67,16 @@ export class Skills implements OnInit {
     this.skillsService.addSkillExperience(skillName, 100).subscribe({
       next: (response) => {
         console.log('Experience added:', response);
-        if (response.data.leveledUp) {
-          console.log(`🎉 ${skillName} leveled up to ${response.data.newLevel}!`);
+        console.log('Message:', response.message);
+
+        // Log skill level up
+        if (response.data.skill.leveledUp) {
+          console.log(`🎉 ${skillName} leveled up to ${response.data.skill.newLevel}!`);
+        }
+
+        // Log attribute level up
+        if (response.data.attribute.leveledUp) {
+          console.log(`⭐ ${response.data.attribute.name} leveled up to ${response.data.attribute.newLevel}!`);
         }
       },
       error: (error) => {

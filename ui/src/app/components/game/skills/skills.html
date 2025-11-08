@@ -34,6 +34,13 @@
                 {{ skills()![skillKey].experience % 1000 }} / 1000
               </span>
             </div>
+
+            @if (skills()![skillKey].mainAttribute) {
+              <div class="skill-attribute">
+                <span class="label">Main:</span>
+                <span class="value attribute-name">{{ skills()![skillKey].mainAttribute }}</span>
+              </div>
+            }
           </div>
 
           <div class="progress-container">

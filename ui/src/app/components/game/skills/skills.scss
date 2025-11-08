@@ -76,10 +76,13 @@
   padding: 0.75rem;
   background: rgba(0, 0, 0, 0.3);
   border-radius: 8px;
+  flex-wrap: wrap;
+  gap: 0.75rem;
 }
 
 .skill-level,
-.skill-xp {
+.skill-xp,
+.skill-attribute {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
@@ -96,6 +99,12 @@
   font-size: 1.25rem;
   color: #ffffff;
   font-weight: bold;
+
+  &.attribute-name {
+    font-size: 1rem;
+    color: #4ecdc4;
+    text-transform: capitalize;
+  }
 }
 
 .progress-container {
