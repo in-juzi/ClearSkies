@@ -62,26 +62,61 @@ const playerSchema = new mongoose.Schema({
     achievementId: { type: mongoose.Schema.Types.ObjectId, ref: 'Achievement' },
     unlockedAt: { type: Date, default: Date.now }
   }],
+  attributes: {
+    strength: {
+      level: { type: Number, default: 1, min: 1 },
+      experience: { type: Number, default: 0, min: 0 }
+    },
+    endurance: {
+      level: { type: Number, default: 1, min: 1 },
+      experience: { type: Number, default: 0, min: 0 }
+    },
+    magic: {
+      level: { type: Number, default: 1, min: 1 },
+      experience: { type: Number, default: 0, min: 0 }
+    },
+    perception: {
+      level: { type: Number, default: 1, min: 1 },
+      experience: { type: Number, default: 0, min: 0 }
+    },
+    dexterity: {
+      level: { type: Number, default: 1, min: 1 },
+      experience: { type: Number, default: 0, min: 0 }
+    },
+    will: {
+      level: { type: Number, default: 1, min: 1 },
+      experience: { type: Number, default: 0, min: 0 }
+    },
+    charisma: {
+      level: { type: Number, default: 1, min: 1 },
+      experience: { type: Number, default: 0, min: 0 }
+    }
+  },
   skills: {
     woodcutting: {
       level: { type: Number, default: 1, min: 1 },
-      experience: { type: Number, default: 0, min: 0 }
+      experience: { type: Number, default: 0, min: 0 },
+      mainAttribute: { type: String, default: 'strength' }
     },
     mining: {
       level: { type: Number, default: 1, min: 1 },
-      experience: { type: Number, default: 0, min: 0 }
+      experience: { type: Number, default: 0, min: 0 },
+      mainAttribute: { type: String, default: 'strength' }
     },
     fishing: {
       level: { type: Number, default: 1, min: 1 },
-      experience: { type: Number, default: 0, min: 0 }
+      experience: { type: Number, default: 0, min: 0 },
+      mainAttribute: { type: String, default: 'endurance' }
     },
     smithing: {
       level: { type: Number, default: 1, min: 1 },
-      experience: { type: Number, default: 0, min: 0 }
+      experience: { type: Number, default: 0, min: 0 },
+      mainAttribute: { type: String, default: 'endurance' }
     },
     cooking: {
       level: { type: Number, default: 1, min: 1 },
-      experience: { type: Number, default: 0, min: 0 }
+      experience: { type: Number, default: 0, min: 0 },
+      mainAttribute: { type: String, default: 'will' }
     }
   },
   createdAt: {
@@ -141,7 +176,46 @@ playerSchema.methods.removeGold = async function(amount) {
   await this.save();
 };
 
+// Add attribute experience and handle attribute leveling
+playerSchema.methods.addAttributeExperience = async function(attributeName, amount) {
+  const validAttributes = ['strength', 'endurance', 'magic', 'perception', 'dexterity', 'will', 'charisma'];
+
+  if (!validAttributes.includes(attributeName)) {
+    throw new Error(`Invalid attribute name: ${attributeName}`);
+  }
+
+  const attribute = this.attributes[attributeName];
+  const oldLevel = attribute.level;
+  attribute.experience += amount;
+
+  // Level up every 1000 XP
+  const newLevel = Math.floor(attribute.experience / 1000) + 1;
+
+  if (newLevel > oldLevel) {
+    attribute.level = newLevel;
+    await this.save();
+    return { leveledUp: true, oldLevel, newLevel, attribute: attributeName };
+  }
+
+  await this.save();
+  return { leveledUp: false, level: attribute.level, attribute: attributeName };
+};
+
+// Get progress to next attribute level (0-100%)
+playerSchema.methods.getAttributeProgress = function(attributeName) {
+  const validAttributes = ['strength', 'endurance', 'magic', 'perception', 'dexterity', 'will', 'charisma'];
+
+  if (!validAttributes.includes(attributeName)) {
+    throw new Error(`Invalid attribute name: ${attributeName}`);
+  }
+
+  const attribute = this.attributes[attributeName];
+  const xpInCurrentLevel = attribute.experience % 1000;
+  return (xpInCurrentLevel / 1000) * 100;
+};
+
 // Add skill experience and handle skill leveling
+// Also awards XP to the skill's main attribute (50% of skill XP)
 playerSchema.methods.addSkillExperience = async function(skillName, amount) {
   const validSkills = ['woodcutting', 'mining', 'fishing', 'smithing', 'cooking'];
 
@@ -156,14 +230,29 @@ playerSchema.methods.addSkillExperience = async function(skillName, amount) {
   // Level up every 1000 XP
   const newLevel = Math.floor(skill.experience / 1000) + 1;
 
+  const skillResult = {
+    skill: skillName,
+    leveledUp: false,
+    level: skill.level,
+    oldLevel,
+    newLevel: skill.level
+  };
+
   if (newLevel > oldLevel) {
     skill.level = newLevel;
-    await this.save();
-    return { leveledUp: true, oldLevel, newLevel, skill: skillName };
+    skillResult.leveledUp = true;
+    skillResult.newLevel = newLevel;
   }
 
-  await this.save();
-  return { leveledUp: false, level: skill.level, skill: skillName };
+  // Award attribute XP (50% of skill XP to main attribute)
+  const mainAttribute = skill.mainAttribute;
+  const attributeXP = Math.floor(amount * 0.5);
+  const attributeResult = await this.addAttributeExperience(mainAttribute, attributeXP);
+
+  return {
+    skill: skillResult,
+    attribute: attributeResult
+  };
 };
 
 // Get progress to next skill level (0-100%)
