@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "node index.js",
+    "dev:watch": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "migrate": "node utils/migrate.js up",
     "migrate:down": "node utils/migrate.js down",
@@ -24,5 +25,8 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.19.3",
     "uuid": "^13.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
   }
 }

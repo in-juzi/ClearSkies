@@ -6,7 +6,8 @@
       "Bash(claude mcp add:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(printf:*)"
+      "Bash(printf:*)",
+      "Bash(done)"
     ],
     "deny": [],
     "ask": []
