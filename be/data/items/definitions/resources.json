@@ -9,7 +9,7 @@
     "stackable": true,
     "maxStack": 100,
     "properties": {
-      "weight": 3,
+      "weight": 0.5,
       "material": "wood",
       "tier": 1,
       "skillSource": "woodcutting"
@@ -27,7 +27,7 @@
     "stackable": true,
     "maxStack": 100,
     "properties": {
-      "weight": 2,
+      "weight": 0.5,
       "material": "wood",
       "tier": 2,
       "skillSource": "woodcutting"
@@ -45,7 +45,7 @@
     "stackable": true,
     "maxStack": 100,
     "properties": {
-      "weight": 2.5,
+      "weight": 0.5,
       "material": "wood",
       "tier": 3,
       "skillSource": "woodcutting"
