@@ -1,0 +1,291 @@
+/**
+ * ClearSkies Design System
+ * Material Design-inspired design tokens for consistent theming
+ */
+
+:root {
+  /* ========================================
+     COLOR PALETTE
+     ======================================== */
+
+  /* Primary colors - Medieval Fantasy Theme */
+  --color-primary: #e94560;
+  --color-primary-dark: #c73651;
+  --color-primary-light: #ff6b6b;
+
+  /* Secondary colors */
+  --color-secondary: #ffd700;
+  --color-secondary-dark: #d4af37;
+  --color-secondary-light: #ffed4e;
+
+  /* Accent colors */
+  --color-accent-blue: #4ecdc4;
+  --color-accent-blue-dark: #44a8a0;
+  --color-accent-purple: #667eea;
+  --color-accent-purple-dark: #764ba2;
+
+  /* Background colors */
+  --color-bg-primary: #1a1a2e;
+  --color-bg-secondary: #16213e;
+  --color-bg-tertiary: #0f3460;
+  --color-bg-elevated: #2a2a3e;
+  --color-bg-overlay: rgba(0, 0, 0, 0.3);
+  --color-bg-overlay-strong: rgba(0, 0, 0, 0.5);
+
+  /* Surface colors */
+  --color-surface: #16213e;
+  --color-surface-variant: #0f3460;
+  --color-surface-border: #4a4a6a;
+  --color-surface-border-light: #3d3d5c;
+
+  /* Text colors */
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #eeeeee;
+  --color-text-tertiary: #dddddd;
+  --color-text-muted: #aaaaaa;
+  --color-text-disabled: #666666;
+  --color-text-label: #a0a0c0;
+  --color-text-label-alt: #95a3b3;
+
+  /* Status colors */
+  --color-success: #4ecdc4;
+  --color-warning: #f0a500;
+  --color-error: #ff4444;
+  --color-error-light: #ff6b6b;
+  --color-info: #4e54c8;
+
+  /* Game-specific colors */
+  --color-health: #e94560;
+  --color-mana: #4e54c8;
+  --color-experience: #ffd700;
+  --color-gold: #ffd700;
+
+  /* ========================================
+     SPACING SYSTEM (4px base unit)
+     ======================================== */
+
+  --spacing-xs: 4px;     /* 4px */
+  --spacing-s: 8px;      /* 8px */
+  --spacing-m: 12px;     /* 12px */
+  --spacing-l: 16px;     /* 16px */
+  --spacing-xl: 20px;    /* 20px */
+  --spacing-2xl: 24px;   /* 24px */
+  --spacing-3xl: 32px;   /* 32px */
+  --spacing-4xl: 40px;   /* 40px */
+  --spacing-5xl: 48px;   /* 48px */
+
+  /* Semantic spacing */
+  --spacing-component-padding: var(--spacing-xl);
+  --spacing-section-gap: var(--spacing-3xl);
+  --spacing-card-padding: var(--spacing-xl);
+  --spacing-inline-gap: var(--spacing-m);
+
+  /* ========================================
+     TYPOGRAPHY
+     ======================================== */
+
+  /* Font families */
+  --font-primary: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  --font-monospace: 'Courier New', Courier, monospace;
+
+  /* Font sizes */
+  --font-size-xs: 11px;
+  --font-size-s: 12px;
+  --font-size-m: 14px;
+  --font-size-l: 16px;
+  --font-size-xl: 18px;
+  --font-size-2xl: 20px;
+  --font-size-3xl: 24px;
+  --font-size-4xl: 28px;
+  --font-size-5xl: 32px;
+
+  /* Font weights */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Line heights */
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.6;
+  --line-height-loose: 2;
+
+  /* Letter spacing */
+  --letter-spacing-tight: -0.5px;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.5px;
+  --letter-spacing-wider: 1px;
+
+  /* ========================================
+     BORDER RADIUS
+     ======================================== */
+
+  --radius-s: 5px;
+  --radius-m: 8px;
+  --radius-l: 10px;
+  --radius-xl: 12px;
+  --radius-full: 9999px;
+
+  /* Semantic radius */
+  --radius-button: var(--radius-s);
+  --radius-card: var(--radius-m);
+  --radius-panel: var(--radius-l);
+  --radius-modal: var(--radius-xl);
+
+  /* ========================================
+     BORDERS
+     ======================================== */
+
+  --border-width-thin: 1px;
+  --border-width-medium: 2px;
+  --border-width-thick: 3px;
+
+  /* Border combinations */
+  --border-default: var(--border-width-medium) solid var(--color-surface-border);
+  --border-light: var(--border-width-thin) solid var(--color-surface-border-light);
+  --border-primary: var(--border-width-medium) solid var(--color-primary);
+  --border-secondary: var(--border-width-medium) solid var(--color-secondary);
+
+  /* ========================================
+     SHADOWS
+     ======================================== */
+
+  --shadow-s: 0 2px 4px rgba(0, 0, 0, 0.2);
+  --shadow-m: 0 4px 6px rgba(0, 0, 0, 0.3);
+  --shadow-l: 0 8px 12px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 12px 20px rgba(0, 0, 0, 0.5);
+
+  /* Glow shadows for effects */
+  --shadow-glow-primary: 0 0 10px rgba(233, 69, 96, 0.5);
+  --shadow-glow-secondary: 0 0 10px rgba(255, 215, 0, 0.5);
+  --shadow-glow-accent: 0 0 10px rgba(78, 205, 196, 0.5);
+  --shadow-glow-purple: 0 0 10px rgba(102, 126, 234, 0.5);
+  --shadow-glow-mana: 0 0 10px rgba(78, 84, 200, 0.5);
+
+  /* ========================================
+     Z-INDEX LAYERS
+     ======================================== */
+
+  --z-base: 0;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-fixed: 300;
+  --z-modal-backdrop: 400;
+  --z-modal: 500;
+  --z-popover: 600;
+  --z-tooltip: 700;
+
+  /* ========================================
+     TRANSITIONS & ANIMATIONS
+     ======================================== */
+
+  /* Durations */
+  --duration-instant: 100ms;
+  --duration-fast: 200ms;
+  --duration-normal: 300ms;
+  --duration-slow: 500ms;
+
+  /* Easing functions */
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+  /* Transition presets */
+  --transition-fast: var(--duration-fast) var(--ease-out);
+  --transition-normal: var(--duration-normal) var(--ease-in-out);
+  --transition-slow: var(--duration-slow) var(--ease-in-out);
+
+  /* ========================================
+     SIZING
+     ======================================== */
+
+  /* Component heights */
+  --height-input: 40px;
+  --height-button: 40px;
+  --height-button-small: 32px;
+  --height-button-large: 48px;
+  --height-header: auto;
+  --height-progress-bar: 24px;
+  --height-progress-bar-small: 20px;
+
+  /* Icon sizes */
+  --icon-size-s: 24px;
+  --icon-size-m: 32px;
+  --icon-size-l: 40px;
+  --icon-size-xl: 48px;
+
+  /* ========================================
+     GRID & LAYOUT
+     ======================================== */
+
+  --grid-gap-s: var(--spacing-s);
+  --grid-gap-m: var(--spacing-l);
+  --grid-gap-l: var(--spacing-2xl);
+
+  --container-max-width: 1200px;
+  --sidebar-width-left: 280px;
+  --sidebar-width-right: 320px;
+
+  /* ========================================
+     OPACITY LEVELS
+     ======================================== */
+
+  --opacity-disabled: 0.4;
+  --opacity-hover: 0.8;
+  --opacity-muted: 0.6;
+
+  /* ========================================
+     GRADIENTS
+     ======================================== */
+
+  --gradient-primary: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  --gradient-secondary: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-secondary-dark) 100%);
+  --gradient-surface: linear-gradient(135deg, var(--color-bg-secondary) 0%, var(--color-bg-tertiary) 100%);
+  --gradient-card: linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%);
+  --gradient-purple: linear-gradient(135deg, var(--color-accent-purple) 0%, var(--color-accent-purple-dark) 100%);
+
+  /* Bar gradients */
+  --gradient-health: linear-gradient(90deg, var(--color-health) 0%, var(--color-primary-light) 100%);
+  --gradient-mana: linear-gradient(90deg, var(--color-mana) 0%, #8f94fb 100%);
+  --gradient-experience: linear-gradient(90deg, var(--color-experience) 0%, var(--color-secondary-light) 100%);
+  --gradient-progress: linear-gradient(90deg, #4a69bd 0%, #6a89cc 50%, #82b1ff 100%);
+  --gradient-attribute: linear-gradient(90deg, var(--color-accent-blue) 0%, var(--color-accent-blue-dark) 100%);
+}
+
+/* ========================================
+   UTILITY CLASSES
+   ======================================== */
+
+/* Text utilities */
+.text-primary { color: var(--color-text-primary); }
+.text-secondary { color: var(--color-text-secondary); }
+.text-muted { color: var(--color-text-muted); }
+.text-error { color: var(--color-error); }
+.text-success { color: var(--color-success); }
+.text-warning { color: var(--color-warning); }
+
+/* Font weight utilities */
+.font-regular { font-weight: var(--font-weight-regular); }
+.font-medium { font-weight: var(--font-weight-medium); }
+.font-semibold { font-weight: var(--font-weight-semibold); }
+.font-bold { font-weight: var(--font-weight-bold); }
+
+/* Spacing utilities */
+.m-0 { margin: 0; }
+.p-0 { padding: 0; }
+.mt-s { margin-top: var(--spacing-s); }
+.mt-m { margin-top: var(--spacing-m); }
+.mt-l { margin-top: var(--spacing-l); }
+.mb-s { margin-bottom: var(--spacing-s); }
+.mb-m { margin-bottom: var(--spacing-m); }
+.mb-l { margin-bottom: var(--spacing-l); }
+
+/* Display utilities */
+.flex { display: flex; }
+.flex-column { flex-direction: column; }
+.flex-center { justify-content: center; align-items: center; }
+.gap-s { gap: var(--spacing-s); }
+.gap-m { gap: var(--spacing-m); }
+.gap-l { gap: var(--spacing-l); }

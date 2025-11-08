@@ -15,15 +15,19 @@ ClearSkies/
 │   ├── config/            # Database configuration
 │   ├── controllers/       # Request handlers
 │   │   ├── authController.js
-│   │   └── skillsController.js
+│   │   ├── skillsController.js
+│   │   └── attributesController.js
 │   ├── middleware/        # Auth and other middleware
 │   ├── migrations/        # Database migrations
+│   │   ├── 001-add-skills-to-players.js
+│   │   └── 002-add-attributes-and-skill-main-attributes.js
 │   ├── models/           # Mongoose schemas
 │   │   ├── User.js
 │   │   └── Player.js
 │   ├── routes/           # API routes
 │   │   ├── auth.js
-│   │   └── skills.js
+│   │   ├── skills.js
+│   │   └── attributes.js
 │   └── utils/            # Utility functions (JWT, migrations, etc.)
 ├── ui/                    # Frontend (Angular 20)
 │   └── src/
@@ -32,12 +36,14 @@ ClearSkies/
 │           ├── components/      # UI components
 │           │   ├── game/       # Game-related components
 │           │   │   ├── game.component.*
-│           │   │   └── skills/ # Skills component
+│           │   │   ├── skills/      # Skills component
+│           │   │   └── attributes/  # Attributes component
 │           │   ├── login/
 │           │   └── register/
 │           ├── services/        # Angular services
 │           │   ├── auth.service.ts
-│           │   └── skills.service.ts
+│           │   ├── skills.service.ts
+│           │   └── attributes.service.ts
 │           ├── guards/          # Route guards
 │           │   └── auth.guard.ts (authGuard, guestGuard)
 │           ├── interceptors/    # HTTP interceptors
@@ -73,12 +79,16 @@ ClearSkies/
 - ✅ HTTP interceptor for automatic JWT token attachment
 - ✅ Player profile with character stats
 - ✅ MongoDB models (User, Player)
-- ✅ Game interface with stats display
+- ✅ Game interface with three-column layout (inventory, game area, character stats)
 - ✅ Skills system with 5 skills (woodcutting, mining, fishing, smithing, cooking)
 - ✅ Skills UI with PNG icons and progress tracking
 - ✅ XP gain and automatic skill leveling (1000 XP per level)
+- ✅ Attributes system with 7 attributes (strength, endurance, magic, perception, dexterity, will, charisma)
+- ✅ Skill-to-attribute XP linking (skills award 50% XP to their main attribute)
+- ✅ Attributes UI with progress tracking and level display
 - ✅ Database migration system with up/down functions
 - ✅ Skills API endpoints (GET all skills, GET single skill, POST add XP)
+- ✅ Attributes API endpoints (GET all attributes, GET single attribute, POST add XP)
 
 ### Database Models
 
@@ -89,9 +99,19 @@ ClearSkies/
 **Player** (Game Data):
 - characterName, level, experience
 - stats (health, mana, strength, dexterity, intelligence, vitality)
-- skills (woodcutting, mining, fishing, smithing, cooking) - each with level & experience (1000 XP per level)
-- gold, inventory, location, questProgress, achievements, skills
-- Methods: `addSkillExperience(skillName, xp)`, `getSkillProgress(skillName)`
+- attributes (strength, endurance, magic, perception, dexterity, will, charisma) - each with level & experience (1000 XP per level)
+- skills (woodcutting, mining, fishing, smithing, cooking) - each with level, experience, and mainAttribute
+  - Woodcutting → Strength
+  - Mining → Strength
+  - Fishing → Endurance
+  - Smithing → Endurance
+  - Cooking → Will
+- gold, inventory, location, questProgress, achievements
+- Methods:
+  - `addSkillExperience(skillName, xp)` - Awards skill XP and 50% to linked attribute
+  - `getSkillProgress(skillName)`
+  - `addAttributeExperience(attributeName, xp)`
+  - `getAttributeProgress(attributeName)`
 
 ### API Endpoints
 
@@ -102,9 +122,14 @@ ClearSkies/
 - `POST /api/auth/logout` - Logout (protected)
 
 **Skills:**
-- `GET /api/skills` - Get all player skills (protected)
+- `GET /api/skills` - Get all player skills with progress (protected)
 - `GET /api/skills/:skillName` - Get single skill details (protected)
-- `POST /api/skills/:skillName/experience` - Add XP to skill (protected)
+- `POST /api/skills/:skillName/experience` - Add XP to skill, returns both skill and attribute results (protected)
+
+**Attributes:**
+- `GET /api/attributes` - Get all player attributes with progress (protected)
+- `GET /api/attributes/:attributeName` - Get single attribute details (protected)
+- `POST /api/attributes/:attributeName/experience` - Add XP to attribute (protected)
 
 ## Development Guidelines
 
@@ -135,11 +160,14 @@ npm run migrate:status   # Check migration status
 npm run migrate:down     # Rollback last migration
 ```
 
+**Existing Migrations:**
+1. `001-add-skills-to-players.js` - Adds skills to existing player documents
+2. `002-add-attributes-and-skill-main-attributes.js` - Adds attributes and mainAttribute field to skills
+
 **Creating a New Migration:**
 1. Create a file in `be/migrations/` with format: `NNN-description.js`
 2. Export `up()` and `down()` functions
 3. Include name and description
-4. Example: `be/migrations/001-add-skills-to-players.js`
 
 **Migration Template:**
 ```javascript
@@ -168,6 +196,7 @@ module.exports = {
 - `/todo` - Save AI response as a new todo task
 - `/todo-done <filename>` - Move todo to completed
 - `/context-update` - Update CLAUDE.md with latest project context and changes
+- `/logical-commits` - Analyze unstaged changes and create logical, atomic commits
 
 ## Environment Variables
 
