@@ -52,12 +52,19 @@
   </div>
 
   <!-- Item Details Panel -->
-  <div class="item-details-panel" *ngIf="selectedItem">
+  <div
+    class="item-details-panel"
+    *ngIf="selectedItem"
+    #detailsPanel
+    [style.left]="panelLeft"
+    [style.top]="panelTop"
+    [style.transform]="panelTransform"
+    (mousedown)="onDragStart($event, detailsPanel)">
     <div class="details-header">
       <h3 [class]="inventoryService.getRarityColor(selectedItem.definition.rarity)">
         {{ selectedItem.definition.name }}
       </h3>
-      <button (click)="closeItemDetails()" class="close-btn">✕</button>
+      <button (click)="closeItemDetails()" class="close-btn close-button">✕</button>
     </div>
 
     <div class="details-content">

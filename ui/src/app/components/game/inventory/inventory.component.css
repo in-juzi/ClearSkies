@@ -163,6 +163,14 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
   z-index: 1000;
   overflow: hidden;
+  user-select: none; /* Prevent text selection during drag */
+}
+
+/* Add dragging state */
+.item-details-panel.dragging {
+  cursor: move !important;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.7);
+  border-color: #6a6a8c;
 }
 
 .details-header {
@@ -172,6 +180,7 @@
   padding: 1rem;
   background: rgba(74, 74, 108, 0.3);
   border-bottom: 1px solid #4a4a6c;
+  cursor: move; /* Show move cursor on header */
 }
 
 .details-header h3 {
