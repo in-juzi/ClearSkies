@@ -38,6 +38,12 @@
             </button>
             <button
               class="nav-tab"
+              [class.active]="rightSidebarTab() === 'equipment'"
+              (click)="rightSidebarTab.set('equipment')">
+              Equipment
+            </button>
+            <button
+              class="nav-tab"
               [class.active]="rightSidebarTab() === 'skills'"
               (click)="rightSidebarTab.set('skills')">
               Skills
@@ -111,6 +117,11 @@
                   }
                 </div>
               </div>
+            }
+
+            <!-- Equipment Tab -->
+            @if (rightSidebarTab() === 'equipment') {
+              <app-equipment></app-equipment>
             }
 
             <!-- Skills Tab -->

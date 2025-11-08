@@ -5,6 +5,7 @@ export interface ItemDefinition {
   category: 'resource' | 'equipment' | 'consumable' | 'crafted';
   equipmentType?: string;
   consumableType?: string;
+  slot?: string; // Equipment slot (head, body, mainHand, etc.)
   baseValue: number;
   rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
   stackable: boolean;
@@ -86,4 +87,47 @@ export interface RemoveItemRequest {
 
 export interface ItemDefinitionsResponse {
   items: ItemDefinition[];
+}
+
+// Equipment System
+
+export type EquipmentSlot =
+  | 'head'
+  | 'body'
+  | 'mainHand'
+  | 'offHand'
+  | 'belt'
+  | 'gloves'
+  | 'boots'
+  | 'necklace'
+  | 'ringRight'
+  | 'ringLeft';
+
+export interface EquipmentSlots {
+  [slotName: string]: string | null; // slot name -> instanceId or null
+}
+
+export interface EquippedItemsResponse {
+  equippedItems: {
+    [slotName: string]: ItemDetails;
+  };
+  slots: EquipmentSlots;
+}
+
+export interface EquipItemRequest {
+  instanceId: string;
+  slotName: string;
+}
+
+export interface UnequipItemRequest {
+  slotName: string;
+}
+
+export interface EquipmentResponse {
+  message: string;
+  slot: string;
+  item: ItemDetails | null;
+  equippedItems: {
+    [slotName: string]: ItemInstance;
+  };
 }

@@ -1,0 +1,50 @@
+<div class="equipment-container">
+  <h2 class="equipment-title">Equipment</h2>
+
+  <div class="equipment-grid">
+    @for (slot of slotConfigs; track slot.name) {
+      <div
+        class="equipment-slot"
+        [class.drag-over]="isSlotDraggedOver(slot.name)"
+        [class.occupied]="getItemInSlot(slot.name)"
+        [style.grid-row]="slot.position.row"
+        [style.grid-column]="slot.position.col"
+        (dragover)="onDragOver($event, slot.name)"
+        (dragleave)="onDragLeave()"
+        (drop)="onDrop($event, slot.name)"
+        (contextmenu)="onSlotContextMenu($event, slot.name)"
+        [title]="slot.label">
+
+        <!-- Empty slot -->
+        @if (!getItemInSlot(slot.name)) {
+          <div class="slot-empty">
+            <span class="slot-icon">{{ slot.icon }}</span>
+            <span class="slot-label">{{ slot.label }}</span>
+          </div>
+        }
+
+        <!-- Equipped item -->
+        @if (getItemInSlot(slot.name); as item) {
+          <div class="slot-item" [class]="getRarityClass(item.definition.rarity)">
+            <div class="item-icon">{{ slot.icon }}</div>
+            <div class="item-info">
+              <div class="item-name">{{ item.definition.name }}</div>
+              @if (item.definition.properties['damage']) {
+                <div class="item-stat">⚔️ {{ item.definition.properties['damage'] }}</div>
+              }
+              @if (item.definition.properties['defense']) {
+                <div class="item-stat">🛡️ {{ item.definition.properties['defense'] }}</div>
+              }
+            </div>
+            <div class="item-rarity-badge">{{ item.definition.rarity }}</div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <div class="equipment-help">
+    <p><strong>Drag & Drop</strong> equipment from inventory to equip</p>
+    <p><strong>Right-click</strong> equipped items to unequip</p>
+  </div>
+</div>

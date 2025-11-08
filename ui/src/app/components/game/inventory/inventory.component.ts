@@ -186,4 +186,26 @@ export class InventoryComponent implements OnInit {
     this.panelTransform = 'translate(-50%, -50%)';
     this.hasBeenDragged = false;
   }
+
+  // Item drag-and-drop handlers for equipment
+  onItemDragStart(event: DragEvent, item: ItemDetails): void {
+    if (item.definition.category !== 'equipment') {
+      event.preventDefault();
+      return;
+    }
+
+    // Set the drag data as JSON
+    event.dataTransfer!.effectAllowed = 'move';
+    event.dataTransfer!.setData('application/json', JSON.stringify(item));
+
+    // Add visual feedback
+    const target = event.target as HTMLElement;
+    target.classList.add('dragging-item');
+  }
+
+  onItemDragEnd(event: DragEvent): void {
+    // Remove visual feedback
+    const target = event.target as HTMLElement;
+    target.classList.remove('dragging-item');
+  }
 }

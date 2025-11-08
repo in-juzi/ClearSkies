@@ -26,7 +26,11 @@
       *ngFor="let item of getFilteredInventory()"
       class="inventory-item"
       [class]="getRarityClass(item.definition.rarity)"
-      (click)="selectItem(item)">
+      [class.equipped]="item.equipped"
+      [draggable]="item.definition.category === 'equipment'"
+      (click)="selectItem(item)"
+      (dragstart)="onItemDragStart($event, item)"
+      (dragend)="onItemDragEnd($event)">
       <div class="item-icon">
         <!-- Placeholder for item icon -->
         <span class="item-tier">T{{ item.definition.properties.tier }}</span>
