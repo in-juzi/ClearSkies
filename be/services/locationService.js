@@ -180,7 +180,8 @@ class LocationService {
     // Check skill requirements
     if (activity.requirements.skills) {
       for (const [skillName, requiredLevel] of Object.entries(activity.requirements.skills)) {
-        const playerSkill = player.skills?.get(skillName);
+        const playerSkill = player.skills?.[skillName];
+        console.log(`[Activity Req Check] Skill ${skillName}: Required=${requiredLevel}, Player has=${playerSkill?.level || 'none'}`);
         if (!playerSkill || playerSkill.level < requiredLevel) {
           failures.push(`Requires ${skillName} level ${requiredLevel}`);
         }
@@ -190,7 +191,8 @@ class LocationService {
     // Check attribute requirements
     if (activity.requirements.attributes) {
       for (const [attrName, requiredLevel] of Object.entries(activity.requirements.attributes)) {
-        const playerAttr = player.attributes?.get(attrName);
+        const playerAttr = player.attributes?.[attrName];
+        console.log(`[Activity Req Check] Attribute ${attrName}: Required=${requiredLevel}, Player has=${playerAttr?.level || 'none'}`);
         if (!playerAttr || playerAttr.level < requiredLevel) {
           failures.push(`Requires ${attrName} level ${requiredLevel}`);
         }
@@ -226,7 +228,7 @@ class LocationService {
     // Check attribute requirements
     if (navigationLink.requirements.attributes) {
       for (const [attrName, requiredLevel] of Object.entries(navigationLink.requirements.attributes)) {
-        const playerAttr = player.attributes?.get(attrName);
+        const playerAttr = player.attributes?.[attrName];
         if (!playerAttr || playerAttr.level < requiredLevel) {
           failures.push(`Requires ${attrName} level ${requiredLevel}`);
         }
