@@ -16,7 +16,13 @@ ClearSkies/
 │   ├── controllers/       # Request handlers
 │   │   ├── authController.js
 │   │   ├── skillsController.js
-│   │   └── attributesController.js
+│   │   ├── attributesController.js
+│   │   └── inventoryController.js
+│   ├── data/              # Game data (JSON-based)
+│   │   └── items/
+│   │       ├── definitions/   # Item definitions (resources, equipment, consumables)
+│   │       ├── qualities/     # Quality definitions (woodGrain, purity, etc.)
+│   │       └── traits/        # Trait definitions (pristine, cursed, etc.)
 │   ├── middleware/        # Auth and other middleware
 │   ├── migrations/        # Database migrations
 │   │   ├── 001-add-skills-to-players.js
@@ -27,7 +33,10 @@ ClearSkies/
 │   ├── routes/           # API routes
 │   │   ├── auth.js
 │   │   ├── skills.js
-│   │   └── attributes.js
+│   │   ├── attributes.js
+│   │   └── inventory.js
+│   ├── services/         # Business logic services
+│   │   └── itemService.js
 │   └── utils/            # Utility functions (JWT, migrations, etc.)
 ├── ui/                    # Frontend (Angular 20)
 │   └── src/
@@ -37,20 +46,25 @@ ClearSkies/
 │           │   ├── game/       # Game-related components
 │           │   │   ├── game.component.*
 │           │   │   ├── skills/      # Skills component
-│           │   │   └── attributes/  # Attributes component
+│           │   │   ├── attributes/  # Attributes component
+│           │   │   └── inventory/   # Inventory component
 │           │   ├── login/
 │           │   └── register/
 │           ├── services/        # Angular services
 │           │   ├── auth.service.ts
 │           │   ├── skills.service.ts
-│           │   └── attributes.service.ts
+│           │   ├── attributes.service.ts
+│           │   └── inventory.service.ts
 │           ├── guards/          # Route guards
 │           │   └── auth.guard.ts (authGuard, guestGuard)
 │           ├── interceptors/    # HTTP interceptors
 │           │   └── auth.interceptor.ts
 │           └── models/          # TypeScript interfaces
-│               └── user.model.ts
+│               ├── user.model.ts
+│               └── inventory.model.ts
 ├── project/               # Project management
+│   ├── docs/             # Project documentation
+│   │   └── inventory-system.md
 │   ├── ideas/            # Feature ideas and concepts
 │   ├── tasks/
 │   │   ├── todo/         # Pending tasks
@@ -65,9 +79,9 @@ ClearSkies/
 
 ## Running the Project
 
-- **Backend**: `npm run dev:be` (runs on http://localhost:3000)
-- **Frontend**: `npm run dev:ui` (runs on http://localhost:4200)
-- **Both**: `npm run dev` (runs both concurrently)
+- **Backend**: `cd be && npm run dev` (runs on http://localhost:3000)
+- **Frontend**: `cd ui && npm run dev` (runs on http://localhost:4200)
+- **Both**: `npm run dev` from root (runs both concurrently)
 
 ## Important Context
 
@@ -89,6 +103,15 @@ ClearSkies/
 - ✅ Database migration system with up/down functions
 - ✅ Skills API endpoints (GET all skills, GET single skill, POST add XP)
 - ✅ Attributes API endpoints (GET all attributes, GET single attribute, POST add XP)
+- ✅ Inventory system with dynamic qualities and traits
+- ✅ JSON-based item definitions (15 items: resources, equipment, consumables)
+- ✅ Quality system (5 types: woodGrain, moisture, purity, freshness, age)
+- ✅ Trait system (7 types with rarity levels: common to epic)
+- ✅ Item instance management with stacking logic
+- ✅ Inventory UI with category filtering and detailed item views
+- ✅ Random quality/trait generation for items
+- ✅ Dynamic vendor pricing based on qualities and traits
+- ✅ Hot-reload capability for item definitions
 
 ### Database Models
 
@@ -106,12 +129,27 @@ ClearSkies/
   - Fishing → Endurance
   - Smithing → Endurance
   - Cooking → Will
-- gold, inventory, location, questProgress, achievements
+- inventory - array of item instances with:
+  - instanceId (unique ID)
+  - itemId (reference to item definition)
+  - quantity (stack size)
+  - qualities (Map of quality values 0-1)
+  - traits (array of trait IDs)
+  - equipped (boolean)
+  - acquiredAt (timestamp)
+- inventoryCapacity (default: 100)
+- gold, location, questProgress, achievements
 - Methods:
   - `addSkillExperience(skillName, xp)` - Awards skill XP and 50% to linked attribute
   - `getSkillProgress(skillName)`
   - `addAttributeExperience(attributeName, xp)`
   - `getAttributeProgress(attributeName)`
+  - `addItem(itemInstance)` - Add item with stacking logic
+  - `removeItem(instanceId, quantity)` - Remove items
+  - `getItem(instanceId)` - Get single item
+  - `getItemsByItemId(itemId)` - Get all of one type
+  - `getInventorySize()` - Total item count
+  - `getInventoryValue()` - Total vendor price
 
 ### API Endpoints
 
@@ -131,6 +169,20 @@ ClearSkies/
 - `GET /api/attributes/:attributeName` - Get single attribute details (protected)
 - `POST /api/attributes/:attributeName/experience` - Add XP to attribute (protected)
 
+**Inventory:**
+- `GET /api/inventory` - Get player's full inventory with enhanced details (protected)
+- `GET /api/inventory/items/:instanceId` - Get single item details (protected)
+- `POST /api/inventory/items` - Add item to inventory with validation (protected)
+  - Body: `{ itemId, quantity, qualities, traits }`
+- `POST /api/inventory/items/random` - Add item with randomly generated qualities/traits (protected)
+  - Body: `{ itemId, quantity }`
+- `DELETE /api/inventory/items` - Remove item from inventory (protected)
+  - Body: `{ instanceId, quantity? }`
+- `GET /api/inventory/definitions` - Get all item definitions (catalog) (protected)
+  - Query: `?category=resource|equipment|consumable`
+- `GET /api/inventory/definitions/:itemId` - Get single item definition (protected)
+- `POST /api/inventory/reload` - Hot-reload item definitions (admin) (protected)
+
 ## Development Guidelines
 
 1. **Backend Changes**: Always update relevant models, controllers, routes
@@ -145,8 +197,17 @@ ClearSkies/
    - Auth interceptor directly accesses localStorage to avoid circular dependencies
    - Guards use async initialization pattern with `initialized$` observable
 5. **Assets**: Store icons and images in `ui/src/assets/` (configured in angular.json)
-6. **Styling**: Use medieval fantasy theme (dark blues, purples, gold accents)
-7. **Documentation**: Update project/journal.md and relevant task files
+6. **Styling**:
+   - Use medieval fantasy theme (dark blues, purples, gold accents)
+   - Design tokens available in `ui/src/design-tokens.scss`
+   - See `ui/DESIGN_SYSTEM.md` for complete guidelines
+7. **Item System**:
+   - Item definitions stored in JSON files in `be/data/items/`
+   - Use ItemService for all item operations (loading, creation, calculations)
+   - Hot-reload available via `/api/inventory/reload` endpoint
+   - Quality values are 0-1 scale (affects pricing and effects)
+   - Trait rarities: common (5%), uncommon (15%), rare (30%), epic (50%)
+8. **Documentation**: Update CLAUDE.md and relevant docs in `project/docs/`
 
 ## Database Migrations
 
@@ -206,12 +267,44 @@ Backend requires `.env` file with:
 - `JWT_SECRET` - Secret key for JWT tokens
 - `JWT_EXPIRE` - Token expiration (default: 7d)
 
+## Inventory System
+
+The inventory system uses a three-tier architecture for flexibility and easy balancing:
+
+1. **Item Definitions** (JSON files in `be/data/items/definitions/`)
+   - Canonical item templates
+   - 15 items: resources (logs, ore, fish), equipment (swords, shields), consumables (food, potions)
+   - Define base properties, allowed qualities, and traits
+
+2. **Quality & Trait Definitions** (JSON files)
+   - Qualities: woodGrain, moisture, age, purity, freshness (0-1 scale)
+   - Traits: fragrant, knotted, pristine, cursed, blessed, masterwork (with rarity levels)
+   - Define effects on vendor pricing, crafting, alchemy, combat
+
+3. **Item Instances** (Player inventory in MongoDB)
+   - References to base items
+   - Unique quality values and applied traits
+   - Automatic stacking for identical items
+   - Calculated vendor prices
+
+**Key Features:**
+- Items can have unique qualities (0-1 values) affecting price and effects
+- Traits provide special properties (rare, epic, etc.)
+- Easy balancing by editing JSON files (no code changes needed)
+- Hot-reload capability without server restart
+- Random generation based on item tier and rarity
+- Full documentation in `project/docs/inventory-system.md`
+
 ## Next Steps / Ideas
 
 See `project/journal.md` for detailed development possibilities including:
 - Combat system
 - Quest system
-- Inventory management
+- Crafting system (using inventory items)
+- Alchemy system (quality-based recipes)
+- Equipment durability and repair
+- Item enchantments
+- Trading and auction house
 - World map
 - Real-time multiplayer features
-- NPC interactions
+- NPC interactions and vendors
