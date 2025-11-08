@@ -18,13 +18,9 @@
                  [alt]="attributeName"
                  class="attribute-icon"
                  (error)="$event.target.style.display='none'">
-            <h3>{{ capitalizeFirst(attributeName) }}</h3>
-          </div>
-
-          <div class="attribute-info">
-            <div class="level">Level {{ attributes()![attributeName].level }}</div>
-            <div class="experience">
-              {{ attributes()![attributeName].experience }} XP
+            <div class="attribute-title">
+              <h3>{{ capitalizeFirst(attributeName) }}</h3>
+              <span class="attribute-level">Lv {{ attributes()![attributeName].level }}</span>
             </div>
           </div>
 
@@ -34,19 +30,40 @@
                    [style.width.%]="attributes()![attributeName].progress">
               </div>
             </div>
-            <div class="progress-text">
-              {{ attributes()![attributeName].progress.toFixed(1) }}%
+          </div>
+
+          <!-- Hover Detail Card -->
+          <div class="attribute-hover-card">
+            <div class="hover-header">
+              <img [src]="getAttributeIcon(attributeName)"
+                   [alt]="attributeName"
+                   class="hover-icon"
+                   (error)="$event.target.style.display='none'">
+              <div class="hover-title">
+                <h4>{{ capitalizeFirst(attributeName) }}</h4>
+                <span class="hover-level">Level {{ attributes()![attributeName].level }}</span>
+              </div>
+            </div>
+
+            <div class="hover-stats">
+              <div class="stat-row">
+                <span class="stat-label">Total Experience:</span>
+                <span class="stat-value">{{ attributes()![attributeName].experience }} XP</span>
+              </div>
+              <div class="stat-row">
+                <span class="stat-label">Progress:</span>
+                <span class="stat-value">{{ attributes()![attributeName].progress.toFixed(1) }}%</span>
+              </div>
+              <div class="stat-row highlight">
+                <span class="stat-label">To Next Level:</span>
+                <span class="stat-value">{{ attributes()![attributeName].xpToNextLevel }} XP</span>
+              </div>
+            </div>
+
+            <div class="hover-footer">
+              <div class="description">Improves overall character capability</div>
             </div>
           </div>
-
-          <div class="xp-to-next">
-            {{ attributes()![attributeName].xpToNextLevel }} XP to next level
-          </div>
-
-          <!-- Testing button - remove in production -->
-          <button class="test-btn" (click)="testAddXP(attributeName)">
-            +100 XP (Test)
-          </button>
         </div>
       }
     </div>
