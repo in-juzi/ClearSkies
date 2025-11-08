@@ -3,7 +3,7 @@
   "name": "Chop Oak Trees",
   "description": "Fell sturdy oak trees for quality timber",
   "type": "resource-gathering",
-  "duration": 40,
+  "duration": 6,
   "requirements": {
     "skills": {
       "woodcutting": 1
@@ -15,7 +15,7 @@
     },
     "items": [
       {
-        "itemId": "oak-log",
+        "itemId": "oak_log",
         "quantity": { "min": 1, "max": 2 },
         "chance": 0.9
       }

@@ -15,7 +15,7 @@
     },
     "items": [
       {
-        "itemId": "aged-fish",
+        "itemId": "salmon",
         "quantity": { "min": 1, "max": 2 },
         "chance": 0.7
       }
