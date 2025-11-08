@@ -1,0 +1,115 @@
+{
+  "fragrant": {
+    "traitId": "fragrant",
+    "name": "Fragrant",
+    "description": "Has a pleasant, aromatic scent",
+    "rarity": "uncommon",
+    "applicableCategories": ["resource", "consumable"],
+    "effects": {
+      "vendorPrice": {
+        "modifier": 1.25
+      },
+      "alchemy": {
+        "bonusProperties": ["calming"]
+      }
+    }
+  },
+  "knotted": {
+    "traitId": "knotted",
+    "name": "Knotted",
+    "description": "Contains many knots, making it harder to work with",
+    "rarity": "common",
+    "applicableCategories": ["resource"],
+    "effects": {
+      "vendorPrice": {
+        "modifier": 0.75
+      },
+      "smithing": {
+        "difficultyIncrease": 10
+      }
+    }
+  },
+  "weathered": {
+    "traitId": "weathered",
+    "name": "Weathered",
+    "description": "Exposed to the elements, giving it unique properties",
+    "rarity": "uncommon",
+    "applicableCategories": ["resource"],
+    "effects": {
+      "vendorPrice": {
+        "modifier": 1.1
+      },
+      "alchemy": {
+        "bonusProperties": ["durability"]
+      }
+    }
+  },
+  "pristine": {
+    "traitId": "pristine",
+    "name": "Pristine",
+    "description": "In perfect condition with no flaws",
+    "rarity": "rare",
+    "applicableCategories": ["resource", "crafted"],
+    "effects": {
+      "vendorPrice": {
+        "modifier": 1.5
+      },
+      "smithing": {
+        "qualityBonus": 0.2
+      },
+      "cooking": {
+        "qualityBonus": 0.2
+      }
+    }
+  },
+  "cursed": {
+    "traitId": "cursed",
+    "name": "Cursed",
+    "description": "Bears a mysterious curse",
+    "rarity": "rare",
+    "applicableCategories": ["equipment", "crafted"],
+    "effects": {
+      "vendorPrice": {
+        "modifier": 0.5
+      },
+      "combat": {
+        "damageBonus": 0.3,
+        "healthDrain": 5
+      }
+    }
+  },
+  "blessed": {
+    "traitId": "blessed",
+    "name": "Blessed",
+    "description": "Blessed by divine forces",
+    "rarity": "epic",
+    "applicableCategories": ["equipment", "consumable", "crafted"],
+    "effects": {
+      "vendorPrice": {
+        "modifier": 2.0
+      },
+      "combat": {
+        "damageBonus": 0.2
+      },
+      "consumption": {
+        "healingMultiplier": 2.0
+      }
+    }
+  },
+  "masterwork": {
+    "traitId": "masterwork",
+    "name": "Masterwork",
+    "description": "Crafted by a master artisan",
+    "rarity": "epic",
+    "applicableCategories": ["crafted", "equipment"],
+    "effects": {
+      "vendorPrice": {
+        "modifier": 3.0
+      },
+      "combat": {
+        "damageBonus": 0.4,
+        "durabilityMultiplier": 2.0
+      }
+    }
+  }
+}

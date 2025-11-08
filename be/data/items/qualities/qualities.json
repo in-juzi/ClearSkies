@@ -1,0 +1,85 @@
+{
+  "woodGrain": {
+    "qualityId": "woodGrain",
+    "name": "Wood Grain Quality",
+    "description": "Affects the structural integrity and magical properties of wood",
+    "applicableCategories": ["resource", "crafted"],
+    "valueType": "numeric",
+    "range": [0, 1],
+    "effects": {
+      "alchemy": {
+        "potencyMultiplier": 1.5
+      },
+      "vendorPrice": {
+        "modifier": 0.1
+      }
+    }
+  },
+  "moisture": {
+    "qualityId": "moisture",
+    "name": "Moisture Content",
+    "description": "The amount of moisture in the wood - drier is usually better",
+    "applicableCategories": ["resource"],
+    "valueType": "numeric",
+    "range": [0, 1],
+    "effects": {
+      "vendorPrice": {
+        "modifier": -0.15
+      },
+      "burning": {
+        "efficiencyMultiplier": -0.5
+      }
+    }
+  },
+  "age": {
+    "qualityId": "age",
+    "name": "Age",
+    "description": "How aged the wood is - older wood can have different properties",
+    "applicableCategories": ["resource"],
+    "valueType": "numeric",
+    "range": [0, 1],
+    "effects": {
+      "alchemy": {
+        "potencyMultiplier": 0.8
+      },
+      "vendorPrice": {
+        "modifier": 0.05
+      }
+    }
+  },
+  "purity": {
+    "qualityId": "purity",
+    "name": "Purity",
+    "description": "The purity of ore or metal - affects smithing quality",
+    "applicableCategories": ["resource", "crafted"],
+    "valueType": "numeric",
+    "range": [0, 1],
+    "effects": {
+      "smithing": {
+        "qualityBonus": 0.3
+      },
+      "vendorPrice": {
+        "modifier": 0.25
+      }
+    }
+  },
+  "freshness": {
+    "qualityId": "freshness",
+    "name": "Freshness",
+    "description": "How fresh the fish or food is",
+    "applicableCategories": ["consumable", "resource"],
+    "valueType": "numeric",
+    "range": [0, 1],
+    "effects": {
+      "cooking": {
+        "qualityBonus": 0.4
+      },
+      "vendorPrice": {
+        "modifier": 0.2
+      },
+      "consumption": {
+        "healingMultiplier": 1.5
+      }
+    }
+  }
+}

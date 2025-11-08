@@ -1,0 +1,164 @@
+{
+  "oak_log": {
+    "itemId": "oak_log",
+    "name": "Oak Log",
+    "description": "A sturdy oak log, useful for construction and crafting",
+    "category": "resource",
+    "baseValue": 25,
+    "rarity": "common",
+    "stackable": true,
+    "maxStack": 100,
+    "properties": {
+      "weight": 3,
+      "material": "wood",
+      "tier": 1,
+      "skillSource": "woodcutting"
+    },
+    "allowedQualities": ["woodGrain", "moisture", "age"],
+    "allowedTraits": ["fragrant", "knotted", "weathered", "pristine"]
+  },
+  "willow_log": {
+    "itemId": "willow_log",
+    "name": "Willow Log",
+    "description": "A flexible willow log, prized for its magical properties",
+    "category": "resource",
+    "baseValue": 50,
+    "rarity": "uncommon",
+    "stackable": true,
+    "maxStack": 100,
+    "properties": {
+      "weight": 2,
+      "material": "wood",
+      "tier": 2,
+      "skillSource": "woodcutting"
+    },
+    "allowedQualities": ["woodGrain", "moisture", "age"],
+    "allowedTraits": ["fragrant", "knotted", "weathered", "pristine"]
+  },
+  "maple_log": {
+    "itemId": "maple_log",
+    "name": "Maple Log",
+    "description": "A fine maple log with beautiful grain patterns",
+    "category": "resource",
+    "baseValue": 75,
+    "rarity": "uncommon",
+    "stackable": true,
+    "maxStack": 100,
+    "properties": {
+      "weight": 2.5,
+      "material": "wood",
+      "tier": 3,
+      "skillSource": "woodcutting"
+    },
+    "allowedQualities": ["woodGrain", "moisture", "age"],
+    "allowedTraits": ["fragrant", "knotted", "weathered", "pristine"]
+  },
+  "copper_ore": {
+    "itemId": "copper_ore",
+    "name": "Copper Ore",
+    "description": "Raw copper ore, ready to be smelted",
+    "category": "resource",
+    "baseValue": 30,
+    "rarity": "common",
+    "stackable": true,
+    "maxStack": 100,
+    "properties": {
+      "weight": 5,
+      "material": "ore",
+      "tier": 1,
+      "skillSource": "mining"
+    },
+    "allowedQualities": ["purity"],
+    "allowedTraits": ["pristine"]
+  },
+  "iron_ore": {
+    "itemId": "iron_ore",
+    "name": "Iron Ore",
+    "description": "Raw iron ore, the backbone of any smithy",
+    "category": "resource",
+    "baseValue": 60,
+    "rarity": "common",
+    "stackable": true,
+    "maxStack": 100,
+    "properties": {
+      "weight": 6,
+      "material": "ore",
+      "tier": 2,
+      "skillSource": "mining"
+    },
+    "allowedQualities": ["purity"],
+    "allowedTraits": ["pristine", "cursed"]
+  },
+  "silver_ore": {
+    "itemId": "silver_ore",
+    "name": "Silver Ore",
+    "description": "Precious silver ore with a lustrous shine",
+    "category": "resource",
+    "baseValue": 120,
+    "rarity": "uncommon",
+    "stackable": true,
+    "maxStack": 100,
+    "properties": {
+      "weight": 5.5,
+      "material": "ore",
+      "tier": 3,
+      "skillSource": "mining"
+    },
+    "allowedQualities": ["purity"],
+    "allowedTraits": ["pristine", "blessed"]
+  },
+  "trout": {
+    "itemId": "trout",
+    "name": "Trout",
+    "description": "A freshly caught trout",
+    "category": "consumable",
+    "baseValue": 15,
+    "rarity": "common",
+    "stackable": true,
+    "maxStack": 50,
+    "properties": {
+      "weight": 1,
+      "material": "fish",
+      "tier": 1,
+      "skillSource": "fishing"
+    },
+    "allowedQualities": ["freshness"],
+    "allowedTraits": ["pristine"]
+  },
+  "salmon": {
+    "itemId": "salmon",
+    "name": "Salmon",
+    "description": "A prized salmon, rich in flavor",
+    "category": "consumable",
+    "baseValue": 35,
+    "rarity": "uncommon",
+    "stackable": true,
+    "maxStack": 50,
+    "properties": {
+      "weight": 1.5,
+      "material": "fish",
+      "tier": 2,
+      "skillSource": "fishing"
+    },
+    "allowedQualities": ["freshness"],
+    "allowedTraits": ["pristine", "blessed"]
+  },
+  "pike": {
+    "itemId": "pike",
+    "name": "Pike",
+    "description": "A fierce pike with sharp teeth",
+    "category": "consumable",
+    "baseValue": 50,
+    "rarity": "uncommon",
+    "stackable": true,
+    "maxStack": 50,
+    "properties": {
+      "weight": 2,
+      "material": "fish",
+      "tier": 3,
+      "skillSource": "fishing"
+    },
+    "allowedQualities": ["freshness"],
+    "allowedTraits": ["pristine"]
+  }
+}
