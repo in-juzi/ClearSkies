@@ -17,16 +17,23 @@ ClearSkies/
 │   │   ├── authController.js
 │   │   ├── skillsController.js
 │   │   ├── attributesController.js
-│   │   └── inventoryController.js
+│   │   ├── inventoryController.js
+│   │   └── locationController.js
 │   ├── data/              # Game data (JSON-based)
-│   │   └── items/
-│   │       ├── definitions/   # Item definitions (resources, equipment, consumables)
-│   │       ├── qualities/     # Quality definitions (woodGrain, purity, etc.)
-│   │       └── traits/        # Trait definitions (pristine, cursed, etc.)
+│   │   ├── items/
+│   │   │   ├── definitions/   # Item definitions (resources, equipment, consumables)
+│   │   │   ├── qualities/     # Quality definitions (woodGrain, purity, etc.)
+│   │   │   └── traits/        # Trait definitions (pristine, cursed, etc.)
+│   │   └── locations/
+│   │       ├── definitions/   # Location definitions (kennik, forest-clearing, etc.)
+│   │       ├── biomes/        # Biome definitions (forest, mountain, sea)
+│   │       ├── facilities/    # Facility definitions (market, dock, mine, etc.)
+│   │       └── activities/    # Activity definitions (chop-oak, fish-salmon, etc.)
 │   ├── middleware/        # Auth and other middleware
 │   ├── migrations/        # Database migrations
 │   │   ├── 001-add-skills-to-players.js
-│   │   └── 002-add-attributes-and-skill-main-attributes.js
+│   │   ├── 002-add-attributes-and-skill-main-attributes.js
+│   │   └── 003-add-location-system.js
 │   ├── models/           # Mongoose schemas
 │   │   ├── User.js
 │   │   └── Player.js
@@ -34,9 +41,11 @@ ClearSkies/
 │   │   ├── auth.js
 │   │   ├── skills.js
 │   │   ├── attributes.js
-│   │   └── inventory.js
+│   │   ├── inventory.js
+│   │   └── locations.js
 │   ├── services/         # Business logic services
-│   │   └── itemService.js
+│   │   ├── itemService.js
+│   │   └── locationService.js
 │   └── utils/            # Utility functions (JWT, migrations, etc.)
 ├── ui/                    # Frontend (Angular 20)
 │   └── src/
@@ -47,21 +56,24 @@ ClearSkies/
 │           │   │   ├── game.component.*
 │           │   │   ├── skills/      # Skills component
 │           │   │   ├── attributes/  # Attributes component
-│           │   │   └── inventory/   # Inventory component
+│           │   │   ├── inventory/   # Inventory component
+│           │   │   └── location/    # Location component
 │           │   ├── login/
 │           │   └── register/
 │           ├── services/        # Angular services
 │           │   ├── auth.service.ts
 │           │   ├── skills.service.ts
 │           │   ├── attributes.service.ts
-│           │   └── inventory.service.ts
+│           │   ├── inventory.service.ts
+│           │   └── location.service.ts
 │           ├── guards/          # Route guards
 │           │   └── auth.guard.ts (authGuard, guestGuard)
 │           ├── interceptors/    # HTTP interceptors
 │           │   └── auth.interceptor.ts
 │           └── models/          # TypeScript interfaces
 │               ├── user.model.ts
-│               └── inventory.model.ts
+│               ├── inventory.model.ts
+│               └── location.model.ts
 ├── project/               # Project management
 │   ├── docs/             # Project documentation
 │   │   └── inventory-system.md
@@ -93,13 +105,15 @@ ClearSkies/
 - ✅ HTTP interceptor for automatic JWT token attachment
 - ✅ Player profile with character stats
 - ✅ MongoDB models (User, Player)
-- ✅ Game interface with three-column layout (inventory, game area, character stats)
+- ✅ Game interface with three-column layout (inventory, location area, character/skills/attributes)
+- ✅ Tabbed sidebar navigation for character info, skills, and attributes
 - ✅ Skills system with 5 skills (woodcutting, mining, fishing, smithing, cooking)
-- ✅ Skills UI with PNG icons and progress tracking
+- ✅ Skills UI with compact 3-column grid layout and hover tooltips
+- ✅ Edge-aware tooltip positioning (prevents cutoff at screen edges)
 - ✅ XP gain and automatic skill leveling (1000 XP per level)
 - ✅ Attributes system with 7 attributes (strength, endurance, magic, perception, dexterity, will, charisma)
 - ✅ Skill-to-attribute XP linking (skills award 50% XP to their main attribute)
-- ✅ Attributes UI with progress tracking and level display
+- ✅ Attributes UI with compact 3-column grid and hover details
 - ✅ Database migration system with up/down functions
 - ✅ Skills API endpoints (GET all skills, GET single skill, POST add XP)
 - ✅ Attributes API endpoints (GET all attributes, GET single attribute, POST add XP)
@@ -112,6 +126,13 @@ ClearSkies/
 - ✅ Random quality/trait generation for items
 - ✅ Dynamic vendor pricing based on qualities and traits
 - ✅ Hot-reload capability for item definitions
+- ✅ Location system with travel and activity management
+- ✅ JSON-based location definitions (locations, biomes, facilities, activities)
+- ✅ Location discovery and travel mechanics
+- ✅ Activity system with skill-based requirements and rewards
+- ✅ Activity progress tracking with time-based completion
+- ✅ Location UI with facility and activity browsing
+- ✅ Location API endpoints (GET locations, POST discover, POST start activity, POST travel)
 
 ### Database Models
 
@@ -138,7 +159,16 @@ ClearSkies/
   - equipped (boolean)
   - acquiredAt (timestamp)
 - inventoryCapacity (default: 100)
-- gold, location, questProgress, achievements
+- currentLocation (string, default: 'kennik') - Current location ID
+- discoveredLocations (array of strings, default: ['kennik']) - List of discovered location IDs
+- activeActivity (object, optional) - Currently active activity with:
+  - activityId, facilityId, locationId
+  - startTime, endTime (timestamps)
+- travelState (object, optional) - Travel progress with:
+  - isTravel (boolean)
+  - targetLocationId
+  - startTime, endTime (timestamps)
+- gold, questProgress, achievements
 - Methods:
   - `addSkillExperience(skillName, xp)` - Awards skill XP and 50% to linked attribute
   - `getSkillProgress(skillName)`
@@ -183,6 +213,18 @@ ClearSkies/
 - `GET /api/inventory/definitions/:itemId` - Get single item definition (protected)
 - `POST /api/inventory/reload` - Hot-reload item definitions (admin) (protected)
 
+**Locations:**
+- `GET /api/locations` - Get all locations (discovered and undiscovered) (protected)
+- `GET /api/locations/:locationId` - Get details for a specific location (protected)
+- `POST /api/locations/discover` - Discover a new location (protected)
+  - Body: `{ locationId }`
+- `POST /api/locations/travel` - Start travel to a location (protected)
+  - Body: `{ targetLocationId }`
+- `POST /api/locations/activity/start` - Start an activity at current location (protected)
+  - Body: `{ activityId, facilityId }`
+- `POST /api/locations/activity/complete` - Complete current activity and claim rewards (protected)
+- `POST /api/locations/activity/cancel` - Cancel current activity (protected)
+
 ## Development Guidelines
 
 1. **Backend Changes**: Always update relevant models, controllers, routes
@@ -208,7 +250,18 @@ ClearSkies/
    - Hot-reload available via `/api/inventory/reload` endpoint
    - Quality values are 0-1 scale (affects pricing and effects)
    - Trait rarities: common (5%), uncommon (15%), rare (30%), epic (50%)
-8. **Documentation**: Update CLAUDE.md and relevant docs in `project/docs/`
+8. **Location System**:
+   - Location definitions stored in JSON files in `be/data/locations/`
+   - Use LocationService for all location operations
+   - Four-tier structure: locations → facilities → activities → rewards
+   - Activities can require skills, award XP, and give item rewards
+   - Travel and activity completion are time-based
+9. **UI Design**:
+   - Compact 3-column grid layouts for skills and attributes
+   - Hover tooltips for detailed information (prevents clutter)
+   - Edge-aware positioning to prevent tooltip cutoff
+   - Tabbed navigation for multi-view sidebars
+10. **Documentation**: Update CLAUDE.md and relevant docs in `project/docs/`
 
 ## Database Migrations
 
@@ -225,6 +278,7 @@ npm run migrate:down     # Rollback last migration
 **Existing Migrations:**
 1. `001-add-skills-to-players.js` - Adds skills to existing player documents
 2. `002-add-attributes-and-skill-main-attributes.js` - Adds attributes and mainAttribute field to skills
+3. `003-add-location-system.js` - Adds location fields (currentLocation, discoveredLocations, activeActivity, travelState)
 
 **Creating a New Migration:**
 1. Create a file in `be/migrations/` with format: `NNN-description.js`
@@ -295,6 +349,41 @@ The inventory system uses a three-tier architecture for flexibility and easy bal
 - Hot-reload capability without server restart
 - Random generation based on item tier and rarity
 - Full documentation in `project/docs/inventory-system.md`
+
+## Location System
+
+The location system provides a rich world exploration and activity framework:
+
+1. **Location Definitions** (JSON files in `be/data/locations/definitions/`)
+   - Define locations with name, description, biome type
+   - List of facilities available at each location
+   - Travel requirements and discovery conditions
+   - Examples: Kennik (starting town), Forest Clearing, Mountain Pass
+
+2. **Biomes** (JSON files in `be/data/locations/biomes/`)
+   - Define environmental types (forest, mountain, sea)
+   - Ambient descriptions and characteristics
+   - Affect available resources and activities
+
+3. **Facilities** (JSON files in `be/data/locations/facilities/`)
+   - Specific buildings or areas within locations
+   - Each facility offers different activities
+   - Examples: Market, Fishing Dock, Logging Camp, Mine
+
+4. **Activities** (JSON files in `be/data/locations/activities/`)
+   - Actions players can perform at facilities
+   - Skill requirements and difficulty levels
+   - Time-based completion (duration in seconds)
+   - Rewards: XP, items (with quantities and quality ranges)
+   - Examples: Chop Oak, Fish Salmon, Mine Iron, Combat Bandits
+
+**Key Features:**
+- Players start in Kennik and can discover new locations
+- Travel between locations takes time
+- Activities award skill XP and items to inventory
+- Activity completion is time-based (tracked server-side)
+- Rich location descriptions and lore through biomes
+- Easy content expansion by adding new JSON files
 
 ## Platform-Specific Tool Notes
 
