@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(move:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(claude mcp add:*)"
     ],
     "deny": [],
     "ask": []
