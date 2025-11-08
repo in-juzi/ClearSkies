@@ -58,6 +58,7 @@ ClearSkies/
 │           │   │   ├── skills/      # Skills component
 │           │   │   ├── attributes/  # Attributes component
 │           │   │   ├── inventory/   # Inventory component
+│           │   │   ├── equipment/   # Equipment component
 │           │   │   └── location/    # Location component
 │           │   ├── login/
 │           │   └── register/
@@ -66,6 +67,7 @@ ClearSkies/
 │           │   ├── skills.service.ts
 │           │   ├── attributes.service.ts
 │           │   ├── inventory.service.ts
+│           │   ├── equipment.service.ts
 │           │   └── location.service.ts
 │           ├── guards/          # Route guards
 │           │   └── auth.guard.ts (authGuard, guestGuard)
@@ -77,7 +79,8 @@ ClearSkies/
 │               └── location.model.ts
 ├── project/               # Project management
 │   ├── docs/             # Project documentation
-│   │   └── inventory-system.md
+│   │   ├── inventory-system.md
+│   │   └── equipment-system.md
 │   ├── ideas/            # Feature ideas and concepts
 │   ├── tasks/
 │   │   ├── todo/         # Pending tasks
@@ -106,8 +109,8 @@ ClearSkies/
 - ✅ HTTP interceptor for automatic JWT token attachment
 - ✅ Player profile with character stats
 - ✅ MongoDB models (User, Player)
-- ✅ Game interface with three-column layout (inventory, location area, character/skills/attributes)
-- ✅ Tabbed sidebar navigation for character info, skills, and attributes
+- ✅ Game interface with three-column layout (inventory, location area, character/skills/attributes/equipment)
+- ✅ Tabbed sidebar navigation for character info, equipment, skills, and attributes
 - ✅ Skills system with 5 skills (woodcutting, mining, fishing, smithing, cooking)
 - ✅ Skills UI with compact 3-column grid layout and hover tooltips
 - ✅ Edge-aware tooltip positioning (prevents cutoff at screen edges)
@@ -119,7 +122,7 @@ ClearSkies/
 - ✅ Skills API endpoints (GET all skills, GET single skill, POST add XP)
 - ✅ Attributes API endpoints (GET all attributes, GET single attribute, POST add XP)
 - ✅ Inventory system with dynamic qualities and traits
-- ✅ JSON-based item definitions (15 items: resources, equipment, consumables)
+- ✅ JSON-based item definitions (18 items: 9 resources, 6 equipment, 3 consumables)
 - ✅ Quality system (5 types: woodGrain, moisture, purity, freshness, age)
 - ✅ Trait system (7 types with rarity levels: common to epic)
 - ✅ Item instance management with stacking logic
@@ -136,10 +139,15 @@ ClearSkies/
 - ✅ Location UI with facility and activity browsing
 - ✅ Location API endpoints (GET locations, POST discover, POST start activity, POST travel)
 - ✅ Equipment slot system with 10 default slots (head, body, mainHand, offHand, belt, gloves, boots, necklace, ringRight, ringLeft)
-- ✅ Extensible slot architecture (easy to add new slots)
-- ✅ Item definitions with slot assignments
-- ✅ Equip/unequip functionality with validation
+- ✅ Extensible slot architecture (easy to add new slots via addEquipmentSlot method)
+- ✅ Item definitions with slot assignments for equipment items
+- ✅ Equip/unequip functionality with slot validation
+- ✅ Equipment UI with 3x4 grid layout and square slots
+- ✅ Drag-and-drop from inventory to equipment slots
+- ✅ Visual indicators for equipped items (purple border, sword emoji)
+- ✅ Right-click to unequip items from slots
 - ✅ Equipment API endpoints (GET equipped items, POST equip, POST unequip)
+- ✅ Equipment service for managing equipped items state
 
 ### Database Models
 
@@ -281,13 +289,21 @@ ClearSkies/
    - Four-tier structure: locations → facilities → activities → rewards
    - Activities can require skills, award XP, and give item rewards
    - Travel and activity completion are time-based
-9. **UI Design**:
-   - Compact 3-column grid layouts for skills and attributes
+9. **Equipment System**:
+   - Equipment items must include a `slot` field in their definition
+   - Use EquipmentService for managing equipped items
+   - Equipment UI uses square slots (aspect-ratio: 1) with grid layout
+   - Drag-and-drop is restricted to equipment category items only
+   - Visual feedback for equipped items in inventory and equipment panels
+   - Auto-unequip when equipping to occupied slots
+10. **UI Design**:
+   - Compact 3-column grid layouts for skills, attributes, and equipment
    - Hover tooltips for detailed information (prevents clutter)
    - Edge-aware positioning to prevent tooltip cutoff
    - Tabbed navigation for multi-view sidebars
    - Draggable panels for flexible UI positioning (drag from header only)
-10. **Documentation**: Update CLAUDE.md and relevant docs in `project/docs/`
+   - Square equipment slots using grid pseudo-element technique
+11. **Documentation**: Update CLAUDE.md and relevant docs in `project/docs/`
 
 ## Database Migrations
 
@@ -355,8 +371,11 @@ The inventory system uses a three-tier architecture for flexibility and easy bal
 
 1. **Item Definitions** (JSON files in `be/data/items/definitions/`)
    - Canonical item templates
-   - 15 items: resources (logs, ore, fish), equipment (swords, shields), consumables (food, potions)
-   - Define base properties, allowed qualities, and traits
+   - 18 items total:
+     - 9 resources: oak_log, pine_log, birch_log, iron_ore, copper_ore, coal, salmon, trout, shrimp
+     - 6 equipment: copper_sword, iron_sword, wooden_shield, iron_helm, hemp_coif, leather_tunic
+     - 3 consumables: bread, health_potion, mana_potion
+   - Define base properties, allowed qualities, traits, and equipment slots
 
 2. **Quality & Trait Definitions** (JSON files)
    - Qualities: woodGrain, moisture, age, purity, freshness (0-1 scale)
@@ -411,6 +430,45 @@ The location system provides a rich world exploration and activity framework:
 - Activity completion is time-based (tracked server-side)
 - Rich location descriptions and lore through biomes
 - Easy content expansion by adding new JSON files
+
+## Equipment System
+
+The equipment system allows players to equip items to specific body slots for stat bonuses and character progression:
+
+1. **Equipment Slots** (Player.equipmentSlots Map)
+   - 10 default slots: head, body, mainHand, offHand, belt, gloves, boots, necklace, ringRight, ringLeft
+   - Stored as `Map<string, string|null>` (slot name → instanceId or null)
+   - Extensible architecture: new slots can be added via `addEquipmentSlot()` method
+   - Each slot can hold one item at a time
+
+2. **Equipment Items** (Item definitions with `slot` field)
+   - Must include `slot` field indicating which slot they can be equipped to
+   - Examples: iron_helm (head), leather_tunic (body), copper_sword (mainHand), wooden_shield (offHand)
+   - Properties include defense, damage, durability, required level
+   - Equipment items are non-stackable (maxStack: 1)
+
+3. **Equipment UI** (3x4 grid with square slots)
+   - Drag-and-drop from inventory to equipment slots
+   - Visual feedback: purple border and sword emoji for equipped items
+   - Right-click to unequip items
+   - Rarity-based coloring for equipped items
+   - Square slots using grid pseudo-element technique (aspect-ratio: 1)
+
+4. **Equipment Methods** (Player model)
+   - `equipItem(instanceId, slotName)` - Equip item with validation and auto-unequip
+   - `unequipItem(slotName)` - Unequip and return item to inventory
+   - `getEquippedItems()` - Get all currently equipped items
+   - `isSlotAvailable(slotName)` - Check if slot is empty
+   - `addEquipmentSlot(slotName)` - Add new equipment slot for future expansion
+
+**Key Features:**
+- Slot-based equipment validation (items can only go in designated slots)
+- Auto-unequip when equipping to occupied slot
+- Items marked with `equipped: true` flag in inventory
+- Full API support for equip/unequip operations
+- Visual feedback throughout UI (inventory and equipment panels)
+- Extensible for future slots (rings, accessories, etc.)
+- Full documentation in `project/docs/equipment-system.md`
 
 ## Platform-Specific Tool Notes
 
