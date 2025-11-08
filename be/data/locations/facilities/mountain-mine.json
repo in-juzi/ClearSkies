@@ -1,0 +1,10 @@
+{
+  "facilityId": "mountain-mine",
+  "name": "Iron Mine",
+  "description": "Dark tunnels lead deep into the mountain where rich veins of ore can be found.",
+  "type": "resource-gathering",
+  "icon": "mining",
+  "activities": [
+    "activity-mine-iron"
+  ]
+}

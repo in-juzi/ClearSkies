@@ -1,0 +1,10 @@
+{
+  "biomeId": "sea",
+  "name": "Coastal",
+  "description": "The salty air and sound of waves create a maritime atmosphere",
+  "theme": {
+    "primaryColor": "#2C5F7F",
+    "secondaryColor": "#1A3A4F",
+    "accentColor": "#87CEEB"
+  }
+}

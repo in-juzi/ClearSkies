@@ -1,0 +1,10 @@
+{
+  "facilityId": "kennik-market",
+  "name": "Village Market",
+  "description": "A small marketplace where locals trade goods and supplies.",
+  "type": "trading",
+  "icon": "market",
+  "activities": [],
+  "stub": true,
+  "stubMessage": "The market is closed for now. Trading system coming soon!"
+}

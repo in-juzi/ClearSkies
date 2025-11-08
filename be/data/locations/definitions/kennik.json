@@ -1,0 +1,21 @@
+{
+  "locationId": "kennik",
+  "name": "Kennik",
+  "description": "A small fishing village on this nameless island. Over time, it also became a paltry port for the sailors coming from the mainland.",
+  "biome": "sea",
+  "facilities": [
+    "kennik-fishing-dock",
+    "kennik-market"
+  ],
+  "navigationLinks": [
+    {
+      "targetLocationId": "forest-clearing",
+      "name": "Forest Path",
+      "description": "A worn dirt path leading into the dense forest",
+      "travelTime": 60,
+      "requirements": {},
+      "encounters": []
+    }
+  ],
+  "isStartingLocation": true
+}

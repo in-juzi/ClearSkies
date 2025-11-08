@@ -1,0 +1,24 @@
+{
+  "activityId": "activity-fish-salmon",
+  "name": "Fish for Salmon",
+  "description": "Try your luck catching prized salmon in deeper waters",
+  "type": "resource-gathering",
+  "duration": 45,
+  "requirements": {
+    "skills": {
+      "fishing": 5
+    }
+  },
+  "rewards": {
+    "experience": {
+      "fishing": 40
+    },
+    "items": [
+      {
+        "itemId": "aged-fish",
+        "quantity": { "min": 1, "max": 2 },
+        "chance": 0.7
+      }
+    ]
+  }
+}

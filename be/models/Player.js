@@ -55,12 +55,27 @@ const playerSchema = new mongoose.Schema({
     default: 100,
     min: 1
   },
-  location: {
-    currentZone: { type: String, default: 'Starting Village' },
-    coordinates: {
-      x: { type: Number, default: 0 },
-      y: { type: Number, default: 0 }
-    }
+  // Location system
+  currentLocation: {
+    type: String,
+    default: 'kennik' // Starting location
+  },
+  discoveredLocations: {
+    type: [String],
+    default: ['kennik']
+  },
+  activeActivity: {
+    activityId: { type: String },
+    facilityId: { type: String },
+    locationId: { type: String },
+    startTime: { type: Date },
+    endTime: { type: Date }
+  },
+  travelState: {
+    isTravel: { type: Boolean, default: false },
+    targetLocationId: { type: String },
+    startTime: { type: Date },
+    endTime: { type: Date }
   },
   questProgress: [{
     questId: { type: mongoose.Schema.Types.ObjectId, ref: 'Quest' },

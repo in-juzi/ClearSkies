@@ -1,0 +1,24 @@
+{
+  "activityId": "activity-chop-oak",
+  "name": "Chop Oak Trees",
+  "description": "Fell sturdy oak trees for quality timber",
+  "type": "resource-gathering",
+  "duration": 40,
+  "requirements": {
+    "skills": {
+      "woodcutting": 1
+    }
+  },
+  "rewards": {
+    "experience": {
+      "woodcutting": 30
+    },
+    "items": [
+      {
+        "itemId": "oak-log",
+        "quantity": { "min": 1, "max": 2 },
+        "chance": 0.9
+      }
+    ]
+  }
+}

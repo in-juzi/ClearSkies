@@ -1,0 +1,33 @@
+{
+  "locationId": "forest-clearing",
+  "name": "Forest Clearing",
+  "description": "A peaceful clearing in the heart of the woods. Ancient oak trees tower overhead, and the sounds of wildlife echo through the branches.",
+  "biome": "forest",
+  "facilities": [
+    "forest-logging-camp",
+    "forest-bandit-camp"
+  ],
+  "navigationLinks": [
+    {
+      "targetLocationId": "kennik",
+      "name": "Return to Kennik",
+      "description": "The path back to the fishing village",
+      "travelTime": 60,
+      "requirements": {},
+      "encounters": []
+    },
+    {
+      "targetLocationId": "mountain-pass",
+      "name": "Mountain Trail",
+      "description": "A steep rocky trail climbing towards the mountains",
+      "travelTime": 120,
+      "requirements": {
+        "attributes": {
+          "endurance": 3
+        }
+      },
+      "encounters": []
+    }
+  ],
+  "isStartingLocation": false
+}

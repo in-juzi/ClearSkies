@@ -196,6 +196,7 @@ ClearSkies/
    - Token stored in localStorage with key `clearskies_token`
    - Auth interceptor directly accesses localStorage to avoid circular dependencies
    - Guards use async initialization pattern with `initialized$` observable
+   - **IMPORTANT**: Auth middleware attaches the full User document to `req.user`, so access the user ID via `req.user._id` (NOT `req.user.userId`)
 5. **Assets**: Store icons and images in `ui/src/assets/` (configured in angular.json)
 6. **Styling**:
    - Use medieval fantasy theme (dark blues, purples, gold accents)
@@ -294,6 +295,16 @@ The inventory system uses a three-tier architecture for flexibility and easy bal
 - Hot-reload capability without server restart
 - Random generation based on item tier and rarity
 - Full documentation in `project/docs/inventory-system.md`
+
+## Platform-Specific Tool Notes
+
+### Windows (MSYS/Git Bash)
+
+**taskkill command:**
+- **Correct usage**: `taskkill //F //PID <pid>`
+- **Incorrect usage**: `taskkill /F /PID <pid>` (fails with "Invalid argument/option - 'F:/'")
+- The forward slashes need to be doubled (`//`) in MSYS/Git Bash environments
+- Example: `taskkill //F //PID 35732`
 
 ## Next Steps / Ideas
 

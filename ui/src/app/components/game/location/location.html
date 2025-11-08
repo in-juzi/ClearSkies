@@ -1,0 +1,221 @@
+<div class="location-container">
+  <!-- Messages -->
+  <div class="messages" *ngIf="errorMessage || successMessage">
+    <div class="error-message" *ngIf="errorMessage">{{ errorMessage }}</div>
+    <div class="success-message" *ngIf="successMessage">{{ successMessage }}</div>
+  </div>
+
+  <!-- Traveling State -->
+  <div class="traveling-view" *ngIf="travelState()?.isTravel">
+    <h2>Traveling...</h2>
+    <div class="travel-progress">
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="getTravelProgressPercent()"></div>
+      </div>
+      <p>Destination: {{ currentLocation()?.name }}</p>
+      <p>Time remaining: {{ formatTime(travelState()?.remainingTime || 0) }}</p>
+    </div>
+    <div class="travel-actions">
+      <button
+        (click)="skipTravel()"
+        class="btn-warning"
+        title="Skip to 1 second before arrival (Dev feature)">
+        Skip
+      </button>
+      <button
+        (click)="cancelTravel()"
+        class="btn-danger">
+        Cancel
+      </button>
+    </div>
+  </div>
+
+  <!-- Active Activity State -->
+  <div class="activity-view" *ngIf="activeActivity()?.activityId && activityProgress()">
+    <h2>Activity in Progress</h2>
+    <div class="activity-progress">
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="getActivityProgressPercent()"></div>
+      </div>
+      <p *ngIf="!activityProgress()?.completed">
+        Time remaining: {{ formatTime(activityProgress()?.remainingTime || 0) }}
+      </p>
+      <p *ngIf="activityProgress()?.completed" class="complete-text">
+        Activity Complete!
+      </p>
+      <div class="activity-actions">
+        <button
+          *ngIf="activityProgress()?.completed"
+          (click)="completeActivity()"
+          class="btn-primary">
+          Claim Rewards
+        </button>
+        <button
+          *ngIf="!activityProgress()?.completed"
+          (click)="cancelActivity()"
+          class="btn-danger">
+          Cancel
+        </button>
+      </div>
+    </div>
+
+    <!-- Rewards Display -->
+    <div class="rewards-display" *ngIf="lastRewards">
+      <h3>Rewards Received!</h3>
+      <div class="reward-items">
+        <div *ngIf="lastRewards.gold > 0" class="reward-item">
+          <span class="reward-icon">💰</span>
+          <span>{{ lastRewards.gold }} Gold</span>
+        </div>
+        <div *ngFor="let item of lastRewards.items" class="reward-item">
+          <span class="reward-icon">📦</span>
+          <span>{{ item.itemId }} x{{ item.quantity }}</span>
+        </div>
+        <div *ngFor="let exp of lastRewards.experience | keyvalue" class="reward-item">
+          <span class="reward-icon">⭐</span>
+          <span>{{ exp.key }}: +{{ exp.value.skill?.leveledUp ? exp.value.skill.newLevel : exp.value.level }} XP</span>
+          <span *ngIf="exp.value.leveledUp || exp.value.skill?.leveledUp" class="level-up">LEVEL UP!</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Location View (no activity, no travel) -->
+  <div class="main-view" *ngIf="!activeActivity()?.activityId && !travelState()?.isTravel && currentLocation()">
+    <!-- Location Header -->
+    <div class="location-header" [style.background-color]="currentLocation()?.biome?.theme?.primaryColor">
+      <h1>{{ currentLocation()?.name }}</h1>
+      <p class="location-description">{{ currentLocation()?.description }}</p>
+      <span class="biome-badge" [style.background-color]="currentLocation()?.biome?.theme?.accentColor">
+        {{ currentLocation()?.biome?.name }}
+      </span>
+    </div>
+
+    <!-- Activity Detail View -->
+    <div class="activity-detail" *ngIf="selectedActivity">
+      <button (click)="backToActivities()" class="btn-back">← Back to Activities</button>
+      <h2>{{ selectedActivity.name }}</h2>
+      <p>{{ selectedActivity.description }}</p>
+
+      <div class="activity-info">
+        <div class="info-item">
+          <strong>Duration:</strong> {{ selectedActivity.duration }}s
+        </div>
+        <div class="info-item">
+          <strong>Type:</strong> {{ selectedActivity.type }}
+        </div>
+      </div>
+
+      <div class="requirements" *ngIf="selectedActivity.requirements">
+        <h3>Requirements</h3>
+        <ul>
+          <li *ngFor="let skill of selectedActivity.requirements.skills | keyvalue">
+            {{ skill.key }} Level {{ skill.value }}
+          </li>
+          <li *ngFor="let attr of selectedActivity.requirements.attributes | keyvalue">
+            {{ attr.key }} Level {{ attr.value }}
+          </li>
+        </ul>
+        <div class="requirement-failures" *ngIf="selectedActivity.requirementFailures && selectedActivity.requirementFailures.length > 0">
+          <p class="error">Not met:</p>
+          <ul>
+            <li *ngFor="let failure of selectedActivity.requirementFailures">{{ failure }}</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="rewards" *ngIf="selectedActivity.rewards">
+        <h3>Rewards</h3>
+        <ul>
+          <li *ngFor="let exp of selectedActivity.rewards.experience | keyvalue">
+            {{ exp.key }}: +{{ exp.value }} XP
+          </li>
+          <li *ngFor="let item of selectedActivity.rewards.items">
+            {{ item.itemId }} ({{ item.quantity.min }}-{{ item.quantity.max }}) - {{ (item.chance * 100).toFixed(0) }}% chance
+          </li>
+          <li *ngIf="selectedActivity.rewards.gold">
+            Gold: {{ selectedActivity.rewards.gold.min }}-{{ selectedActivity.rewards.gold.max }}
+          </li>
+        </ul>
+      </div>
+
+      <button
+        (click)="startActivity()"
+        [disabled]="!selectedActivity.available"
+        [class.btn-disabled]="!selectedActivity.available"
+        class="btn-primary">
+        {{ selectedActivity.available ? 'Start Activity' : 'Requirements Not Met' }}
+      </button>
+    </div>
+
+    <!-- Facility Detail View -->
+    <div class="facility-detail" *ngIf="selectedFacility() && !selectedActivity">
+      <button (click)="backToFacilities()" class="btn-back">← Back to Facilities</button>
+      <h2>{{ selectedFacility()?.name }}</h2>
+      <p>{{ selectedFacility()?.description }}</p>
+
+      <h3>Activities</h3>
+      <div class="activities-list">
+        <div
+          *ngFor="let activity of selectedFacility()?.activities"
+          class="activity-card"
+          [class.available]="activity.available"
+          [class.unavailable]="!activity.available"
+          (click)="selectActivity(activity)">
+          <h4>{{ activity.name }}</h4>
+          <p>{{ activity.description }}</p>
+          <div class="activity-meta">
+            <span>⏱️ {{ activity.duration }}s</span>
+            <span *ngIf="!activity.available" class="unavailable-badge">Requirements Not Met</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Facility List View -->
+    <div class="facilities-view" *ngIf="!selectedFacility()">
+      <h2>Facilities</h2>
+      <div class="facilities-list">
+        <div
+          *ngFor="let facility of currentLocation()?.facilities"
+          class="facility-card"
+          (click)="selectFacility(facility)">
+          <h3>{{ facility.name }}</h3>
+          <p>{{ facility.description }}</p>
+          <span class="facility-type">{{ facility.type }}</span>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <div class="navigation-section" *ngIf="currentLocation()?.navigationLinks && currentLocation()!.navigationLinks.length > 0">
+        <h2>Travel</h2>
+        <div class="navigation-list">
+          <div
+            *ngFor="let link of currentLocation()?.navigationLinks"
+            class="nav-link"
+            [class.available]="link.available"
+            [class.unavailable]="!link.available">
+            <h3>{{ link.name }}</h3>
+            <p>{{ link.description }}</p>
+            <div class="nav-meta">
+              <span>⏱️ {{ link.travelTime }}s</span>
+              <span *ngIf="!link.available" class="unavailable-badge">Requirements Not Met</span>
+            </div>
+            <div class="requirement-failures" *ngIf="link.requirementFailures && link.requirementFailures.length > 0">
+              <p class="error">Not met:</p>
+              <ul>
+                <li *ngFor="let failure of link.requirementFailures">{{ failure }}</li>
+              </ul>
+            </div>
+            <button
+              *ngIf="link.available"
+              (click)="travel(link.targetLocationId)"
+              class="btn-primary">
+              Travel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

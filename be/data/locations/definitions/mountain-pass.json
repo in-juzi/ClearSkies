@@ -1,0 +1,20 @@
+{
+  "locationId": "mountain-pass",
+  "name": "Mountain Pass",
+  "description": "A high mountain pass where the air is thin and cold. Rocky outcroppings reveal precious ore veins.",
+  "biome": "mountain",
+  "facilities": [
+    "mountain-mine"
+  ],
+  "navigationLinks": [
+    {
+      "targetLocationId": "forest-clearing",
+      "name": "Return to Forest",
+      "description": "Descend back to the forest clearing",
+      "travelTime": 120,
+      "requirements": {},
+      "encounters": []
+    }
+  ],
+  "isStartingLocation": false
+}

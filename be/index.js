@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/database');
 const itemService = require('./services/itemService');
+const locationService = require('./services/locationService');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -14,6 +15,11 @@ connectDB();
 itemService.loadDefinitions()
   .then(() => console.log('✓ Item definitions loaded'))
   .catch(err => console.error('Failed to load item definitions:', err));
+
+// Load location definitions
+locationService.loadAll()
+  .then(() => console.log('✓ Location definitions loaded'))
+  .catch(err => console.error('Failed to load location definitions:', err));
 
 // Middleware
 app.use(cors());
@@ -39,11 +45,13 @@ const authRoutes = require('./routes/auth');
 const skillsRoutes = require('./routes/skills');
 const attributesRoutes = require('./routes/attributes');
 const inventoryRoutes = require('./routes/inventory');
+const locationRoutes = require('./routes/locations');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/skills', skillsRoutes);
 app.use('/api/attributes', attributesRoutes);
 app.use('/api/inventory', inventoryRoutes);
+app.use('/api/locations', locationRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
