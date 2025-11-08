@@ -8,10 +8,10 @@ export interface User {
 
 export interface Player {
   id: string;
-  characterName: string;
   level: number;
   experience: number;
   stats: PlayerStats;
+  skills: PlayerSkills;
   gold: number;
   location: Location;
   inventory: InventoryItem[];
@@ -32,6 +32,53 @@ export interface PlayerStats {
   intelligence: number;
   vitality: number;
 }
+
+export interface Skill {
+  level: number;
+  experience: number;
+}
+
+export interface PlayerSkills {
+  woodcutting: Skill;
+  mining: Skill;
+  fishing: Skill;
+  smithing: Skill;
+  cooking: Skill;
+}
+
+export interface SkillWithProgress extends Skill {
+  progress: number;
+  experienceToNext?: number;
+}
+
+export interface SkillsResponse {
+  success: boolean;
+  data: {
+    skills: {
+      woodcutting: SkillWithProgress;
+      mining: SkillWithProgress;
+      fishing: SkillWithProgress;
+      smithing: SkillWithProgress;
+      cooking: SkillWithProgress;
+    };
+  };
+}
+
+export interface SkillExperienceResponse {
+  success: boolean;
+  message: string;
+  data: {
+    skill: string;
+    level: number;
+    experience: number;
+    progress: number;
+    leveledUp: boolean;
+    oldLevel?: number;
+    newLevel?: number;
+  };
+}
+
+export type SkillName = 'woodcutting' | 'mining' | 'fishing' | 'smithing' | 'cooking';
 
 export interface Location {
   currentZone: string;
@@ -61,7 +108,6 @@ export interface RegisterRequest {
   username: string;
   email: string;
   password: string;
-  characterName?: string;
 }
 
 export interface LoginRequest {

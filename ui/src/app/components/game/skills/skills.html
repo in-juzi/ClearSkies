@@ -1,0 +1,61 @@
+<div class="skills-container">
+  <h2 class="skills-title">Skills</h2>
+
+  @if (loading()) {
+    <div class="loading">Loading skills...</div>
+  }
+
+  @if (error()) {
+    <div class="error">{{ error() }}</div>
+  }
+
+  @if (!loading() && !error() && skills()) {
+    <div class="skills-grid">
+      @for (skillKey of getSkillKeys(); track skillKey) {
+        <div class="skill-card">
+          <div class="skill-header">
+            <img
+              class="skill-icon"
+              [src]="skillIcons[skillKey]"
+              [alt]="skillNames[skillKey]"
+              loading="lazy">
+            <h3 class="skill-name">{{ skillNames[skillKey] }}</h3>
+          </div>
+
+          <div class="skill-info">
+            <div class="skill-level">
+              <span class="label">Level:</span>
+              <span class="value">{{ skills()![skillKey].level }}</span>
+            </div>
+
+            <div class="skill-xp">
+              <span class="label">XP:</span>
+              <span class="value">
+                {{ skills()![skillKey].experience % 1000 }} / 1000
+              </span>
+            </div>
+          </div>
+
+          <div class="progress-container">
+            <div
+              class="progress-bar"
+              [style.width.%]="skills()![skillKey].progress">
+            </div>
+          </div>
+
+          <div class="xp-to-next">
+            {{ getExperienceToNext(skills()![skillKey].experience) }} XP to next level
+          </div>
+
+          <!-- Testing button - remove in production -->
+          <button
+            class="test-btn"
+            (click)="testAddExperience(skillKey)"
+            title="Add 100 XP (for testing)">
+            +100 XP
+          </button>
+        </div>
+      }
+    </div>
+  }
+</div>
