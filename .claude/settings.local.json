@@ -3,7 +3,10 @@
     "allow": [
       "Bash(move:*)",
       "Bash(mkdir:*)",
-      "Bash(claude mcp add:*)"
+      "Bash(claude mcp add:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(printf:*)"
     ],
     "deny": [],
     "ask": []
