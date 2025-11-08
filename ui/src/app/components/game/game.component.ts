@@ -5,11 +5,12 @@ import { AuthService } from '../../services/auth.service';
 import { AttributesService } from '../../services/attributes.service';
 import { Skills } from './skills/skills';
 import { AttributesComponent } from './attributes/attributes';
+import { InventoryComponent } from './inventory/inventory.component';
 
 @Component({
   selector: 'app-game',
   standalone: true,
-  imports: [CommonModule, Skills, AttributesComponent],
+  imports: [CommonModule, Skills, AttributesComponent, InventoryComponent],
   templateUrl: './game.component.html',
   styleUrl: './game.component.scss'
 })

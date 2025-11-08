@@ -18,22 +18,7 @@
       <div class="game-layout">
         <!-- Left Sidebar: Inventory -->
         <aside class="left-sidebar">
-          <div class="panel">
-            <h3>Inventory</h3>
-            <div class="inventory-grid">
-              @for (slot of [1,2,3,4,5,6,7,8,9,10,11,12]; track slot) {
-                <div class="inventory-slot empty">
-                  <span class="slot-number">{{ slot }}</span>
-                </div>
-              }
-            </div>
-            <div class="inventory-footer">
-              <div class="gold-display">
-                <span class="gold-icon">⚜</span>
-                <span class="gold-amount">{{ currentPlayer()!.gold }}</span>
-              </div>
-            </div>
-          </div>
+          <app-inventory></app-inventory>
         </aside>
 
         <!-- Center: Main Game Area -->

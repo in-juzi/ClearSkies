@@ -1,0 +1,146 @@
+<div class="inventory-container">
+  <!-- Header -->
+  <div class="inventory-header">
+    <h2 class="text-2xl font-bold text-gold-400">Inventory</h2>
+    <div class="inventory-stats">
+      <span class="stat">{{ inventoryService.inventorySize() }} / {{ inventoryService.inventoryCapacity() }}</span>
+      <span class="stat">Weight: {{ getTotalWeight() }}</span>
+      <span class="stat">Value: {{ inventoryService.inventoryValue() }}g</span>
+    </div>
+  </div>
+
+  <!-- Category Filter -->
+  <div class="category-filter">
+    <button
+      *ngFor="let category of categories"
+      [class.active]="selectedCategory === category.value"
+      (click)="selectedCategory = category.value"
+      class="category-btn">
+      {{ category.label }}
+    </button>
+  </div>
+
+  <!-- Inventory Grid -->
+  <div class="inventory-grid">
+    <div
+      *ngFor="let item of getFilteredInventory()"
+      class="inventory-item"
+      [class]="getRarityClass(item.definition.rarity)"
+      (click)="selectItem(item)">
+      <div class="item-icon">
+        <!-- Placeholder for item icon -->
+        <span class="item-tier">T{{ item.definition.properties.tier }}</span>
+      </div>
+      <div class="item-info">
+        <div class="item-name" [class]="inventoryService.getRarityColor(item.definition.rarity)">
+          {{ item.definition.name }}
+        </div>
+        <div class="item-quantity" *ngIf="item.quantity > 1">x{{ item.quantity }}</div>
+      </div>
+      <!-- Trait indicators -->
+      <div class="item-traits" *ngIf="item.traits && item.traits.length > 0">
+        <span class="trait-badge" *ngFor="let trait of item.traits">
+          {{ trait.charAt(0).toUpperCase() }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Empty slots -->
+    <div *ngIf="getFilteredInventory().length === 0" class="empty-message">
+      <p>No items in this category</p>
+    </div>
+  </div>
+
+  <!-- Item Details Panel -->
+  <div class="item-details-panel" *ngIf="selectedItem">
+    <div class="details-header">
+      <h3 [class]="inventoryService.getRarityColor(selectedItem.definition.rarity)">
+        {{ selectedItem.definition.name }}
+      </h3>
+      <button (click)="closeItemDetails()" class="close-btn">✕</button>
+    </div>
+
+    <div class="details-content">
+      <!-- Basic Info -->
+      <div class="detail-section">
+        <p class="item-description">{{ selectedItem.definition.description }}</p>
+        <div class="detail-row">
+          <span class="label">Category:</span>
+          <span>{{ selectedItem.definition.category }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Rarity:</span>
+          <span [class]="inventoryService.getRarityColor(selectedItem.definition.rarity)">
+            {{ selectedItem.definition.rarity }}
+          </span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Quantity:</span>
+          <span>{{ selectedItem.quantity }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Weight:</span>
+          <span>{{ selectedItem.definition.properties.weight }} kg</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Value:</span>
+          <span class="text-gold-400">{{ selectedItem.vendorPrice }}g each</span>
+        </div>
+      </div>
+
+      <!-- Qualities -->
+      <div class="detail-section" *ngIf="getQualityKeys(selectedItem.qualityDetails).length > 0">
+        <h4 class="section-title">Qualities</h4>
+        <div class="quality-list">
+          <div *ngFor="let qualityId of getQualityKeys(selectedItem.qualityDetails)" class="quality-item">
+            <span class="quality-name">{{ selectedItem.qualityDetails[qualityId].name }}:</span>
+            <span [class]="inventoryService.getQualityColor(selectedItem.qualityDetails[qualityId].value)">
+              {{ inventoryService.formatQuality(selectedItem.qualityDetails[qualityId].value) }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Traits -->
+      <div class="detail-section" *ngIf="selectedItem.traitDetails && selectedItem.traitDetails.length > 0">
+        <h4 class="section-title">Traits</h4>
+        <div class="trait-list">
+          <div *ngFor="let trait of selectedItem.traitDetails" class="trait-item">
+            <span [class]="inventoryService.getRarityColor(trait.rarity)" class="trait-name">
+              {{ trait.name }}
+            </span>
+            <p class="trait-description">{{ trait.description }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="detail-actions">
+        <button class="btn-primary" *ngIf="selectedItem.definition.category === 'consumable'">
+          Use
+        </button>
+        <button class="btn-primary" *ngIf="selectedItem.definition.category === 'equipment' && !selectedItem.equipped">
+          Equip
+        </button>
+        <button class="btn-secondary" *ngIf="selectedItem.definition.category === 'equipment' && selectedItem.equipped">
+          Unequip
+        </button>
+        <button class="btn-danger" (click)="removeItem(selectedItem.instanceId)">
+          Drop
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dev Tools (remove in production) -->
+  <div class="dev-tools" *ngIf="true">
+    <h4>Dev Tools</h4>
+    <div class="dev-buttons">
+      <button (click)="addTestItem('oak_log')" class="dev-btn">Add Oak Log</button>
+      <button (click)="addTestItem('willow_log')" class="dev-btn">Add Willow Log</button>
+      <button (click)="addTestItem('copper_ore')" class="dev-btn">Add Copper Ore</button>
+      <button (click)="addTestItem('trout')" class="dev-btn">Add Trout</button>
+      <button (click)="addTestItem('copper_sword')" class="dev-btn">Add Copper Sword</button>
+    </div>
+  </div>
+</div>
