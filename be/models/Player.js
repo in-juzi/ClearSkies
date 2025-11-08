@@ -7,14 +7,6 @@ const playerSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
-  characterName: {
-    type: String,
-    required: [true, 'Character name is required'],
-    unique: true,
-    trim: true,
-    minlength: [3, 'Character name must be at least 3 characters'],
-    maxlength: [20, 'Character name cannot exceed 20 characters']
-  },
   level: {
     type: Number,
     default: 1,
@@ -70,10 +62,28 @@ const playerSchema = new mongoose.Schema({
     achievementId: { type: mongoose.Schema.Types.ObjectId, ref: 'Achievement' },
     unlockedAt: { type: Date, default: Date.now }
   }],
-  skills: [{
-    skillId: { type: mongoose.Schema.Types.ObjectId, ref: 'Skill' },
-    level: { type: Number, default: 1, min: 1 }
-  }],
+  skills: {
+    woodcutting: {
+      level: { type: Number, default: 1, min: 1 },
+      experience: { type: Number, default: 0, min: 0 }
+    },
+    mining: {
+      level: { type: Number, default: 1, min: 1 },
+      experience: { type: Number, default: 0, min: 0 }
+    },
+    fishing: {
+      level: { type: Number, default: 1, min: 1 },
+      experience: { type: Number, default: 0, min: 0 }
+    },
+    smithing: {
+      level: { type: Number, default: 1, min: 1 },
+      experience: { type: Number, default: 0, min: 0 }
+    },
+    cooking: {
+      level: { type: Number, default: 1, min: 1 },
+      experience: { type: Number, default: 0, min: 0 }
+    }
+  },
   createdAt: {
     type: Date,
     default: Date.now
@@ -129,6 +139,44 @@ playerSchema.methods.removeGold = async function(amount) {
   }
   this.gold -= amount;
   await this.save();
+};
+
+// Add skill experience and handle skill leveling
+playerSchema.methods.addSkillExperience = async function(skillName, amount) {
+  const validSkills = ['woodcutting', 'mining', 'fishing', 'smithing', 'cooking'];
+
+  if (!validSkills.includes(skillName)) {
+    throw new Error(`Invalid skill name: ${skillName}`);
+  }
+
+  const skill = this.skills[skillName];
+  const oldLevel = skill.level;
+  skill.experience += amount;
+
+  // Level up every 1000 XP
+  const newLevel = Math.floor(skill.experience / 1000) + 1;
+
+  if (newLevel > oldLevel) {
+    skill.level = newLevel;
+    await this.save();
+    return { leveledUp: true, oldLevel, newLevel, skill: skillName };
+  }
+
+  await this.save();
+  return { leveledUp: false, level: skill.level, skill: skillName };
+};
+
+// Get progress to next skill level (0-100%)
+playerSchema.methods.getSkillProgress = function(skillName) {
+  const validSkills = ['woodcutting', 'mining', 'fishing', 'smithing', 'cooking'];
+
+  if (!validSkills.includes(skillName)) {
+    throw new Error(`Invalid skill name: ${skillName}`);
+  }
+
+  const skill = this.skills[skillName];
+  const xpInCurrentLevel = skill.experience % 1000;
+  return (xpInCurrentLevel / 1000) * 100;
 };
 
 module.exports = mongoose.model('Player', playerSchema);
