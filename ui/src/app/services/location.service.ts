@@ -1,6 +1,6 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, interval, tap } from 'rxjs';
+import { Observable, interval, tap, Subject } from 'rxjs';
 import {
   Location,
   Facility,
@@ -10,12 +10,16 @@ import {
   ActivityRewards,
   LocationState
 } from '../models/location.model';
+import { SkillsService } from './skills.service';
+import { AttributesService } from './attributes.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LocationService {
   private apiUrl = 'http://localhost:3000/api/locations';
+  private skillsService = inject(SkillsService);
+  private attributesService = inject(AttributesService);
 
   // Signals for reactive state
   currentLocation = signal<Location | null>(null);
@@ -24,6 +28,12 @@ export class LocationService {
   travelState = signal<TravelState | null>(null);
   selectedFacility = signal<Facility | null>(null);
   activityProgress = signal<{ active: boolean; completed: boolean; remainingTime: number } | null>(null);
+
+  // Observable for activity completion events
+  activityCompleted$ = new Subject<{ rewards: ActivityRewards; activityName: string }>();
+
+  // Observable for activity errors
+  activityError$ = new Subject<{ error: string; message: string }>();
 
   // Polling interval for checking activity/travel status (in milliseconds)
   private pollingInterval = 1000; // 1 second
@@ -145,8 +155,25 @@ export class LocationService {
           remainingTime: response.remainingTime || 0
         });
 
+        // Automatically claim rewards and restart when completed
         if (response.completed) {
-          this.stopActivityPolling();
+          this.completeActivity().subscribe({
+            error: (err) => {
+              // Emit error event for UI notification
+              const errorMessage = err.error?.error || err.error?.message || 'Failed to complete activity';
+              this.activityError$.next({
+                error: errorMessage,
+                message: err.error?.message || 'Activity stopped due to error'
+              });
+
+              // Cancel the activity on the server to ensure state is cleared
+              this.http.post(`${this.apiUrl}/activities/cancel`, {}).subscribe({
+                error: (cancelErr) => {
+                  console.error('Error cancelling activity after error:', cancelErr);
+                }
+              });
+            }
+          });
         }
       })
     );
@@ -155,21 +182,73 @@ export class LocationService {
   /**
    * Complete activity and claim rewards
    */
-  completeActivity(): Observable<{ message: string; rewards?: ActivityRewards; stub?: boolean }> {
-    return this.http.post<{ message: string; rewards?: ActivityRewards; stub?: boolean }>(
+  completeActivity(): Observable<{ message: string; rewards?: ActivityRewards; stub?: boolean; activityRestarted?: boolean; newActivity?: any }> {
+    return this.http.post<{ message: string; rewards?: ActivityRewards; stub?: boolean; activityRestarted?: boolean; newActivity?: any }>(
       `${this.apiUrl}/activities/complete`,
       {}
     ).pipe(
-      tap(response => {
-        this.stopActivityPolling();
-        this.activeActivity.set({
-          activityId: null,
-          facilityId: null,
-          locationId: null,
-          startTime: null,
-          endTime: null
-        });
-        this.activityProgress.set(null);
+      tap({
+        next: (response) => {
+          // Refresh skills and attributes after claiming rewards
+          this.skillsService.getSkills().subscribe();
+          this.attributesService.getAllAttributes().subscribe();
+
+          // Emit completion event with rewards if available
+          if (response.rewards && response.newActivity) {
+            this.activityCompleted$.next({
+              rewards: response.rewards,
+              activityName: response.newActivity.name || 'Unknown Activity'
+            });
+          }
+
+          // If activity was restarted, update the active activity with new times
+          if (response.activityRestarted && response.newActivity) {
+            this.activeActivity.set({
+              activityId: response.newActivity.activityId,
+              facilityId: this.activeActivity()?.facilityId || null,
+              locationId: this.currentLocation()?.locationId || null,
+              startTime: new Date(response.newActivity.startTime),
+              endTime: new Date(response.newActivity.endTime)
+            });
+            // Reset progress to show it's in progress again
+            this.activityProgress.set({
+              active: true,
+              completed: false,
+              remainingTime: response.newActivity.duration || 0
+            });
+            // Continue polling
+            this.startActivityPolling();
+          } else {
+            // Activity not restarted (stub or error), clear state
+            this.stopActivityPolling();
+            this.activeActivity.set({
+              activityId: null,
+              facilityId: null,
+              locationId: null,
+              startTime: null,
+              endTime: null
+            });
+            this.activityProgress.set(null);
+          }
+        },
+        error: (error) => {
+          // Handle errors (e.g., inventory full)
+          console.error('Error completing activity:', error);
+
+          // Stop the activity loop
+          this.stopActivityPolling();
+          this.activeActivity.set({
+            activityId: null,
+            facilityId: null,
+            locationId: null,
+            startTime: null,
+            endTime: null
+          });
+          this.activityProgress.set(null);
+
+          // Re-throw error so component can handle notification
+          throw error;
+        }
       })
     );
   }
