@@ -314,6 +314,12 @@ exports.getFacility = async (req, res) => {
       return res.status(404).json({ message: 'Facility not found' });
     }
 
+    // Debug: Log player skills and attributes
+    console.log('[getFacility] Player skills Map:', player.skills);
+    console.log('[getFacility] Player attributes Map:', player.attributes);
+    console.log('[getFacility] Player skills size:', player.skills?.size);
+    console.log('[getFacility] Player attributes size:', player.attributes?.size);
+
     // Check requirements for each activity
     const activitiesWithReqs = facility.activities.map(activity => {
       const reqCheck = locationService.meetsActivityRequirements(activity, player);
@@ -348,11 +354,7 @@ exports.startActivity = async (req, res) => {
       return res.status(404).json({ message: 'Player not found' });
     }
 
-    // Check if already doing an activity or traveling
-    if (player.activeActivity.activityId) {
-      return res.status(400).json({ message: 'Already doing an activity' });
-    }
-
+    // Check if traveling
     if (player.travelState.isTravel) {
       return res.status(400).json({ message: 'Cannot start activity while traveling' });
     }
@@ -499,10 +501,10 @@ exports.completeActivity = async (req, res) => {
     const expResults = {};
     for (const [skillOrAttr, xp] of Object.entries(rewards.experience)) {
       // Check if it's a skill
-      if (player.skills.has(skillOrAttr)) {
+      if (player.skills[skillOrAttr]) {
         const result = await player.addSkillExperience(skillOrAttr, xp);
         expResults[skillOrAttr] = result;
-      } else if (player.attributes.has(skillOrAttr)) {
+      } else if (player.attributes[skillOrAttr]) {
         const result = await player.addAttributeExperience(skillOrAttr, xp);
         expResults[skillOrAttr] = result;
       }
@@ -511,7 +513,9 @@ exports.completeActivity = async (req, res) => {
     // Award items
     const itemsAdded = [];
     for (const itemReward of rewards.items) {
-      const itemInstance = itemService.createRandomItemInstance(itemReward.itemId, itemReward.quantity);
+      const qualities = itemService.generateRandomQualities(itemReward.itemId);
+      const traits = itemService.generateRandomTraits(itemReward.itemId);
+      const itemInstance = itemService.createItemInstance(itemReward.itemId, itemReward.quantity, qualities, traits);
       await player.addItem(itemInstance);
       itemsAdded.push({
         itemId: itemReward.itemId,
@@ -525,13 +529,20 @@ exports.completeActivity = async (req, res) => {
       await player.addGold(rewards.gold);
     }
 
-    // Clear active activity
+    // Store activity info before restarting
+    const completedActivityId = player.activeActivity.activityId;
+    const completedFacilityId = player.activeActivity.facilityId;
+
+    // Automatically restart the same activity
+    const restartTime = new Date();
+    const restartEndTime = new Date(restartTime.getTime() + activity.duration * 1000);
+
     player.activeActivity = {
-      activityId: null,
-      facilityId: null,
-      locationId: null,
-      startTime: null,
-      endTime: null
+      activityId: completedActivityId,
+      facilityId: completedFacilityId,
+      locationId: player.currentLocation,
+      startTime: restartTime,
+      endTime: restartEndTime
     };
 
     await player.save();
@@ -542,6 +553,12 @@ exports.completeActivity = async (req, res) => {
         experience: expResults,
         items: itemsAdded,
         gold: rewards.gold
+      },
+      activityRestarted: true,
+      newActivity: {
+        ...activity,
+        startTime: restartTime,
+        endTime: restartEndTime
       }
     });
   } catch (error) {
