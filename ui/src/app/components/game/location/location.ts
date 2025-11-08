@@ -25,6 +25,7 @@ export class LocationComponent implements OnInit, OnDestroy {
   lastRewards: ActivityRewards | null = null;
   errorMessage: string | null = null;
   successMessage: string | null = null;
+  activityLog: Array<{ timestamp: Date; rewards: ActivityRewards; activityName: string }> = [];
 
   ngOnInit() {
     // Load current location on component init
@@ -33,6 +34,26 @@ export class LocationComponent implements OnInit, OnDestroy {
         this.errorMessage = 'Failed to load location data';
         console.error('Error loading location:', err);
       }
+    });
+
+    // Subscribe to activity completion events
+    this.locationService.activityCompleted$.subscribe(completion => {
+      this.activityLog.unshift({
+        timestamp: new Date(),
+        rewards: completion.rewards,
+        activityName: completion.activityName
+      });
+
+      // Keep only the last 10 entries
+      if (this.activityLog.length > 10) {
+        this.activityLog = this.activityLog.slice(0, 10);
+      }
+    });
+
+    // Subscribe to activity error events
+    this.locationService.activityError$.subscribe(error => {
+      this.errorMessage = error.error;
+      setTimeout(() => this.errorMessage = null, 5000);
     });
   }
 
@@ -233,14 +254,17 @@ export class LocationComponent implements OnInit, OnDestroy {
       return 0;
     }
 
+    // Calculate total duration from start/end times
     const start = new Date(activity.startTime).getTime();
     const end = new Date(activity.endTime).getTime();
-    const now = Date.now();
+    const totalDuration = (end - start) / 1000; // Convert to seconds
 
-    const total = end - start;
-    const elapsed = now - start;
+    // Calculate elapsed time based on remaining time from server
+    const remainingTime = progress.remainingTime || 0;
+    const elapsed = totalDuration - remainingTime;
 
-    return Math.min(100, Math.max(0, (elapsed / total) * 100));
+    // Return percentage (elapsed / total * 100)
+    return Math.min(100, Math.max(0, (elapsed / totalDuration) * 100));
   }
 
   /**
