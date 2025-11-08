@@ -2,11 +2,6 @@
   <!-- Header -->
   <div class="inventory-header">
     <h2 class="text-2xl font-bold text-gold-400">Inventory</h2>
-    <div class="inventory-stats">
-      <span class="stat">{{ inventoryService.inventorySize() }} / {{ inventoryService.inventoryCapacity() }}</span>
-      <span class="stat">Weight: {{ getTotalWeight() }}</span>
-      <span class="stat">Value: {{ inventoryService.inventoryValue() }}g</span>
-    </div>
   </div>
 
   <!-- Category Filter -->
@@ -16,7 +11,7 @@
       [class.active]="selectedCategory === category.value"
       (click)="selectedCategory = category.value"
       class="category-btn">
-      {{ category.label }}
+      {{ category.shortLabel }}
     </button>
   </div>
 
@@ -143,6 +138,33 @@
     </div>
   </div>
 
+  <!-- Inventory Stats (at bottom) -->
+  <div class="inventory-stats-container">
+    <div class="inventory-stats">
+      <div class="stat-item">
+        <span class="stat-icon">📦</span>
+        <div class="stat-content">
+          <span class="stat-label">Capacity</span>
+          <span class="stat-value">{{ inventoryService.inventorySize() }} / {{ inventoryService.inventoryCapacity() }}</span>
+        </div>
+      </div>
+      <div class="stat-item">
+        <span class="stat-icon">⚖️</span>
+        <div class="stat-content">
+          <span class="stat-label">Weight</span>
+          <span class="stat-value">{{ getTotalWeight() }} kg</span>
+        </div>
+      </div>
+      <div class="stat-item">
+        <span class="stat-icon">💰</span>
+        <div class="stat-content">
+          <span class="stat-label">Value</span>
+          <span class="stat-value text-gold-400">{{ inventoryService.inventoryValue() }}g</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Dev Tools (remove in production) -->
   <div class="dev-tools" *ngIf="true">
     <h4>Dev Tools</h4>
@@ -152,6 +174,7 @@
       <button (click)="addTestItem('copper_ore')" class="dev-btn">Add Copper Ore</button>
       <button (click)="addTestItem('trout')" class="dev-btn">Add Trout</button>
       <button (click)="addTestItem('copper_sword')" class="dev-btn">Add Copper Sword</button>
+      <button (click)="dropAllItems()" class="dev-btn dev-btn-danger">Drop All Items</button>
     </div>
   </div>
 </div>

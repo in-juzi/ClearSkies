@@ -17,7 +17,14 @@ body {
 }
 
 html, body {
-  height: 100%;
+  height: 100vh;
   width: 100%;
-  overflow-x: hidden;
+  overflow: hidden;
+}
+
+/* Ensure app root takes full height */
+app-root {
+  display: block;
+  height: 100vh;
+  overflow: hidden;
 }

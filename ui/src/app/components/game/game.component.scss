@@ -1,14 +1,15 @@
 .game-container {
-  min-height: 100vh;
+  height: 100vh;
   background: var(--color-bg-primary);
   color: var(--color-text-secondary);
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .game-header {
   background: var(--gradient-surface);
-  padding: var(--spacing-xl) var(--spacing-3xl);
+  padding: var(--spacing-m) var(--spacing-3xl);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -18,34 +19,34 @@
   .header-left {
     display: flex;
     align-items: center;
-    gap: var(--spacing-xl);
 
     h1 {
       margin: 0;
       color: var(--color-primary);
-      font-size: var(--font-size-3xl);
-    }
-
-    .username {
-      color: var(--color-secondary);
-      font-weight: var(--font-weight-semibold);
-      font-size: var(--font-size-l);
+      font-size: var(--font-size-2xl);
     }
   }
 
   .header-right {
     display: flex;
     align-items: center;
-    gap: var(--spacing-xl);
+    gap: var(--spacing-l);
+
+    .username {
+      color: var(--color-secondary);
+      font-weight: var(--font-weight-semibold);
+      font-size: var(--font-size-m);
+    }
 
     .logout-btn {
-      padding: var(--spacing-s) var(--spacing-xl);
+      padding: var(--spacing-xs) var(--spacing-l);
       background: var(--color-primary);
       color: var(--color-text-primary);
       border: none;
       border-radius: var(--radius-button);
       cursor: pointer;
       font-weight: var(--font-weight-semibold);
+      font-size: var(--font-size-s);
       transition: background var(--transition-normal);
 
       &:hover {
@@ -92,78 +93,89 @@
   }
 }
 
-// Left Sidebar - Inventory
+// Left Sidebar - Inventory (with tab navigation)
 .left-sidebar {
   border-right: var(--border-width-medium) solid var(--color-bg-tertiary);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 
-  .inventory-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--spacing-m);
-    padding: var(--spacing-xl);
-  }
-
-  .inventory-slot {
-    aspect-ratio: 1;
-    background: var(--color-bg-tertiary);
-    border: var(--border-width-medium) solid var(--color-bg-primary);
-    border-radius: var(--radius-card);
+  // Ensure child components take full height
+  app-inventory {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all var(--transition-normal);
-    position: relative;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+  }
 
-    &.empty {
-      opacity: var(--opacity-muted);
+  // Tab Navigation (same styling as right sidebar)
+  .sidebar-nav {
+    display: flex;
+    background: var(--color-bg-overlay-strong);
+    border-bottom: var(--border-width-medium) solid var(--color-bg-tertiary);
+    flex-shrink: 0;
 
-      .slot-number {
-        font-size: var(--font-size-s);
-        color: var(--color-text-disabled);
+    .nav-tab {
+      flex: 1;
+      padding: var(--spacing-m) var(--spacing-s);
+      background: transparent;
+      border: none;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      font-size: var(--font-size-s);
+      font-weight: var(--font-weight-semibold);
+      transition: all var(--transition-normal);
+      position: relative;
+
+      &:hover {
+        background: var(--color-bg-tertiary);
+        color: var(--color-text-secondary);
       }
-    }
 
-    &:hover {
-      border-color: var(--color-primary);
-      background: var(--color-bg-secondary);
+      &.active {
+        color: var(--color-primary);
+        background: var(--color-bg-secondary);
+
+        &::after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          height: 3px;
+          background: var(--color-primary);
+        }
+      }
     }
   }
 
-  .inventory-footer {
-    padding: var(--spacing-xl);
-    border-top: var(--border-width-medium) solid var(--color-bg-tertiary);
-    margin-top: auto;
-
-    .gold-display {
-      background: var(--color-bg-tertiary);
-      padding: var(--spacing-xl);
-      border-radius: var(--radius-card);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: var(--spacing-m);
-
-      .gold-icon {
-        font-size: var(--font-size-3xl);
-        color: var(--color-gold);
-      }
-
-      .gold-amount {
-        font-size: var(--font-size-2xl);
-        font-weight: var(--font-weight-bold);
-        color: var(--color-gold);
-      }
-    }
+  // Tab Content
+  .sidebar-content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
   }
 }
 
 // Center Content - Game Area
 .center-content {
   background: var(--color-bg-primary);
+  height: 100%;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+
+  // Ensure the app-location component takes full height
+  app-location {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+  }
 
   .location-header {
     background: var(--gradient-surface);
@@ -225,9 +237,20 @@
 // Right Sidebar - Character/Skills/Attributes
 .right-sidebar {
   border-left: var(--border-width-medium) solid var(--color-bg-tertiary);
+  height: 100%;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+
+  // Ensure child components take full height
+  app-skills,
+  app-attributes,
+  app-equipment {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+  }
 
   // Tab Navigation
   .sidebar-nav {
@@ -275,12 +298,17 @@
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
   }
 
   .panel {
     padding-bottom: var(--spacing-xl);
-    height: auto;
-    overflow: visible;
+    height: 100%;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 
   .character-info {

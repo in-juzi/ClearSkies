@@ -2,12 +2,10 @@
   <header class="game-header">
     <div class="header-left">
       <h1>ClearSkies</h1>
-      @if (currentUser()) {
-        <span class="username">{{ currentUser()!.username }}</span>
-      }
     </div>
     <div class="header-right">
       @if (currentUser()) {
+        <span class="username">{{ currentUser()!.username }}</span>
         <button class="logout-btn" (click)="onLogout()">Logout</button>
       }
     </div>
@@ -18,7 +16,22 @@
       <div class="game-layout">
         <!-- Left Sidebar: Inventory -->
         <aside class="left-sidebar">
-          <app-inventory></app-inventory>
+          <!-- Tab Navigation -->
+          <div class="sidebar-nav">
+            <button
+              class="nav-tab"
+              [class.active]="leftSidebarTab() === 'inventory'"
+              (click)="leftSidebarTab.set('inventory')">
+              Inventory
+            </button>
+          </div>
+
+          <!-- Tab Content -->
+          <div class="sidebar-content">
+            @if (leftSidebarTab() === 'inventory') {
+              <app-inventory></app-inventory>
+            }
+          </div>
         </aside>
 
         <!-- Center: Main Game Area -->
@@ -26,7 +39,7 @@
           <app-location></app-location>
         </section>
 
-        <!-- Right Sidebar: Character/Skills/Attributes -->
+        <!-- Right Sidebar: Character/Skills/Attributes/Status -->
         <aside class="right-sidebar">
           <!-- Tab Navigation -->
           <div class="sidebar-nav">
@@ -53,6 +66,12 @@
               [class.active]="rightSidebarTab() === 'attributes'"
               (click)="rightSidebarTab.set('attributes')">
               Attributes
+            </button>
+            <button
+              class="nav-tab"
+              [class.active]="rightSidebarTab() === 'status'"
+              (click)="rightSidebarTab.set('status')">
+              Status
             </button>
           </div>
 
@@ -132,6 +151,11 @@
             <!-- Attributes Tab -->
             @if (rightSidebarTab() === 'attributes') {
               <app-attributes></app-attributes>
+            }
+
+            <!-- Status Tab -->
+            @if (rightSidebarTab() === 'status') {
+              <app-character-status></app-character-status>
             }
           </div>
         </aside>

@@ -3,120 +3,120 @@
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 20px;
+  background: var(--gradient-purple);
+  padding: var(--spacing-xl);
 }
 
 .register-card {
-  background: white;
-  padding: 40px;
-  border-radius: 10px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  background: var(--color-text-primary);
+  padding: var(--spacing-4xl);
+  border-radius: var(--radius-l);
+  box-shadow: var(--shadow-xl);
   width: 100%;
   max-width: 450px;
 
   h1 {
-    font-size: 28px;
-    color: #333;
-    margin-bottom: 10px;
+    font-size: var(--font-size-4xl);
+    color: var(--color-bg-primary);
+    margin-bottom: var(--spacing-m);
     text-align: center;
   }
 
   h2 {
-    font-size: 18px;
-    color: #666;
-    margin-bottom: 30px;
+    font-size: var(--font-size-xl);
+    color: var(--color-text-disabled);
+    margin-bottom: var(--spacing-3xl);
     text-align: center;
-    font-weight: normal;
+    font-weight: var(--font-weight-regular);
   }
 }
 
 .error-message {
-  background-color: #fee;
-  border: 1px solid #fcc;
-  color: #c33;
-  padding: 12px;
-  border-radius: 5px;
-  margin-bottom: 20px;
+  background-color: var(--color-error-light);
+  border: var(--border-width-thin) solid var(--color-error);
+  color: var(--color-error);
+  padding: var(--spacing-m);
+  border-radius: var(--radius-s);
+  margin-bottom: var(--spacing-xl);
   text-align: center;
 }
 
 .form-group {
-  margin-bottom: 20px;
+  margin-bottom: var(--spacing-xl);
 
   label {
     display: block;
-    margin-bottom: 8px;
-    color: #333;
-    font-weight: 500;
+    margin-bottom: var(--spacing-s);
+    color: var(--color-bg-primary);
+    font-weight: var(--font-weight-medium);
   }
 
   input {
     width: 100%;
-    padding: 12px;
-    border: 2px solid #ddd;
-    border-radius: 5px;
-    font-size: 16px;
-    transition: border-color 0.3s;
+    padding: var(--spacing-m);
+    border: var(--border-width-medium) solid var(--color-surface-border-light);
+    border-radius: var(--radius-s);
+    font-size: var(--font-size-l);
+    transition: border-color var(--transition-normal);
     box-sizing: border-box;
 
     &:focus {
       outline: none;
-      border-color: #667eea;
+      border-color: var(--color-accent-purple);
     }
 
     &.invalid {
-      border-color: #c33;
+      border-color: var(--color-error);
     }
   }
 
   .error {
     display: block;
-    color: #c33;
-    font-size: 14px;
-    margin-top: 5px;
+    color: var(--color-error);
+    font-size: var(--font-size-m);
+    margin-top: var(--spacing-xs);
   }
 
   .hint {
     display: block;
-    color: #999;
-    font-size: 13px;
-    margin-top: 5px;
+    color: var(--color-text-muted);
+    font-size: var(--font-size-s);
+    margin-top: var(--spacing-xs);
   }
 }
 
 button {
   width: 100%;
-  padding: 12px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  padding: var(--spacing-m);
+  background: var(--gradient-purple);
+  color: var(--color-text-primary);
   border: none;
-  border-radius: 5px;
-  font-size: 16px;
-  font-weight: 600;
+  border-radius: var(--radius-button);
+  font-size: var(--font-size-l);
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
-  transition: opacity 0.3s;
-  margin-top: 10px;
+  transition: opacity var(--transition-normal);
+  margin-top: var(--spacing-m);
 
   &:hover:not(:disabled) {
-    opacity: 0.9;
+    opacity: var(--opacity-hover);
   }
 
   &:disabled {
-    opacity: 0.6;
+    opacity: var(--opacity-disabled);
     cursor: not-allowed;
   }
 }
 
 .login-link {
-  margin-top: 20px;
+  margin-top: var(--spacing-xl);
   text-align: center;
-  color: #666;
+  color: var(--color-text-disabled);
 
   a {
-    color: #667eea;
+    color: var(--color-accent-purple);
     text-decoration: none;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
 
     &:hover {
       text-decoration: underline;

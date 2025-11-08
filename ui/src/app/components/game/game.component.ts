@@ -8,11 +8,12 @@ import { AttributesComponent } from './attributes/attributes';
 import { InventoryComponent } from './inventory/inventory.component';
 import { LocationComponent } from './location/location';
 import { Equipment } from './equipment/equipment';
+import { CharacterStatus } from './character-status/character-status';
 
 @Component({
   selector: 'app-game',
   standalone: true,
-  imports: [CommonModule, Skills, AttributesComponent, InventoryComponent, LocationComponent, Equipment],
+  imports: [CommonModule, Skills, AttributesComponent, InventoryComponent, LocationComponent, Equipment, CharacterStatus],
   templateUrl: './game.component.html',
   styleUrl: './game.component.scss'
 })
@@ -26,7 +27,10 @@ export class GameComponent implements OnInit {
   attributes = this.attributesService.attributes;
 
   // Track which tab is active in the right sidebar
-  rightSidebarTab = signal<'character' | 'equipment' | 'skills' | 'attributes'>('character');
+  rightSidebarTab = signal<'character' | 'equipment' | 'skills' | 'attributes' | 'status'>('character');
+
+  // Track which tab is active in the left sidebar
+  leftSidebarTab = signal<'inventory'>('inventory');
 
   ngOnInit(): void {
     // Fetch latest player data

@@ -29,10 +29,10 @@ export class InventoryComponent implements OnInit {
   hasBeenDragged = false;
 
   categories = [
-    { value: 'all', label: 'All Items' },
-    { value: 'resource', label: 'Resources' },
-    { value: 'equipment', label: 'Equipment' },
-    { value: 'consumable', label: 'Consumables' }
+    { value: 'all', label: 'All Items', shortLabel: 'All' },
+    { value: 'resource', label: 'Resources', shortLabel: 'Resources' },
+    { value: 'equipment', label: 'Equipment', shortLabel: 'Equipment' },
+    { value: 'consumable', label: 'Consumables', shortLabel: 'Consumables' }
   ];
 
   constructor(
@@ -207,5 +207,32 @@ export class InventoryComponent implements OnInit {
     // Remove visual feedback
     const target = event.target as HTMLElement;
     target.classList.remove('dragging-item');
+  }
+
+  // Dev helper: Drop all items in inventory
+  dropAllItems(): void {
+    if (!confirm('Are you sure you want to drop ALL items in your inventory? This cannot be undone!')) {
+      return;
+    }
+
+    const items = this.inventoryService.inventory();
+    if (items.length === 0) {
+      console.log('No items to drop');
+      return;
+    }
+
+    // Remove all items
+    const removePromises = items.map(item =>
+      this.inventoryService.removeItem({ instanceId: item.instanceId }).toPromise()
+    );
+
+    Promise.all(removePromises)
+      .then(() => {
+        console.log('All items dropped');
+        this.selectedItem = null;
+      })
+      .catch((error) => {
+        console.error('Error dropping all items:', error);
+      });
   }
 }
