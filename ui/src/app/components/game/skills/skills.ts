@@ -16,13 +16,13 @@ export class Skills implements OnInit {
   loading = signal(true);
   error = signal<string | null>(null);
 
-  // Skill icons mapping (path to PNG files in assets)
+  // Skill icons mapping (path to SVG files in assets)
   skillIcons: Record<SkillName, string> = {
-    woodcutting: 'assets/icons/skill_woodcutting.png',
-    mining: 'assets/icons/ui_dig.png',
-    fishing: 'assets/icons/skill_fishing.png',
-    smithing: 'assets/icons/skill_smithing.png',
-    cooking: 'assets/icons/skill_cooking.png'
+    woodcutting: 'assets/icons/skill_woodcutting.svg',
+    mining: 'assets/icons/ui_dig_1.svg',
+    fishing: 'assets/icons/ui_fishing_new.svg',
+    smithing: 'assets/icons/skill_blacksmithing.svg',
+    cooking: 'assets/icons/skill_cooking.svg'
   };
 
   // Skill display names
