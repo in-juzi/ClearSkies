@@ -86,19 +86,39 @@ const addSkillExperience = async (req, res) => {
     // Add experience and check for level up
     const result = await player.addSkillExperience(skillName, amount);
 
+    // Build message based on level ups
+    let message = `Gained ${amount} ${skillName} experience`;
+    if (result.skill.leveledUp && result.attribute.leveledUp) {
+      message = `Congratulations! ${skillName} leveled up to ${result.skill.newLevel} and ${result.attribute.attribute} leveled up to ${result.attribute.newLevel}!`;
+    } else if (result.skill.leveledUp) {
+      message = `Congratulations! ${skillName} leveled up to ${result.skill.newLevel}!`;
+    } else if (result.attribute.leveledUp) {
+      message = `${result.attribute.attribute} leveled up to ${result.attribute.newLevel}!`;
+    }
+
     res.status(200).json({
       success: true,
-      message: result.leveledUp
-        ? `Congratulations! ${skillName} leveled up to ${result.newLevel}!`
-        : `Gained ${amount} ${skillName} experience`,
+      message: message,
       data: {
-        skill: skillName,
-        level: result.leveledUp ? result.newLevel : result.level,
-        experience: player.skills[skillName].experience,
-        progress: player.getSkillProgress(skillName),
-        leveledUp: result.leveledUp,
-        oldLevel: result.oldLevel,
-        newLevel: result.newLevel
+        skill: {
+          name: skillName,
+          level: player.skills[skillName].level,
+          experience: player.skills[skillName].experience,
+          progress: player.getSkillProgress(skillName),
+          leveledUp: result.skill.leveledUp,
+          oldLevel: result.skill.oldLevel,
+          newLevel: result.skill.newLevel,
+          mainAttribute: player.skills[skillName].mainAttribute
+        },
+        attribute: {
+          name: result.attribute.attribute,
+          level: player.attributes[result.attribute.attribute].level,
+          experience: player.attributes[result.attribute.attribute].experience,
+          progress: player.getAttributeProgress(result.attribute.attribute),
+          leveledUp: result.attribute.leveledUp,
+          oldLevel: result.attribute.oldLevel,
+          newLevel: result.attribute.leveledUp ? result.attribute.newLevel : result.attribute.level
+        }
       }
     });
 

@@ -31,9 +31,11 @@ app.get('/health', (req, res) => {
 // API Routes
 const authRoutes = require('./routes/auth');
 const skillsRoutes = require('./routes/skills');
+const attributesRoutes = require('./routes/attributes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/skills', skillsRoutes);
+app.use('/api/attributes', attributesRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
