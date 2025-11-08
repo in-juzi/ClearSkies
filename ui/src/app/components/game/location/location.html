@@ -37,25 +37,36 @@
       <div class="progress-bar">
         <div class="progress-fill" [style.width.%]="getActivityProgressPercent()"></div>
       </div>
-      <p *ngIf="!activityProgress()?.completed">
+      <p>
         Time remaining: {{ formatTime(activityProgress()?.remainingTime || 0) }}
-      </p>
-      <p *ngIf="activityProgress()?.completed" class="complete-text">
-        Activity Complete!
       </p>
       <div class="activity-actions">
         <button
-          *ngIf="activityProgress()?.completed"
-          (click)="completeActivity()"
-          class="btn-primary">
-          Claim Rewards
-        </button>
-        <button
-          *ngIf="!activityProgress()?.completed"
           (click)="cancelActivity()"
           class="btn-danger">
           Cancel
         </button>
+      </div>
+    </div>
+
+    <!-- Activity Log -->
+    <div class="activity-log" *ngIf="activityLog.length > 0">
+      <h3>Recent Completions</h3>
+      <div class="log-entries">
+        <div *ngFor="let entry of activityLog" class="log-entry">
+          <div class="log-timestamp">{{ entry.timestamp | date:'HH:mm:ss' }}</div>
+          <div class="log-content">
+            <div class="log-activity">{{ entry.activityName }}</div>
+            <div class="log-rewards">
+              <span *ngIf="entry.rewards.gold > 0" class="reward-mini">💰 {{ entry.rewards.gold }}</span>
+              <span *ngFor="let item of entry.rewards.items" class="reward-mini">📦 {{ item.quantity }}x</span>
+              <span *ngFor="let exp of entry.rewards.experience | keyvalue" class="reward-mini">
+                ⭐ {{ exp.key }}: +{{ exp.value.skill?.experience || exp.value.experience }} XP
+                <span *ngIf="exp.value.leveledUp || exp.value.skill?.leveledUp" class="level-up-mini">↑</span>
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
