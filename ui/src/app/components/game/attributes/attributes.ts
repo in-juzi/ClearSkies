@@ -40,7 +40,7 @@ export class AttributesComponent implements OnInit {
 
   getAttributeIcon(attributeName: string): string {
     // Return icon path for each attribute
-    return `assets/icons/attributes/${attributeName}.png`;
+    return `assets/icons/attr_${attributeName}.png`;
   }
 
   capitalizeFirst(str: string): string {

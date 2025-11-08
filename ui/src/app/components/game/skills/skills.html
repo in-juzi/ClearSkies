@@ -2,76 +2,67 @@
   <h2 class="skills-title">Skills</h2>
 
   @if (loading()) {
-    <div class="loading">Loading skills...</div>
+  <div class="loading">Loading skills...</div>
   }
 
   @if (error()) {
-    <div class="error">{{ error() }}</div>
+  <div class="error">{{ error() }}</div>
   }
 
   @if (!loading() && !error() && skills()) {
-    <div class="skills-grid">
-      @for (skillKey of getSkillKeys(); track skillKey) {
-        <div class="skill-card">
-          <div class="skill-header">
-            <img
-              class="skill-icon"
-              [src]="skillIcons[skillKey]"
-              [alt]="skillNames[skillKey]"
-              loading="lazy">
-            <div class="skill-title">
-              <h3 class="skill-name">{{ skillNames[skillKey] }}</h3>
-              <span class="skill-level">Lv {{ skills()![skillKey].level }}</span>
-            </div>
-          </div>
+  <div class="skills-grid">
+    @for (skillKey of getSkillKeys(); track skillKey) {
+    <div class="skill-card">
+      <div class="skill-header">
+        <img class="skill-icon" [src]="skillIcons[skillKey]" [alt]="skillNames[skillKey]" loading="lazy">
+        <div class="skill-title">
+          <h3 class="skill-name">{{ skillNames[skillKey] }}</h3>
+          <span class="skill-level">Lv {{ skills()![skillKey].level }}</span>
+        </div>
+      </div>
 
-          <div class="progress-container">
-            <div
-              class="progress-bar"
-              [style.width.%]="skills()![skillKey].progress">
-            </div>
-          </div>
+      <div class="progress-container">
+        <div class="progress-bar" [style.width.%]="skills()![skillKey].progress">
+        </div>
+      </div>
 
-          <!-- Hover Detail Card -->
-          <div class="skill-hover-card">
-            <div class="hover-header">
-              <img
-                class="hover-icon"
-                [src]="skillIcons[skillKey]"
-                [alt]="skillNames[skillKey]">
-              <div class="hover-title">
-                <h4>{{ skillNames[skillKey] }}</h4>
-                <span class="hover-level">Level {{ skills()![skillKey].level }}</span>
-              </div>
-            </div>
-
-            <div class="hover-stats">
-              <div class="stat-row">
-                <span class="stat-label">Experience:</span>
-                <span class="stat-value">{{ skills()![skillKey].experience % 1000 }} / 1000</span>
-              </div>
-              <div class="stat-row">
-                <span class="stat-label">Progress:</span>
-                <span class="stat-value">{{ skills()![skillKey].progress.toFixed(1) }}%</span>
-              </div>
-              <div class="stat-row">
-                <span class="stat-label">To Next Level:</span>
-                <span class="stat-value">{{ getExperienceToNext(skills()![skillKey].experience) }} XP</span>
-              </div>
-              @if (skills()![skillKey].mainAttribute) {
-                <div class="stat-row highlight">
-                  <span class="stat-label">Main Attribute:</span>
-                  <span class="stat-value">{{ skills()![skillKey].mainAttribute }}</span>
-                </div>
-              }
-            </div>
-
-            <div class="hover-footer">
-              <div class="total-xp">Total XP: {{ skills()![skillKey].experience }}</div>
-            </div>
+      <!-- Hover Detail Card -->
+      <div class="skill-hover-card">
+        <div class="hover-header">
+          <img class="hover-icon" [src]="skillIcons[skillKey]" [alt]="skillNames[skillKey]">
+          <div class="hover-title">
+            <h4>{{ skillNames[skillKey] }}</h4>
+            <span class="hover-level">Level {{ skills()![skillKey].level }}</span>
           </div>
         </div>
-      }
+
+        <div class="hover-stats">
+          <div class="stat-row">
+            <span class="stat-label">Experience:</span>
+            <span class="stat-value">{{ skills()![skillKey].experience % 1000 }} / 1000</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Progress:</span>
+            <span class="stat-value">{{ skills()![skillKey].progress.toFixed(1) }}%</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">To Next Level:</span>
+            <span class="stat-value">{{ getExperienceToNext(skills()![skillKey].experience) }} XP</span>
+          </div>
+          @if (skills()![skillKey].mainAttribute) {
+          <div class="stat-row highlight">
+            <span class="stat-label">Main Attribute:</span>
+            <span class="stat-value">{{ skills()![skillKey].mainAttribute }}</span>
+          </div>
+          }
+        </div>
+
+        <div class="hover-footer">
+          <div class="total-xp">Total XP: {{ skills()![skillKey].experience }}</div>
+        </div>
+      </div>
     </div>
+    }
+  </div>
   }
 </div>

@@ -2,70 +2,65 @@
   <h2>Attributes</h2>
 
   @if (loading()) {
-    <div class="loading">Loading attributes...</div>
+  <div class="loading">Loading attributes...</div>
   }
 
   @if (error()) {
-    <div class="error">{{ error() }}</div>
+  <div class="error">{{ error() }}</div>
   }
 
   @if (attributes() && !loading()) {
-    <div class="attributes-grid">
-      @for (attributeName of attributeList; track attributeName) {
-        <div class="attribute-card">
-          <div class="attribute-header">
-            <img [src]="getAttributeIcon(attributeName)"
-                 [alt]="attributeName"
-                 class="attribute-icon"
-                 (error)="$event.target.style.display='none'">
-            <div class="attribute-title">
-              <h3>{{ capitalizeFirst(attributeName) }}</h3>
-              <span class="attribute-level">Lv {{ attributes()![attributeName].level }}</span>
-            </div>
-          </div>
+  <div class="attributes-grid">
+    @for (attributeName of attributeList; track attributeName) {
+    <div class="attribute-card">
+      <div class="attribute-header">
+        <img class="attribute-icon" [src]="getAttributeIcon(attributeName)" [alt]="attributeName"
+          (error)="$event.target.style.display='none'">
+        <div class="attribute-title">
+          <h3>{{ capitalizeFirst(attributeName) }}</h3>
+          <span class="attribute-level">Lv {{ attributes()![attributeName].level }}</span>
+        </div>
+      </div>
 
-          <div class="progress-container">
-            <div class="progress-bar">
-              <div class="progress-fill"
-                   [style.width.%]="attributes()![attributeName].progress">
-              </div>
-            </div>
-          </div>
-
-          <!-- Hover Detail Card -->
-          <div class="attribute-hover-card">
-            <div class="hover-header">
-              <img [src]="getAttributeIcon(attributeName)"
-                   [alt]="attributeName"
-                   class="hover-icon"
-                   (error)="$event.target.style.display='none'">
-              <div class="hover-title">
-                <h4>{{ capitalizeFirst(attributeName) }}</h4>
-                <span class="hover-level">Level {{ attributes()![attributeName].level }}</span>
-              </div>
-            </div>
-
-            <div class="hover-stats">
-              <div class="stat-row">
-                <span class="stat-label">Total Experience:</span>
-                <span class="stat-value">{{ attributes()![attributeName].experience }} XP</span>
-              </div>
-              <div class="stat-row">
-                <span class="stat-label">Progress:</span>
-                <span class="stat-value">{{ attributes()![attributeName].progress.toFixed(1) }}%</span>
-              </div>
-              <div class="stat-row highlight">
-                <span class="stat-label">To Next Level:</span>
-                <span class="stat-value">{{ attributes()![attributeName].xpToNextLevel }} XP</span>
-              </div>
-            </div>
-
-            <div class="hover-footer">
-              <div class="description">Improves overall character capability</div>
-            </div>
+      <div class="progress-container">
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="attributes()![attributeName].progress">
           </div>
         </div>
-      }
+      </div>
+
+      <!-- Hover Detail Card -->
+      <div class="attribute-hover-card">
+        <div class="hover-header">
+          <img [src]="getAttributeIcon(attributeName)" [alt]="attributeName" class="hover-icon"
+            (error)="$event.target.style.display='none'">
+          <div class="hover-title">
+            <h4>{{ capitalizeFirst(attributeName) }}</h4>
+            <span class="hover-level">Level {{ attributes()![attributeName].level }}</span>
+          </div>
+        </div>
+
+        <div class="hover-stats">
+          <div class="stat-row">
+            <span class="stat-label">Total Experience:</span>
+            <span class="stat-value">{{ attributes()![attributeName].experience }} XP</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Progress:</span>
+            <span class="stat-value">{{ attributes()![attributeName].progress.toFixed(1) }}%</span>
+          </div>
+          <div class="stat-row highlight">
+            <span class="stat-label">To Next Level:</span>
+            <span class="stat-value">{{ attributes()![attributeName].xpToNextLevel }} XP</span>
+          </div>
+        </div>
+
+        <div class="hover-footer">
+          <div class="description">Improves overall character capability</div>
+        </div>
+      </div>
     </div>
+    }
+  </div>
   }
 </div>

@@ -46,7 +46,6 @@
       .attribute-hover-card {
         opacity: 1;
         visibility: visible;
-        transform: translateY(0);
       }
     }
 
@@ -111,8 +110,6 @@
     .attribute-hover-card {
       position: absolute;
       top: 100%;
-      left: 50%;
-      transform: translateX(-50%) translateY(-8px);
       margin-top: var(--spacing-s);
       min-width: 280px;
       background: var(--gradient-card);
@@ -131,8 +128,6 @@
         content: '';
         position: absolute;
         top: -8px;
-        left: 50%;
-        transform: translateX(-50%);
         width: 0;
         height: 0;
         border-left: 8px solid transparent;
@@ -218,5 +213,52 @@
         }
       }
     }
+  }
+}
+
+// Adjust hover card position for edge cards
+// Use container queries to prevent overflow
+.attribute-card {
+  .attribute-hover-card {
+    // Default: prevent overflow on both sides
+    max-width: calc(100vw - 2 * var(--spacing-l));
+    max-width: calc(var(--sidebar-width-right) - 2 * var(--spacing-l) - 16px); // Adjust for sidebar width and extra padding
+  }
+}
+
+.attribute-card:nth-child(3n+1) .attribute-hover-card {
+  // Left column - align to left edge
+  left: 0;
+  transform: translateX(0) translateY(-8px);
+
+  &::before {
+    left: var(--spacing-l);
+    transform: translateX(0);
+  }
+}
+
+.attribute-card:nth-child(3n+2) .attribute-hover-card {
+  // Middle column - keep centered but prevent overflow
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%) translateY(-8px);
+
+  &::before {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+  }
+}
+
+.attribute-card:nth-child(3n) .attribute-hover-card {
+  // Right column - align to right edge
+  left: auto;
+  right: 0;
+  transform: translateX(0) translateY(-8px);
+
+  &::before {
+    left: auto;
+    right: var(--spacing-l);
+    transform: translateX(0);
   }
 }
