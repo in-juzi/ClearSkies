@@ -1,5 +1,6 @@
 const fs = require('fs').promises;
 const path = require('path');
+const dropTableService = require('./dropTableService');
 
 class LocationService {
   constructor() {
@@ -7,6 +8,7 @@ class LocationService {
     this.locations = new Map();
     this.facilities = new Map();
     this.activities = new Map();
+    this.dropTableService = dropTableService;
     this.loaded = false;
   }
 
@@ -19,7 +21,8 @@ class LocationService {
         this.loadBiomes(),
         this.loadActivities(),
         this.loadFacilities(),
-        this.loadLocations()
+        this.loadLocations(),
+        this.dropTableService.loadAll()
       ]);
       this.loaded = true;
       console.log('Location data loaded successfully');
@@ -254,14 +257,31 @@ class LocationService {
   /**
    * Calculate activity rewards
    */
-  calculateActivityRewards(activity) {
+  calculateActivityRewards(activity, options = {}) {
     const rewards = {
       experience: activity.rewards.experience || {},
       items: [],
       gold: 0
     };
 
-    // Roll for item drops
+    // Roll on drop tables (new system)
+    if (activity.rewards.dropTables && Array.isArray(activity.rewards.dropTables)) {
+      const drops = this.dropTableService.rollMultipleDropTables(
+        activity.rewards.dropTables,
+        options
+      );
+
+      for (const drop of drops) {
+        rewards.items.push({
+          itemId: drop.itemId,
+          quantity: drop.quantity,
+          qualityBonus: drop.qualityBonus,
+          qualityMultiplier: drop.qualityMultiplier
+        });
+      }
+    }
+
+    // Legacy: Roll for item drops (old system - backward compatible)
     if (activity.rewards.items) {
       for (const itemReward of activity.rewards.items) {
         if (Math.random() <= itemReward.chance) {

@@ -1,0 +1,24 @@
+{
+  "dropTableId": "rare-fishing",
+  "name": "Rare Fishing Finds",
+  "description": "Rare treasures pulled from the water",
+  "drops": [
+    {
+      "itemId": "mana_potion",
+      "weight": 2,
+      "quantity": { "min": 1, "max": 1 },
+      "comment": "Magical items lost in the depths"
+    },
+    {
+      "itemId": "copper_sword",
+      "weight": 1,
+      "quantity": { "min": 1, "max": 1 },
+      "comment": "Ancient weapon from the riverbed"
+    },
+    {
+      "dropNothing": true,
+      "weight": 97,
+      "comment": "Just fish today"
+    }
+  ]
+}

@@ -13,12 +13,9 @@
     "experience": {
       "woodcutting": 30
     },
-    "items": [
-      {
-        "itemId": "oak_log",
-        "quantity": { "min": 1, "max": 2 },
-        "chance": 0.9
-      }
+    "dropTables": [
+      "woodcutting-oak",
+      "rare-woodcutting"
     ]
   }
 }

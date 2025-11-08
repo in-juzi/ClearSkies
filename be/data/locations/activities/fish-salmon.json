@@ -13,12 +13,9 @@
     "experience": {
       "fishing": 40
     },
-    "items": [
-      {
-        "itemId": "salmon",
-        "quantity": { "min": 1, "max": 2 },
-        "chance": 0.7
-      }
+    "dropTables": [
+      "fishing-salmon",
+      "rare-fishing"
     ]
   }
 }
