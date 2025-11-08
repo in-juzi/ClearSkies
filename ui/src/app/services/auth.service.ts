@@ -24,11 +24,15 @@ export class AuthService {
   private currentUserSignal = signal<User | null>(null);
   private currentPlayerSignal = signal<Player | null>(null);
   private loadingSignal = signal<boolean>(false);
+  private initializingSignal = signal<boolean>(true);
+  private initializedSubject = new BehaviorSubject<boolean>(false);
 
   // Public read-only signals
   readonly currentUser = this.currentUserSignal.asReadonly();
   readonly currentPlayer = this.currentPlayerSignal.asReadonly();
   readonly loading = this.loadingSignal.asReadonly();
+  readonly initializing = this.initializingSignal.asReadonly();
+  readonly initialized$ = this.initializedSubject.asObservable();
 
   // Computed signals
   readonly isAuthenticated = computed(() => this.currentUserSignal() !== null);
@@ -129,13 +133,24 @@ export class AuthService {
    */
   private checkAuth(): void {
     const token = this.getToken();
+
     if (token) {
       // Fetch user profile to verify token
       this.getProfile().subscribe({
-        error: () => {
-          this.clearAuth();
+        next: (response) => {
+          this.initializingSignal.set(false);
+          this.initializedSubject.next(true);
+        },
+        error: (error) => {
+          // Clear auth without redirect - let the guard handle navigation
+          this.clearAuth(false);
+          this.initializingSignal.set(false);
+          this.initializedSubject.next(true);
         }
       });
+    } else {
+      this.initializingSignal.set(false);
+      this.initializedSubject.next(true);
     }
   }
 
@@ -152,11 +167,14 @@ export class AuthService {
   /**
    * Clear authentication state
    */
-  private clearAuth(): void {
+  private clearAuth(redirect: boolean = true): void {
     localStorage.removeItem(this.TOKEN_KEY);
     this.currentUserSignal.set(null);
     this.currentPlayerSignal.set(null);
     this.loadingSignal.set(false);
-    this.router.navigate(['/login']);
+
+    if (redirect) {
+      this.router.navigate(['/login']);
+    }
   }
 }
