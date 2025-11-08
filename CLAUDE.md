@@ -139,8 +139,13 @@ ClearSkies/
 - ✅ Location discovery and travel mechanics
 - ✅ Activity system with skill-based requirements and rewards
 - ✅ Activity progress tracking with time-based completion
+- ✅ Activity completion log with recent rewards history (last 10 entries)
+- ✅ Automatic activity reward claiming (no manual claim button needed)
 - ✅ Location UI with facility and activity browsing
 - ✅ Location API endpoints (GET locations, POST discover, POST start activity, POST travel)
+- ✅ Drop table system for flexible loot distribution
+- ✅ Weighted random drop selection with quality bonuses
+- ✅ Reusable drop tables across multiple activities
 - ✅ Equipment slot system with 10 default slots (head, body, mainHand, offHand, belt, gloves, boots, necklace, ringRight, ringLeft)
 - ✅ Extensible slot architecture (easy to add new slots via addEquipmentSlot method)
 - ✅ Item definitions with slot assignments for equipment items
@@ -151,6 +156,9 @@ ClearSkies/
 - ✅ Right-click to unequip items from slots
 - ✅ Equipment API endpoints (GET equipped items, POST equip, POST unequip)
 - ✅ Equipment service for managing equipped items state
+- ✅ SVG icon system (222+ scalable icons for abilities, items, skills, attributes, UI elements)
+- ✅ Improved UI layout with viewport overflow fixes (100vh height, proper overflow handling)
+- ✅ Nodemon for backend auto-restart during development
 
 ### Database Models
 
@@ -274,11 +282,15 @@ ClearSkies/
    - Auth interceptor directly accesses localStorage to avoid circular dependencies
    - Guards use async initialization pattern with `initialized$` observable
    - **IMPORTANT**: Auth middleware attaches the full User document to `req.user`, so access the user ID via `req.user._id` (NOT `req.user.userId`)
-5. **Assets**: Store icons and images in `ui/src/assets/` (configured in angular.json)
+5. **Assets**:
+   - Store icons and images in `ui/src/assets/` (configured in angular.json)
+   - **Icons are SVG format** (222+ icons available for abilities, items, skills, attributes, UI elements)
+   - Icon paths use `.svg` extension (e.g., `assets/icons/skill_woodcutting.svg`)
 6. **Styling**:
    - Use medieval fantasy theme (dark blues, purples, gold accents)
    - Design tokens available in `ui/src/design-tokens.scss`
    - See `ui/DESIGN_SYSTEM.md` for complete guidelines
+   - Global styles use `height: 100vh` and `overflow: hidden` for proper viewport management
 7. **Item System**:
    - Item definitions stored in JSON files in `be/data/items/`
    - Use ItemService for all item operations (loading, creation, calculations)
@@ -309,6 +321,8 @@ ClearSkies/
    - Tabbed navigation for multi-view sidebars
    - Draggable panels for flexible UI positioning (drag from header only)
    - Square equipment slots using grid pseudo-element technique
+   - Activity completion log displays last 10 completed activities with rewards
+   - Automatic reward claiming (activities complete automatically when time expires)
 11. **Documentation**: Update CLAUDE.md and relevant docs in `project/docs/`
 
 ## Database Migrations
