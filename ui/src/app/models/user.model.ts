@@ -11,6 +11,7 @@ export interface Player {
   level: number;
   experience: number;
   stats: PlayerStats;
+  attributes: PlayerAttributes;
   skills: PlayerSkills;
   gold: number;
   location: Location;
@@ -33,9 +34,25 @@ export interface PlayerStats {
   vitality: number;
 }
 
+export interface Attribute {
+  level: number;
+  experience: number;
+}
+
+export interface PlayerAttributes {
+  strength: Attribute;
+  endurance: Attribute;
+  magic: Attribute;
+  perception: Attribute;
+  dexterity: Attribute;
+  will: Attribute;
+  charisma: Attribute;
+}
+
 export interface Skill {
   level: number;
   experience: number;
+  mainAttribute: string;
 }
 
 export interface PlayerSkills {
@@ -44,6 +61,15 @@ export interface PlayerSkills {
   fishing: Skill;
   smithing: Skill;
   cooking: Skill;
+}
+
+export interface AttributeWithProgress extends Attribute {
+  progress: number;
+  xpToNextLevel?: number;
+}
+
+export interface AttributesResponse {
+  [key: string]: AttributeWithProgress;
 }
 
 export interface SkillWithProgress extends Skill {
@@ -68,17 +94,30 @@ export interface SkillExperienceResponse {
   success: boolean;
   message: string;
   data: {
-    skill: string;
-    level: number;
-    experience: number;
-    progress: number;
-    leveledUp: boolean;
-    oldLevel?: number;
-    newLevel?: number;
+    skill: {
+      name: string;
+      level: number;
+      experience: number;
+      progress: number;
+      leveledUp: boolean;
+      oldLevel: number;
+      newLevel: number;
+      mainAttribute: string;
+    };
+    attribute: {
+      name: string;
+      level: number;
+      experience: number;
+      progress: number;
+      leveledUp: boolean;
+      oldLevel: number;
+      newLevel: number;
+    };
   };
 }
 
 export type SkillName = 'woodcutting' | 'mining' | 'fishing' | 'smithing' | 'cooking';
+export type AttributeName = 'strength' | 'endurance' | 'magic' | 'perception' | 'dexterity' | 'will' | 'charisma';
 
 export interface Location {
   currentZone: string;
