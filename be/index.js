@@ -2,12 +2,18 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/database');
+const itemService = require('./services/itemService');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Connect to MongoDB
 connectDB();
+
+// Load item definitions
+itemService.loadDefinitions()
+  .then(() => console.log('✓ Item definitions loaded'))
+  .catch(err => console.error('Failed to load item definitions:', err));
 
 // Middleware
 app.use(cors());
@@ -32,10 +38,12 @@ app.get('/health', (req, res) => {
 const authRoutes = require('./routes/auth');
 const skillsRoutes = require('./routes/skills');
 const attributesRoutes = require('./routes/attributes');
+const inventoryRoutes = require('./routes/inventory');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/skills', skillsRoutes);
 app.use('/api/attributes', attributesRoutes);
+app.use('/api/inventory', inventoryRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

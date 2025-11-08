@@ -38,10 +38,23 @@ const playerSchema = new mongoose.Schema({
     min: 0
   },
   inventory: [{
-    itemId: { type: mongoose.Schema.Types.ObjectId, ref: 'Item' },
+    instanceId: { type: String, required: true },
+    itemId: { type: String, required: true }, // Reference to item definition
     quantity: { type: Number, default: 1, min: 1 },
-    equipped: { type: Boolean, default: false }
+    qualities: {
+      type: Map,
+      of: Number,
+      default: {}
+    },
+    traits: [{ type: String }],
+    equipped: { type: Boolean, default: false },
+    acquiredAt: { type: Date, default: Date.now }
   }],
+  inventoryCapacity: {
+    type: Number,
+    default: 100,
+    min: 1
+  },
   location: {
     currentZone: { type: String, default: 'Starting Village' },
     coordinates: {
@@ -266,6 +279,90 @@ playerSchema.methods.getSkillProgress = function(skillName) {
   const skill = this.skills[skillName];
   const xpInCurrentLevel = skill.experience % 1000;
   return (xpInCurrentLevel / 1000) * 100;
+};
+
+// Inventory Management Methods
+
+// Add item to inventory
+playerSchema.methods.addItem = async function(itemInstance) {
+  // Check inventory capacity
+  const currentSize = this.inventory.reduce((sum, item) => sum + item.quantity, 0);
+  if (currentSize + itemInstance.quantity > this.inventoryCapacity) {
+    throw new Error('Inventory is full');
+  }
+
+  // Try to stack with existing items
+  const itemService = require('../services/itemService');
+  const existingItem = this.inventory.find(inv =>
+    itemService.canStack(inv, itemInstance)
+  );
+
+  if (existingItem) {
+    const itemDef = itemService.getItemDefinition(itemInstance.itemId);
+    const newQuantity = existingItem.quantity + itemInstance.quantity;
+
+    if (itemDef.stackable && newQuantity <= itemDef.maxStack) {
+      existingItem.quantity = newQuantity;
+    } else {
+      // Can't stack, add as new item
+      this.inventory.push(itemInstance);
+    }
+  } else {
+    // New item, add to inventory
+    this.inventory.push(itemInstance);
+  }
+
+  await this.save();
+  return itemInstance;
+};
+
+// Remove item from inventory by instance ID
+playerSchema.methods.removeItem = async function(instanceId, quantity = null) {
+  const itemIndex = this.inventory.findIndex(item => item.instanceId === instanceId);
+
+  if (itemIndex === -1) {
+    throw new Error('Item not found in inventory');
+  }
+
+  const item = this.inventory[itemIndex];
+
+  if (quantity === null || quantity >= item.quantity) {
+    // Remove entire stack
+    this.inventory.splice(itemIndex, 1);
+  } else {
+    // Remove partial quantity
+    if (quantity <= 0) {
+      throw new Error('Quantity must be positive');
+    }
+    item.quantity -= quantity;
+  }
+
+  await this.save();
+  return item;
+};
+
+// Get item from inventory by instance ID
+playerSchema.methods.getItem = function(instanceId) {
+  return this.inventory.find(item => item.instanceId === instanceId);
+};
+
+// Get all items of a specific itemId
+playerSchema.methods.getItemsByItemId = function(itemId) {
+  return this.inventory.filter(item => item.itemId === itemId);
+};
+
+// Get inventory size
+playerSchema.methods.getInventorySize = function() {
+  return this.inventory.reduce((sum, item) => sum + item.quantity, 0);
+};
+
+// Get inventory value (total vendor price)
+playerSchema.methods.getInventoryValue = function() {
+  const itemService = require('../services/itemService');
+  return this.inventory.reduce((sum, item) => {
+    const price = itemService.calculateVendorPrice(item);
+    return sum + (price * item.quantity);
+  }, 0);
 };
 
 module.exports = mongoose.model('Player', playerSchema);
