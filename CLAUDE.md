@@ -28,7 +28,8 @@ ClearSkies/
 │   │       ├── definitions/   # Location definitions (kennik, forest-clearing, etc.)
 │   │       ├── biomes/        # Biome definitions (forest, mountain, sea)
 │   │       ├── facilities/    # Facility definitions (market, dock, mine, etc.)
-│   │       └── activities/    # Activity definitions (chop-oak, fish-salmon, etc.)
+│   │       ├── activities/    # Activity definitions (chop-oak, fish-salmon, etc.)
+│   │       └── drop-tables/   # Drop table definitions (weighted loot pools)
 │   ├── middleware/        # Auth and other middleware
 │   ├── migrations/        # Database migrations
 │   │   ├── 001-add-skills-to-players.js
@@ -46,7 +47,8 @@ ClearSkies/
 │   │   └── locations.js
 │   ├── services/         # Business logic services
 │   │   ├── itemService.js
-│   │   └── locationService.js
+│   │   ├── locationService.js
+│   │   └── dropTableService.js
 │   └── utils/            # Utility functions (JWT, migrations, etc.)
 ├── ui/                    # Frontend (Angular 20)
 │   └── src/
@@ -80,7 +82,8 @@ ClearSkies/
 ├── project/               # Project management
 │   ├── docs/             # Project documentation
 │   │   ├── inventory-system.md
-│   │   └── equipment-system.md
+│   │   ├── equipment-system.md
+│   │   └── drop-table-system.md
 │   ├── ideas/            # Feature ideas and concepts
 │   ├── tasks/
 │   │   ├── todo/         # Pending tasks
@@ -287,8 +290,11 @@ ClearSkies/
    - Location definitions stored in JSON files in `be/data/locations/`
    - Use LocationService for all location operations
    - Four-tier structure: locations → facilities → activities → rewards
-   - Activities can require skills, award XP, and give item rewards
+   - Activities can require skills, award XP, and give item rewards via drop tables
    - Travel and activity completion are time-based
+   - Drop tables use weighted random selection for flexible loot distribution
+   - Activities reference drop tables in `rewards.dropTables` array
+   - Drop tables support quality bonuses and "dropNothing" entries
 9. **Equipment System**:
    - Equipment items must include a `slot` field in their definition
    - Use EquipmentService for managing equipped items
@@ -420,16 +426,25 @@ The location system provides a rich world exploration and activity framework:
    - Actions players can perform at facilities
    - Skill requirements and difficulty levels
    - Time-based completion (duration in seconds)
-   - Rewards: XP, items (with quantities and quality ranges)
+   - Rewards: XP, items via drop tables
    - Examples: Chop Oak, Fish Salmon, Mine Iron, Combat Bandits
+
+5. **Drop Tables** (JSON files in `be/data/locations/drop-tables/`)
+   - Weighted loot pools for activity rewards
+   - Define relative drop rates using weight system
+   - Reusable across multiple activities
+   - Support for quality bonuses and rare drops
+   - Examples: woodcutting-oak, rare-woodcutting, fishing-salmon, rare-fishing
 
 **Key Features:**
 - Players start in Kennik and can discover new locations
 - Travel between locations takes time
-- Activities award skill XP and items to inventory
+- Activities award skill XP and items to inventory via drop tables
 - Activity completion is time-based (tracked server-side)
 - Rich location descriptions and lore through biomes
+- Flexible drop table system for easy loot balancing
 - Easy content expansion by adding new JSON files
+- Full documentation in `project/docs/drop-table-system.md`
 
 ## Equipment System
 
