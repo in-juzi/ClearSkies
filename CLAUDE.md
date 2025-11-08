@@ -33,7 +33,8 @@ ClearSkies/
 │   ├── migrations/        # Database migrations
 │   │   ├── 001-add-skills-to-players.js
 │   │   ├── 002-add-attributes-and-skill-main-attributes.js
-│   │   └── 003-add-location-system.js
+│   │   ├── 003-add-location-system.js
+│   │   └── 004-add-equipment-slots.js
 │   ├── models/           # Mongoose schemas
 │   │   ├── User.js
 │   │   └── Player.js
@@ -123,6 +124,7 @@ ClearSkies/
 - ✅ Trait system (7 types with rarity levels: common to epic)
 - ✅ Item instance management with stacking logic
 - ✅ Inventory UI with category filtering and detailed item views
+- ✅ Draggable item details panel (repositionable via header drag)
 - ✅ Random quality/trait generation for items
 - ✅ Dynamic vendor pricing based on qualities and traits
 - ✅ Hot-reload capability for item definitions
@@ -133,6 +135,11 @@ ClearSkies/
 - ✅ Activity progress tracking with time-based completion
 - ✅ Location UI with facility and activity browsing
 - ✅ Location API endpoints (GET locations, POST discover, POST start activity, POST travel)
+- ✅ Equipment slot system with 10 default slots (head, body, mainHand, offHand, belt, gloves, boots, necklace, ringRight, ringLeft)
+- ✅ Extensible slot architecture (easy to add new slots)
+- ✅ Item definitions with slot assignments
+- ✅ Equip/unequip functionality with validation
+- ✅ Equipment API endpoints (GET equipped items, POST equip, POST unequip)
 
 ### Database Models
 
@@ -159,6 +166,10 @@ ClearSkies/
   - equipped (boolean)
   - acquiredAt (timestamp)
 - inventoryCapacity (default: 100)
+- equipmentSlots (Map<string, string|null>) - Extensible equipment slot system
+  - Default slots: head, body, mainHand, offHand, belt, gloves, boots, necklace, ringRight, ringLeft
+  - Key = slot name, Value = instanceId of equipped item (or null)
+  - New slots can be added dynamically via addEquipmentSlot() method
 - currentLocation (string, default: 'kennik') - Current location ID
 - discoveredLocations (array of strings, default: ['kennik']) - List of discovered location IDs
 - activeActivity (object, optional) - Currently active activity with:
@@ -180,6 +191,11 @@ ClearSkies/
   - `getItemsByItemId(itemId)` - Get all of one type
   - `getInventorySize()` - Total item count
   - `getInventoryValue()` - Total vendor price
+  - `equipItem(instanceId, slotName)` - Equip item to slot (auto-unequips current item)
+  - `unequipItem(slotName)` - Unequip item from slot
+  - `getEquippedItems()` - Get all equipped items
+  - `isSlotAvailable(slotName)` - Check if slot is empty
+  - `addEquipmentSlot(slotName)` - Add new equipment slot (for extensibility)
 
 ### API Endpoints
 
@@ -212,6 +228,14 @@ ClearSkies/
   - Query: `?category=resource|equipment|consumable`
 - `GET /api/inventory/definitions/:itemId` - Get single item definition (protected)
 - `POST /api/inventory/reload` - Hot-reload item definitions (admin) (protected)
+
+**Equipment:**
+- `GET /api/inventory/equipment` - Get all equipped items and available slots (protected)
+- `POST /api/inventory/equipment/equip` - Equip an item to a slot (protected)
+  - Body: `{ instanceId, slotName }`
+  - Automatically unequips current item in slot if occupied
+- `POST /api/inventory/equipment/unequip` - Unequip an item from a slot (protected)
+  - Body: `{ slotName }`
 
 **Locations:**
 - `GET /api/locations` - Get all locations (discovered and undiscovered) (protected)
@@ -250,6 +274,7 @@ ClearSkies/
    - Hot-reload available via `/api/inventory/reload` endpoint
    - Quality values are 0-1 scale (affects pricing and effects)
    - Trait rarities: common (5%), uncommon (15%), rare (30%), epic (50%)
+   - Equipment items must include a `slot` field indicating which equipment slot they can be equipped to
 8. **Location System**:
    - Location definitions stored in JSON files in `be/data/locations/`
    - Use LocationService for all location operations
@@ -261,6 +286,7 @@ ClearSkies/
    - Hover tooltips for detailed information (prevents clutter)
    - Edge-aware positioning to prevent tooltip cutoff
    - Tabbed navigation for multi-view sidebars
+   - Draggable panels for flexible UI positioning (drag from header only)
 10. **Documentation**: Update CLAUDE.md and relevant docs in `project/docs/`
 
 ## Database Migrations
@@ -279,6 +305,7 @@ npm run migrate:down     # Rollback last migration
 1. `001-add-skills-to-players.js` - Adds skills to existing player documents
 2. `002-add-attributes-and-skill-main-attributes.js` - Adds attributes and mainAttribute field to skills
 3. `003-add-location-system.js` - Adds location fields (currentLocation, discoveredLocations, activeActivity, travelState)
+4. `004-add-equipment-slots.js` - Adds equipment slot system to all players with 10 default slots
 
 **Creating a New Migration:**
 1. Create a file in `be/migrations/` with format: `NNN-description.js`
