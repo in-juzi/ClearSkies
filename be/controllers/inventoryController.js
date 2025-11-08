@@ -221,3 +221,107 @@ exports.reloadDefinitions = async (req, res) => {
     res.status(500).json({ message: 'Error reloading definitions', error: error.message });
   }
 };
+
+/**
+ * Equip an item to a slot
+ * Body: { instanceId, slotName }
+ */
+exports.equipItem = async (req, res) => {
+  try {
+    const { instanceId, slotName } = req.body;
+
+    if (!instanceId || !slotName) {
+      return res.status(400).json({ message: 'instanceId and slotName are required' });
+    }
+
+    const player = await Player.findOne({ userId: req.user._id });
+    if (!player) {
+      return res.status(404).json({ message: 'Player not found' });
+    }
+
+    // Equip the item
+    const result = await player.equipItem(instanceId, slotName);
+
+    // Get enhanced item details
+    const itemDetails = itemService.getItemDetails(result.item.toObject());
+
+    res.json({
+      message: 'Item equipped successfully',
+      slot: result.slot,
+      item: itemDetails,
+      equippedItems: player.getEquippedItems()
+    });
+  } catch (error) {
+    console.error('Equip item error:', error);
+    res.status(400).json({ message: error.message });
+  }
+};
+
+/**
+ * Unequip an item from a slot
+ * Body: { slotName }
+ */
+exports.unequipItem = async (req, res) => {
+  try {
+    const { slotName } = req.body;
+
+    if (!slotName) {
+      return res.status(400).json({ message: 'slotName is required' });
+    }
+
+    const player = await Player.findOne({ userId: req.user._id });
+    if (!player) {
+      return res.status(404).json({ message: 'Player not found' });
+    }
+
+    // Unequip the item
+    const result = await player.unequipItem(slotName);
+
+    // Get enhanced item details
+    const itemDetails = result.item ? itemService.getItemDetails(result.item.toObject()) : null;
+
+    res.json({
+      message: 'Item unequipped successfully',
+      slot: result.slot,
+      item: itemDetails,
+      equippedItems: player.getEquippedItems()
+    });
+  } catch (error) {
+    console.error('Unequip item error:', error);
+    res.status(400).json({ message: error.message });
+  }
+};
+
+/**
+ * Get all equipped items
+ */
+exports.getEquippedItems = async (req, res) => {
+  try {
+    const player = await Player.findOne({ userId: req.user._id });
+    if (!player) {
+      return res.status(404).json({ message: 'Player not found' });
+    }
+
+    const equippedItems = player.getEquippedItems();
+
+    // Enhance equipped items with details
+    const enhancedEquipped = {};
+    for (const [slot, item] of Object.entries(equippedItems)) {
+      enhancedEquipped[slot] = itemService.getItemDetails(item.toObject());
+    }
+
+    // Get all available slots
+    const allSlots = {};
+    for (const [slot, instanceId] of player.equipmentSlots.entries()) {
+      allSlots[slot] = instanceId;
+    }
+
+    res.json({
+      equippedItems: enhancedEquipped,
+      slots: allSlots
+    });
+  } catch (error) {
+    console.error('Get equipped items error:', error);
+    res.status(500).json({ message: 'Error fetching equipped items', error: error.message });
+  }
+};

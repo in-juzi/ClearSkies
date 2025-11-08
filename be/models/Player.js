@@ -55,6 +55,24 @@ const playerSchema = new mongoose.Schema({
     default: 100,
     min: 1
   },
+  // Equipment slots - extensible Map structure
+  // Key = slot name, Value = instanceId of equipped item (or null)
+  equipmentSlots: {
+    type: Map,
+    of: String,
+    default: () => new Map([
+      ['head', null],
+      ['body', null],
+      ['mainHand', null],
+      ['offHand', null],
+      ['belt', null],
+      ['gloves', null],
+      ['boots', null],
+      ['necklace', null],
+      ['ringRight', null],
+      ['ringLeft', null]
+    ])
+  },
   // Location system
   currentLocation: {
     type: String,
@@ -378,6 +396,111 @@ playerSchema.methods.getInventoryValue = function() {
     const price = itemService.calculateVendorPrice(item);
     return sum + (price * item.quantity);
   }, 0);
+};
+
+// Equipment Management Methods
+
+// Equip an item to a slot
+playerSchema.methods.equipItem = async function(instanceId, slotName) {
+  const itemService = require('../services/itemService');
+
+  // Find the item in inventory
+  const item = this.getItem(instanceId);
+  if (!item) {
+    throw new Error('Item not found in inventory');
+  }
+
+  // Get item definition to check if it can be equipped
+  const itemDef = itemService.getItemDefinition(item.itemId);
+  if (!itemDef) {
+    throw new Error('Item definition not found');
+  }
+
+  // Check if item is equippable
+  if (itemDef.category !== 'equipment' || !itemDef.slot) {
+    throw new Error('Item cannot be equipped');
+  }
+
+  // Validate the slot exists
+  if (!this.equipmentSlots.has(slotName)) {
+    throw new Error(`Invalid equipment slot: ${slotName}`);
+  }
+
+  // Check if item can be equipped to this slot
+  if (itemDef.slot !== slotName) {
+    throw new Error(`Item cannot be equipped to ${slotName} slot. It can only be equipped to ${itemDef.slot}`);
+  }
+
+  // Check if slot already has an item equipped
+  const currentlyEquipped = this.equipmentSlots.get(slotName);
+  if (currentlyEquipped) {
+    // Unequip current item first
+    await this.unequipItem(slotName);
+  }
+
+  // Equip the new item
+  this.equipmentSlots.set(slotName, instanceId);
+  item.equipped = true;
+
+  await this.save();
+  return { slot: slotName, item };
+};
+
+// Unequip an item from a slot
+playerSchema.methods.unequipItem = async function(slotName) {
+  // Validate the slot exists
+  if (!this.equipmentSlots.has(slotName)) {
+    throw new Error(`Invalid equipment slot: ${slotName}`);
+  }
+
+  const instanceId = this.equipmentSlots.get(slotName);
+  if (!instanceId) {
+    throw new Error(`No item equipped in ${slotName} slot`);
+  }
+
+  // Find the item and mark as unequipped
+  const item = this.getItem(instanceId);
+  if (item) {
+    item.equipped = false;
+  }
+
+  // Clear the slot
+  this.equipmentSlots.set(slotName, null);
+
+  await this.save();
+  return { slot: slotName, item };
+};
+
+// Get all currently equipped items
+playerSchema.methods.getEquippedItems = function() {
+  const equipped = {};
+  for (const [slot, instanceId] of this.equipmentSlots.entries()) {
+    if (instanceId) {
+      const item = this.getItem(instanceId);
+      if (item) {
+        equipped[slot] = item;
+      }
+    }
+  }
+  return equipped;
+};
+
+// Check if a slot is available
+playerSchema.methods.isSlotAvailable = function(slotName) {
+  if (!this.equipmentSlots.has(slotName)) {
+    return false;
+  }
+  return this.equipmentSlots.get(slotName) === null;
+};
+
+// Add a new equipment slot (for future extensibility)
+playerSchema.methods.addEquipmentSlot = async function(slotName) {
+  if (this.equipmentSlots.has(slotName)) {
+    throw new Error(`Equipment slot ${slotName} already exists`);
+  }
+  this.equipmentSlots.set(slotName, null);
+  await this.save();
+  return slotName;
 };
 
 module.exports = mongoose.model('Player', playerSchema);

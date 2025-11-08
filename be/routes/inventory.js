@@ -30,4 +30,9 @@ router.get('/definitions/:itemId', inventoryController.getItemDefinition);
 // Reload item definitions (admin)
 router.post('/reload', inventoryController.reloadDefinitions);
 
+// Equipment routes
+router.get('/equipment', inventoryController.getEquippedItems);
+router.post('/equipment/equip', inventoryController.equipItem);
+router.post('/equipment/unequip', inventoryController.unequipItem);
+
 module.exports = router;

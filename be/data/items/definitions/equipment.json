@@ -5,6 +5,7 @@
     "description": "A basic sword made of copper",
     "category": "equipment",
     "equipmentType": "weapon",
+    "slot": "mainHand",
     "baseValue": 100,
     "rarity": "common",
     "stackable": false,
@@ -26,6 +27,7 @@
     "description": "A reliable iron sword",
     "category": "equipment",
     "equipmentType": "weapon",
+    "slot": "mainHand",
     "baseValue": 250,
     "rarity": "common",
     "stackable": false,
@@ -47,6 +49,7 @@
     "description": "A simple wooden shield for basic protection",
     "category": "equipment",
     "equipmentType": "shield",
+    "slot": "offHand",
     "baseValue": 50,
     "rarity": "common",
     "stackable": false,
@@ -60,6 +63,72 @@
       "requiredLevel": 1
     },
     "allowedQualities": ["woodGrain"],
+    "allowedTraits": ["weathered", "pristine", "blessed", "masterwork"]
+  },
+  "iron_helm": {
+    "itemId": "iron_helm",
+    "name": "Iron Helm",
+    "description": "A sturdy iron helmet",
+    "category": "equipment",
+    "equipmentType": "armor",
+    "slot": "head",
+    "baseValue": 150,
+    "rarity": "common",
+    "stackable": false,
+    "maxStack": 1,
+    "properties": {
+      "weight": 6,
+      "material": "iron",
+      "tier": 2,
+      "defense": 5,
+      "durability": 120,
+      "requiredLevel": 3
+    },
+    "allowedQualities": ["purity"],
+    "allowedTraits": ["pristine", "cursed", "blessed", "masterwork"]
+  },
+  "hemp_coif": {
+    "itemId": "hemp_coif",
+    "name": "Hemp Coif",
+    "description": "A simple cloth head covering made from hemp",
+    "category": "equipment",
+    "equipmentType": "armor",
+    "slot": "head",
+    "baseValue": 20,
+    "rarity": "common",
+    "stackable": false,
+    "maxStack": 1,
+    "properties": {
+      "weight": 1,
+      "material": "cloth",
+      "tier": 1,
+      "defense": 1,
+      "durability": 50,
+      "requiredLevel": 1
+    },
+    "allowedQualities": [],
+    "allowedTraits": ["weathered", "pristine", "blessed"]
+  },
+  "leather_tunic": {
+    "itemId": "leather_tunic",
+    "name": "Leather Tunic",
+    "description": "A basic leather chest piece",
+    "category": "equipment",
+    "equipmentType": "armor",
+    "slot": "body",
+    "baseValue": 75,
+    "rarity": "common",
+    "stackable": false,
+    "maxStack": 1,
+    "properties": {
+      "weight": 5,
+      "material": "leather",
+      "tier": 1,
+      "defense": 3,
+      "durability": 90,
+      "requiredLevel": 1
+    },
+    "allowedQualities": [],
     "allowedTraits": ["weathered", "pristine", "blessed", "masterwork"]
   }
 }
