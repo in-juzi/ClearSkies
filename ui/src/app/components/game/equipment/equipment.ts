@@ -24,16 +24,16 @@ export class Equipment {
 
   // Slot configuration with grid positions
   slotConfigs: SlotConfig[] = [
-    { name: 'head', label: 'Head', icon: '🛡️', position: { row: 1, col: 2 } },
-    { name: 'gloves', label: 'Gloves', icon: '🧤', position: { row: 2, col: 1 } },
-    { name: 'body', label: 'Body', icon: '👔', position: { row: 2, col: 2 } },
-    { name: 'necklace', label: 'Necklace', icon: '📿', position: { row: 2, col: 3 } },
-    { name: 'mainHand', label: 'Main Hand', icon: '⚔️', position: { row: 3, col: 1 } },
-    { name: 'belt', label: 'Belt', icon: '⛓️', position: { row: 3, col: 2 } },
-    { name: 'offHand', label: 'Off Hand', icon: '🛡️', position: { row: 3, col: 3 } },
-    { name: 'ringLeft', label: 'Ring (L)', icon: '💍', position: { row: 4, col: 1 } },
-    { name: 'boots', label: 'Boots', icon: '🥾', position: { row: 4, col: 2 } },
-    { name: 'ringRight', label: 'Ring (R)', icon: '💍', position: { row: 4, col: 3 } }
+    { name: 'head', label: 'Head', icon: 'assets/icons/item-categories/item_cat_body.svg', position: { row: 1, col: 2 } },
+    { name: 'gloves', label: 'Gloves', icon: 'assets/icons/item-categories/item_cat_glove.svg', position: { row: 2, col: 1 } },
+    { name: 'body', label: 'Body', icon: 'assets/icons/item-categories/item_cat_body.svg', position: { row: 2, col: 2 } },
+    { name: 'necklace', label: 'Necklace', icon: 'assets/icons/item-categories/item_cat_amulet.svg', position: { row: 2, col: 3 } },
+    { name: 'mainHand', label: 'Main Hand', icon: 'assets/icons/item-categories/item_cat_sword.svg', position: { row: 3, col: 1 } },
+    { name: 'belt', label: 'Belt', icon: 'assets/icons/item-categories/item_cat_belt.svg', position: { row: 3, col: 2 } },
+    { name: 'offHand', label: 'Off Hand', icon: 'assets/icons/item-categories/item_cat_axe.svg', position: { row: 3, col: 3 } },
+    { name: 'ringLeft', label: 'Ring (L)', icon: 'assets/icons/item-categories/item_cat_ring.svg', position: { row: 4, col: 1 } },
+    { name: 'boots', label: 'Boots', icon: 'assets/icons/item-categories/item_cat_boot.svg', position: { row: 4, col: 2 } },
+    { name: 'ringRight', label: 'Ring (R)', icon: 'assets/icons/item-categories/item_cat_ring.svg', position: { row: 4, col: 3 } }
   ];
 
   // Computed signal for equipped items

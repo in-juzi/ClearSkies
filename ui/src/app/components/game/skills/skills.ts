@@ -18,18 +18,18 @@ export class Skills implements OnInit {
 
   // Skill icons mapping (path to SVG files in assets)
   skillIcons: Record<SkillName, string> = {
-    woodcutting: 'assets/icons/skill_woodcutting.svg',
-    mining: 'assets/icons/ui_dig_1.svg',
-    fishing: 'assets/icons/ui_fishing_new.svg',
-    smithing: 'assets/icons/skill_blacksmithing.svg',
-    cooking: 'assets/icons/skill_cooking.svg',
-    herbalism: 'assets/icons/skill_herbalism.svg',
-    oneHanded: 'assets/icons/ability_melee_slash.svg',
-    dualWield: 'assets/icons/ability_melee_double_strike.svg',
-    twoHanded: 'assets/icons/ability_melee_overhead_strike.svg',
-    ranged: 'assets/icons/ability_ranged_bow.svg',
-    casting: 'assets/icons/ability_magic_fireball.svg',
-    gun: 'assets/icons/ability_ranged_gun.svg'
+    woodcutting: 'assets/icons/skills/skill_woodcutting.svg',
+    mining: 'assets/icons/ui/ui_dig_1.svg',
+    fishing: 'assets/icons/ui/ui_fishing_new.svg',
+    smithing: 'assets/icons/skills/skill_blacksmithing.svg',
+    cooking: 'assets/icons/skills/skill_cooking.svg',
+    herbalism: 'assets/icons/skills/skill_herbalism.svg',
+    oneHanded: 'assets/icons/abilities/ability_quick_slash.svg',
+    dualWield: 'assets/icons/abilities/ability_slash_2.svg',
+    twoHanded: 'assets/icons/abilities/ability_hammer_smash.svg',
+    ranged: 'assets/icons/abilities/ability_piercing_arrow.svg',
+    casting: 'assets/icons/abilities/ability_lightning_strike.svg',
+    gun: 'assets/icons/abilities/ability_plasma_shot.svg'
   };
 
   // Skill display names

@@ -317,6 +317,31 @@
   letter-spacing: var(--letter-spacing-wide);
 }
 
+/* Subcategories */
+.subcategories-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-s);
+}
+
+.subcategory-tag {
+  display: inline-block;
+  font-size: var(--font-size-s);
+  padding: var(--spacing-xs) var(--spacing-s);
+  background: var(--color-accent-purple-dark);
+  color: var(--color-text-primary);
+  border-radius: var(--radius-s);
+  border: var(--border-width-thin) solid var(--color-accent-purple);
+  text-transform: lowercase;
+  font-weight: var(--font-weight-medium);
+  transition: all var(--transition-fast);
+}
+
+.subcategory-tag:hover {
+  background: var(--color-accent-purple);
+  transform: translateY(-1px);
+}
+
 .quality-list, .trait-list {
   display: flex;
   flex-direction: column;

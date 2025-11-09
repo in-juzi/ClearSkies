@@ -18,7 +18,7 @@
         <!-- Empty slot -->
         @if (!getItemInSlot(slot.name)) {
           <div class="slot-empty">
-            <span class="slot-icon">{{ slot.icon }}</span>
+            <img [src]="slot.icon" [alt]="slot.label" class="slot-icon" />
             <span class="slot-label">{{ slot.label }}</span>
           </div>
         }
@@ -26,7 +26,7 @@
         <!-- Equipped item -->
         @if (getItemInSlot(slot.name); as item) {
           <div class="slot-item" [class]="getRarityClass(item.definition.rarity)">
-            <div class="item-icon">{{ slot.icon }}</div>
+            <img [src]="slot.icon" [alt]="slot.label" class="item-icon" />
             <div class="item-info">
               <div class="item-name">{{ item.definition.name }}</div>
               @if (item.definition.properties['damage']) {
