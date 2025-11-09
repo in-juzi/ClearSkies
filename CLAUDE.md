@@ -1,5 +1,32 @@
 # ClearSkies - Medieval Fantasy Browser Game
 
+## Current Development Focus
+
+**Active Features**:
+- ✅ Herbalism system (completed - 6 herbs, 4 gathering locations)
+- ✅ Combat skills framework (completed - 6 combat skills added)
+- ✅ Manual/help system (completed - full game guide with 6 sections)
+- ✅ Quality/trait effect display (completed - enhanced inventory UI)
+- ✅ XP scaling display (completed - shows raw vs scaled XP)
+
+**Recent Changes** (Last 5 commits):
+- chore: update project configuration and todo tasks
+- fix: format weight display to 1 decimal place
+- feat: add manual/help system with comprehensive game guide
+- style: improve auth forms and game layout
+- docs: add comprehensive project documentation
+
+**Known Issues**:
+- None currently identified
+
+**Next Priorities**:
+- Alchemy system (quality-based crafting)
+- Combat system implementation
+- Player chat/social features
+- Player housing
+
+> **Maintenance Note**: Update this section regularly so AI has context without needing to explore
+
 ## Project Overview
 
 ClearSkies is a medieval fantasy browser-based game built with a modern tech stack:
@@ -7,117 +34,65 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 - **Frontend**: Angular 20 (standalone components)
 - **Authentication**: JWT-based with bcrypt password hashing
 
-## Project Structure
+## Quick File Reference
+
+### Frequently Modified Files
+
+**Backend Core:**
+- Controllers: [be/controllers/inventoryController.js](be/controllers/inventoryController.js), [be/controllers/locationController.js](be/controllers/locationController.js), [be/controllers/skillsController.js](be/controllers/skillsController.js), [be/controllers/attributesController.js](be/controllers/attributesController.js), [be/controllers/authController.js](be/controllers/authController.js), [be/controllers/manualController.js](be/controllers/manualController.js)
+- Models: [be/models/Player.js](be/models/Player.js), [be/models/User.js](be/models/User.js)
+- Services: [be/services/itemService.js](be/services/itemService.js), [be/services/locationService.js](be/services/locationService.js), [be/services/dropTableService.js](be/services/dropTableService.js)
+- Routes: [be/routes/inventory.js](be/routes/inventory.js), [be/routes/locations.js](be/routes/locations.js), [be/routes/skills.js](be/routes/skills.js), [be/routes/attributes.js](be/routes/attributes.js), [be/routes/auth.js](be/routes/auth.js), [be/routes/manual.js](be/routes/manual.js)
+
+**Frontend Core:**
+- Game Component: [ui/src/app/components/game/game.component.ts](ui/src/app/components/game/game.component.ts), [ui/src/app/components/game/game.component.html](ui/src/app/components/game/game.component.html)
+- Inventory: [ui/src/app/components/game/inventory/inventory.component.ts](ui/src/app/components/game/inventory/inventory.component.ts), [ui/src/app/components/game/inventory/inventory.component.html](ui/src/app/components/game/inventory/inventory.component.html)
+- Location: [ui/src/app/components/game/location/location.ts](ui/src/app/components/game/location/location.ts), [ui/src/app/components/game/location/location.html](ui/src/app/components/game/location/location.html)
+- Skills: [ui/src/app/components/game/skills/skills.ts](ui/src/app/components/game/skills/skills.ts)
+- Equipment: [ui/src/app/components/game/equipment/equipment.component.ts](ui/src/app/components/game/equipment/equipment.component.ts)
+- Manual: [ui/src/app/components/manual/manual.component.ts](ui/src/app/components/manual/manual.component.ts), [ui/src/app/components/manual/sections/](ui/src/app/components/manual/sections/)
+- Services: [ui/src/app/services/inventory.service.ts](ui/src/app/services/inventory.service.ts), [ui/src/app/services/location.service.ts](ui/src/app/services/location.service.ts), [ui/src/app/services/skills.service.ts](ui/src/app/services/skills.service.ts), [ui/src/app/services/auth.service.ts](ui/src/app/services/auth.service.ts), [ui/src/app/services/manual.service.ts](ui/src/app/services/manual.service.ts)
+
+**Game Data:**
+- Item Definitions: [be/data/items/definitions/](be/data/items/definitions/)
+- Location Definitions: [be/data/locations/definitions/](be/data/locations/definitions/)
+- Activities: [be/data/locations/activities/](be/data/locations/activities/)
+- Drop Tables: [be/data/locations/drop-tables/](be/data/locations/drop-tables/)
+- Facilities: [be/data/locations/facilities/](be/data/locations/facilities/)
+
+**Utilities:**
+- [be/utils/add-item.js](be/utils/add-item.js) - Add items to player inventory
+- [be/utils/content-generator.js](be/utils/content-generator.js) - Interactive content creation
+- [be/utils/test-xp-scaling.js](be/utils/test-xp-scaling.js) - XP formula testing
+
+## Project Structure (Key Files Only)
 
 ```
-ClearSkies/
-├── be/                     # Backend (Node.js/Express)
-│   ├── config/            # Database configuration
-│   ├── controllers/       # Request handlers
-│   │   ├── authController.js
-│   │   ├── skillsController.js
-│   │   ├── attributesController.js
-│   │   ├── inventoryController.js
-│   │   └── locationController.js
-│   ├── data/              # Game data (JSON-based)
-│   │   ├── items/
-│   │   │   ├── definitions/   # Item definitions (resources, equipment, consumables)
-│   │   │   ├── qualities/     # Quality definitions (woodGrain, purity, etc.)
-│   │   │   └── traits/        # Trait definitions (pristine, cursed, etc.)
-│   │   └── locations/
-│   │       ├── definitions/   # Location definitions (kennik, forest-clearing, etc.)
-│   │       ├── biomes/        # Biome definitions (forest, mountain, sea)
-│   │       ├── facilities/    # Facility definitions (market, dock, mine, etc.)
-│   │       ├── activities/    # Activity definitions (chop-oak, fish-salmon, etc.)
-│   │       └── drop-tables/   # Drop table definitions (weighted loot pools)
-│   ├── middleware/        # Auth and other middleware
-│   │   ├── auth.js
-│   │   └── responseValidator.js  # JSON serialization validator (dev only)
-│   ├── migrations/        # Database migrations
-│   │   ├── 001-add-skills-to-players.js
-│   │   ├── 002-add-attributes-and-skill-main-attributes.js
-│   │   ├── 003-add-location-system.js
-│   │   └── 004-add-equipment-slots.js
-│   ├── models/           # Mongoose schemas
-│   │   ├── User.js
-│   │   └── Player.js
-│   ├── routes/           # API routes
-│   │   ├── auth.js
-│   │   ├── skills.js
-│   │   ├── attributes.js
-│   │   ├── inventory.js
-│   │   └── locations.js
-│   ├── services/         # Business logic services
-│   │   ├── itemService.js
-│   │   ├── locationService.js
-│   │   └── dropTableService.js
-│   └── utils/            # Utility functions
-│       ├── jwt.js            # JWT token utilities
-│       ├── migrations.js     # Migration runner
-│       ├── jsonSafe.js       # JSON serialization with circular ref detection
-│       ├── add-item.js       # Add items to player inventory (dev tool)
-│       └── content-generator.js  # Interactive content creation agent
-├── ui/                    # Frontend (Angular 20)
-│   └── src/
-│       ├── assets/       # Static assets (icons, images)
-│       └── app/
-│           ├── components/      # UI components
-│           │   ├── game/       # Game-related components
-│           │   │   ├── game.component.*
-│           │   │   ├── skills/      # Skills component
-│           │   │   ├── attributes/  # Attributes component
-│           │   │   ├── inventory/   # Inventory component
-│           │   │   ├── equipment/   # Equipment component
-│           │   │   ├── location/    # Location component
-│           │   │   └── character-status/  # Character status display
-│           │   ├── shared/         # Shared/reusable components
-│           │   │   └── confirm-dialog/    # Confirmation dialog
-│           │   ├── login/
-│           │   └── register/
-│           ├── services/        # Angular services
-│           │   ├── auth.service.ts
-│           │   ├── skills.service.ts
-│           │   ├── attributes.service.ts
-│           │   ├── inventory.service.ts
-│           │   ├── equipment.service.ts
-│           │   ├── location.service.ts
-│           │   └── confirm-dialog.service.ts
-│           ├── guards/          # Route guards
-│           │   └── auth.guard.ts (authGuard, guestGuard)
-│           ├── interceptors/    # HTTP interceptors
-│           │   └── auth.interceptor.ts
-│           └── models/          # TypeScript interfaces
-│               ├── user.model.ts
-│               ├── inventory.model.ts
-│               └── location.model.ts
-├── project/               # Project management
-│   ├── docs/             # Project documentation
-│   │   ├── inventory-system.md
-│   │   ├── equipment-system.md
-│   │   ├── drop-table-system.md
-│   │   ├── level-based-quality-trait-system.md
-│   │   ├── item-requirements-system.md
-│   │   ├── error-handling-system.md
-│   │   └── content-generator-agent.md
-│   ├── ideas/            # Feature ideas and concepts
-│   ├── tasks/
-│   │   ├── todo/         # Pending tasks
-│   │   └── complete/     # Completed tasks
-│   └── journal.md        # Development journal
-└── .claude/
-    └── commands/         # Custom Claude commands
-        ├── todo.md
-        ├── todo-done.md
-        ├── context-update.md
-        ├── logical-commits.md
-        └── checkpoint.md
+be/
+├── controllers/      # inventoryController, locationController, skillsController, attributesController, authController
+├── models/          # Player.js (inventory, skills, equipment), User.js
+├── services/        # itemService, locationService, dropTableService
+├── data/
+│   ├── items/definitions/    # Item JSON files
+│   └── locations/           # Location, activity, drop table JSON
+├── migrations/      # Database migration scripts
+└── utils/          # Dev tools (add-item.js, content-generator.js, test-xp-scaling.js)
+
+ui/src/app/
+├── components/game/  # inventory/, location/, skills/, equipment/, attributes/
+├── services/        # *.service.ts (match backend APIs)
+└── models/         # TypeScript interfaces
 ```
+
+**Full structure**: See detailed tree above or explore with Task agent if needed
 
 ## Running the Project
 
 - **Backend**: `cd be && npm run dev` (runs on http://localhost:3000)
 - **Frontend**: `cd ui && npm run dev` (runs on http://localhost:4200)
 - **Both**: `npm run dev` from root (runs both concurrently)
+
+**IMPORTANT**: During active development sessions, the backend and frontend are already running on their expected ports. Do NOT start new instances without a specific reason (e.g., after making server configuration changes, installing new dependencies, or if processes have crashed). Check for existing processes first using `netstat` or similar tools.
 
 ## Utility Scripts
 
@@ -137,11 +112,121 @@ cd be && node utils/add-item.js
 3. Run the script from the `be` directory
 
 **Example item IDs:**
-- Resources: `oak_log`, `pine_log`, `birch_log`, `iron_ore`, `copper_ore`, `coal`, `salmon`, `trout`, `shrimp`
+- Resources:
+  - Logs: `oak_log`, `willow_log`, `maple_log`
+  - Ore: `copper_ore`, `iron_ore`, `silver_ore`
+  - Fish: `trout`, `salmon`, `pike`, `shrimp`
+  - Herbs: `chamomile`, `sage`, `nettle`, `mandrake_root`, `moonpetal`, `dragons_breath`
 - Equipment: `bronze_woodcutting_axe`, `iron_woodcutting_axe`, `bronze_mining_pickaxe`, `iron_mining_pickaxe`, `bamboo_fishing_rod`, `willow_fishing_rod`, `copper_sword`, `iron_sword`, `wooden_shield`, `iron_helm`, `hemp_coif`, `leather_tunic`
 - Consumables: `bread`, `health_potion`, `mana_potion`
 
 **Note**: The script initializes the item service, connects to the database, finds the player "Juzi", and adds the specified item to their inventory.
+
+## Common Code Patterns (Quick Reference)
+
+### Adding New Item Definition
+**File**: `be/data/items/definitions/{category}/{itemId}.json`
+**Template**:
+```json
+{
+  "itemId": "new_item",
+  "name": "New Item",
+  "description": "Medieval fantasy description...",
+  "category": "resource|equipment|consumable",
+  "rarity": "common|uncommon|rare|epic|legendary",
+  "tier": 1,
+  "baseValue": 10,
+  "maxStack": 99,
+  "allowedQualities": ["purity"],
+  "allowedTraits": ["pristine", "blessed"]
+}
+```
+
+### Adding New Activity
+**File**: `be/data/locations/activities/{activity-id}.json`
+**Template**:
+```json
+{
+  "activityId": "new-activity",
+  "name": "Activity Name",
+  "description": "What players do here...",
+  "duration": 10,
+  "requirements": {
+    "skills": { "woodcutting": 5 },
+    "equipped": [{ "subtype": "woodcutting-axe" }]
+  },
+  "rewards": {
+    "experience": { "woodcutting": 25 },
+    "dropTables": ["drop-table-id"]
+  }
+}
+```
+
+### Adding New Drop Table
+**File**: `be/data/locations/drop-tables/{table-id}.json`
+**Template**:
+```json
+{
+  "dropTableId": "new-drop-table",
+  "name": "Drop Table Name",
+  "drops": [
+    {
+      "itemId": "oak_log",
+      "weight": 70,
+      "quantity": { "min": 1, "max": 3 }
+    },
+    {
+      "itemId": "rare_item",
+      "weight": 30,
+      "quantity": { "min": 1, "max": 1 },
+      "qualityBonus": 2
+    }
+  ]
+}
+```
+
+### Adding Skill XP (Backend Pattern)
+**Location**: Player model method
+```javascript
+await player.addSkillExperience('woodcutting', xpAmount);
+// Automatically awards 50% to linked attribute (Strength)
+// Returns { skill: {...}, attribute: {...} }
+```
+
+### Equipment Slot Validation (Backend Pattern)
+**Location**: inventoryController.js equip endpoint
+```javascript
+const itemDef = itemService.getItemDefinition(instanceItem.itemId);
+if (itemDef.slot !== slotName) {
+  return res.status(400).json({
+    message: `Item cannot be equipped to ${slotName}. Requires ${itemDef.slot} slot.`
+  });
+}
+```
+
+### Item Stacking Logic (Backend Pattern)
+**Location**: Player.addItem() in Player.js
+```javascript
+// Items stack if: same itemId, same quality levels, same trait levels
+const existingItem = this.inventory.find(item =>
+  item.itemId === itemInstance.itemId &&
+  !item.equipped &&
+  itemService._sortedMapString(item.qualities) === itemService._sortedMapString(itemInstance.qualities) &&
+  itemService._sortedMapString(item.traits) === itemService._sortedMapString(itemInstance.traits)
+);
+```
+
+### Converting Mongoose Maps to Plain Objects
+**Location**: Any controller sending item data
+```javascript
+const plainItem = item.toObject();
+if (plainItem.qualities instanceof Map) {
+  plainItem.qualities = Object.fromEntries(plainItem.qualities);
+}
+if (plainItem.traits instanceof Map) {
+  plainItem.traits = Object.fromEntries(plainItem.traits);
+}
+```
 
 ### Content Generator Agent
 
@@ -208,6 +293,186 @@ With agent: ~30 seconds of your time, agent works in background
 
 See [project/docs/content-generator-agent.md](project/docs/content-generator-agent.md) for full documentation.
 
+### Content Validator Agent
+
+**Agent**: `.claude/agents/content-validator.md`
+
+AI-powered agent for validating existing game content and identifying broken references, inconsistencies, and data integrity issues.
+
+**How to Use:**
+
+Simply ask to validate the content:
+
+```
+"Validate all game content"
+
+"Check for broken references in the content files"
+```
+
+The agent will autonomously:
+- ✓ Read all item, quality, trait, drop table, activity, facility, location, and biome definitions
+- ✓ Build reference maps of all valid IDs
+- ✓ Validate all references across content files
+- ✓ Check for broken item references in drop tables
+- ✓ Identify unreferenced drop tables or activities
+- ✓ Verify skill, biome, and subtype references
+- ✓ Check quantity ranges and balance values
+- ✓ Report comprehensive findings with fix suggestions
+
+**What It Validates:**
+
+1. **Item References** - All item IDs in drop tables exist in item definitions
+2. **Drop Table References** - All drop tables referenced by activities exist
+3. **Skill References** - All skills in requirements are valid (woodcutting, mining, fishing, smithing, cooking)
+4. **Biome References** - All biomes referenced by locations exist
+5. **Facility References** - All facilities in locations exist
+6. **Activity References** - All activities in facilities exist
+7. **Navigation Links** - All location links reference existing locations
+8. **Quality/Trait IDs** - All quality and trait references are valid
+9. **Equipment Subtypes** - All subtypes in requirements exist
+10. **Data Integrity** - Quantity ranges, level values, weight values are reasonable
+
+**Error Severity Levels:**
+
+- **CRITICAL**: Breaks functionality (missing items, broken references)
+- **WARNING**: May cause issues (unreferenced content, unusual balance)
+- **INFO**: Best practices (missing descriptions, naming conventions)
+
+**Example Issues Caught:**
+
+```
+[CRITICAL] Forest Clearing - Chop Oak Trees Activity
+  Issue: Drop table references item 'birch_log'
+  Problem: Item 'birch_log' does not exist
+  Fix: Either create birch_log.json or remove from drop table
+
+[WARNING] Woodcutting Pine Drop Table
+  Issue: Drop table defined but never referenced
+  Fix: Remove file or add activity using this table
+
+[INFO] Mountain Pass Location
+  Issue: Missing ambient description
+  Fix: Add atmospheric details for immersion
+```
+
+**Workflow:**
+
+1. Reads all content definitions
+2. Builds reference maps (valid IDs)
+3. Validates each content type systematically
+4. Groups errors by severity
+5. Provides actionable fix suggestions
+6. Reports statistics and health assessment
+
+**Benefits:**
+- Catches broken references before they cause runtime errors
+- Identifies unused content (dead code)
+- Ensures consistent data integrity
+- Provides actionable fix suggestions
+- Works autonomously in background
+- Comprehensive reporting with file locations
+
+## Optimization Guidelines for AI
+
+### Skip Exploration For:
+- **Item additions** - Use templates in Common Code Patterns, don't search existing items
+- **Activity creation** - Use Content Generator agent, don't explore all activities
+- **Known bug fixes** - User will provide file:line references
+- **Style tweaks** - CSS changes don't need architecture exploration
+- **Simple JSON additions** - Use templates, skip validation searches
+
+### Use Direct Tools (Grep/Glob/Read) For:
+- Finding specific function definitions - `Grep("functionName", type: "js")`
+- Locating item/activity by ID - `Grep("itemId", path: "be/data")`
+- Checking if file exists - `Glob("**/filename.js")`
+- Reading specific code sections - `Read(file, offset, limit)`
+
+### Use Task Agent Only For:
+- "How does X system work overall?" (architectural questions requiring multi-file analysis)
+- "Find all places where Y is used" (comprehensive codebase search)
+- Complex multi-step research tasks (involving multiple file types and validation)
+- Content creation via Content Generator agent
+- Content validation via Content Validator agent
+
+### Token-Efficient Patterns:
+1. **Provide file:line when known** - Skip Grep/Glob entirely
+2. **Use offset/limit for large files** - Read only relevant sections
+3. **Batch related changes** - One message, multiple edits
+4. **Reference previous reads** - "In the Player model we looked at..."
+5. **Use Edit over Write** - More efficient for modifications
+6. **Use head_limit with Grep** - Limit results to first N matches
+7. **Use files_with_matches** - Get file list before reading content
+
+## Critical Code Locations
+
+### Player Model (be/models/Player.js)
+- Skills schema: ~L15-40
+- Attributes schema: ~L42-55
+- Inventory schema: ~L57-75
+- Equipment slots: ~L77-85
+- `addSkillExperience()`: ~L145-165
+- `addAttributeExperience()`: ~L167-185
+- `addItem()`: ~L200-240 (includes stacking logic)
+- `removeItem()`: ~L242-265
+- `equipItem()`: ~L280-310
+- `unequipItem()`: ~L312-330
+- `hasEquippedSubtype()`: ~L350-365
+- `hasInventoryItem()`: ~L367-380
+
+### Item Service (be/services/itemService.js)
+- Item definitions loading: ~L20-60
+- `getItemDefinition()`: ~L65-70
+- `createItemInstance()`: ~L85-120
+- `calculateVendorPrice()`: ~L145-180
+- `generateRandomQualities()`: ~L200-235
+- `generateRandomTraits()`: ~L240-275
+- `_sortedMapString()`: ~L310-320 (quality/trait comparison)
+
+### Location Service (be/services/locationService.js)
+- Location loading: ~L25-70
+- `getLocation()`: ~L75-85
+- `validateActivityRequirements()`: ~L120-180
+- `calculateScaledXP()`: ~L185-205 (XP scaling formula)
+- `processActivityCompletion()`: ~L230-295
+- `getActivityRewards()`: ~L300-340
+
+### Inventory Controller (be/controllers/inventoryController.js)
+- GET all inventory: ~L15-50
+- POST add item: ~L55-95
+- POST add random item: ~L100-135
+- DELETE remove item: ~L140-175
+- POST equip item: ~L180-220
+- POST unequip item: ~L225-250
+- Mongoose Map conversion helpers: Throughout (use Object.fromEntries pattern)
+
+### Location Controller (be/controllers/locationController.js)
+- GET all locations: ~L15-45
+- GET location details: ~L50-80
+- POST start activity: ~L90-145
+- POST complete activity: ~L150-210
+- POST travel: ~L215-260
+
+## How to Ask Questions Efficiently
+
+### ❌ High Token Usage:
+- "Explore the inventory system" → I read 10+ files exploring architecture
+- "Find where items are created" → I search entire codebase with multiple Greps
+- "How does equipment work?" → I explore models, controllers, services, UI components
+- "Show me all activities" → I read all activity JSON files
+
+### ✅ Low Token Usage:
+- "Add copper_helmet item to items/definitions/equipment/" → Direct creation using template
+- "In inventoryController.js:145, fix the stacking check to validate trait levels" → Targeted edit
+- "Check equipItem method in Player.js around line 280" → Direct Read with offset
+- "Use Content Generator to add salmon fishing activity" → Agent handles it autonomously
+
+### 🎯 Optimal Request Pattern:
+1. **Provide file path + line number when known** - Enables direct Read with offset
+2. **Use Content Generator for game content** - Activities, items, drop tables, locations
+3. **Batch multiple related requests** - "Add items: copper_helmet, iron_helmet, steel_helmet with these properties..."
+4. **Reference previous reads** - "In the Player model we looked at, modify addItem method..."
+5. **Specify exact change location** - "In line 145 of inventoryController.js, change X to Y"
+
 ## Important Context
 
 ### Completed Features
@@ -220,10 +485,14 @@ See [project/docs/content-generator-agent.md](project/docs/content-generator-age
 - ✅ MongoDB models (User, Player)
 - ✅ Game interface with three-column layout (inventory, location area, character/skills/attributes/equipment)
 - ✅ Tabbed sidebar navigation for character info, equipment, skills, and attributes
-- ✅ Skills system with 5 skills (woodcutting, mining, fishing, smithing, cooking)
+- ✅ Skills system with 12 skills:
+  - Gathering: woodcutting, mining, fishing, herbalism
+  - Crafting: smithing, cooking
+  - Combat: oneHanded, dualWield, twoHanded, ranged, casting, gun
 - ✅ Skills UI with compact 3-column grid layout and hover tooltips
 - ✅ Edge-aware tooltip positioning (prevents cutoff at screen edges)
 - ✅ XP gain and automatic skill leveling (1000 XP per level)
+- ✅ XP scaling system with diminishing returns (polynomial decay based on level difference)
 - ✅ Attributes system with 7 attributes (strength, endurance, magic, perception, dexterity, will, charisma)
 - ✅ Skill-to-attribute XP linking (skills award 50% XP to their main attribute)
 - ✅ Attributes UI with compact 3-column grid and hover details
@@ -231,7 +500,7 @@ See [project/docs/content-generator-agent.md](project/docs/content-generator-age
 - ✅ Skills API endpoints (GET all skills, GET single skill, POST add XP)
 - ✅ Attributes API endpoints (GET all attributes, GET single attribute, POST add XP)
 - ✅ Inventory system with dynamic qualities and traits
-- ✅ JSON-based item definitions (18 items: 9 resources, 6 equipment, 3 consumables)
+- ✅ JSON-based item definitions (36 items: 21 resources including 6 herbs, 12 equipment, 3 consumables)
 - ✅ Quality system (5 types: woodGrain, moisture, purity, freshness, age)
 - ✅ Trait system (7 types with rarity levels: common to epic)
 - ✅ Item instance management with stacking logic
@@ -271,6 +540,13 @@ See [project/docs/content-generator-agent.md](project/docs/content-generator-age
 - ✅ Confirm dialog component for destructive action confirmation
 - ✅ Character status component (placeholder for future features)
 - ✅ JSON safety utilities and response validator middleware
+- ✅ Herbalism system (6 herbs, 4 gathering facilities, herbalism skill linked to Will)
+- ✅ Combat skills framework (6 combat skills: oneHanded, dualWield, twoHanded, ranged, casting, gun)
+- ✅ Manual/help system (comprehensive game guide with 6 tabbed sections)
+- ✅ Quality/trait effect display (enhanced inventory UI showing all effect types)
+- ✅ XP scaling feedback (shows raw vs scaled XP in activity completion)
+- ✅ Development utilities (content generator, validator, duplicate checker, XP tester)
+- ✅ Content generator and validator AI agents (.claude/agents/)
 
 ### Database Models
 
@@ -282,12 +558,22 @@ See [project/docs/content-generator-agent.md](project/docs/content-generator-age
 - characterName, level, experience
 - stats (health, mana, strength, dexterity, intelligence, vitality)
 - attributes (strength, endurance, magic, perception, dexterity, will, charisma) - each with level & experience (1000 XP per level)
-- skills (woodcutting, mining, fishing, smithing, cooking) - each with level, experience, and mainAttribute
-  - Woodcutting → Strength
-  - Mining → Strength
-  - Fishing → Endurance
-  - Smithing → Endurance
-  - Cooking → Will
+- skills (woodcutting, mining, fishing, smithing, cooking, herbalism, oneHanded, dualWield, twoHanded, ranged, casting, gun) - each with level, experience, and mainAttribute
+  - Gathering Skills:
+    - Woodcutting → Strength
+    - Mining → Strength
+    - Fishing → Endurance
+    - Herbalism → Will
+  - Crafting Skills:
+    - Smithing → Endurance
+    - Cooking → Will
+  - Combat Skills:
+    - One-Handed → Strength
+    - Dual Wield → Dexterity
+    - Two-Handed → Strength
+    - Ranged → Dexterity
+    - Casting → Magic
+    - Gun → Perception
 - inventory - array of item instances with:
   - instanceId (unique ID)
   - itemId (reference to item definition)
@@ -331,133 +617,125 @@ See [project/docs/content-generator-agent.md](project/docs/content-generator-age
   - `hasInventoryItem(itemId, minQuantity)` - Check if item exists in inventory with min quantity
   - `getInventoryItemQuantity(itemId)` - Get total quantity of item in inventory
 
-### API Endpoints
+### API Endpoints Quick Reference
 
-**Authentication:**
-- `POST /api/auth/register` - Create account
-- `POST /api/auth/login` - Login
-- `GET /api/auth/me` - Get profile (protected)
-- `POST /api/auth/logout` - Logout (protected)
+All endpoints except auth register/login require JWT token (protected).
 
-**Skills:**
-- `GET /api/skills` - Get all player skills with progress (protected)
-- `GET /api/skills/:skillName` - Get single skill details (protected)
-- `POST /api/skills/:skillName/experience` - Add XP to skill, returns both skill and attribute results (protected)
+**Auth**: `/api/auth`
+- POST `/register` - Create account
+- POST `/login` - Login (returns JWT token)
+- GET `/me` - Get profile
+- POST `/logout` - Logout
 
-**Attributes:**
-- `GET /api/attributes` - Get all player attributes with progress (protected)
-- `GET /api/attributes/:attributeName` - Get single attribute details (protected)
-- `POST /api/attributes/:attributeName/experience` - Add XP to attribute (protected)
+**Skills**: `/api/skills` (all protected)
+- GET `/` - All player skills with progress
+- GET `/:skillName` - Single skill details
+- POST `/:skillName/experience` - Add XP (awards 50% to linked attribute)
+  - Body: `{ xp }`
+  - Returns: `{ skill: {...}, attribute: {...} }`
 
-**Inventory:**
-- `GET /api/inventory` - Get player's full inventory with enhanced details (protected)
-- `GET /api/inventory/items/:instanceId` - Get single item details (protected)
-- `POST /api/inventory/items` - Add item to inventory with validation (protected)
-  - Body: `{ itemId, quantity, qualities, traits }`
-- `POST /api/inventory/items/random` - Add item with randomly generated qualities/traits (protected)
-  - Body: `{ itemId, quantity }`
-- `DELETE /api/inventory/items` - Remove item from inventory (protected)
-  - Body: `{ instanceId, quantity? }`
-- `GET /api/inventory/definitions` - Get all item definitions (catalog) (protected)
-  - Query: `?category=resource|equipment|consumable`
-- `GET /api/inventory/definitions/:itemId` - Get single item definition (protected)
-- `POST /api/inventory/reload` - Hot-reload item definitions (admin) (protected)
+**Attributes**: `/api/attributes` (all protected)
+- GET `/` - All player attributes with progress
+- GET `/:attributeName` - Single attribute details
+- POST `/:attributeName/experience` - Add XP
+  - Body: `{ xp }`
 
-**Equipment:**
-- `GET /api/inventory/equipment` - Get all equipped items and available slots (protected)
-- `POST /api/inventory/equipment/equip` - Equip an item to a slot (protected)
-  - Body: `{ instanceId, slotName }`
-  - Automatically unequips current item in slot if occupied
-- `POST /api/inventory/equipment/unequip` - Unequip an item from a slot (protected)
-  - Body: `{ slotName }`
+**Inventory**: `/api/inventory` (all protected)
+- GET `/` - Full inventory with details
+- GET `/items/:instanceId` - Single item
+- POST `/items` - Add item - Body: `{ itemId, quantity, qualities?, traits? }`
+- POST `/items/random` - Add with random quality/traits - Body: `{ itemId, quantity }`
+- DELETE `/items` - Remove item - Body: `{ instanceId, quantity? }`
+- GET `/definitions` - All item definitions - Query: `?category=resource|equipment|consumable`
+- GET `/definitions/:itemId` - Single definition
+- POST `/reload` - Hot-reload definitions (admin)
 
-**Locations:**
-- `GET /api/locations` - Get all locations (discovered and undiscovered) (protected)
-- `GET /api/locations/:locationId` - Get details for a specific location (protected)
-- `POST /api/locations/discover` - Discover a new location (protected)
-  - Body: `{ locationId }`
-- `POST /api/locations/travel` - Start travel to a location (protected)
-  - Body: `{ targetLocationId }`
-- `POST /api/locations/activity/start` - Start an activity at current location (protected)
-  - Body: `{ activityId, facilityId }`
-- `POST /api/locations/activity/complete` - Complete current activity and claim rewards (protected)
-- `POST /api/locations/activity/cancel` - Cancel current activity (protected)
+**Equipment**: `/api/inventory/equipment` (all protected)
+- GET `/` - All equipped items + available slots
+- POST `/equip` - Equip to slot (auto-unequips current) - Body: `{ instanceId, slotName }`
+- POST `/unequip` - Unequip from slot - Body: `{ slotName }`
 
-## Development Guidelines
+**Locations**: `/api/locations` (all protected)
+- GET `/` - All locations (discovered + undiscovered)
+- GET `/:locationId` - Location details
+- POST `/discover` - Discover location - Body: `{ locationId }`
+- POST `/travel` - Travel to location - Body: `{ targetLocationId }`
+- POST `/activity/start` - Start activity - Body: `{ activityId, facilityId }`
+- POST `/activity/complete` - Complete activity, claim rewards
+- POST `/activity/cancel` - Cancel current activity
 
-1. **Backend Changes**: Always update relevant models, controllers, routes
-2. **Database Schema Changes**: Create migrations for model updates (see Database Migrations below)
-3. **Frontend Changes**:
-   - Use Angular signals for state management
-   - All game-related components should be organized under `ui/src/app/components/game/`
-   - Use standalone components with Angular 20
-4. **Authentication**:
-   - All protected endpoints use JWT middleware
-   - Token stored in localStorage with key `clearskies_token`
-   - Auth interceptor directly accesses localStorage to avoid circular dependencies
-   - Guards use async initialization pattern with `initialized$` observable
-   - **IMPORTANT**: Auth middleware attaches the full User document to `req.user`, so access the user ID via `req.user._id` (NOT `req.user.userId`)
-5. **Assets**:
-   - Store icons and images in `ui/src/assets/` (configured in angular.json)
-   - **Icons are SVG format** (222+ icons available for abilities, items, skills, attributes, UI elements)
-   - Icon paths use `.svg` extension (e.g., `assets/icons/skill_woodcutting.svg`)
-6. **Styling**:
-   - Use medieval fantasy theme (dark blues, purples, gold accents)
-   - Design tokens available in `ui/src/design-tokens.scss`
-   - See `ui/DESIGN_SYSTEM.md` for complete guidelines
-   - Global styles use `height: 100vh` and `overflow: hidden` for proper viewport management
-7. **Item System**:
-   - Item definitions stored in JSON files in `be/data/items/`
-   - Use ItemService for all item operations (loading, creation, calculations)
-   - Hot-reload available via `/api/inventory/reload` endpoint
-   - **Quality system**: Level-based (1-5), each level has explicit name, description, and effects
-   - **Trait system**: Level-based (1-3), stored as Map<traitId, level>
-   - Trait rarities: common (5%), uncommon (15%), rare (30%), epic (50%)
-   - Items with identical quality/trait levels stack together
-   - Equipment items must include a `slot` field indicating which equipment slot they can be equipped to
-   - See `project/docs/level-based-quality-trait-system.md` for full details
-8. **Location System**:
-   - Location definitions stored in JSON files in `be/data/locations/`
-   - Use LocationService for all location operations
-   - Four-tier structure: locations → facilities → activities → rewards
-   - Activities can require skills, award XP, and give item rewards via drop tables
-   - Travel and activity completion are time-based
-   - Drop tables use weighted random selection for flexible loot distribution
-   - Activities reference drop tables in `rewards.dropTables` array
-   - Drop tables support quality bonuses and "dropNothing" entries
-9. **Equipment System**:
-   - Equipment items must include a `slot` field in their definition
-   - Use EquipmentService for managing equipped items
-   - Equipment UI uses square slots (aspect-ratio: 1) with grid layout
-   - Drag-and-drop is restricted to equipment category items only
-   - Visual feedback for equipped items in inventory and equipment panels
-   - Auto-unequip when equipping to occupied slots
-10. **UI Design**:
-   - Compact 3-column grid layouts for skills, attributes, and equipment
-   - Hover tooltips for detailed information (prevents clutter)
-   - Edge-aware positioning to prevent tooltip cutoff
-   - Tabbed navigation for multi-view sidebars
-   - Draggable panels for flexible UI positioning (drag from header only)
-   - Square equipment slots using grid pseudo-element technique
-   - Activity completion log displays last 10 completed activities with rewards
-   - Automatic reward claiming (activities complete automatically when time expires)
-11. **Error Handling & Serialization**:
-   - **Response Validator Middleware**: Automatically validates all API responses in development mode
-   - **jsonSafe Utility**: Use `be/utils/jsonSafe.js` for circular reference detection
-     - `jsonSafe(obj, label)` - Validates object can be serialized, provides detailed error analysis
-     - `sanitize(obj)` - Deep clone with Mongoose Map/schema conversion
-     - `safeStringify(obj)` - Stringify with automatic Mongoose handling
-   - **Mongoose Maps**: Always convert to plain objects before JSON serialization
-     - Use `.toObject()` method on Mongoose Maps
-     - `_sortedMapString()` in ItemService handles this automatically for quality/trait comparison
-   - **Common Pitfall**: Don't reference item instances after `player.addItem()` - they become Mongoose documents with circular refs
-12. **File Editing Workflow**:
-   - **Always attempt Edit tool first** for making changes to existing files
-   - **Retry Edit tool once** if it fails with "File has been unexpectedly modified"
-   - **Only use bash commands as fallback** if Edit tool fails twice (bash is significantly slower)
-   - Clean up any `.bak` files created during bash operations
-   - File modification errors typically occur due to file watchers (Angular dev server, linters, formatters)
-13. **Documentation**: Update CLAUDE.md and relevant docs in `project/docs/`
+**Manual**: `/api/manual` (all protected)
+- GET `/skills` - All skill definitions for manual
+- GET `/attributes` - All attribute definitions for manual
+- GET `/items` - All item definitions for manual
+- GET `/locations` - All location/facility/activity data for manual
+
+## Development Quick Rules
+
+### Code Changes:
+- ✅ Backend model change → Create migration in `be/migrations/`
+- ✅ Item/location definition change → Hot-reload via `/api/inventory/reload` (no restart needed)
+- ✅ New dependency → Restart backend/frontend servers
+- ✅ Config change → Restart servers
+- ✅ .html/.ts change → Skip `ng build` unless major refactor or TypeScript errors expected
+- ✅ Use Angular signals for state management
+- ✅ Game components go under `ui/src/app/components/game/`
+
+### Authentication:
+- ✅ All protected endpoints use JWT middleware
+- ✅ Token in localStorage: `clearskies_token`
+- ✅ `req.user._id` for user ID (NOT `req.user.userId`)
+- ✅ Auth middleware attaches full User document to `req.user`
+- ❌ If API auth issues, ask user for bearer token from browser Network tab
+
+### File Operations:
+- ✅ Use Edit tool first (faster than bash)
+- ✅ Retry Edit once if "unexpectedly modified" error
+- ✅ Fall back to bash only if Edit fails twice
+- ✅ Read with offset/limit for large files
+- ✅ Batch related changes in one message
+
+### Item System:
+- ✅ Definitions in `be/data/items/definitions/`
+- ✅ Use ItemService for all operations
+- ✅ Quality levels: 1-5 (discrete integers)
+- ✅ Trait levels: 1-3 (stored as Map<traitId, level>)
+- ✅ Items stack if same itemId + quality levels + trait levels
+- ✅ Equipment items need `slot` field
+- ✅ Hot-reload: POST `/api/inventory/reload`
+
+### Location System:
+- ✅ Definitions in `be/data/locations/`
+- ✅ Use LocationService for all operations
+- ✅ Structure: locations → facilities → activities → drop tables
+- ✅ Activities can require: skills, equipped items (by subtype), inventory items
+- ✅ XP scaling: polynomial decay based on level difference
+- ✅ Time-based completion (tracked server-side)
+
+### Mongoose Maps (CRITICAL):
+- ❌ `Object.entries(map)` returns EMPTY on Mongoose Maps
+- ✅ Always convert: `Object.fromEntries(map)` after `.toObject()`
+- ✅ Pattern in Common Code Patterns section above
+- ❌ Don't reference items after `player.addItem()` (circular refs)
+
+### Assets & Styling:
+- ✅ Icons in `ui/src/assets/` (222+ SVG icons)
+- ✅ Medieval fantasy theme (dark blues, purples, gold)
+- ✅ Design tokens: `ui/src/design-tokens.scss`
+
+### Testing:
+- ✅ Backend: Check API responses
+- ✅ Frontend: Visual check in browser (:3000/:4200)
+- ✅ Skip builds unless TypeScript errors expected
+
+### Content Creation:
+- ✅ New items/activities → Use Content Generator agent
+- ✅ Validation → Use Content Validator agent
+- ✅ Don't manually create JSON for game content (use agents)
+
+### Documentation:
+- ✅ Update CLAUDE.md when architecture changes
+- ✅ Add docs to `project/docs/` for new systems
 
 ## Database Migrations
 
@@ -477,6 +755,7 @@ npm run migrate:down     # Rollback last migration
 3. `003-add-location-system.js` - Adds location fields (currentLocation, discoveredLocations, activeActivity, travelState)
 4. `004-add-equipment-slots.js` - Adds equipment slot system to all players with 10 default slots
 5. `005-convert-quality-trait-to-levels.js` - Converts quality/trait system from decimal values to integer levels
+6. `006-add-herbalism-skill.js` - Adds herbalism gathering skill to all players (linked to Will attribute)
 
 **Creating a New Migration:**
 1. Create a file in `be/migrations/` with format: `NNN-description.js`
@@ -527,8 +806,12 @@ The inventory system uses a three-tier architecture for flexibility and easy bal
 
 1. **Item Definitions** (JSON files in `be/data/items/definitions/`)
    - Canonical item templates
-   - 24 items total:
-     - 9 resources: oak_log, pine_log, birch_log, iron_ore, copper_ore, coal, salmon, trout, shrimp
+   - 30 items total:
+     - 15 resources:
+       - Logs: oak_log, willow_log, maple_log
+       - Ore: copper_ore, iron_ore, silver_ore
+       - Fish: trout, salmon, pike, shrimp
+       - Herbs: chamomile, sage, nettle, mandrake_root, moonpetal, dragons_breath
      - 12 equipment:
        - Weapons: copper_sword, iron_sword
        - Armor: wooden_shield, iron_helm, hemp_coif, leather_tunic
@@ -698,6 +981,138 @@ The item requirements system enables activities to require specific tools and co
 
 **Full documentation:** `project/docs/item-requirements-system.md`
 
+## XP System
+
+The XP system uses a three-tier architecture with skills, attributes, and intelligent scaling to encourage content progression:
+
+### 1. **Skills & Attributes**
+
+**Skills** (6 gathering/crafting skills):
+- woodcutting → Strength attribute
+- mining → Strength attribute
+- fishing → Endurance attribute
+- smithing → Endurance attribute
+- cooking → Will attribute
+- herbalism → Will attribute
+
+**Attributes** (7 total):
+- strength, endurance, magic, perception, dexterity, will, charisma
+
+**Leveling:**
+- 1000 XP per level for both skills and attributes
+- Level formula: `Math.floor(xp / 1000) + 1`
+- Example: 2500 XP = Level 3
+
+### 2. **XP Linking (Skills → Attributes)**
+
+When a skill gains XP, **50% of that XP is automatically awarded to its linked attribute**:
+
+```javascript
+// Player completes woodcutting activity → earns 100 XP
+// Woodcutting skill gains 100 XP
+// Strength attribute gains 50 XP (50% of 100)
+```
+
+**Implementation:**
+- `Player.addSkillExperience(skillName, xp)` - Awards skill XP and 50% to linked attribute
+- Returns results for both skill and attribute level-ups
+
+### 3. **XP Scaling System (Diminishing Returns)**
+
+Activities award "raw XP" which is scaled based on the player's skill level vs the activity's level requirement. This prevents low-level activity farming and encourages progression to higher-level content.
+
+**Scaling Formula:**
+```javascript
+calculateScaledXP(rawXP, playerLevel, activityLevel) {
+  const levelDiff = playerLevel - activityLevel;
+
+  // Grace range: 0-1 levels over = full XP
+  if (levelDiff <= 1) {
+    return rawXP;
+  }
+
+  // Polynomial decay: 1 / (1 + 0.3 * (diff - 1))
+  const effectiveDiff = levelDiff - 1;
+  const scalingFactor = 1 / (1 + 0.3 * effectiveDiff);
+
+  // Apply floor of 1 XP
+  return Math.max(1, Math.floor(rawXP * scalingFactor));
+}
+```
+
+**Example Scaling** (Mine Iron: L5 requirement, 45 raw XP):
+
+| Player Level | Level Diff | Scaled XP | % of Raw | Notes |
+|--------------|------------|-----------|----------|-------|
+| L5 | 0 | 45 XP | 100% | At-level |
+| L6 | +1 | 45 XP | 100% | Grace range |
+| L7 | +2 | 34 XP | 75% | Starts scaling |
+| L10 | +5 | 20 XP | 44% | Half effectiveness |
+| L15 | +10 | 12 XP | 26% | Very low |
+| L25 | +20 | 6 XP | 13% | Minimum effective |
+
+**Key Properties:**
+- **Grace Range**: 0-1 levels over = full XP (forgiving for near-level content)
+- **Polynomial Curve**: Smoother than linear, gentler than exponential
+- **Minimum Floor**: Always awards at least 1 XP (symbolic reward)
+- **Intuitive**: Players can estimate "about 75% at +2 levels, 50% at +5 levels"
+- **Predictable**: Same formula applies consistently everywhere
+
+**Implementation:**
+- `LocationService.calculateScaledXP(rawXP, playerLevel, activityLevel)` - Scaling logic
+- `LocationService.calculateActivityRewards(activity, { player })` - Applies scaling automatically
+- Activity's skill requirement used as activity level reference
+- Both raw and scaled XP returned in API responses for UI display
+
+**UI Display:**
+- Activity completion log shows: "woodcutting: 30 XP → 23 XP" (when scaled)
+- Or simply: "woodcutting: +30 XP" (when at-level/in grace range)
+- Clear feedback helps players understand the system
+
+**Testing:**
+- Test script available: `be/utils/test-xp-scaling.js`
+- Verifies formula behavior across level ranges
+- Confirms minimum floor is enforced
+
+### 4. **How Players Earn XP**
+
+**Activities** (Primary XP Source):
+- Activities award skill XP when completed (time-based)
+- XP values defined in activity JSON files
+- Scaled automatically based on player level
+- Attribute XP calculated from scaled value (50% passthrough)
+
+**Example Flow:**
+1. Player starts "Mine Iron" activity (45 raw mining XP)
+2. Player is level 7, activity requires level 5 (+2 difference)
+3. Scaled XP: 45 × 77% = 34 XP
+4. Mining skill gains 34 XP
+5. Strength attribute gains 17 XP (50% of 34)
+
+### 5. **API Endpoints**
+
+**Skills:**
+- `POST /api/skills/:skillName/experience` - Add XP to skill, returns both skill and attribute results
+
+**Attributes:**
+- `POST /api/attributes/:attributeName/experience` - Add XP to attribute
+
+**Activities:**
+- Activity completion automatically awards scaled XP via `POST /api/locations/activities/complete`
+- Response includes both `experience` (scaled) and `rawExperience` (original) values
+
+### 6. **Balance Notes**
+
+- **1000 XP per level**: Consistent progression across skills and attributes
+- **50% XP flow**: Ensures attributes level slower than skills (as intended)
+- **Activity XP ranges**: 20-50 XP per completion (raw values)
+- **Activity durations**: 5-50 seconds (prevents instant grinding)
+- **Grace range**: Allows players to continue activities 1 level below comfortably
+- **Scaling curve**: Pushes players to upgrade to higher-level activities without hard forcing
+
+**Design Philosophy:**
+The XP scaling system encourages natural progression while respecting player freedom. Players can still farm lower-level content if desired (minimum 1 XP), but they're gently incentivized to seek level-appropriate challenges for maximum efficiency.
+
 ## Content Generator Agent
 
 The Content Generator Agent (`.claude/agents/content-generator.md`) is an AI-powered autonomous agent for creating game content. It works in the background while you continue development.
@@ -780,6 +1195,54 @@ You: *continue coding*
 When the user asks to create game content, invoke the content generator agent using the Task tool with `subagent_type="general-purpose"` and provide the user's request in the prompt. The agent will handle all validation, file creation, and reporting autonomously.
 
 **Full documentation:** `project/docs/content-generator-agent.md`
+
+## Fast Paths (Zero Exploration Needed)
+
+### I Can Do Instantly (No Search Required):
+1. **Add item definition** - You provide itemId + properties, I use template from Common Code Patterns
+2. **Add drop table** - You specify items/weights, I create JSON file
+3. **Add activity** - You describe activity, I create JSON with requirements/rewards
+4. **Create migration** - You describe schema change, I write up/down functions
+5. **Add API endpoint** - You specify route + logic, I create route handler
+6. **Fix known bug** - You provide file:line reference + change description
+7. **Update CLAUDE.md** - Meta improvements to this documentation
+8. **Run utility scripts** - Execute scripts in `be/utils/`
+9. **Git operations** - Status, add, commit, push (when requested)
+10. **Modify JSON data** - Items, locations, activities, drop tables (direct edits)
+
+### I Need Brief Search (<2K tokens):
+1. **Find specific function** - Grep by function name
+2. **Locate item/activity** - Glob by pattern or Grep by ID
+3. **Check if file exists** - Glob verification
+4. **Verify API endpoint** - Grep in routes files
+5. **Find model method** - Grep in Player.js or User.js
+
+### I Need Deep Exploration (>10K tokens):
+1. **"How does X work?"** - Multi-file architectural analysis
+2. **"Find all uses of Y"** - Comprehensive codebase search
+3. **"Design new system"** - Architecture planning with research
+4. **"Debug complex issue"** - Multi-file investigation
+5. **"Refactor architecture"** - Understanding dependencies across files
+
+### Optimization Tips:
+- ✅ **Frame requests as "Fast Path" tasks when possible** - Saves 5-20K tokens
+- ✅ **Provide file:line for known locations** - Enables instant targeted edits
+- ✅ **Use Content Generator for game content** - Autonomous background work
+- ✅ **Batch similar changes** - One message = multiple items/activities/etc.
+- ✅ **Reference previous context** - "In the Player model we read earlier..."
+- ❌ **Avoid exploratory questions** - "Show me everything" wastes tokens
+
+### Example Optimal Requests:
+```
+✅ "Add copper_helmet to be/data/items/definitions/equipment/ with slot: head, tier: 2"
+✅ "In Player.js line 280, change equipItem to validate slot compatibility"
+✅ "Create 3 herb items: sage, thyme, rosemary as tier-1 resources"
+✅ "Use Content Generator: add iron mining to mountain pass, level 10 requirement"
+
+❌ "Explore how the inventory system works"
+❌ "Show me all the items in the game"
+❌ "How does equipment work?"
+```
 
 ## Platform-Specific Tool Notes
 
