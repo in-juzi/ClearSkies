@@ -1,65 +1,201 @@
 {
   "woodGrain": {
     "qualityId": "woodGrain",
-    "name": "Wood Grain Quality",
-    "description": "Affects the structural integrity and magical properties of wood",
+    "name": "Wood Grain",
+    "description": "The structural integrity and magical properties of wood",
     "applicableCategories": ["resource", "crafted"],
-    "valueType": "numeric",
-    "range": [0, 1],
-    "effects": {
-      "alchemy": {
-        "potencyMultiplier": 1.5
+    "valueType": "level",
+    "maxLevel": 5,
+    "levels": {
+      "1": {
+        "name": "Poor Grain",
+        "description": "Rough, inconsistent grain with many imperfections",
+        "effects": {
+          "alchemy": { "potencyMultiplier": 0.8 },
+          "vendorPrice": { "modifier": 0.85 }
+        }
       },
-      "vendorPrice": {
-        "modifier": 0.1
+      "2": {
+        "name": "Fair Grain",
+        "description": "Acceptable grain with minor irregularities",
+        "effects": {
+          "alchemy": { "potencyMultiplier": 0.9 },
+          "vendorPrice": { "modifier": 0.95 }
+        }
+      },
+      "3": {
+        "name": "Good Grain",
+        "description": "Solid, consistent grain pattern",
+        "effects": {
+          "alchemy": { "potencyMultiplier": 1.0 },
+          "vendorPrice": { "modifier": 1.0 }
+        }
+      },
+      "4": {
+        "name": "Fine Grain",
+        "description": "Smooth, uniform grain with excellent structure",
+        "effects": {
+          "alchemy": { "potencyMultiplier": 1.15 },
+          "vendorPrice": { "modifier": 1.15 }
+        }
+      },
+      "5": {
+        "name": "Perfect Grain",
+        "description": "Flawless grain pattern with exceptional properties",
+        "effects": {
+          "alchemy": { "potencyMultiplier": 1.3 },
+          "vendorPrice": { "modifier": 1.35 }
+        }
       }
     }
   },
   "moisture": {
     "qualityId": "moisture",
-    "name": "Moisture Content",
-    "description": "The amount of moisture in the wood - drier is usually better",
+    "name": "Moisture",
+    "description": "The moisture content - drier is better for most uses",
     "applicableCategories": ["resource"],
-    "valueType": "numeric",
-    "range": [0, 1],
-    "effects": {
-      "vendorPrice": {
-        "modifier": -0.15
+    "valueType": "level",
+    "maxLevel": 5,
+    "levels": {
+      "1": {
+        "name": "Waterlogged",
+        "description": "Extremely wet and heavy",
+        "effects": {
+          "vendorPrice": { "modifier": 0.6 },
+          "burning": { "efficiencyMultiplier": 0.4 }
+        }
       },
-      "burning": {
-        "efficiencyMultiplier": -0.5
+      "2": {
+        "name": "Damp",
+        "description": "Still quite moist",
+        "effects": {
+          "vendorPrice": { "modifier": 0.75 },
+          "burning": { "efficiencyMultiplier": 0.6 }
+        }
+      },
+      "3": {
+        "name": "Slightly Moist",
+        "description": "Moderate moisture content",
+        "effects": {
+          "vendorPrice": { "modifier": 0.9 },
+          "burning": { "efficiencyMultiplier": 0.85 }
+        }
+      },
+      "4": {
+        "name": "Well-Seasoned",
+        "description": "Properly dried with low moisture",
+        "effects": {
+          "vendorPrice": { "modifier": 1.1 },
+          "burning": { "efficiencyMultiplier": 1.1 }
+        }
+      },
+      "5": {
+        "name": "Perfectly Dried",
+        "description": "Ideally dried for maximum efficiency",
+        "effects": {
+          "vendorPrice": { "modifier": 1.25 },
+          "burning": { "efficiencyMultiplier": 1.3 }
+        }
       }
     }
   },
   "age": {
     "qualityId": "age",
     "name": "Age",
-    "description": "How aged the wood is - older wood can have different properties",
+    "description": "How aged the wood is - affects properties",
     "applicableCategories": ["resource"],
-    "valueType": "numeric",
-    "range": [0, 1],
-    "effects": {
-      "alchemy": {
-        "potencyMultiplier": 0.8
+    "valueType": "level",
+    "maxLevel": 5,
+    "levels": {
+      "1": {
+        "name": "Freshly Cut",
+        "description": "Just harvested, bright and new",
+        "effects": {
+          "alchemy": { "potencyMultiplier": 0.9 },
+          "vendorPrice": { "modifier": 1.0 }
+        }
       },
-      "vendorPrice": {
-        "modifier": 0.05
+      "2": {
+        "name": "Lightly Aged",
+        "description": "A few months old",
+        "effects": {
+          "alchemy": { "potencyMultiplier": 1.0 },
+          "vendorPrice": { "modifier": 1.05 }
+        }
+      },
+      "3": {
+        "name": "Aged",
+        "description": "Well-aged with developing character",
+        "effects": {
+          "alchemy": { "potencyMultiplier": 1.1 },
+          "vendorPrice": { "modifier": 1.1 }
+        }
+      },
+      "4": {
+        "name": "Mature",
+        "description": "Years of aging have enhanced properties",
+        "effects": {
+          "alchemy": { "potencyMultiplier": 1.2 },
+          "vendorPrice": { "modifier": 1.2 }
+        }
+      },
+      "5": {
+        "name": "Ancient",
+        "description": "Decades or centuries old with rare properties",
+        "effects": {
+          "alchemy": { "potencyMultiplier": 1.4 },
+          "vendorPrice": { "modifier": 1.35 }
+        }
       }
     }
   },
   "purity": {
     "qualityId": "purity",
     "name": "Purity",
-    "description": "The purity of ore or metal - affects smithing quality",
+    "description": "The purity of ore or metal",
     "applicableCategories": ["resource", "crafted"],
-    "valueType": "numeric",
-    "range": [0, 1],
-    "effects": {
-      "smithing": {
-        "qualityBonus": 0.3
+    "valueType": "level",
+    "maxLevel": 5,
+    "levels": {
+      "1": {
+        "name": "Impure",
+        "description": "Contains many impurities and contaminants",
+        "effects": {
+          "smithing": { "qualityBonus": 0.7 },
+          "vendorPrice": { "modifier": 0.7 }
+        }
       },
-      "vendorPrice": {
-        "modifier": 0.25
+      "2": {
+        "name": "Low Purity",
+        "description": "Some impurities present",
+        "effects": {
+          "smithing": { "qualityBonus": 0.85 },
+          "vendorPrice": { "modifier": 0.85 }
+        }
+      },
+      "3": {
+        "name": "Pure",
+        "description": "Good purity with minimal impurities",
+        "effects": {
+          "smithing": { "qualityBonus": 1.0 },
+          "vendorPrice": { "modifier": 1.0 }
+        }
+      },
+      "4": {
+        "name": "High Purity",
+        "description": "Excellent purity, very clean",
+        "effects": {
+          "smithing": { "qualityBonus": 1.2 },
+          "vendorPrice": { "modifier": 1.25 }
+        }
+      },
+      "5": {
+        "name": "Flawless",
+        "description": "Perfect purity with no impurities",
+        "effects": {
+          "smithing": { "qualityBonus": 1.5 },
+          "vendorPrice": { "modifier": 1.6 }
+        }
       }
     }
   },
@@ -68,17 +204,53 @@
     "name": "Freshness",
     "description": "How fresh the fish or food is",
     "applicableCategories": ["consumable", "resource"],
-    "valueType": "numeric",
-    "range": [0, 1],
-    "effects": {
-      "cooking": {
-        "qualityBonus": 0.4
+    "valueType": "level",
+    "maxLevel": 5,
+    "levels": {
+      "1": {
+        "name": "Spoiling",
+        "description": "Past its prime, barely edible",
+        "effects": {
+          "cooking": { "qualityBonus": 0.6 },
+          "vendorPrice": { "modifier": 0.5 },
+          "consumption": { "healingMultiplier": 0.6 }
+        }
       },
-      "vendorPrice": {
-        "modifier": 0.2
+      "2": {
+        "name": "Aging",
+        "description": "Starting to show age",
+        "effects": {
+          "cooking": { "qualityBonus": 0.8 },
+          "vendorPrice": { "modifier": 0.75 },
+          "consumption": { "healingMultiplier": 0.8 }
+        }
       },
-      "consumption": {
-        "healingMultiplier": 1.5
+      "3": {
+        "name": "Fresh",
+        "description": "Good freshness, standard quality",
+        "effects": {
+          "cooking": { "qualityBonus": 1.0 },
+          "vendorPrice": { "modifier": 1.0 },
+          "consumption": { "healingMultiplier": 1.0 }
+        }
+      },
+      "4": {
+        "name": "Very Fresh",
+        "description": "Recently harvested, excellent quality",
+        "effects": {
+          "cooking": { "qualityBonus": 1.25 },
+          "vendorPrice": { "modifier": 1.3 },
+          "consumption": { "healingMultiplier": 1.3 }
+        }
+      },
+      "5": {
+        "name": "Pristine",
+        "description": "Just caught, peak freshness",
+        "effects": {
+          "cooking": { "qualityBonus": 1.5 },
+          "vendorPrice": { "modifier": 1.6 },
+          "consumption": { "healingMultiplier": 1.6 }
+        }
       }
     }
   }

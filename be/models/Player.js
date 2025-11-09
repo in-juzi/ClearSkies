@@ -43,10 +43,14 @@ const playerSchema = new mongoose.Schema({
     quantity: { type: Number, default: 1, min: 1 },
     qualities: {
       type: Map,
-      of: Number,
+      of: Number, // Stores quality levels as integers (1-5)
       default: {}
     },
-    traits: [{ type: String }],
+    traits: {
+      type: Map,
+      of: Number, // Stores trait levels as integers (1-3)
+      default: {}
+    },
     equipped: { type: Boolean, default: false },
     acquiredAt: { type: Date, default: Date.now }
   }],
@@ -501,6 +505,44 @@ playerSchema.methods.addEquipmentSlot = async function(slotName) {
   this.equipmentSlots.set(slotName, null);
   await this.save();
   return slotName;
+};
+
+// Check if player has an item with a specific subtype equipped (in any slot)
+playerSchema.methods.hasEquippedSubtype = function(subtype, itemService) {
+  if (!itemService) {
+    throw new Error('itemService is required for hasEquippedSubtype');
+  }
+
+  // Get all equipped items
+  const equippedItems = this.getEquippedItems();
+
+  // Check each equipped item for matching subtype
+  for (const item of Object.values(equippedItems)) {
+    const itemDef = itemService.getItemDefinition(item.itemId);
+    if (itemDef && itemDef.subtype === subtype) {
+      return true;
+    }
+  }
+
+  return false;
+};
+
+// Check if player has a specific item in inventory (equipped or not)
+playerSchema.methods.hasInventoryItem = function(itemId, minQuantity = 1) {
+  const items = this.inventory.filter(item => item.itemId === itemId);
+
+  if (items.length === 0) {
+    return false;
+  }
+
+  const totalQuantity = items.reduce((sum, item) => sum + (item.quantity || 1), 0);
+  return totalQuantity >= minQuantity;
+};
+
+// Get total quantity of an item in inventory
+playerSchema.methods.getInventoryItemQuantity = function(itemId) {
+  const items = this.inventory.filter(item => item.itemId === itemId);
+  return items.reduce((sum, item) => sum + (item.quantity || 1), 0);
 };
 
 module.exports = mongoose.model('Player', playerSchema);
