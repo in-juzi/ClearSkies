@@ -108,7 +108,9 @@ ClearSkies/
     └── commands/         # Custom Claude commands
         ├── todo.md
         ├── todo-done.md
-        └── context-update.md
+        ├── context-update.md
+        ├── logical-commits.md
+        └── checkpoint.md
 ```
 
 ## Running the Project
@@ -143,40 +145,66 @@ cd be && node utils/add-item.js
 
 ### Content Generator Agent
 
-**Script**: `be/utils/content-generator.js`
+**Agent**: `.claude/agents/content-generator.md`
 
-Interactive CLI tool for creating new game content with built-in validation.
+AI-powered agent for creating game content with autonomous operation and comprehensive validation.
 
-```bash
-cd be && node utils/content-generator.js
+**How to Use:**
+
+Simply describe what content you want in natural language:
+
+```
+"Add a mountain mine where players can mine copper ore"
+```
+
+The agent will autonomously:
+- ✓ Verify all item references exist
+- ✓ Create drop tables with balanced weights
+- ✓ Create activities with appropriate requirements
+- ✓ Create facilities and locations
+- ✓ Write medieval fantasy descriptions
+- ✓ Report back with summary
+
+**Example Requests:**
+
+```
+"Create a fishing spot for catching tuna in deep water"
+
+"Add salmon fishing to Kennik dock, requires level 10 fishing"
+
+"I need a forest clearing with logging. Players should be able to
+chop birch trees at level 5 woodcutting"
+
+"Create a drop table for rare gemstone mining with rubies (5%),
+sapphires (10%), and common ore (85%)"
 ```
 
 **Features:**
-- Create locations, facilities, activities, and drop tables
-- Real-time validation of all references (items, skills, biomes)
-- Prevents creation of drop tables with non-existent items
-- Interactive prompts with step-by-step guidance
-- JSON preview before saving
-- Chain creation (create drop table → activity → facility → location)
+- Works in background while you continue coding
+- AI-powered validation and balance suggestions
+- Natural language interface (no menus or prompts)
+- Creates entire content chains (drop table → activity → facility → location)
+- Writes evocative medieval fantasy descriptions
+- Checks existing content for consistency
+- Explains design decisions
 
-**Menu Options:**
-1. Drop Table - Create weighted loot pools
-2. Activity - Create activities with requirements and rewards
-3. Facility - Create facilities that house activities
-4. Location - Create locations with facilities and navigation
+**What It Creates:**
+1. Drop Tables - Weighted loot pools with item validation
+2. Activities - Actions with requirements and rewards
+3. Facilities - Buildings that house activities
+4. Locations - Areas with facilities and navigation
 
 **Validation:**
-- ✓ All referenced items must exist in item definitions
-- ✓ All drop tables validate item existence
-- ✓ All skills, biomes, and other references are checked
-- ✓ Prevents common errors (negative weights, invalid ranges, etc.)
+- ✓ All referenced items must exist
+- ✓ Skills, biomes, and references validated
+- ✓ Drop tables checked before activities reference them
+- ✓ Balanced rewards and requirements
+- ✓ Prevents common errors automatically
 
-**Recommended Workflow:**
-1. Create drop tables first (for activity rewards)
-2. Create activities (referencing drop tables)
-3. Create facilities (grouping activities)
-4. Create locations (assembling facilities)
-5. Add navigation links between locations
+**Workflow:**
+
+Traditional approach: ~27 minutes + context switching
+With agent: ~30 seconds of your time, agent works in background
 
 See [project/docs/content-generator-agent.md](project/docs/content-generator-agent.md) for full documentation.
 
@@ -483,6 +511,7 @@ module.exports = {
 - `/todo-done <filename>` - Move todo to completed
 - `/context-update` - Update CLAUDE.md with latest project context and changes
 - `/logical-commits` - Analyze unstaged changes and create logical, atomic commits
+- `/checkpoint` - Run logical-commits + context-update in one automated workflow
 
 ## Environment Variables
 
@@ -671,48 +700,84 @@ The item requirements system enables activities to require specific tools and co
 
 ## Content Generator Agent
 
-The Content Generator Agent (`be/utils/content-generator.js`) is an interactive CLI tool for creating game content with built-in validation.
+The Content Generator Agent (`.claude/agents/content-generator.md`) is an AI-powered autonomous agent for creating game content. It works in the background while you continue development.
 
 **Purpose:**
-- Assists in generating new locations, facilities, activities, and drop tables
-- Ensures thorough creation with step-by-step prompts
-- Validates that all referenced items exist (prevents broken drop tables)
-- Checks all references (skills, biomes, items, facilities, etc.)
+- Creates locations, facilities, activities, and drop tables from natural language requests
+- Works autonomously while you focus on development
+- Comprehensive validation ensures all references exist
+- AI-powered suggestions for balance and design
 
 **How to Use:**
-```bash
-cd be
-node utils/content-generator.js
+
+Simply describe what content you want in natural language:
+
+```
+"Add a mountain mine where players can mine copper ore"
+
+"Create salmon fishing at Kennik dock with level 10 requirement"
+
+"I need a forest clearing with birch logging for level 5 woodcutters"
 ```
 
-**What It Creates:**
-1. **Drop Tables** - Weighted loot pools with item validation
-2. **Activities** - Actions with requirements and rewards
-3. **Facilities** - Buildings that house activities
-4. **Locations** - Areas with facilities and navigation
+**What It Does:**
 
-**Key Features:**
-- Interactive prompts guide you through creation
-- Real-time validation prevents errors
-- Shows list of available items/skills/biomes
-- Allows chaining (create drop table → activity → facility → location in sequence)
-- Preview JSON before saving
-- Color-coded terminal output
+The agent autonomously:
+1. Reads existing game data for context
+2. Validates all item/skill/biome references
+3. Creates drop tables with balanced weights
+4. Creates activities with appropriate requirements
+5. Creates facilities grouping related activities
+6. Creates locations with medieval fantasy descriptions
+7. Reports back with summary and design decisions
+
+**What It Creates:**
+1. **Drop Tables** - Weighted loot pools (validates items exist)
+2. **Activities** - Actions with requirements/rewards/XP
+3. **Facilities** - Buildings housing activities
+4. **Locations** - Areas with facilities and navigation links
+
+**AI-Powered Features:**
+- Medieval fantasy description writing
+- Balance suggestions (drop rates, XP, requirements)
+- Context-aware consistency checking
+- Error prevention and validation
+- Explains design decisions
+- Works without interrupting your development flow
+
+**Example Workflow:**
+
+Traditional: ~27 minutes + context switching
+```
+1. Research items → 5 min
+2. Create drop table JSON → 3 min
+3. Validate items → 2 min
+4. Create activity JSON → 5 min
+5. Create facility JSON → 3 min
+6. Create location JSON → 2 min
+7. Add navigation → 2 min
+8. Test → 5 min
+```
+
+With Agent: ~30 seconds of your time
+```
+You: "Add tuna fishing at deep water dock, level 12 fishing"
+Agent: *works autonomously in background*
+Agent: "Created tuna fishing with drop table, activity at deep-water-dock..."
+You: *continue coding*
+```
 
 **Validation:**
-- ✓ Prevents non-existent items in drop tables
-- ✓ Validates skill requirements
-- ✓ Checks biome existence
-- ✓ Verifies facility and location references
-- ✓ Ensures quantity ranges are valid
-- ✓ Confirms weights are positive
+- ✓ All item IDs must exist in item definitions
+- ✓ Skills validated (woodcutting, mining, fishing, smithing, cooking)
+- ✓ Biomes validated (forest, mountain, sea)
+- ✓ Drop tables created before activities reference them
+- ✓ Balanced weights, XP, durations, requirements
+- ✓ Quantity ranges valid (min ≤ max)
 
-**Recommended Workflow:**
-1. Create drop tables first (defines loot)
-2. Create activities (uses drop tables for rewards)
-3. Create facilities (groups activities)
-4. Create locations (assembles facilities)
-5. Add navigation links (connects locations)
+**Invoking the Agent:**
+
+When the user asks to create game content, invoke the content generator agent using the Task tool with `subagent_type="general-purpose"` and provide the user's request in the prompt. The agent will handle all validation, file creation, and reporting autonomously.
 
 **Full documentation:** `project/docs/content-generator-agent.md`
 
