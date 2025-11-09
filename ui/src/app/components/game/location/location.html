@@ -126,6 +126,12 @@
           <li *ngFor="let attr of selectedActivity.requirements.attributes | keyvalue">
             {{ attr.key }} Level {{ attr.value }}
           </li>
+          <li *ngFor="let equipped of selectedActivity.requirements.equipped">
+            {{ equipped.subtype }} equipped
+          </li>
+          <li *ngFor="let inv of selectedActivity.requirements.inventory">
+            {{ inv.quantity || 1 }}x {{ inv.itemId }} in inventory
+          </li>
         </ul>
         <div class="requirement-failures" *ngIf="selectedActivity.requirementFailures && selectedActivity.requirementFailures.length > 0">
           <p class="error">Not met:</p>

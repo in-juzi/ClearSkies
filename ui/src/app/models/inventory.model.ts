@@ -4,6 +4,7 @@ export interface ItemDefinition {
   description: string;
   category: 'resource' | 'equipment' | 'consumable' | 'crafted';
   equipmentType?: string;
+  subtype?: string; // Item subtype (woodcutting-axe, mining-pickaxe, fishing-rod, etc.)
   consumableType?: string;
   slot?: string; // Equipment slot (head, body, mainHand, etc.)
   baseValue: number;
@@ -20,13 +21,31 @@ export interface ItemDefinition {
   allowedTraits: string[];
 }
 
+export interface QualityLevelData {
+  name: string;
+  description: string;
+  effects: {
+    [effectType: string]: {
+      [key: string]: any;
+    };
+  };
+}
+
 export interface QualityDefinition {
   qualityId: string;
   name: string;
   description: string;
   applicableCategories: string[];
-  valueType: 'numeric' | 'boolean' | 'enum';
-  range: [number, number];
+  valueType: 'level';
+  maxLevel: number;
+  levels: {
+    [level: string]: QualityLevelData;
+  };
+}
+
+export interface TraitLevelData {
+  name: string;
+  description: string;
   effects: {
     [effectType: string]: {
       [key: string]: any;
@@ -40,10 +59,9 @@ export interface TraitDefinition {
   description: string;
   rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
   applicableCategories: string[];
-  effects: {
-    [effectType: string]: {
-      [key: string]: any;
-    };
+  maxLevel: number;
+  levels: {
+    [level: string]: TraitLevelData;
   };
 }
 
@@ -51,8 +69,8 @@ export interface ItemInstance {
   instanceId: string;
   itemId: string;
   quantity: number;
-  qualities: { [qualityId: string]: number };
-  traits: string[];
+  qualities: { [qualityId: string]: number }; // Map of qualityId -> level (integer)
+  traits: { [traitId: string]: number }; // Map of traitId -> level (integer)
   equipped?: boolean;
   acquiredAt: Date;
 }
@@ -61,9 +79,24 @@ export interface ItemDetails extends ItemInstance {
   definition: ItemDefinition;
   vendorPrice: number;
   qualityDetails: {
-    [qualityId: string]: QualityDefinition & { value: number };
+    [qualityId: string]: {
+      qualityId: string;
+      name: string;
+      level: number;
+      maxLevel: number;
+      levelData: QualityLevelData;
+    };
   };
-  traitDetails: TraitDefinition[];
+  traitDetails: {
+    [traitId: string]: {
+      traitId: string;
+      name: string;
+      rarity: string;
+      level: number;
+      maxLevel: number;
+      levelData: TraitLevelData;
+    };
+  };
 }
 
 export interface InventoryResponse {
@@ -76,8 +109,8 @@ export interface InventoryResponse {
 export interface AddItemRequest {
   itemId: string;
   quantity?: number;
-  qualities?: { [qualityId: string]: number };
-  traits?: string[];
+  qualities?: { [qualityId: string]: number }; // Map of qualityId -> level (integer)
+  traits?: { [traitId: string]: number }; // Map of traitId -> level (integer)
 }
 
 export interface RemoveItemRequest {

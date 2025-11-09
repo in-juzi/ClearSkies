@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LocationService } from '../../../services/location.service';
 import { Location, Facility, Activity, ActivityRewards } from '../../../models/location.model';
+import { ConfirmDialogService } from '../../../services/confirm-dialog.service';
 
 @Component({
   selector: 'app-location',
@@ -11,6 +12,7 @@ import { Location, Facility, Activity, ActivityRewards } from '../../../models/l
   standalone: true
 })
 export class LocationComponent implements OnInit, OnDestroy {
+  private confirmDialog = inject(ConfirmDialogService);
   private locationService = inject(LocationService);
 
   // Exposed signals from service
@@ -164,8 +166,15 @@ export class LocationComponent implements OnInit, OnDestroy {
   /**
    * Cancel the current activity
    */
-  cancelActivity() {
-    if (!confirm('Are you sure you want to cancel this activity? Progress will be lost.')) {
+  async cancelActivity() {
+    const confirmed = await this.confirmDialog.confirm({
+      title: 'Cancel Activity',
+      message: 'Are you sure you want to cancel this activity? Progress will be lost.',
+      confirmLabel: 'Yes, Cancel',
+      cancelLabel: 'No, Continue'
+    });
+
+    if (!confirmed) {
       return;
     }
 
@@ -182,26 +191,17 @@ export class LocationComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Start traveling to a location
-   */
-  travel(targetLocationId: string) {
-    this.locationService.startTravel(targetLocationId).subscribe({
-      next: (response) => {
-        this.successMessage = response.message;
-        setTimeout(() => this.successMessage = null, 3000);
-      },
-      error: (err) => {
-        this.errorMessage = err.error?.message || 'Failed to start travel';
-        setTimeout(() => this.errorMessage = null, 3000);
-      }
-    });
-  }
-
-  /**
    * Cancel current travel
    */
-  cancelTravel() {
-    if (!confirm('Are you sure you want to cancel travel? You will return to your previous location.')) {
+  async cancelTravel() {
+    const confirmed = await this.confirmDialog.confirm({
+      title: 'Cancel Travel',
+      message: 'Are you sure you want to cancel travel? You will return to your previous location.',
+      confirmLabel: 'Yes, Cancel',
+      cancelLabel: 'No, Continue'
+    });
+
+    if (!confirmed) {
       return;
     }
 
@@ -213,6 +213,22 @@ export class LocationComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         this.errorMessage = err.error?.message || 'Failed to cancel travel';
+        setTimeout(() => this.errorMessage = null, 3000);
+      }
+    });
+  }
+
+  /**
+   * Start traveling to a location
+   */
+  travel(targetLocationId: string) {
+    this.locationService.startTravel(targetLocationId).subscribe({
+      next: (response) => {
+        this.successMessage = response.message;
+        setTimeout(() => this.successMessage = null, 3000);
+      },
+      error: (err) => {
+        this.errorMessage = err.error?.message || 'Failed to start travel';
         setTimeout(() => this.errorMessage = null, 3000);
       }
     });

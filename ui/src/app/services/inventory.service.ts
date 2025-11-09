@@ -140,20 +140,29 @@ export class InventoryService {
   }
 
   /**
-   * Helper: Format quality value as percentage
+   * Helper: Format quality level (now returns level number, not percentage)
    */
-  formatQuality(value: number): string {
-    return `${Math.round(value * 100)}%`;
+  formatQuality(level: number): string {
+    return `Level ${level}`;
   }
 
   /**
-   * Helper: Get quality color based on value
+   * Helper: Get quality color based on level (1-5)
    */
-  getQualityColor(value: number): string {
-    if (value >= 0.8) return 'text-green-400';
-    if (value >= 0.6) return 'text-blue-400';
-    if (value >= 0.4) return 'text-yellow-400';
-    if (value >= 0.2) return 'text-orange-400';
-    return 'text-red-400';
+  getQualityColor(level: number): string {
+    if (level >= 5) return 'text-purple-400'; // Perfect
+    if (level >= 4) return 'text-green-400';  // Fine
+    if (level >= 3) return 'text-blue-400';   // Good
+    if (level >= 2) return 'text-yellow-400'; // Fair
+    return 'text-red-400';                     // Poor
+  }
+
+  /**
+   * Helper: Get trait color based on level (1-3)
+   */
+  getTraitLevelColor(level: number): string {
+    if (level >= 3) return 'text-purple-400'; // Max level
+    if (level >= 2) return 'text-blue-400';   // Mid level
+    return 'text-green-400';                   // Base level
   }
 }

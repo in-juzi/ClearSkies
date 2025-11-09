@@ -35,10 +35,10 @@
           {{ item.definition.name }}
         </div>
         <div class="item-quantity" *ngIf="item.quantity > 1">x{{ item.quantity }}</div>
-        <!-- Trait indicators inline -->
-        <div class="item-traits-inline" *ngIf="item.traits && item.traits.length > 0">
-          <span class="trait-badge" *ngFor="let trait of item.traits">
-            {{ trait.charAt(0).toUpperCase() }}
+        <!-- Trait indicators inline (now showing trait levels) -->
+        <div class="item-traits-inline" *ngIf="getQualityKeys(item.traits).length > 0">
+          <span class="trait-badge" *ngFor="let traitId of getQualityKeys(item.traits)" [title]="traitId + ' Level ' + item.traits[traitId]">
+            {{ traitId.charAt(0).toUpperCase() }}{{ item.traits[traitId] }}
           </span>
         </div>
       </div>
@@ -99,23 +99,37 @@
         <h4 class="section-title">Qualities</h4>
         <div class="quality-list">
           <div *ngFor="let qualityId of getQualityKeys(selectedItem.qualityDetails)" class="quality-item">
-            <span class="quality-name">{{ selectedItem.qualityDetails[qualityId].name }}:</span>
-            <span [class]="inventoryService.getQualityColor(selectedItem.qualityDetails[qualityId].value)">
-              {{ inventoryService.formatQuality(selectedItem.qualityDetails[qualityId].value) }}
-            </span>
+            <div class="quality-header">
+              <span class="quality-name">{{ selectedItem.qualityDetails[qualityId].name }}</span>
+              <span [class]="inventoryService.getQualityColor(selectedItem.qualityDetails[qualityId].level)" class="quality-level">
+                {{ inventoryService.formatQuality(selectedItem.qualityDetails[qualityId].level) }}
+              </span>
+            </div>
+            <div class="quality-level-name">
+              {{ selectedItem.qualityDetails[qualityId].levelData.name }}
+            </div>
+            <p class="quality-description">{{ selectedItem.qualityDetails[qualityId].levelData.description }}</p>
           </div>
         </div>
       </div>
 
       <!-- Traits -->
-      <div class="detail-section" *ngIf="selectedItem.traitDetails && selectedItem.traitDetails.length > 0">
+      <div class="detail-section" *ngIf="getQualityKeys(selectedItem.traitDetails).length > 0">
         <h4 class="section-title">Traits</h4>
         <div class="trait-list">
-          <div *ngFor="let trait of selectedItem.traitDetails" class="trait-item">
-            <span [class]="inventoryService.getRarityColor(trait.rarity)" class="trait-name">
-              {{ trait.name }}
-            </span>
-            <p class="trait-description">{{ trait.description }}</p>
+          <div *ngFor="let traitId of getQualityKeys(selectedItem.traitDetails)" class="trait-item">
+            <div class="trait-header">
+              <span [class]="inventoryService.getRarityColor(selectedItem.traitDetails[traitId].rarity)" class="trait-name">
+                {{ selectedItem.traitDetails[traitId].name }}
+              </span>
+              <span [class]="inventoryService.getTraitLevelColor(selectedItem.traitDetails[traitId].level)" class="trait-level">
+                {{ inventoryService.formatQuality(selectedItem.traitDetails[traitId].level) }}
+              </span>
+            </div>
+            <div class="trait-level-name" [class]="inventoryService.getRarityColor(selectedItem.traitDetails[traitId].rarity)">
+              {{ selectedItem.traitDetails[traitId].levelData.name }}
+            </div>
+            <p class="trait-description">{{ selectedItem.traitDetails[traitId].levelData.description }}</p>
           </div>
         </div>
       </div>

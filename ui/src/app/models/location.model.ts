@@ -23,6 +23,15 @@ export interface NavigationLink {
   requirementFailures?: string[];
 }
 
+export interface EquippedRequirement {
+  subtype: string;
+}
+
+export interface InventoryRequirement {
+  itemId: string;
+  quantity?: number;
+}
+
 export interface Activity {
   activityId: string;
   name: string;
@@ -32,7 +41,9 @@ export interface Activity {
   requirements: {
     skills?: { [key: string]: number };
     attributes?: { [key: string]: number };
-    items?: string[];
+    items?: string[]; // Deprecated: use equipped or inventory instead
+    equipped?: EquippedRequirement[];
+    inventory?: InventoryRequirement[];
   };
   rewards: {
     experience: { [key: string]: number };

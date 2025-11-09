@@ -1,6 +1,7 @@
-import { Component, OnInit, Renderer2, ElementRef } from '@angular/core';
+import { Component, OnInit, inject, Renderer2, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { InventoryService } from '../../../services/inventory.service';
+import { ConfirmDialogService } from '../../../services/confirm-dialog.service';
 import { ItemDetails } from '../../../models/inventory.model';
 
 @Component({
@@ -11,6 +12,8 @@ import { ItemDetails } from '../../../models/inventory.model';
   styleUrl: './inventory.component.css'
 })
 export class InventoryComponent implements OnInit {
+  private confirmDialog = inject(ConfirmDialogService);
+  
   selectedItem: ItemDetails | null = null;
   selectedCategory: string = 'all';
 
@@ -100,18 +103,27 @@ export class InventoryComponent implements OnInit {
     });
   }
 
-  removeItem(instanceId: string, quantity?: number): void {
-    if (confirm(`Are you sure you want to remove this item?`)) {
-      this.inventoryService.removeItem({ instanceId, quantity }).subscribe({
-        next: () => {
-          console.log('Item removed');
-          this.selectedItem = null;
-        },
-        error: (error) => {
-          console.error('Error removing item:', error);
-        }
-      });
+  async removeItem(instanceId: string, quantity?: number): Promise<void> {
+    const confirmed = await this.confirmDialog.confirm({
+      title: 'Remove Item',
+      message: 'Are you sure you want to remove this item?',
+      confirmLabel: 'Remove',
+      cancelLabel: 'Keep'
+    });
+
+    if (!confirmed) {
+      return;
     }
+
+    this.inventoryService.removeItem({ instanceId, quantity }).subscribe({
+      next: () => {
+        console.log('Item removed');
+        this.selectedItem = null;
+      },
+      error: (error) => {
+        console.error('Error removing item:', error);
+      }
+    });
   }
 
   getQualityKeys(qualities: any): string[] {
@@ -210,10 +222,18 @@ export class InventoryComponent implements OnInit {
   }
 
   // Dev helper: Drop all items in inventory
-  dropAllItems(): void {
-    if (!confirm('Are you sure you want to drop ALL items in your inventory? This cannot be undone!')) {
+  async dropAllItems(): Promise<void> {
+    const confirmed = await this.confirmDialog.confirm({
+      title: 'Drop All Items',
+      message: 'Are you sure you want to drop ALL items in your inventory? This cannot be undone!',
+      confirmLabel: 'Drop All',
+      cancelLabel: 'Cancel'
+    });
+
+    if (!confirmed) {
       return;
     }
+
 
     const items = this.inventoryService.inventory();
     if (items.length === 0) {
@@ -221,18 +241,22 @@ export class InventoryComponent implements OnInit {
       return;
     }
 
-    // Remove all items
-    const removePromises = items.map(item =>
-      this.inventoryService.removeItem({ instanceId: item.instanceId }).toPromise()
-    );
+    // Remove all items sequentially to avoid race conditions
+    console.log(`Dropping ${items.length} items...`);
+    let successCount = 0;
+    let errorCount = 0;
 
-    Promise.all(removePromises)
-      .then(() => {
-        console.log('All items dropped');
-        this.selectedItem = null;
-      })
-      .catch((error) => {
-        console.error('Error dropping all items:', error);
-      });
+    for (const item of items) {
+      try {
+        await this.inventoryService.removeItem({ instanceId: item.instanceId }).toPromise();
+        successCount++;
+      } catch (error) {
+        console.error(`Error dropping item ${item.instanceId}:`, error);
+        errorCount++;
+      }
+    }
+
+    console.log(`Dropped ${successCount} items successfully${errorCount > 0 ? `, ${errorCount} failed` : ''}`);
+    this.selectedItem = null;
   }
 }
