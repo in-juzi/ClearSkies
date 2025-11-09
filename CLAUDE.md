@@ -31,6 +31,8 @@ ClearSkies/
 │   │       ├── activities/    # Activity definitions (chop-oak, fish-salmon, etc.)
 │   │       └── drop-tables/   # Drop table definitions (weighted loot pools)
 │   ├── middleware/        # Auth and other middleware
+│   │   ├── auth.js
+│   │   └── responseValidator.js  # JSON serialization validator (dev only)
 │   ├── migrations/        # Database migrations
 │   │   ├── 001-add-skills-to-players.js
 │   │   ├── 002-add-attributes-and-skill-main-attributes.js
@@ -49,7 +51,12 @@ ClearSkies/
 │   │   ├── itemService.js
 │   │   ├── locationService.js
 │   │   └── dropTableService.js
-│   └── utils/            # Utility functions (JWT, migrations, etc.)
+│   └── utils/            # Utility functions
+│       ├── jwt.js            # JWT token utilities
+│       ├── migrations.js     # Migration runner
+│       ├── jsonSafe.js       # JSON serialization with circular ref detection
+│       ├── add-item.js       # Add items to player inventory (dev tool)
+│       └── content-generator.js  # Interactive content creation agent
 ├── ui/                    # Frontend (Angular 20)
 │   └── src/
 │       ├── assets/       # Static assets (icons, images)
@@ -101,6 +108,69 @@ ClearSkies/
 - **Backend**: `cd be && npm run dev` (runs on http://localhost:3000)
 - **Frontend**: `cd ui && npm run dev` (runs on http://localhost:4200)
 - **Both**: `npm run dev` from root (runs both concurrently)
+
+## Utility Scripts
+
+### Adding Items to Player Inventory
+
+**Script**: `be/utils/add-item.js`
+
+When the user asks to add an item to their character (Juzi), use this script:
+
+```bash
+cd be && node utils/add-item.js
+```
+
+**How to modify for different items:**
+1. Open `be/utils/add-item.js`
+2. Change the `itemId` in line 28: `itemService.createItemInstance('ITEM_ID_HERE', QUANTITY)`
+3. Run the script from the `be` directory
+
+**Example item IDs:**
+- Resources: `oak_log`, `pine_log`, `birch_log`, `iron_ore`, `copper_ore`, `coal`, `salmon`, `trout`, `shrimp`
+- Equipment: `bronze_woodcutting_axe`, `iron_woodcutting_axe`, `bronze_mining_pickaxe`, `iron_mining_pickaxe`, `bamboo_fishing_rod`, `willow_fishing_rod`, `copper_sword`, `iron_sword`, `wooden_shield`, `iron_helm`, `hemp_coif`, `leather_tunic`
+- Consumables: `bread`, `health_potion`, `mana_potion`
+
+**Note**: The script initializes the item service, connects to the database, finds the player "Juzi", and adds the specified item to their inventory.
+
+### Content Generator Agent
+
+**Script**: `be/utils/content-generator.js`
+
+Interactive CLI tool for creating new game content with built-in validation.
+
+```bash
+cd be && node utils/content-generator.js
+```
+
+**Features:**
+- Create locations, facilities, activities, and drop tables
+- Real-time validation of all references (items, skills, biomes)
+- Prevents creation of drop tables with non-existent items
+- Interactive prompts with step-by-step guidance
+- JSON preview before saving
+- Chain creation (create drop table → activity → facility → location)
+
+**Menu Options:**
+1. Drop Table - Create weighted loot pools
+2. Activity - Create activities with requirements and rewards
+3. Facility - Create facilities that house activities
+4. Location - Create locations with facilities and navigation
+
+**Validation:**
+- ✓ All referenced items must exist in item definitions
+- ✓ All drop tables validate item existence
+- ✓ All skills, biomes, and other references are checked
+- ✓ Prevents common errors (negative weights, invalid ranges, etc.)
+
+**Recommended Workflow:**
+1. Create drop tables first (for activity rewards)
+2. Create activities (referencing drop tables)
+3. Create facilities (grouping activities)
+4. Create locations (assembling facilities)
+5. Add navigation links between locations
+
+See [project/docs/content-generator-agent.md](project/docs/content-generator-agent.md) for full documentation.
 
 ## Important Context
 
@@ -215,6 +285,9 @@ ClearSkies/
   - `getEquippedItems()` - Get all equipped items
   - `isSlotAvailable(slotName)` - Check if slot is empty
   - `addEquipmentSlot(slotName)` - Add new equipment slot (for extensibility)
+  - `hasEquippedSubtype(subtype, itemService)` - Check if item with subtype is equipped in any slot
+  - `hasInventoryItem(itemId, minQuantity)` - Check if item exists in inventory with min quantity
+  - `getInventoryItemQuantity(itemId)` - Get total quantity of item in inventory
 
 ### API Endpoints
 
@@ -323,7 +396,23 @@ ClearSkies/
    - Square equipment slots using grid pseudo-element technique
    - Activity completion log displays last 10 completed activities with rewards
    - Automatic reward claiming (activities complete automatically when time expires)
-11. **Documentation**: Update CLAUDE.md and relevant docs in `project/docs/`
+11. **Error Handling & Serialization**:
+   - **Response Validator Middleware**: Automatically validates all API responses in development mode
+   - **jsonSafe Utility**: Use `be/utils/jsonSafe.js` for circular reference detection
+     - `jsonSafe(obj, label)` - Validates object can be serialized, provides detailed error analysis
+     - `sanitize(obj)` - Deep clone with Mongoose Map/schema conversion
+     - `safeStringify(obj)` - Stringify with automatic Mongoose handling
+   - **Mongoose Maps**: Always convert to plain objects before JSON serialization
+     - Use `.toObject()` method on Mongoose Maps
+     - `_sortedMapString()` in ItemService handles this automatically for quality/trait comparison
+   - **Common Pitfall**: Don't reference item instances after `player.addItem()` - they become Mongoose documents with circular refs
+12. **File Editing Workflow**:
+   - **Always attempt Edit tool first** for making changes to existing files
+   - **Retry Edit tool once** if it fails with "File has been unexpectedly modified"
+   - **Only use bash commands as fallback** if Edit tool fails twice (bash is significantly slower)
+   - Clean up any `.bak` files created during bash operations
+   - File modification errors typically occur due to file watchers (Angular dev server, linters, formatters)
+13. **Documentation**: Update CLAUDE.md and relevant docs in `project/docs/`
 
 ## Database Migrations
 
@@ -391,11 +480,15 @@ The inventory system uses a three-tier architecture for flexibility and easy bal
 
 1. **Item Definitions** (JSON files in `be/data/items/definitions/`)
    - Canonical item templates
-   - 18 items total:
+   - 24 items total:
      - 9 resources: oak_log, pine_log, birch_log, iron_ore, copper_ore, coal, salmon, trout, shrimp
-     - 6 equipment: copper_sword, iron_sword, wooden_shield, iron_helm, hemp_coif, leather_tunic
+     - 12 equipment:
+       - Weapons: copper_sword, iron_sword
+       - Armor: wooden_shield, iron_helm, hemp_coif, leather_tunic
+       - Tools: bronze_woodcutting_axe, iron_woodcutting_axe, bronze_mining_pickaxe, iron_mining_pickaxe, rare_iron_mining_pickaxe_offhand, bamboo_fishing_rod, willow_fishing_rod
      - 3 consumables: bread, health_potion, mana_potion
-   - Define base properties, allowed qualities, traits, and equipment slots
+   - Define base properties, allowed qualities, traits, equipment slots, and subtypes
+   - Equipment items include `subtype` field for activity requirement matching (e.g., woodcutting-axe, mining-pickaxe, fishing-rod)
 
 2. **Quality & Trait Definitions** (JSON files)
    - Qualities: woodGrain, moisture, age, purity, freshness (0-1 scale)
@@ -438,10 +531,10 @@ The location system provides a rich world exploration and activity framework:
 
 4. **Activities** (JSON files in `be/data/locations/activities/`)
    - Actions players can perform at facilities
-   - Skill requirements and difficulty levels
+   - Requirements: skills, attributes, equipped items (by subtype), inventory items (with quantity)
    - Time-based completion (duration in seconds)
    - Rewards: XP, items via drop tables
-   - Examples: Chop Oak, Fish Salmon, Mine Iron, Combat Bandits
+   - Examples: Chop Oak (requires woodcutting-axe equipped), Fish Salmon (requires fishing-rod equipped), Mine Iron (requires mining-pickaxe equipped)
 
 5. **Drop Tables** (JSON files in `be/data/locations/drop-tables/`)
    - Weighted loot pools for activity rewards
@@ -457,8 +550,9 @@ The location system provides a rich world exploration and activity framework:
 - Activity completion is time-based (tracked server-side)
 - Rich location descriptions and lore through biomes
 - Flexible drop table system for easy loot balancing
+- Item requirements system for activities (equipped tools and inventory items)
 - Easy content expansion by adding new JSON files
-- Full documentation in `project/docs/drop-table-system.md`
+- Full documentation in `project/docs/drop-table-system.md` and `project/docs/item-requirements-system.md`
 
 ## Equipment System
 
@@ -499,6 +593,106 @@ The equipment system allows players to equip items to specific body slots for st
 - Extensible for future slots (rings, accessories, etc.)
 - Full documentation in `project/docs/equipment-system.md`
 
+## Item Requirements System
+
+The item requirements system enables activities to require specific tools and consumables:
+
+1. **Equipment Requirements** (by subtype)
+   - Activities can require items with specific subtypes to be equipped
+   - Checks all equipment slots (mainHand, offHand, etc.) for matching subtype
+   - Supports tier progression (bronze, iron, steel axes all satisfy "woodcutting-axe")
+   - Example: `"equipped": [{ "subtype": "woodcutting-axe" }]`
+
+2. **Inventory Requirements** (by itemId)
+   - Activities can require specific items in inventory with minimum quantities
+   - Items can be equipped or unequipped, just needs to be in inventory
+   - Example: `"inventory": [{ "itemId": "torch", "quantity": 3 }]`
+
+3. **Item Subtypes**
+   - Equipment items include optional `subtype` field for categorization
+   - Current subtypes: woodcutting-axe, mining-pickaxe, fishing-rod, sword, shield, helm, coif, tunic
+   - Multiple items can share same subtype for progression tiers
+   - Enables flexible requirement matching
+
+**Activity Requirement Schema:**
+```json
+{
+  "requirements": {
+    "skills": { "woodcutting": 1 },
+    "equipped": [
+      { "subtype": "woodcutting-axe" }
+    ],
+    "inventory": [
+      { "itemId": "torch", "quantity": 2 }
+    ]
+  }
+}
+```
+
+**Tool Items:**
+- Woodcutting: bronze_woodcutting_axe, iron_woodcutting_axe
+- Mining: bronze_mining_pickaxe, iron_mining_pickaxe, rare_iron_mining_pickaxe_offhand
+- Fishing: bamboo_fishing_rod, willow_fishing_rod
+
+**Player Methods:**
+- `hasEquippedSubtype(subtype, itemService)` - Check if subtype equipped in any slot
+- `hasInventoryItem(itemId, minQuantity)` - Check if item in inventory with quantity
+- `getInventoryItemQuantity(itemId)` - Get total item quantity
+
+**Validation:**
+- LocationService checks requirements before allowing activity start
+- User-friendly error messages: "Requires woodcutting-axe equipped"
+- Frontend displays requirements in activity detail view
+
+**Full documentation:** `project/docs/item-requirements-system.md`
+
+## Content Generator Agent
+
+The Content Generator Agent (`be/utils/content-generator.js`) is an interactive CLI tool for creating game content with built-in validation.
+
+**Purpose:**
+- Assists in generating new locations, facilities, activities, and drop tables
+- Ensures thorough creation with step-by-step prompts
+- Validates that all referenced items exist (prevents broken drop tables)
+- Checks all references (skills, biomes, items, facilities, etc.)
+
+**How to Use:**
+```bash
+cd be
+node utils/content-generator.js
+```
+
+**What It Creates:**
+1. **Drop Tables** - Weighted loot pools with item validation
+2. **Activities** - Actions with requirements and rewards
+3. **Facilities** - Buildings that house activities
+4. **Locations** - Areas with facilities and navigation
+
+**Key Features:**
+- Interactive prompts guide you through creation
+- Real-time validation prevents errors
+- Shows list of available items/skills/biomes
+- Allows chaining (create drop table → activity → facility → location in sequence)
+- Preview JSON before saving
+- Color-coded terminal output
+
+**Validation:**
+- ✓ Prevents non-existent items in drop tables
+- ✓ Validates skill requirements
+- ✓ Checks biome existence
+- ✓ Verifies facility and location references
+- ✓ Ensures quantity ranges are valid
+- ✓ Confirms weights are positive
+
+**Recommended Workflow:**
+1. Create drop tables first (defines loot)
+2. Create activities (uses drop tables for rewards)
+3. Create facilities (groups activities)
+4. Create locations (assembles facilities)
+5. Add navigation links (connects locations)
+
+**Full documentation:** `project/docs/content-generator-agent.md`
+
 ## Platform-Specific Tool Notes
 
 ### Windows (MSYS/Git Bash)
@@ -508,6 +702,12 @@ The equipment system allows players to equip items to specific body slots for st
 - **Incorrect usage**: `taskkill /F /PID <pid>` (fails with "Invalid argument/option - 'F:/'")
 - The forward slashes need to be doubled (`//`) in MSYS/Git Bash environments
 - Example: `taskkill //F //PID 35732`
+
+**move vs mv command:**
+- **Correct usage**: `mv source destination` (Unix/MSYS command)
+- **Incorrect usage**: `move source destination` (Windows CMD command, not available in MSYS/Git Bash)
+- MSYS/Git Bash uses Unix commands, so use `mv` for moving/renaming files
+- Example: `mv test-levels.js be/test-levels.js`
 
 ## Next Steps / Ideas
 
