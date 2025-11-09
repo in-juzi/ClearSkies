@@ -11,11 +11,12 @@ import { InventoryComponent } from './inventory/inventory.component';
 import { LocationComponent } from './location/location';
 import { Equipment } from './equipment/equipment';
 import { CharacterStatus } from './character-status/character-status';
+import { ChatComponent } from './chat/chat.component';
 
 @Component({
   selector: 'app-game',
   standalone: true,
-  imports: [CommonModule, RouterModule, ManualComponent, Skills, AttributesComponent, InventoryComponent, LocationComponent, Equipment, CharacterStatus],
+  imports: [CommonModule, RouterModule, ManualComponent, Skills, AttributesComponent, InventoryComponent, LocationComponent, Equipment, CharacterStatus, ChatComponent],
   templateUrl: './game.component.html',
   styleUrl: './game.component.scss'
 })
