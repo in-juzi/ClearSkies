@@ -82,6 +82,69 @@ Medieval fantasy browser game built with:
 - Gold management system
 - Stats tracking (health, mana, strength, dexterity, intelligence, vitality)
 
+## UI/UX Design Decisions
+
+### Inventory Item Layout (2025-01-09)
+
+**Implemented: Vertical Stack Layout**
+
+Current implementation uses a vertical stack layout for inventory items to prevent text truncation when items have multiple qualities/traits:
+
+```
+┌─────────────────────────────────┐
+│ [🪓] Oak Log x12                │
+│      WG5 AG3 MC4 MST2           │
+├─────────────────────────────────┤
+│ [⚔️] Iron Sword                 │
+│      PR4 BLS3                   │
+└─────────────────────────────────┘
+```
+
+**Structure:**
+- Icon on left (40x40px, fixed)
+- Content area stacked vertically:
+  - Top row: Item name + quantity (name can use full width)
+  - Bottom row: Quality/trait badges (wrap if needed)
+
+**Alternative Layout Options (for future consideration):**
+
+1. **Wrap Badges to New Line**
+   - Keep horizontal left/right split
+   - Allow badges to wrap when space runs out
+   - Maintains the original left/right concept
+
+   ```
+   ┌─────────────────────────────────┐
+   │ [🪓] Oak Log x12    WG5 AG3     │
+   │                     MC4 MST2    │
+   └─────────────────────────────────┘
+   ```
+
+2. **Two-Row Layout**
+   - First row: Icon + Name (full width)
+   - Second row: Quantity + Badges
+   - Very compact, clear hierarchy
+
+   ```
+   ┌─────────────────────────────────┐
+   │ [🪓] Oak Log                    │
+   │ x12          WG5 AG3 MC4 MST2   │
+   └─────────────────────────────────┘
+   ```
+
+3. **Smaller Badge Font/Spacing**
+   - Reduce badge size to fit more horizontally
+   - Quick fix but doesn't scale well with 5+ badges
+   - May reduce readability
+
+**Why Vertical Stack?**
+- No truncation of item names (critical for item identification)
+- All badges always visible
+- Clean, scannable layout
+- Scales well with any number of qualities/traits
+- Similar to successful inventory systems (Diablo, Path of Exile)
+- Badges can wrap naturally if needed
+
 ## Notes
 - Backend server runs on port 3000 by default
 - MongoDB connection required (configure in .env file)

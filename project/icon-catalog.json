@@ -1,0 +1,242 @@
+{
+  "metadata": {
+    "lastUpdated": "2025-11-09",
+    "totalIcons": 1429,
+    "analyzed": 10,
+    "collection": "lorc",
+    "sourcePath": "C:\\Users\\trace\\OneDrive\\Documents\\Projects\\Game Icons Project\\icons\\ffffff\\000000\\1x1\\lorc (1429)",
+    "format": "svg",
+    "viewBox": "0 0 512 512",
+    "style": "silhouette-icons",
+    "colorScheme": "white-on-black",
+    "batchTracking": {
+      "currentBatch": 1,
+      "batchSize": 10,
+      "lastAnalyzedFile": "alien-skull.svg",
+      "nextBatchStartIndex": 10,
+      "analysisComplete": false,
+      "resumeInstruction": "Continue from index 10 in alphabetically sorted file list"
+    }
+  },
+  "icons": [
+    {
+      "id": "ace",
+      "filename": "ace.svg",
+      "description": "Playing card ace symbol - diamond shape with ornate decorative pattern inside",
+      "visualElements": ["diamond", "card", "ornate pattern", "geometric"],
+      "tags": ["card", "ace", "gambling", "game", "playing-card", "suit", "diamond"],
+      "categories": ["items", "games", "symbols"],
+      "gameUseCases": ["inventory-item", "collectible", "quest-item", "gambling-minigame"],
+      "style": "silhouette",
+      "complexity": "high",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["card games", "gambling systems", "collectible items", "magical symbols"],
+      "relevanceScore": {
+        "clearSkies": 3,
+        "medieval": 5,
+        "fantasy": 4
+      }
+    },
+    {
+      "id": "acid-blob",
+      "filename": "acid-blob.svg",
+      "description": "Amorphous blob creature with eyes and flowing liquid form, suggesting acidic slime monster",
+      "visualElements": ["blob", "eyes", "liquid", "creature", "drips"],
+      "tags": ["monster", "slime", "acid", "creature", "enemy", "ooze", "liquid"],
+      "categories": ["creatures", "enemies", "monsters"],
+      "gameUseCases": ["enemy-icon", "monster-type", "status-effect", "creature-ability"],
+      "style": "silhouette",
+      "complexity": "medium",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["slime enemies", "acid damage types", "ooze creatures", "poison effects"],
+      "relevanceScore": {
+        "clearSkies": 8,
+        "medieval": 6,
+        "fantasy": 9
+      }
+    },
+    {
+      "id": "acorn",
+      "filename": "acorn.svg",
+      "description": "Single acorn with cap, organic natural shape suggesting forest resource or food item",
+      "visualElements": ["acorn", "cap", "nut", "seed", "organic"],
+      "tags": ["resource", "food", "nature", "seed", "nut", "gathering", "forest"],
+      "categories": ["resources", "consumables", "nature", "gathering"],
+      "gameUseCases": ["resource-item", "crafting-material", "food-item", "gathering-reward"],
+      "style": "silhouette",
+      "complexity": "low",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["gathering resources", "crafting materials", "food items", "forest loot", "herbalism rewards"],
+      "relevanceScore": {
+        "clearSkies": 10,
+        "medieval": 10,
+        "fantasy": 8
+      }
+    },
+    {
+      "id": "aerial-signal",
+      "filename": "aerial-signal.svg",
+      "description": "Radio tower or antenna with concentric circular signal waves radiating outward",
+      "visualElements": ["antenna", "tower", "waves", "signals", "broadcast"],
+      "tags": ["signal", "communication", "tower", "broadcast", "antenna", "waves", "technology"],
+      "categories": ["technology", "communication", "structures", "ui-elements"],
+      "gameUseCases": ["ability-icon", "buff-indicator", "area-effect", "structure-icon"],
+      "style": "silhouette",
+      "complexity": "medium",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["communication abilities", "buff/debuff indicators", "area-of-effect spells", "scanning abilities"],
+      "relevanceScore": {
+        "clearSkies": 2,
+        "medieval": 1,
+        "fantasy": 3
+      }
+    },
+    {
+      "id": "aerodynamic-harpoon",
+      "filename": "aerodynamic-harpoon.svg",
+      "description": "Sleek harpoon projectile with fins and motion lines, suggesting high-speed weapon",
+      "visualElements": ["harpoon", "spear", "projectile", "fins", "motion-lines"],
+      "tags": ["weapon", "projectile", "harpoon", "spear", "ranged", "throwing", "hunting"],
+      "categories": ["weapons", "projectiles", "tools", "fishing"],
+      "gameUseCases": ["weapon-item", "ability-icon", "fishing-tool", "ranged-weapon"],
+      "style": "silhouette",
+      "complexity": "medium",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["fishing tools", "throwing weapons", "ranged abilities", "hunting equipment"],
+      "relevanceScore": {
+        "clearSkies": 9,
+        "medieval": 7,
+        "fantasy": 8
+      }
+    },
+    {
+      "id": "aerosol",
+      "filename": "aerosol.svg",
+      "description": "Spray can with cloud of particles being dispersed, suggesting aerosol or spray effect",
+      "visualElements": ["can", "spray", "particles", "cloud", "mist"],
+      "tags": ["spray", "aerosol", "particles", "consumable", "effect", "poison", "tool"],
+      "categories": ["consumables", "tools", "effects", "items"],
+      "gameUseCases": ["consumable-item", "ability-icon", "status-effect", "crafting-component"],
+      "style": "silhouette",
+      "complexity": "medium",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["poison items", "buff potions", "environmental effects", "crafting materials"],
+      "relevanceScore": {
+        "clearSkies": 3,
+        "medieval": 2,
+        "fantasy": 4
+      }
+    },
+    {
+      "id": "afterburn",
+      "filename": "afterburn.svg",
+      "description": "Stylized flame with flowing curves and heat distortion, suggesting lingering fire effect",
+      "visualElements": ["flame", "fire", "curves", "heat", "flowing"],
+      "tags": ["fire", "flame", "burn", "effect", "damage", "heat", "lingering"],
+      "categories": ["effects", "magic", "damage-types", "abilities"],
+      "gameUseCases": ["status-effect", "damage-type", "ability-icon", "debuff"],
+      "style": "silhouette",
+      "complexity": "medium",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["fire damage", "burn debuffs", "fire spells", "damage-over-time effects"],
+      "relevanceScore": {
+        "clearSkies": 7,
+        "medieval": 8,
+        "fantasy": 9
+      }
+    },
+    {
+      "id": "air-zigzag",
+      "filename": "air-zigzag.svg",
+      "description": "Zigzag lightning-like pattern suggesting air currents, wind, or electrical energy",
+      "visualElements": ["zigzag", "lightning", "waves", "energy", "wind"],
+      "tags": ["air", "wind", "lightning", "energy", "magic", "element", "electricity"],
+      "categories": ["effects", "magic", "elements", "abilities"],
+      "gameUseCases": ["ability-icon", "element-type", "status-effect", "spell-icon"],
+      "style": "silhouette",
+      "complexity": "low",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["wind spells", "lightning abilities", "air magic", "speed buffs", "electrical damage"],
+      "relevanceScore": {
+        "clearSkies": 6,
+        "medieval": 7,
+        "fantasy": 9
+      }
+    },
+    {
+      "id": "alien-fire",
+      "filename": "alien-fire.svg",
+      "description": "Otherworldly flame with unusual shape and symmetry, suggesting supernatural or alien fire",
+      "visualElements": ["flame", "fire", "symmetrical", "alien", "supernatural"],
+      "tags": ["fire", "alien", "supernatural", "magic", "flame", "mystical", "otherworldly"],
+      "categories": ["effects", "magic", "abilities", "supernatural"],
+      "gameUseCases": ["ability-icon", "damage-type", "spell-effect", "status-effect"],
+      "style": "silhouette",
+      "complexity": "high",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["magical fire spells", "supernatural abilities", "exotic damage types", "mystical effects"],
+      "relevanceScore": {
+        "clearSkies": 5,
+        "medieval": 6,
+        "fantasy": 8
+      }
+    },
+    {
+      "id": "alien-skull",
+      "filename": "alien-skull.svg",
+      "description": "Stylized insectoid or alien skull with compound eyes and mandibles, suggesting otherworldly creature",
+      "visualElements": ["skull", "alien", "insect", "eyes", "mandibles"],
+      "tags": ["skull", "alien", "creature", "death", "insect", "otherworldly", "horror"],
+      "categories": ["creatures", "symbols", "enemies", "death"],
+      "gameUseCases": ["enemy-icon", "death-marker", "quest-item", "creature-type"],
+      "style": "silhouette",
+      "complexity": "high",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["alien enemies", "death indicators", "horror themes", "exotic creature types"],
+      "relevanceScore": {
+        "clearSkies": 4,
+        "medieval": 3,
+        "fantasy": 6
+      }
+    }
+  ],
+  "categories": {
+    "items": ["ace"],
+    "games": ["ace"],
+    "symbols": ["ace", "alien-skull"],
+    "creatures": ["acid-blob", "alien-skull"],
+    "enemies": ["acid-blob", "alien-skull"],
+    "monsters": ["acid-blob"],
+    "resources": ["acorn"],
+    "consumables": ["acorn", "aerosol"],
+    "nature": ["acorn"],
+    "gathering": ["acorn"],
+    "technology": ["aerial-signal"],
+    "communication": ["aerial-signal"],
+    "structures": ["aerial-signal"],
+    "ui-elements": ["aerial-signal"],
+    "weapons": ["aerodynamic-harpoon"],
+    "projectiles": ["aerodynamic-harpoon"],
+    "tools": ["aerodynamic-harpoon", "aerosol"],
+    "fishing": ["aerodynamic-harpoon"],
+    "effects": ["aerosol", "afterburn", "air-zigzag", "alien-fire"],
+    "magic": ["afterburn", "air-zigzag", "alien-fire"],
+    "damage-types": ["afterburn"],
+    "abilities": ["afterburn", "air-zigzag", "alien-fire"],
+    "elements": ["air-zigzag"],
+    "supernatural": ["alien-fire"],
+    "death": ["alien-skull"]
+  },
+  "stats": {
+    "byComplexity": {
+      "low": 2,
+      "medium": 6,
+      "high": 2
+    },
+    "topRelevanceForClearSkies": [
+      { "id": "acorn", "score": 10 },
+      { "id": "aerodynamic-harpoon", "score": 9 },
+      { "id": "acid-blob", "score": 8 }
+    ]
+  }
+}
