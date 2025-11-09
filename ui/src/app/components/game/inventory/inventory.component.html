@@ -26,19 +26,35 @@
       (click)="selectItem(item)"
       (dragstart)="onItemDragStart($event, item)"
       (dragend)="onItemDragEnd($event)">
+      <!-- Item icon (left side) -->
       <div class="item-icon">
         <!-- Placeholder for item icon -->
         <span class="item-tier">T{{ item.definition.properties.tier }}</span>
       </div>
-      <div class="item-info">
-        <div class="item-name" [class]="inventoryService.getRarityColor(item.definition.rarity)">
-          {{ item.definition.name }}
+
+      <!-- Item content (right side - vertical stack) -->
+      <div class="item-content">
+        <!-- Top row: Name + Quantity -->
+        <div class="item-header">
+          <div class="item-name" [class]="inventoryService.getRarityColor(item.definition.rarity)">
+            {{ item.definition.name }}
+          </div>
+          <div class="item-quantity" *ngIf="item.quantity > 1">x{{ item.quantity }}</div>
         </div>
-        <div class="item-quantity" *ngIf="item.quantity > 1">x{{ item.quantity }}</div>
-        <!-- Trait indicators inline (now showing trait levels) -->
-        <div class="item-traits-inline" *ngIf="getQualityKeys(item.traits).length > 0">
-          <span class="trait-badge" *ngFor="let traitId of getQualityKeys(item.traits)" [title]="traitId + ' Level ' + item.traits[traitId]">
-            {{ traitId.charAt(0).toUpperCase() }}{{ item.traits[traitId] }}
+
+        <!-- Bottom row: Quality/Trait badges -->
+        <div class="item-badges" *ngIf="getQualityKeys(item.qualities).length > 0 || getQualityKeys(item.traits).length > 0">
+          <!-- Quality indicators inline -->
+          <span class="quality-badge" *ngFor="let qualityId of getQualityKeys(item.qualities)"
+                [title]="item.qualityDetails[qualityId]?.name + ' Level ' + item.qualities[qualityId]"
+                [class]="inventoryService.getQualityColor(item.qualities[qualityId])">
+            {{ item.qualityDetails[qualityId]?.shorthand || qualityId.charAt(0).toUpperCase() }}{{ item.qualities[qualityId] }}
+          </span>
+          <!-- Trait indicators inline (now showing trait levels) -->
+          <span class="trait-badge" *ngFor="let traitId of getQualityKeys(item.traits)"
+                [title]="item.traitDetails[traitId]?.name + ' Level ' + item.traits[traitId]"
+                [class]="inventoryService.getTraitLevelColor(item.traits[traitId])">
+            {{ item.traitDetails[traitId]?.shorthand || traitId.charAt(0).toUpperCase() }}{{ item.traits[traitId] }}
           </span>
         </div>
       </div>
@@ -101,14 +117,25 @@
           <div *ngFor="let qualityId of getQualityKeys(selectedItem.qualityDetails)" class="quality-item">
             <div class="quality-header">
               <span class="quality-name">{{ selectedItem.qualityDetails[qualityId].name }}</span>
-              <span [class]="inventoryService.getQualityColor(selectedItem.qualityDetails[qualityId].level)" class="quality-level">
-                {{ inventoryService.formatQuality(selectedItem.qualityDetails[qualityId].level) }}
+              <span [class]="inventoryService.getQualityColor(selectedItem.qualityDetails[qualityId].level)" class="quality-level-badge">
+                Level {{ selectedItem.qualityDetails[qualityId].level }}
               </span>
             </div>
-            <div class="quality-level-name">
+            <div class="quality-level-name" [class]="inventoryService.getQualityColor(selectedItem.qualityDetails[qualityId].level)">
               {{ selectedItem.qualityDetails[qualityId].levelData.name }}
             </div>
             <p class="quality-description">{{ selectedItem.qualityDetails[qualityId].levelData.description }}</p>
+
+            <!-- Effects -->
+            <div class="effects-section" *ngIf="selectedItem.qualityDetails[qualityId].levelData.effects">
+              <div class="effect-label">Effects:</div>
+              <div class="effects-grid">
+                <div *ngFor="let effect of getQualityKeys(selectedItem.qualityDetails[qualityId].levelData.effects)" class="effect-item">
+                  <span class="effect-type">{{ formatEffectType(effect) }}:</span>
+                  <span class="effect-value">{{ formatEffectValue(selectedItem.qualityDetails[qualityId].levelData.effects[effect]) }}</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -117,24 +144,42 @@
       <div class="detail-section" *ngIf="getQualityKeys(selectedItem.traitDetails).length > 0">
         <h4 class="section-title">Traits</h4>
         <div class="trait-list">
-          <div *ngFor="let traitId of getQualityKeys(selectedItem.traitDetails)" class="trait-item">
+          <div *ngFor="let traitId of getQualityKeys(selectedItem.traitDetails)" class="trait-item" [class]="'trait-rarity-' + selectedItem.traitDetails[traitId].rarity">
             <div class="trait-header">
               <span [class]="inventoryService.getRarityColor(selectedItem.traitDetails[traitId].rarity)" class="trait-name">
                 {{ selectedItem.traitDetails[traitId].name }}
               </span>
-              <span [class]="inventoryService.getTraitLevelColor(selectedItem.traitDetails[traitId].level)" class="trait-level">
-                {{ inventoryService.formatQuality(selectedItem.traitDetails[traitId].level) }}
-              </span>
+              <div class="trait-badges">
+                <span class="trait-rarity-badge" [class]="inventoryService.getRarityColor(selectedItem.traitDetails[traitId].rarity)">
+                  {{ selectedItem.traitDetails[traitId].rarity }}
+                </span>
+                <span [class]="inventoryService.getTraitLevelColor(selectedItem.traitDetails[traitId].level)" class="trait-level-badge">
+                  Level {{ selectedItem.traitDetails[traitId].level }}
+                </span>
+              </div>
             </div>
             <div class="trait-level-name" [class]="inventoryService.getRarityColor(selectedItem.traitDetails[traitId].rarity)">
               {{ selectedItem.traitDetails[traitId].levelData.name }}
             </div>
             <p class="trait-description">{{ selectedItem.traitDetails[traitId].levelData.description }}</p>
+
+            <!-- Effects -->
+            <div class="effects-section" *ngIf="selectedItem.traitDetails[traitId].levelData.effects">
+              <div class="effect-label">Effects:</div>
+              <div class="effects-grid">
+                <div *ngFor="let effect of getQualityKeys(selectedItem.traitDetails[traitId].levelData.effects)" class="effect-item">
+                  <span class="effect-type">{{ formatEffectType(effect) }}:</span>
+                  <span class="effect-value">{{ formatEffectValue(selectedItem.traitDetails[traitId].levelData.effects[effect]) }}</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Actions -->
+    <!-- Actions Footer (always visible) -->
+    <div class="details-footer">
       <div class="detail-actions">
         <button class="btn-primary" *ngIf="selectedItem.definition.category === 'consumable'">
           Use

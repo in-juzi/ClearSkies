@@ -34,6 +34,7 @@ export interface QualityLevelData {
 export interface QualityDefinition {
   qualityId: string;
   name: string;
+  shorthand: string;
   description: string;
   applicableCategories: string[];
   valueType: 'level';
@@ -56,6 +57,7 @@ export interface TraitLevelData {
 export interface TraitDefinition {
   traitId: string;
   name: string;
+  shorthand: string;
   description: string;
   rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
   applicableCategories: string[];
@@ -82,6 +84,7 @@ export interface ItemDetails extends ItemInstance {
     [qualityId: string]: {
       qualityId: string;
       name: string;
+      shorthand: string;
       level: number;
       maxLevel: number;
       levelData: QualityLevelData;
@@ -91,6 +94,7 @@ export interface ItemDetails extends ItemInstance {
     [traitId: string]: {
       traitId: string;
       name: string;
+      shorthand: string;
       rarity: string;
       level: number;
       maxLevel: number;

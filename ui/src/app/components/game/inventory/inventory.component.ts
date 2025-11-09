@@ -131,6 +131,80 @@ export class InventoryComponent implements OnInit {
     return Object.keys(qualities);
   }
 
+  formatEffectType(effectKey: string): string {
+    const typeMap: { [key: string]: string } = {
+      'vendorPrice': 'Vendor Price',
+      'alchemy': 'Alchemy',
+      'smithing': 'Smithing',
+      'cooking': 'Cooking',
+      'burning': 'Burning',
+      'combat': 'Combat',
+      'consumption': 'Consumption'
+    };
+    return typeMap[effectKey] || effectKey;
+  }
+
+  formatEffectValue(effectData: any): string {
+    if (!effectData) return '';
+
+    const effects: string[] = [];
+
+    // Handle different effect properties
+    if (effectData.modifier !== undefined) {
+      const percentNum = (effectData.modifier - 1) * 100;
+      const percent = percentNum.toFixed(0);
+      effects.push(`${percentNum >= 0 ? '+' : ''}${percent}%`);
+    }
+
+    if (effectData.potencyMultiplier !== undefined) {
+      const percentNum = (effectData.potencyMultiplier - 1) * 100;
+      const percent = percentNum.toFixed(0);
+      effects.push(`Potency ${percentNum >= 0 ? '+' : ''}${percent}%`);
+    }
+
+    if (effectData.qualityBonus !== undefined) {
+      const percent = (effectData.qualityBonus * 100).toFixed(0);
+      effects.push(`Quality +${percent}%`);
+    }
+
+    if (effectData.efficiencyMultiplier !== undefined) {
+      const percentNum = (effectData.efficiencyMultiplier - 1) * 100;
+      const percent = percentNum.toFixed(0);
+      effects.push(`Efficiency ${percentNum >= 0 ? '+' : ''}${percent}%`);
+    }
+
+    if (effectData.healingMultiplier !== undefined) {
+      const percentNum = (effectData.healingMultiplier - 1) * 100;
+      const percent = percentNum.toFixed(0);
+      effects.push(`Healing ${percentNum >= 0 ? '+' : ''}${percent}%`);
+    }
+
+    if (effectData.damageBonus !== undefined) {
+      const percent = (effectData.damageBonus * 100).toFixed(0);
+      effects.push(`Damage +${percent}%`);
+    }
+
+    if (effectData.healthDrain !== undefined) {
+      effects.push(`Health Drain -${effectData.healthDrain}/sec`);
+    }
+
+    if (effectData.durabilityMultiplier !== undefined) {
+      const percentNum = (effectData.durabilityMultiplier - 1) * 100;
+      const percent = percentNum.toFixed(0);
+      effects.push(`Durability ${percentNum >= 0 ? '+' : ''}${percent}%`);
+    }
+
+    if (effectData.difficultyIncrease !== undefined) {
+      effects.push(`Difficulty +${effectData.difficultyIncrease}%`);
+    }
+
+    if (effectData.bonusProperties !== undefined && Array.isArray(effectData.bonusProperties)) {
+      effects.push(`Grants: ${effectData.bonusProperties.join(', ')}`);
+    }
+
+    return effects.join(', ');
+  }
+
   // Drag functionality for item details panel
   onDragStart(event: MouseEvent, element: HTMLElement): void {
     // Only allow dragging from the header

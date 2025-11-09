@@ -216,6 +216,7 @@ class ItemService {
           qualityDetails[qualityId] = {
             qualityId,
             name: qualityDef.name,
+            shorthand: qualityDef.shorthand,
             level,
             maxLevel: qualityDef.maxLevel,
             levelData: qualityDef.levels[level]
@@ -233,6 +234,7 @@ class ItemService {
           traitDetails[traitId] = {
             traitId,
             name: traitDef.name,
+            shorthand: traitDef.shorthand,
             rarity: traitDef.rarity,
             level,
             maxLevel: traitDef.maxLevel,
@@ -290,8 +292,13 @@ class ItemService {
     // Handle Mongoose Map objects by converting to plain object
     let plainMap = map;
     if (map && typeof map.toObject === 'function') {
-      // Mongoose Map - convert to plain object
-      plainMap = map.toObject();
+      // Mongoose Map - toObject() returns a JS Map, need to convert further
+      const mongooseMapResult = map.toObject();
+      if (mongooseMapResult instanceof Map) {
+        plainMap = Object.fromEntries(mongooseMapResult);
+      } else {
+        plainMap = mongooseMapResult;
+      }
     } else if (map && map instanceof Map) {
       // JavaScript Map - convert to plain object
       plainMap = Object.fromEntries(map);

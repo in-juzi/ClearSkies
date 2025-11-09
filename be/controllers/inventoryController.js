@@ -14,7 +14,15 @@ exports.getInventory = async (req, res) => {
 
     // Enhance inventory with item details
     const enhancedInventory = player.inventory.map(item => {
-      const details = itemService.getItemDetails(item.toObject());
+      const plainItem = item.toObject();
+      // Convert Mongoose Maps to plain objects for JSON serialization
+      if (plainItem.qualities instanceof Map) {
+        plainItem.qualities = Object.fromEntries(plainItem.qualities);
+      }
+      if (plainItem.traits instanceof Map) {
+        plainItem.traits = Object.fromEntries(plainItem.traits);
+      }
+      const details = itemService.getItemDetails(plainItem);
       return details;
     });
 
