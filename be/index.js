@@ -1,11 +1,13 @@
 require('dotenv').config();
 const express = require('express');
+const http = require('http');
 const cors = require('cors');
 const connectDB = require('./config/database');
 const itemService = require('./services/itemService');
 const locationService = require('./services/locationService');
 
 const app = express();
+const server = http.createServer(app);
 const PORT = process.env.PORT || 3000;
 
 // Connect to MongoDB
@@ -69,7 +71,21 @@ app.use((err, req, res, next) => {
   });
 });
 
+// Initialize Socket.io
+const { Server } = require('socket.io');
+const io = new Server(server, {
+  cors: {
+    origin: 'http://localhost:4200',
+    credentials: true
+  }
+});
+
+// Socket.io chat handlers
+const chatHandler = require('./sockets/chatHandler');
+chatHandler(io);
+
 // Start server
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`Socket.io is ready for connections`);
 });
