@@ -1,0 +1,60 @@
+<div class="manual-container" [class.dialog-mode]="dialogMode()">
+  @if (dialogMode()) {
+    <div class="dialog-overlay" (click)="close()"></div>
+  }
+
+  <div class="manual-card">
+    <div class="manual-header">
+      <h1>ClearSkies Game Manual</h1>
+      @if (dialogMode()) {
+        <button class="close-button" (click)="close()">Close</button>
+      } @else {
+        <a routerLink="/login" class="close-button">Close</a>
+      }
+    </div>
+
+    <div class="manual-content">
+      <!-- Sidebar Navigation -->
+      <nav class="manual-sidebar">
+        @for (section of sections; track section.id) {
+          <button
+            class="nav-item"
+            [class.active]="activeSection() === section.id"
+            (click)="selectSection(section.id)"
+          >
+            <img
+              [src]="'assets/icons/' + section.icon + '.svg'"
+              [alt]="section.label"
+              class="nav-icon"
+            />
+            <span>{{ section.label }}</span>
+          </button>
+        }
+      </nav>
+
+      <!-- Content Area -->
+      <div class="manual-main">
+        @switch (activeSection()) {
+          @case ('overview') {
+            <app-overview-section />
+          }
+          @case ('skills') {
+            <app-skills-section />
+          }
+          @case ('attributes') {
+            <app-attributes-section />
+          }
+          @case ('items') {
+            <app-items-section />
+          }
+          @case ('locations') {
+            <app-locations-section />
+          }
+          @case ('mechanics') {
+            <app-mechanics-section />
+          }
+        }
+      </div>
+    </div>
+  </div>
+</div>

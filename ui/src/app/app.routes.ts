@@ -18,6 +18,10 @@ export const routes: Routes = [
     loadComponent: () => import('./components/register/register.component').then(m => m.RegisterComponent)
   },
   {
+    path: 'manual',
+    loadComponent: () => import('./components/manual/manual.component').then(m => m.ManualComponent)
+  },
+  {
     path: 'game',
     canActivate: [authGuard],
     loadComponent: () => import('./components/game/game.component').then(m => m.GameComponent)

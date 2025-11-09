@@ -50,12 +50,14 @@ const skillsRoutes = require('./routes/skills');
 const attributesRoutes = require('./routes/attributes');
 const inventoryRoutes = require('./routes/inventory');
 const locationRoutes = require('./routes/locations');
+const manualRoutes = require('./routes/manual');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/skills', skillsRoutes);
 app.use('/api/attributes', attributesRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/locations', locationRoutes);
+app.use('/api/manual', manualRoutes); // Public routes (no auth required)
 
 // Error handling middleware
 app.use((err, req, res, next) => {
