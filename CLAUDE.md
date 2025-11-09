@@ -68,7 +68,10 @@ ClearSkies/
 │           │   │   ├── attributes/  # Attributes component
 │           │   │   ├── inventory/   # Inventory component
 │           │   │   ├── equipment/   # Equipment component
-│           │   │   └── location/    # Location component
+│           │   │   ├── location/    # Location component
+│           │   │   └── character-status/  # Character status display
+│           │   ├── shared/         # Shared/reusable components
+│           │   │   └── confirm-dialog/    # Confirmation dialog
 │           │   ├── login/
 │           │   └── register/
 │           ├── services/        # Angular services
@@ -77,7 +80,8 @@ ClearSkies/
 │           │   ├── attributes.service.ts
 │           │   ├── inventory.service.ts
 │           │   ├── equipment.service.ts
-│           │   └── location.service.ts
+│           │   ├── location.service.ts
+│           │   └── confirm-dialog.service.ts
 │           ├── guards/          # Route guards
 │           │   └── auth.guard.ts (authGuard, guestGuard)
 │           ├── interceptors/    # HTTP interceptors
@@ -90,7 +94,11 @@ ClearSkies/
 │   ├── docs/             # Project documentation
 │   │   ├── inventory-system.md
 │   │   ├── equipment-system.md
-│   │   └── drop-table-system.md
+│   │   ├── drop-table-system.md
+│   │   ├── level-based-quality-trait-system.md
+│   │   ├── item-requirements-system.md
+│   │   ├── error-handling-system.md
+│   │   └── content-generator-agent.md
 │   ├── ideas/            # Feature ideas and concepts
 │   ├── tasks/
 │   │   ├── todo/         # Pending tasks
@@ -229,6 +237,12 @@ See [project/docs/content-generator-agent.md](project/docs/content-generator-age
 - ✅ SVG icon system (222+ scalable icons for abilities, items, skills, attributes, UI elements)
 - ✅ Improved UI layout with viewport overflow fixes (100vh height, proper overflow handling)
 - ✅ Nodemon for backend auto-restart during development
+- ✅ Level-based quality and trait system (discrete levels 1-5 for qualities, 1-3 for traits)
+- ✅ Quality and trait display with descriptive names instead of percentages
+- ✅ Improved item stacking based on identical quality/trait levels
+- ✅ Confirm dialog component for destructive action confirmation
+- ✅ Character status component (placeholder for future features)
+- ✅ JSON safety utilities and response validator middleware
 
 ### Database Models
 
@@ -250,8 +264,8 @@ See [project/docs/content-generator-agent.md](project/docs/content-generator-age
   - instanceId (unique ID)
   - itemId (reference to item definition)
   - quantity (stack size)
-  - qualities (Map of quality values 0-1)
-  - traits (array of trait IDs)
+  - qualities (Map<string, number>) - quality levels as integers (1-5)
+  - traits (Map<string, number>) - trait levels as integers (1-3)
   - equipped (boolean)
   - acquiredAt (timestamp)
 - inventoryCapacity (default: 100)
@@ -368,9 +382,12 @@ See [project/docs/content-generator-agent.md](project/docs/content-generator-age
    - Item definitions stored in JSON files in `be/data/items/`
    - Use ItemService for all item operations (loading, creation, calculations)
    - Hot-reload available via `/api/inventory/reload` endpoint
-   - Quality values are 0-1 scale (affects pricing and effects)
+   - **Quality system**: Level-based (1-5), each level has explicit name, description, and effects
+   - **Trait system**: Level-based (1-3), stored as Map<traitId, level>
    - Trait rarities: common (5%), uncommon (15%), rare (30%), epic (50%)
+   - Items with identical quality/trait levels stack together
    - Equipment items must include a `slot` field indicating which equipment slot they can be equipped to
+   - See `project/docs/level-based-quality-trait-system.md` for full details
 8. **Location System**:
    - Location definitions stored in JSON files in `be/data/locations/`
    - Use LocationService for all location operations
@@ -431,6 +448,7 @@ npm run migrate:down     # Rollback last migration
 2. `002-add-attributes-and-skill-main-attributes.js` - Adds attributes and mainAttribute field to skills
 3. `003-add-location-system.js` - Adds location fields (currentLocation, discoveredLocations, activeActivity, travelState)
 4. `004-add-equipment-slots.js` - Adds equipment slot system to all players with 10 default slots
+5. `005-convert-quality-trait-to-levels.js` - Converts quality/trait system from decimal values to integer levels
 
 **Creating a New Migration:**
 1. Create a file in `be/migrations/` with format: `NNN-description.js`
@@ -491,23 +509,28 @@ The inventory system uses a three-tier architecture for flexibility and easy bal
    - Equipment items include `subtype` field for activity requirement matching (e.g., woodcutting-axe, mining-pickaxe, fishing-rod)
 
 2. **Quality & Trait Definitions** (JSON files)
-   - Qualities: woodGrain, moisture, age, purity, freshness (0-1 scale)
-   - Traits: fragrant, knotted, pristine, cursed, blessed, masterwork (with rarity levels)
+   - **Qualities**: woodGrain, moisture, age, purity, freshness (integer levels 1-5)
+     - Each level has explicit name, description, and effects
+     - Example: woodGrain L1 (Poor Grain) → L5 (Perfect Grain)
+   - **Traits**: fragrant, knotted, weathered, pristine, cursed, blessed, masterwork (integer levels 1-3)
+     - Stored as Map<traitId, level> instead of array
+     - Each level has escalating effects
    - Define effects on vendor pricing, crafting, alchemy, combat
 
 3. **Item Instances** (Player inventory in MongoDB)
    - References to base items
-   - Unique quality values and applied traits
-   - Automatic stacking for identical items
-   - Calculated vendor prices
+   - Quality levels (1-5 integers) and trait levels (1-3 integers)
+   - Automatic stacking for items with identical levels
+   - Calculated vendor prices based on level modifiers
 
 **Key Features:**
-- Items can have unique qualities (0-1 values) affecting price and effects
-- Traits provide special properties (rare, epic, etc.)
-- Easy balancing by editing JSON files (no code changes needed)
+- Items have discrete quality levels (1-5) with descriptive names
+- Traits stored as Map with levels (1-3) for escalating effects
+- Better stacking: items with identical levels stack together
+- Easy balancing by editing JSON level definitions (no code changes needed)
 - Hot-reload capability without server restart
-- Random generation based on item tier and rarity
-- Full documentation in `project/docs/inventory-system.md`
+- Random generation based on item tier and rarity distributions
+- Full documentation in `project/docs/inventory-system.md` and `project/docs/level-based-quality-trait-system.md`
 
 ## Location System
 
