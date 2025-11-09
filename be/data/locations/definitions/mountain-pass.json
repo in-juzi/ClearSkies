@@ -4,7 +4,9 @@
   "description": "A high mountain pass where the air is thin and cold. Rocky outcroppings reveal precious ore veins.",
   "biome": "mountain",
   "facilities": [
-    "mountain-mine"
+    "mountain-mine",
+    "mountain-moonlit-meadow",
+    "volcanic-garden"
   ],
   "navigationLinks": [
     {

@@ -167,6 +167,42 @@ const playerSchema = new mongoose.Schema({
       level: { type: Number, default: 1, min: 1 },
       experience: { type: Number, default: 0, min: 0 },
       mainAttribute: { type: String, default: 'will' }
+    },
+    herbalism: {
+      level: { type: Number, default: 1, min: 1 },
+      experience: { type: Number, default: 0, min: 0 },
+      mainAttribute: { type: String, default: 'will' }
+    },
+    // Combat skills
+    oneHanded: {
+      level: { type: Number, default: 1, min: 1 },
+      experience: { type: Number, default: 0, min: 0 },
+      mainAttribute: { type: String, default: 'strength' }
+    },
+    dualWield: {
+      level: { type: Number, default: 1, min: 1 },
+      experience: { type: Number, default: 0, min: 0 },
+      mainAttribute: { type: String, default: 'dexterity' }
+    },
+    twoHanded: {
+      level: { type: Number, default: 1, min: 1 },
+      experience: { type: Number, default: 0, min: 0 },
+      mainAttribute: { type: String, default: 'strength' }
+    },
+    ranged: {
+      level: { type: Number, default: 1, min: 1 },
+      experience: { type: Number, default: 0, min: 0 },
+      mainAttribute: { type: String, default: 'dexterity' }
+    },
+    casting: {
+      level: { type: Number, default: 1, min: 1 },
+      experience: { type: Number, default: 0, min: 0 },
+      mainAttribute: { type: String, default: 'magic' }
+    },
+    gun: {
+      level: { type: Number, default: 1, min: 1 },
+      experience: { type: Number, default: 0, min: 0 },
+      mainAttribute: { type: String, default: 'perception' }
     }
   },
   createdAt: {
@@ -267,7 +303,7 @@ playerSchema.methods.getAttributeProgress = function(attributeName) {
 // Add skill experience and handle skill leveling
 // Also awards XP to the skill's main attribute (50% of skill XP)
 playerSchema.methods.addSkillExperience = async function(skillName, amount) {
-  const validSkills = ['woodcutting', 'mining', 'fishing', 'smithing', 'cooking'];
+  const validSkills = ['woodcutting', 'mining', 'fishing', 'smithing', 'cooking', 'herbalism', 'oneHanded', 'dualWield', 'twoHanded', 'ranged', 'casting', 'gun'];
 
   if (!validSkills.includes(skillName)) {
     throw new Error(`Invalid skill name: ${skillName}`);
@@ -307,7 +343,7 @@ playerSchema.methods.addSkillExperience = async function(skillName, amount) {
 
 // Get progress to next skill level (0-100%)
 playerSchema.methods.getSkillProgress = function(skillName) {
-  const validSkills = ['woodcutting', 'mining', 'fishing', 'smithing', 'cooking'];
+  const validSkills = ['woodcutting', 'mining', 'fishing', 'smithing', 'cooking', 'herbalism', 'oneHanded', 'dualWield', 'twoHanded', 'ranged', 'casting', 'gun'];
 
   if (!validSkills.includes(skillName)) {
     throw new Error(`Invalid skill name: ${skillName}`);

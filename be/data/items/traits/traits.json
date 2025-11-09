@@ -2,6 +2,7 @@
   "fragrant": {
     "traitId": "fragrant",
     "name": "Fragrant",
+    "shorthand": "FRG",
     "description": "Has a pleasant, aromatic scent",
     "rarity": "uncommon",
     "applicableCategories": ["resource", "consumable"],
@@ -36,6 +37,7 @@
   "knotted": {
     "traitId": "knotted",
     "name": "Knotted",
+    "shorthand": "KNT",
     "description": "Contains knots, making it harder to work with",
     "rarity": "common",
     "applicableCategories": ["resource"],
@@ -70,6 +72,7 @@
   "weathered": {
     "traitId": "weathered",
     "name": "Weathered",
+    "shorthand": "WTH",
     "description": "Exposed to the elements, giving it unique properties",
     "rarity": "uncommon",
     "applicableCategories": ["resource"],
@@ -104,6 +107,7 @@
   "pristine": {
     "traitId": "pristine",
     "name": "Pristine",
+    "shorthand": "PRS",
     "description": "In excellent condition",
     "rarity": "rare",
     "applicableCategories": ["resource", "crafted"],
@@ -141,6 +145,7 @@
   "cursed": {
     "traitId": "cursed",
     "name": "Cursed",
+    "shorthand": "CRS",
     "description": "Bears a mysterious curse",
     "rarity": "rare",
     "applicableCategories": ["equipment", "crafted"],
@@ -175,6 +180,7 @@
   "blessed": {
     "traitId": "blessed",
     "name": "Blessed",
+    "shorthand": "BLS",
     "description": "Blessed by divine forces",
     "rarity": "epic",
     "applicableCategories": ["equipment", "consumable", "crafted"],
@@ -212,6 +218,7 @@
   "masterwork": {
     "traitId": "masterwork",
     "name": "Masterwork",
+    "shorthand": "MST",
     "description": "Crafted by a skilled artisan",
     "rarity": "epic",
     "applicableCategories": ["crafted", "equipment"],

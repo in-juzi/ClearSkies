@@ -5,7 +5,8 @@
   "biome": "sea",
   "facilities": [
     "kennik-fishing-dock",
-    "kennik-market"
+    "kennik-market",
+    "kennik-herb-garden"
   ],
   "navigationLinks": [
     {

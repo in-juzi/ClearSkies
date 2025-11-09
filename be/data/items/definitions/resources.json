@@ -178,5 +178,113 @@
     },
     "allowedQualities": ["freshness"],
     "allowedTraits": ["pristine"]
+  },
+  "chamomile": {
+    "itemId": "chamomile",
+    "name": "Chamomile",
+    "description": "Delicate white flowers with a soothing aroma, commonly used in teas and healing salves",
+    "category": "resource",
+    "baseValue": 12,
+    "rarity": "common",
+    "stackable": true,
+    "maxStack": 100,
+    "properties": {
+      "weight": 0.1,
+      "material": "herb",
+      "tier": 1,
+      "skillSource": "herbalism"
+    },
+    "allowedQualities": ["freshness", "purity"],
+    "allowedTraits": ["fragrant", "pristine"]
+  },
+  "sage": {
+    "itemId": "sage",
+    "name": "Sage",
+    "description": "Silvery-green leaves prized for their medicinal properties and protective qualities",
+    "category": "resource",
+    "baseValue": 18,
+    "rarity": "common",
+    "stackable": true,
+    "maxStack": 100,
+    "properties": {
+      "weight": 0.1,
+      "material": "herb",
+      "tier": 1,
+      "skillSource": "herbalism"
+    },
+    "allowedQualities": ["freshness", "purity"],
+    "allowedTraits": ["fragrant", "pristine", "blessed"]
+  },
+  "nettle": {
+    "itemId": "nettle",
+    "name": "Nettle",
+    "description": "Stinging leaves that, when properly prepared, provide remarkable healing properties",
+    "category": "resource",
+    "baseValue": 25,
+    "rarity": "uncommon",
+    "stackable": true,
+    "maxStack": 100,
+    "properties": {
+      "weight": 0.15,
+      "material": "herb",
+      "tier": 2,
+      "skillSource": "herbalism"
+    },
+    "allowedQualities": ["freshness", "purity"],
+    "allowedTraits": ["pristine", "cursed"]
+  },
+  "mandrake_root": {
+    "itemId": "mandrake_root",
+    "name": "Mandrake Root",
+    "description": "A mystical root shaped like a human form, whispered to have powerful magical properties",
+    "category": "resource",
+    "baseValue": 45,
+    "rarity": "uncommon",
+    "stackable": true,
+    "maxStack": 100,
+    "properties": {
+      "weight": 0.3,
+      "material": "herb",
+      "tier": 2,
+      "skillSource": "herbalism"
+    },
+    "allowedQualities": ["freshness", "purity"],
+    "allowedTraits": ["pristine", "blessed", "cursed"]
+  },
+  "moonpetal": {
+    "itemId": "moonpetal",
+    "name": "Moonpetal",
+    "description": "Luminescent white petals that shimmer in moonlight, used in the most potent elixirs",
+    "category": "resource",
+    "baseValue": 80,
+    "rarity": "rare",
+    "stackable": true,
+    "maxStack": 100,
+    "properties": {
+      "weight": 0.1,
+      "material": "herb",
+      "tier": 3,
+      "skillSource": "herbalism"
+    },
+    "allowedQualities": ["freshness", "purity"],
+    "allowedTraits": ["fragrant", "pristine", "blessed", "masterwork"]
+  },
+  "dragons_breath": {
+    "itemId": "dragons_breath",
+    "name": "Dragon's Breath",
+    "description": "Rare crimson flowers that grow in volcanic soil, their petals warm to the touch",
+    "category": "resource",
+    "baseValue": 100,
+    "rarity": "rare",
+    "stackable": true,
+    "maxStack": 100,
+    "properties": {
+      "weight": 0.2,
+      "material": "herb",
+      "tier": 3,
+      "skillSource": "herbalism"
+    },
+    "allowedQualities": ["freshness", "purity"],
+    "allowedTraits": ["pristine", "cursed", "masterwork"]
   }
 }

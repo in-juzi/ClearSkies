@@ -283,14 +283,58 @@ class LocationService {
   }
 
   /**
-   * Calculate activity rewards
+   * Calculate scaled XP based on player level vs activity level
+   * Uses polynomial decay with grace range (0-1 levels over = full XP)
+   *
+   * @param {number} rawXP - Base XP from activity definition
+   * @param {number} playerLevel - Player's current level in the skill
+   * @param {number} activityLevel - Required level for the activity
+   * @returns {number} Scaled XP (minimum 1)
+   */
+  calculateScaledXP(rawXP, playerLevel, activityLevel) {
+    const levelDiff = playerLevel - activityLevel;
+
+    // Grace range: 0-1 levels over = full XP
+    if (levelDiff <= 1) {
+      return rawXP;
+    }
+
+    // Polynomial decay: 1 / (1 + 0.3 * (diff - 1))
+    // Smoother than linear, gentler than exponential
+    const effectiveDiff = levelDiff - 1; // Subtract grace level
+    const scalingFactor = 1 / (1 + 0.3 * effectiveDiff);
+
+    // Apply floor of 1 XP
+    return Math.max(1, Math.floor(rawXP * scalingFactor));
+  }
+
+  /**
+   * Calculate activity rewards with XP scaling
    */
   calculateActivityRewards(activity, options = {}) {
+    const { player } = options;
+
     const rewards = {
-      experience: activity.rewards.experience || {},
+      experience: {},
+      rawExperience: activity.rewards.experience || {}, // Keep raw values for UI
       items: [],
       gold: 0
     };
+
+    // Apply XP scaling if player context provided
+    if (activity.rewards.experience) {
+      for (const [skillName, rawXP] of Object.entries(activity.rewards.experience)) {
+        if (player && player.skills && player.skills[skillName]) {
+          const playerLevel = player.skills[skillName].level;
+          const activityLevel = activity.requirements?.skills?.[skillName] || 1;
+
+          rewards.experience[skillName] = this.calculateScaledXP(rawXP, playerLevel, activityLevel);
+        } else {
+          // No player context or skill not found - use raw XP
+          rewards.experience[skillName] = rawXP;
+        }
+      }
+    }
 
     // Roll on drop tables (new system)
     if (activity.rewards.dropTables && Array.isArray(activity.rewards.dropTables)) {

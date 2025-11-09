@@ -5,7 +5,8 @@
   "biome": "forest",
   "facilities": [
     "forest-logging-camp",
-    "forest-bandit-camp"
+    "forest-bandit-camp",
+    "forest-herb-grove"
   ],
   "navigationLinks": [
     {
