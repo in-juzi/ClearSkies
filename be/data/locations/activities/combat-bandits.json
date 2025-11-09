@@ -5,17 +5,20 @@
   "type": "combat",
   "duration": 60,
   "requirements": {
+    "skills": {
+      "oneHanded": 1
+    },
     "attributes": {
       "strength": 3
     }
   },
   "rewards": {
     "experience": {
-      "strength": 50
+      "oneHanded": 50
     },
     "items": [
       {
-        "itemId": "bronze-sword",
+        "itemId": "copper_sword",
         "quantity": { "min": 1, "max": 1 },
         "chance": 0.1
       }

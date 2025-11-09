@@ -3,11 +3,14 @@
   "name": "Fish for Cod",
   "description": "Cast your line into the harbor waters for common cod",
   "type": "resource-gathering",
-  "duration": 30,
+  "duration": 10,
   "requirements": {
     "skills": {
       "fishing": 1
-    }
+    },
+    "equipped": [
+      { "subtype": "fishing-rod" }
+    ]
   },
   "rewards": {
     "experience": {

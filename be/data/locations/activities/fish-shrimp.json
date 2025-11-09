@@ -3,7 +3,7 @@
   "name": "Fish for Shrimp",
   "description": "Wade in the shallow waters to catch shrimp",
   "type": "resource-gathering",
-  "duration": 20,
+  "duration": 7,
   "requirements": {
     "skills": {},
     "equipped": [

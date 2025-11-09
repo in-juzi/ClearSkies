@@ -59,9 +59,9 @@
             <div class="log-activity">{{ entry.activityName }}</div>
             <div class="log-rewards">
               <span *ngIf="entry.rewards.gold > 0" class="reward-mini">💰 {{ entry.rewards.gold }}</span>
-              <span *ngFor="let item of entry.rewards.items" class="reward-mini">📦 {{ item.quantity }}x</span>
+              <span *ngFor="let item of entry.rewards.items" class="reward-mini">📦 {{ item.quantity }}x {{ item.itemId }}</span>
               <span *ngFor="let exp of entry.rewards.experience | keyvalue" class="reward-mini">
-                ⭐ {{ exp.key }}: +{{ exp.value.skill?.experience || exp.value.experience }} XP
+                ⭐ {{ formatXPDisplay(exp.key, exp.value, entry.rewards.rawExperience) }}
                 <span *ngIf="exp.value.leveledUp || exp.value.skill?.leveledUp" class="level-up-mini">↑</span>
               </span>
             </div>

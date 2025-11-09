@@ -12,6 +12,7 @@ import {
 } from '../models/location.model';
 import { SkillsService } from './skills.service';
 import { AttributesService } from './attributes.service';
+import { InventoryService } from './inventory.service';
 
 @Injectable({
   providedIn: 'root'
@@ -20,6 +21,7 @@ export class LocationService {
   private apiUrl = 'http://localhost:3000/api/locations';
   private skillsService = inject(SkillsService);
   private attributesService = inject(AttributesService);
+  private inventoryService = inject(InventoryService);
 
   // Signals for reactive state
   currentLocation = signal<Location | null>(null);
@@ -189,9 +191,10 @@ export class LocationService {
     ).pipe(
       tap({
         next: (response) => {
-          // Refresh skills and attributes after claiming rewards
+          // Refresh skills, attributes, and inventory after claiming rewards
           this.skillsService.getSkills().subscribe();
           this.attributesService.getAllAttributes().subscribe();
+          this.inventoryService.getInventory().subscribe();
 
           // Emit completion event with rewards if available
           if (response.rewards && response.newActivity) {
@@ -358,6 +361,19 @@ export class LocationService {
       this.travelPoll$.unsubscribe();
       this.travelPoll$ = null;
     }
+  }
+
+  /**
+   * Format XP display with scaling information
+   * @param rawXP - Raw XP value from activity definition
+   * @param scaledXP - Scaled XP value actually awarded
+   * @returns Formatted string for UI display
+   */
+  formatXPDisplay(rawXP: number, scaledXP: number): string {
+    if (rawXP === scaledXP) {
+      return `${rawXP} XP`;
+    }
+    return `${rawXP} XP → ${scaledXP} XP`;
   }
 
   /**

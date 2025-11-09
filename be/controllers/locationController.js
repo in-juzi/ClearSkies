@@ -496,18 +496,24 @@ exports.completeActivity = async (req, res) => {
       });
     }
 
-    const rewards = locationService.calculateActivityRewards(activity);
+    const rewards = locationService.calculateActivityRewards(activity, { player });
 
-    // Award experience
+    // Award experience (already scaled by locationService)
     const expResults = {};
     for (const [skillOrAttr, xp] of Object.entries(rewards.experience)) {
       // Check if it's a skill
       if (player.skills[skillOrAttr]) {
         const result = await player.addSkillExperience(skillOrAttr, xp);
-        expResults[skillOrAttr] = result;
+        expResults[skillOrAttr] = {
+          ...result,
+          experience: xp  // Include the XP that was awarded (scaled)
+        };
       } else if (player.attributes[skillOrAttr]) {
         const result = await player.addAttributeExperience(skillOrAttr, xp);
-        expResults[skillOrAttr] = result;
+        expResults[skillOrAttr] = {
+          ...result,
+          experience: xp  // Include the XP that was awarded (scaled)
+        };
       }
     }
 
@@ -561,6 +567,7 @@ exports.completeActivity = async (req, res) => {
       message: `${activity.name} completed!`,
       rewards: {
         experience: expResults,
+        rawExperience: rewards.rawExperience, // Include raw XP for UI display
         items: itemsAdded,
         gold: rewards.gold
       },

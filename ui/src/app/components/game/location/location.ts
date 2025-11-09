@@ -64,6 +64,23 @@ export class LocationComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Format XP display with scaling information
+   * @param skillName - Name of the skill
+   * @param expResult - Experience result object from activity completion
+   * @param rawExperience - Raw experience values before scaling
+   * @returns Formatted string for UI display
+   */
+  formatXPDisplay(skillName: string, expResult: any, rawExperience?: { [key: string]: number }): string {
+    const scaledXP = expResult.skill?.experience || expResult.experience;
+    const rawXP = rawExperience?.[skillName];
+
+    if (rawXP && rawXP !== scaledXP) {
+      return `${skillName}: ${rawXP} XP → ${scaledXP} XP`;
+    }
+    return `${skillName}: +${scaledXP} XP`;
+  }
+
+  /**
    * Select a facility to view its activities
    */
   selectFacility(facility: Facility) {

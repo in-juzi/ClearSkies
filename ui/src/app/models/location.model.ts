@@ -99,6 +99,7 @@ export interface TravelState {
 
 export interface ActivityRewards {
   experience: { [key: string]: any };
+  rawExperience?: { [key: string]: number }; // Raw XP values before scaling
   items: Array<{
     itemId: string;
     quantity: number;
