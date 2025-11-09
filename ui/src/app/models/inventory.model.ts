@@ -3,9 +3,10 @@ export interface ItemDefinition {
   name: string;
   description: string;
   category: 'resource' | 'equipment' | 'consumable' | 'crafted';
-  equipmentType?: string;
+  subcategories?: string[]; // Multi-value categorization for alchemy, filtering, etc.
+  equipmentType?: string; // Deprecated: use subcategories instead
   subtype?: string; // Item subtype (woodcutting-axe, mining-pickaxe, fishing-rod, etc.)
-  consumableType?: string;
+  consumableType?: string; // Deprecated: use subcategories instead
   slot?: string; // Equipment slot (head, body, mainHand, etc.)
   baseValue: number;
   rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';

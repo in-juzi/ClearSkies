@@ -32,6 +32,7 @@ export interface ManualItem {
   rarity: string;
   icon: string;
   category: string;
+  subcategories: string[];
   stackable: boolean;
   maxStack: number;
   slot?: string;

@@ -36,12 +36,12 @@ export class ManualComponent {
   activeSection = signal<Section>('overview');
 
   sections: { id: Section; label: string; icon: string }[] = [
-    { id: 'overview', label: 'Overview', icon: 'book' },
-    { id: 'skills', label: 'Skills', icon: 'skill_woodcutting' },
-    { id: 'attributes', label: 'Attributes', icon: 'attribute_strength' },
-    { id: 'items', label: 'Items', icon: 'item_oak_log' },
-    { id: 'locations', label: 'Locations', icon: 'location' },
-    { id: 'mechanics', label: 'Mechanics', icon: 'settings' }
+    { id: 'overview', label: 'Overview', icon: 'ui/ui_quest_complete' },
+    { id: 'skills', label: 'Skills', icon: 'skills/skill_woodcutting' },
+    { id: 'attributes', label: 'Attributes', icon: 'attributes/attr_strength' },
+    { id: 'items', label: 'Items', icon: 'item-categories/item_cat_axe' },
+    { id: 'locations', label: 'Locations', icon: 'ui/ui_world_map' },
+    { id: 'mechanics', label: 'Mechanics', icon: 'ui/ui_build' }
   ];
 
   selectSection(section: Section): void {

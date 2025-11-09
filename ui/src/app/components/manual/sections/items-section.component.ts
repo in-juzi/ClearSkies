@@ -35,6 +35,13 @@ import { ManualService, ItemsResponse, QualitiesResponse, TraitsResponse } from 
                     <div class="item-info">
                       <h5>{{ item.name }}</h5>
                       <p>{{ item.description }}</p>
+                      @if (item.subcategories && item.subcategories.length > 0) {
+                        <div class="subcategories">
+                          @for (subcategory of item.subcategories; track subcategory) {
+                            <span class="subcategory-tag">{{ subcategory }}</span>
+                          }
+                        </div>
+                      }
                       <div class="item-meta">
                         <span class="tier">Tier: {{ item.tier }}</span>
                         <span class="rarity">{{ item.rarity }}</span>
@@ -55,6 +62,13 @@ import { ManualService, ItemsResponse, QualitiesResponse, TraitsResponse } from 
                     <div class="item-info">
                       <h5>{{ item.name }}</h5>
                       <p>{{ item.description }}</p>
+                      @if (item.subcategories && item.subcategories.length > 0) {
+                        <div class="subcategories">
+                          @for (subcategory of item.subcategories; track subcategory) {
+                            <span class="subcategory-tag">{{ subcategory }}</span>
+                          }
+                        </div>
+                      }
                       <div class="item-meta">
                         <span class="tier">{{ item.slot }} | {{ item.tier }}</span>
                         @if (item.subtype) {
@@ -77,6 +91,13 @@ import { ManualService, ItemsResponse, QualitiesResponse, TraitsResponse } from 
                     <div class="item-info">
                       <h5>{{ item.name }}</h5>
                       <p>{{ item.description }}</p>
+                      @if (item.subcategories && item.subcategories.length > 0) {
+                        <div class="subcategories">
+                          @for (subcategory of item.subcategories; track subcategory) {
+                            <span class="subcategory-tag">{{ subcategory }}</span>
+                          }
+                        </div>
+                      }
                       <div class="item-meta">
                         <span class="tier">Tier: {{ item.tier }}</span>
                         <span class="rarity">{{ item.rarity }}</span>
@@ -284,6 +305,23 @@ import { ManualService, ItemsResponse, QualitiesResponse, TraitsResponse } from 
           p {
             font-size: var(--font-size-s);
             margin-bottom: var(--spacing-s);
+          }
+        }
+
+        .subcategories {
+          display: flex;
+          flex-wrap: wrap;
+          gap: var(--spacing-xs);
+          margin-bottom: var(--spacing-s);
+
+          .subcategory-tag {
+            font-size: var(--font-size-xs);
+            padding: 2px var(--spacing-xs);
+            background: var(--color-accent-purple-dark);
+            color: var(--color-text-primary);
+            border-radius: var(--radius-s);
+            text-transform: lowercase;
+            border: var(--border-width-thin) solid var(--color-accent-purple);
           }
         }
 

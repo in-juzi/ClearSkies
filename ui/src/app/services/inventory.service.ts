@@ -119,6 +119,28 @@ export class InventoryService {
   }
 
   /**
+   * Helper: Get items by subcategory
+   */
+  getItemsBySubcategory(subcategory: string): ItemDetails[] {
+    return this.inventory().filter(item =>
+      item.definition.subcategories && item.definition.subcategories.includes(subcategory)
+    );
+  }
+
+  /**
+   * Helper: Get all unique subcategories from inventory
+   */
+  getAllSubcategories(): string[] {
+    const subcategoriesSet = new Set<string>();
+    for (const item of this.inventory()) {
+      if (item.definition.subcategories) {
+        item.definition.subcategories.forEach(sub => subcategoriesSet.add(sub));
+      }
+    }
+    return Array.from(subcategoriesSet).sort();
+  }
+
+  /**
    * Helper: Get equipped items
    */
   getEquippedItems(): ItemDetails[] {

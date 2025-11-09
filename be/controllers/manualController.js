@@ -166,9 +166,9 @@ const getItems = async (req, res) => {
 
     // Organize items by category
     const itemsByCategory = {
-      resource: [],
+      resources: [],
       equipment: [],
-      consumable: []
+      consumables: []
     };
 
     for (const [itemId, item] of itemService.itemDefinitions.entries()) {
@@ -180,6 +180,7 @@ const getItems = async (req, res) => {
         rarity: item.rarity,
         icon: item.icon,
         category: item.category,
+        subcategories: item.subcategories || [],
         stackable: item.maxStack > 1,
         maxStack: item.maxStack
       };
@@ -193,11 +194,20 @@ const getItems = async (req, res) => {
         }
       }
 
+      // Map singular category names to plural for response
+      const categoryMap = {
+        resource: 'resources',
+        equipment: 'equipment',
+        consumable: 'consumables'
+      };
+
+      const pluralCategory = categoryMap[item.category] || item.category;
+
       // Add to category array (handle missing categories gracefully)
-      if (!itemsByCategory[item.category]) {
-        itemsByCategory[item.category] = [];
+      if (!itemsByCategory[pluralCategory]) {
+        itemsByCategory[pluralCategory] = [];
       }
-      itemsByCategory[item.category].push(itemData);
+      itemsByCategory[pluralCategory].push(itemData);
     }
 
     res.json({
