@@ -123,3 +123,19 @@ button {
     }
   }
 }
+
+.manual-link {
+  margin-top: var(--spacing-m);
+  text-align: center;
+
+  a {
+    color: var(--color-accent-gold);
+    text-decoration: none;
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-m);
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

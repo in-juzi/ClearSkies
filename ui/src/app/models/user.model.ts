@@ -61,6 +61,14 @@ export interface PlayerSkills {
   fishing: Skill;
   smithing: Skill;
   cooking: Skill;
+  herbalism: Skill;
+  // Combat skills
+  oneHanded: Skill;
+  dualWield: Skill;
+  twoHanded: Skill;
+  ranged: Skill;
+  casting: Skill;
+  gun: Skill;
 }
 
 export interface AttributeWithProgress extends Attribute {
@@ -86,6 +94,14 @@ export interface SkillsResponse {
       fishing: SkillWithProgress;
       smithing: SkillWithProgress;
       cooking: SkillWithProgress;
+      herbalism: SkillWithProgress;
+      // Combat skills
+      oneHanded: SkillWithProgress;
+      dualWield: SkillWithProgress;
+      twoHanded: SkillWithProgress;
+      ranged: SkillWithProgress;
+      casting: SkillWithProgress;
+      gun: SkillWithProgress;
     };
   };
 }
@@ -116,7 +132,7 @@ export interface SkillExperienceResponse {
   };
 }
 
-export type SkillName = 'woodcutting' | 'mining' | 'fishing' | 'smithing' | 'cooking';
+export type SkillName = 'woodcutting' | 'mining' | 'fishing' | 'smithing' | 'cooking' | 'herbalism' | 'oneHanded' | 'dualWield' | 'twoHanded' | 'ranged' | 'casting' | 'gun';
 export type AttributeName = 'strength' | 'endurance' | 'magic' | 'perception' | 'dexterity' | 'will' | 'charisma';
 
 export interface Location {

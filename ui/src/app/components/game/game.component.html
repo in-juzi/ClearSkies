@@ -6,10 +6,16 @@
     <div class="header-right">
       @if (currentUser()) {
         <span class="username">{{ currentUser()!.username }}</span>
+        <button class="manual-link" (click)="openManual()">Manual</button>
         <button class="logout-btn" (click)="onLogout()">Logout</button>
       }
     </div>
   </header>
+
+  <!-- Manual Dialog -->
+  @if (manualDialogService.isOpen()) {
+    <app-manual [dialogMode]="true" />
+  }
 
   <main class="game-main">
     @if (currentPlayer()) {

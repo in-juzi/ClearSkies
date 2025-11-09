@@ -38,6 +38,22 @@
       font-size: var(--font-size-m);
     }
 
+    .manual-link {
+      color: var(--color-accent-gold);
+      background: transparent;
+      border: none;
+      font-weight: var(--font-weight-semibold);
+      font-size: var(--font-size-m);
+      cursor: pointer;
+      padding: 0;
+      transition: opacity var(--transition-normal);
+
+      &:hover {
+        opacity: var(--opacity-hover);
+        text-decoration: underline;
+      }
+    }
+
     .logout-btn {
       padding: var(--spacing-xs) var(--spacing-l);
       background: var(--color-primary);
