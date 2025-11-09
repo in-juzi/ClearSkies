@@ -8,13 +8,17 @@
 - ✅ Manual/help system (completed - full game guide with 6 sections)
 - ✅ Quality/trait effect display (completed - enhanced inventory UI)
 - ✅ XP scaling display (completed - shows raw vs scaled XP)
+- ✅ Real-time chat system (completed - Socket.io with commands and autocomplete)
+- ✅ Icon organization (completed - 220+ icons organized into 6 categories)
 
-**Recent Changes** (Last 5 commits):
-- chore: update project configuration and todo tasks
-- fix: format weight display to 1 decimal place
-- feat: add manual/help system with comprehensive game guide
-- style: improve auth forms and game layout
-- docs: add comprehensive project documentation
+**Recent Changes** (Last 7 commits):
+- refactor: update UI components for icon path changes
+- feat: enhance manual system with item icons and filtering
+- feat: add iconPath field to item definitions
+- refactor: reorganize icons into categorized subdirectories
+- feat: integrate chat component into game UI
+- feat: implement frontend real-time chat UI
+- feat: implement backend real-time chat system
 
 **Known Issues**:
 - None currently identified
@@ -22,8 +26,8 @@
 **Next Priorities**:
 - Alchemy system (quality-based crafting)
 - Combat system implementation
-- Player chat/social features
 - Player housing
+- Guild/party system
 
 > **Maintenance Note**: Update this section regularly so AI has context without needing to explore
 
@@ -40,9 +44,10 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 
 **Backend Core:**
 - Controllers: [be/controllers/inventoryController.js](be/controllers/inventoryController.js), [be/controllers/locationController.js](be/controllers/locationController.js), [be/controllers/skillsController.js](be/controllers/skillsController.js), [be/controllers/attributesController.js](be/controllers/attributesController.js), [be/controllers/authController.js](be/controllers/authController.js), [be/controllers/manualController.js](be/controllers/manualController.js)
-- Models: [be/models/Player.js](be/models/Player.js), [be/models/User.js](be/models/User.js)
+- Models: [be/models/Player.js](be/models/Player.js), [be/models/User.js](be/models/User.js), [be/models/ChatMessage.js](be/models/ChatMessage.js)
 - Services: [be/services/itemService.js](be/services/itemService.js), [be/services/locationService.js](be/services/locationService.js), [be/services/dropTableService.js](be/services/dropTableService.js)
 - Routes: [be/routes/inventory.js](be/routes/inventory.js), [be/routes/locations.js](be/routes/locations.js), [be/routes/skills.js](be/routes/skills.js), [be/routes/attributes.js](be/routes/attributes.js), [be/routes/auth.js](be/routes/auth.js), [be/routes/manual.js](be/routes/manual.js)
+- Sockets: [be/sockets/chatHandler.js](be/sockets/chatHandler.js)
 
 **Frontend Core:**
 - Game Component: [ui/src/app/components/game/game.component.ts](ui/src/app/components/game/game.component.ts), [ui/src/app/components/game/game.component.html](ui/src/app/components/game/game.component.html)
@@ -50,8 +55,9 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 - Location: [ui/src/app/components/game/location/location.ts](ui/src/app/components/game/location/location.ts), [ui/src/app/components/game/location/location.html](ui/src/app/components/game/location/location.html)
 - Skills: [ui/src/app/components/game/skills/skills.ts](ui/src/app/components/game/skills/skills.ts)
 - Equipment: [ui/src/app/components/game/equipment/equipment.component.ts](ui/src/app/components/game/equipment/equipment.component.ts)
+- Chat: [ui/src/app/components/game/chat/chat.component.ts](ui/src/app/components/game/chat/chat.component.ts)
 - Manual: [ui/src/app/components/manual/manual.component.ts](ui/src/app/components/manual/manual.component.ts), [ui/src/app/components/manual/sections/](ui/src/app/components/manual/sections/)
-- Services: [ui/src/app/services/inventory.service.ts](ui/src/app/services/inventory.service.ts), [ui/src/app/services/location.service.ts](ui/src/app/services/location.service.ts), [ui/src/app/services/skills.service.ts](ui/src/app/services/skills.service.ts), [ui/src/app/services/auth.service.ts](ui/src/app/services/auth.service.ts), [ui/src/app/services/manual.service.ts](ui/src/app/services/manual.service.ts)
+- Services: [ui/src/app/services/inventory.service.ts](ui/src/app/services/inventory.service.ts), [ui/src/app/services/location.service.ts](ui/src/app/services/location.service.ts), [ui/src/app/services/skills.service.ts](ui/src/app/services/skills.service.ts), [ui/src/app/services/auth.service.ts](ui/src/app/services/auth.service.ts), [ui/src/app/services/manual.service.ts](ui/src/app/services/manual.service.ts), [ui/src/app/services/chat.service.ts](ui/src/app/services/chat.service.ts)
 
 **Game Data:**
 - Item Definitions: [be/data/items/definitions/](be/data/items/definitions/)
@@ -547,12 +553,25 @@ The agent will autonomously:
 - ✅ XP scaling feedback (shows raw vs scaled XP in activity completion)
 - ✅ Development utilities (content generator, validator, duplicate checker, XP tester)
 - ✅ Content generator and validator AI agents (.claude/agents/)
+- ✅ Real-time chat system with Socket.io (global chat room, message persistence, rate limiting)
+- ✅ Chat UI with collapsible window, command system, and autocomplete
+- ✅ Chat commands (/help, /online, /clear) with keyboard navigation
+- ✅ Icon organization system (220+ icons organized into 6 categories)
+- ✅ Item icon paths (all items include iconPath field for visual display)
 
 ### Database Models
 
 **User** (Authentication):
 - username, email, password (hashed)
 - isActive status, lastLogin timestamp
+
+**ChatMessage** (Chat System):
+- userId (reference to User)
+- username (denormalized for performance)
+- message (chat text, max 500 chars)
+- channel (default: 'global')
+- createdAt (timestamp)
+- Static method: `getRecentMessages(channel, limit)` - Retrieve chat history
 
 **Player** (Game Data):
 - characterName, level, experience
@@ -1243,6 +1262,91 @@ When the user asks to create game content, invoke the content generator agent us
 ❌ "Show me all the items in the game"
 ❌ "How does equipment work?"
 ```
+
+## Chat System
+
+The chat system provides real-time communication between players using Socket.io for bidirectional messaging.
+
+### Architecture
+
+**Backend** ([be/sockets/chatHandler.js](be/sockets/chatHandler.js)):
+- Socket.io server integrated with Express
+- JWT authentication middleware for socket connections
+- Global chat room ('global') for all players
+- Message persistence using ChatMessage model
+- Rate limiting (5 messages per 10 seconds per user)
+- Online user counting via room socket tracking
+
+**Frontend** ([ui/src/app/services/chat.service.ts](ui/src/app/services/chat.service.ts), [ui/src/app/components/game/chat/](ui/src/app/components/game/chat/)):
+- Socket.io client service with Angular signals
+- Collapsible fixed-position chat window (bottom-right)
+- Auto-connects when user authenticates
+- Single-line message format: `timestamp username: message`
+- Command system with autocomplete dropdown
+- Keyboard navigation (Arrow Up/Down, Tab, Enter, Escape)
+
+### Features
+
+**Socket Events**:
+- `chat:sendMessage` - Send message to global chat
+- `chat:message` - Receive broadcasted message
+- `chat:getHistory` - Load chat history (up to 100 messages)
+- `chat:getOnlineCount` - Get number of connected users
+
+**Chat Commands**:
+- `/help` - Show available commands
+- `/online` - Show online user count
+- `/clear` - Clear local chat history (client-side only)
+
+**Command System**:
+```typescript
+// Command registry pattern for extensibility
+interface ChatCommand {
+  name: string;
+  description: string;
+  syntax?: string;
+  execute: (args: string[]) => void;
+}
+```
+
+**Autocomplete**:
+- Dropdown appears when typing `/`
+- Filters commands in real-time
+- Keyboard navigation with visual feedback
+- Click or Tab to autocomplete
+
+### Configuration
+
+**Connection**:
+```typescript
+// Frontend connects to Socket.io server (not /api path)
+const baseUrl = environment.apiUrl.replace('/api', '');
+const socket = io(baseUrl, { auth: { token } });
+```
+
+**Rate Limiting**:
+```javascript
+// Backend rate limiter
+const RATE_LIMIT_WINDOW = 10000; // 10 seconds
+const RATE_LIMIT_MAX = 5; // 5 messages per window
+```
+
+### UI Styling
+
+The chat component uses medieval fantasy theme matching the game design:
+- Purple accent colors for interactive elements
+- Gold text for usernames
+- Dark background with semi-transparency
+- Compact single-line message format for efficient space usage
+- Custom scrollbar styling
+
+### Security
+
+- JWT authentication required for socket connections
+- Username from User model (not player-provided)
+- Message length validation (max 500 characters)
+- Rate limiting to prevent spam
+- XSS protection via Angular's built-in sanitization
 
 ## Platform-Specific Tool Notes
 
