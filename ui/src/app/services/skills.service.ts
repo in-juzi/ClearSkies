@@ -18,6 +18,13 @@ export class SkillsService {
     fishing: SkillWithProgress;
     smithing: SkillWithProgress;
     cooking: SkillWithProgress;
+    herbalism: SkillWithProgress;
+    oneHanded: SkillWithProgress;
+    dualWield: SkillWithProgress;
+    twoHanded: SkillWithProgress;
+    ranged: SkillWithProgress;
+    casting: SkillWithProgress;
+    gun: SkillWithProgress;
   } | null>(null);
 
   /**

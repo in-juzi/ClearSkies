@@ -37,6 +37,35 @@ const getSkills = async (req, res) => {
       cooking: {
         ...player.skills.cooking.toObject(),
         progress: player.getSkillProgress('cooking')
+      },
+      herbalism: {
+        ...player.skills.herbalism.toObject(),
+        progress: player.getSkillProgress('herbalism')
+      },
+      // Combat skills
+      oneHanded: {
+        ...player.skills.oneHanded.toObject(),
+        progress: player.getSkillProgress('oneHanded')
+      },
+      dualWield: {
+        ...player.skills.dualWield.toObject(),
+        progress: player.getSkillProgress('dualWield')
+      },
+      twoHanded: {
+        ...player.skills.twoHanded.toObject(),
+        progress: player.getSkillProgress('twoHanded')
+      },
+      ranged: {
+        ...player.skills.ranged.toObject(),
+        progress: player.getSkillProgress('ranged')
+      },
+      casting: {
+        ...player.skills.casting.toObject(),
+        progress: player.getSkillProgress('casting')
+      },
+      gun: {
+        ...player.skills.gun.toObject(),
+        progress: player.getSkillProgress('gun')
       }
     };
 
@@ -139,7 +168,7 @@ const addSkillExperience = async (req, res) => {
 const getSkill = async (req, res) => {
   try {
     const { skillName } = req.params;
-    const validSkills = ['woodcutting', 'mining', 'fishing', 'smithing', 'cooking'];
+    const validSkills = ['woodcutting', 'mining', 'fishing', 'smithing', 'cooking', 'herbalism', 'oneHanded', 'dualWield', 'twoHanded', 'ranged', 'casting', 'gun'];
 
     if (!validSkills.includes(skillName)) {
       return res.status(400).json({

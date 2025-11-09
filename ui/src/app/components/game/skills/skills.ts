@@ -22,7 +22,14 @@ export class Skills implements OnInit {
     mining: 'assets/icons/ui_dig_1.svg',
     fishing: 'assets/icons/ui_fishing_new.svg',
     smithing: 'assets/icons/skill_blacksmithing.svg',
-    cooking: 'assets/icons/skill_cooking.svg'
+    cooking: 'assets/icons/skill_cooking.svg',
+    herbalism: 'assets/icons/skill_herbalism.svg',
+    oneHanded: 'assets/icons/ability_melee_slash.svg',
+    dualWield: 'assets/icons/ability_melee_double_strike.svg',
+    twoHanded: 'assets/icons/ability_melee_overhead_strike.svg',
+    ranged: 'assets/icons/ability_ranged_bow.svg',
+    casting: 'assets/icons/ability_magic_fireball.svg',
+    gun: 'assets/icons/ability_ranged_gun.svg'
   };
 
   // Skill display names
@@ -31,7 +38,14 @@ export class Skills implements OnInit {
     mining: 'Mining',
     fishing: 'Fishing',
     smithing: 'Smithing',
-    cooking: 'Cooking'
+    cooking: 'Cooking',
+    herbalism: 'Herbalism',
+    oneHanded: 'One-Handed',
+    dualWield: 'Dual Wield',
+    twoHanded: 'Two-Handed',
+    ranged: 'Ranged',
+    casting: 'Casting',
+    gun: 'Gun'
   };
 
   ngOnInit(): void {
@@ -55,7 +69,7 @@ export class Skills implements OnInit {
   }
 
   getSkillKeys(): SkillName[] {
-    return ['woodcutting', 'mining', 'fishing', 'smithing', 'cooking'];
+    return ['woodcutting', 'mining', 'fishing', 'smithing', 'cooking', 'herbalism', 'oneHanded', 'dualWield', 'twoHanded', 'ranged', 'casting', 'gun'];
   }
 
   getExperienceToNext(experience: number): number {
