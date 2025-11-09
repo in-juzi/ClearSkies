@@ -95,6 +95,50 @@ class ItemService {
   }
 
   /**
+   * Get items by subcategory
+   * @param {string} subcategory - The subcategory to filter by
+   * @returns {Array} Items that have the specified subcategory
+   */
+  getItemsBySubcategory(subcategory) {
+    return Array.from(this.itemDefinitions.values())
+      .filter(item => item.subcategories && item.subcategories.includes(subcategory));
+  }
+
+  /**
+   * Get all unique subcategories from items
+   * @param {string} [category] - Optional category to filter by
+   * @returns {Array} Array of unique subcategory strings
+   */
+  getAllSubcategories(category = null) {
+    const subcategoriesSet = new Set();
+
+    for (const item of this.itemDefinitions.values()) {
+      // Filter by category if specified
+      if (category && item.category !== category) {
+        continue;
+      }
+
+      // Add all subcategories from this item
+      if (item.subcategories && Array.isArray(item.subcategories)) {
+        item.subcategories.forEach(sub => subcategoriesSet.add(sub));
+      }
+    }
+
+    return Array.from(subcategoriesSet).sort();
+  }
+
+  /**
+   * Validate item has required subcategory
+   * @param {string} itemId - The item ID to check
+   * @param {string} subcategory - The required subcategory
+   * @returns {boolean} True if item has the subcategory
+   */
+  itemHasSubcategory(itemId, subcategory) {
+    const item = this.getItemDefinition(itemId);
+    return item && item.subcategories && item.subcategories.includes(subcategory);
+  }
+
+  /**
    * Get a quality definition by ID
    */
   getQualityDefinition(qualityId) {

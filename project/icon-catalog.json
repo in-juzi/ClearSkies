@@ -2,7 +2,7 @@
   "metadata": {
     "lastUpdated": "2025-11-09",
     "totalIcons": 1429,
-    "analyzed": 10,
+    "analyzed": 20,
     "collection": "lorc",
     "sourcePath": "C:\\Users\\trace\\OneDrive\\Documents\\Projects\\Game Icons Project\\icons\\ffffff\\000000\\1x1\\lorc (1429)",
     "format": "svg",
@@ -10,12 +10,12 @@
     "style": "silhouette-icons",
     "colorScheme": "white-on-black",
     "batchTracking": {
-      "currentBatch": 1,
+      "currentBatch": 2,
       "batchSize": 10,
-      "lastAnalyzedFile": "alien-skull.svg",
-      "nextBatchStartIndex": 10,
+      "lastAnalyzedFile": "angel-outfit.svg",
+      "nextBatchStartIndex": 20,
       "analysisComplete": false,
-      "resumeInstruction": "Continue from index 10 in alphabetically sorted file list"
+      "resumeInstruction": "Continue from index 20 in alphabetically sorted file list"
     }
   },
   "icons": [
@@ -198,45 +198,239 @@
         "medieval": 3,
         "fantasy": 6
       }
+    },
+    {
+      "id": "alien-stare",
+      "filename": "alien-stare.svg",
+      "description": "Alien or creature head with large teardrop-shaped eyes, suggesting watchful observing gaze",
+      "visualElements": ["head", "eyes", "teardrop", "creature", "alien"],
+      "tags": ["alien", "creature", "eyes", "watching", "observer", "otherworldly", "creature-head"],
+      "categories": ["creatures", "enemies", "monsters"],
+      "gameUseCases": ["enemy-icon", "creature-type", "ability-icon", "status-effect"],
+      "style": "silhouette",
+      "complexity": "medium",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["creature enemies", "watching/detection abilities", "perception-based effects"],
+      "relevanceScore": {
+        "clearSkies": 4,
+        "medieval": 2,
+        "fantasy": 7
+      }
+    },
+    {
+      "id": "all-for-one",
+      "filename": "all-for-one.svg",
+      "description": "Three swords crossing and intersecting at center with ornate design, musketeer motto reference",
+      "visualElements": ["swords", "three", "crossing", "intersection", "ornate"],
+      "tags": ["sword", "weapon", "three", "unity", "combat", "musketeer", "alliance"],
+      "categories": ["weapons", "combat", "symbols"],
+      "gameUseCases": ["ability-icon", "buff-effect", "party-skill", "group-ability"],
+      "style": "silhouette",
+      "complexity": "high",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["group combat abilities", "party buffs", "team-based skills", "alliance abilities"],
+      "relevanceScore": {
+        "clearSkies": 6,
+        "medieval": 8,
+        "fantasy": 7
+      }
+    },
+    {
+      "id": "alligator-clip",
+      "filename": "alligator-clip.svg",
+      "description": "Mechanical spring clip with jagged teeth-like edges, electrical tool component",
+      "visualElements": ["clip", "spring", "teeth", "mechanical", "metal"],
+      "tags": ["clip", "tool", "mechanical", "metal", "electrical", "attachment"],
+      "categories": ["tools", "technology", "items"],
+      "gameUseCases": ["crafting-tool", "equipment-upgrade", "mechanical-item"],
+      "style": "silhouette",
+      "complexity": "medium",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["crafting materials", "mechanical equipment"],
+      "relevanceScore": {
+        "clearSkies": 2,
+        "medieval": 1,
+        "fantasy": 3
+      }
+    },
+    {
+      "id": "ammonite",
+      "filename": "ammonite.svg",
+      "description": "Detailed spiral shell fossil with intricate recursive pattern, prehistoric marine creature remains",
+      "visualElements": ["spiral", "shell", "fossil", "chambers", "intricate"],
+      "tags": ["fossil", "shell", "ammonite", "ancient", "marine", "prehistoric", "artifact"],
+      "categories": ["resources", "archaeological", "nature"],
+      "gameUseCases": ["resource-item", "quest-item", "collectible", "crafting-material"],
+      "style": "silhouette",
+      "complexity": "high",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["archaeological quest items", "marine loot", "ancient artifacts", "alchemy materials"],
+      "relevanceScore": {
+        "clearSkies": 7,
+        "medieval": 6,
+        "fantasy": 8
+      }
+    },
+    {
+      "id": "ammonite-fossil",
+      "filename": "ammonite-fossil.svg",
+      "description": "Fossilized spiral shell with segmented chambers, archaeological ancient specimen",
+      "visualElements": ["fossil", "spiral", "shell", "segments", "chambers"],
+      "tags": ["fossil", "shell", "ancient", "archaeological", "artifact", "prehistoric"],
+      "categories": ["resources", "archaeological", "items"],
+      "gameUseCases": ["quest-item", "collectible", "crafting-material", "alchemy-ingredient"],
+      "style": "silhouette",
+      "complexity": "high",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["archaeology quests", "museum items", "rare ingredients", "ancient loot"],
+      "relevanceScore": {
+        "clearSkies": 7,
+        "medieval": 5,
+        "fantasy": 7
+      }
+    },
+    {
+      "id": "anatomy",
+      "filename": "anatomy.svg",
+      "description": "Human torso figure with internal organs and biological systems visible, medical reference",
+      "visualElements": ["torso", "organs", "anatomy", "systems", "biological"],
+      "tags": ["anatomy", "medical", "biological", "organs", "human", "science"],
+      "categories": ["medical", "technology", "symbols"],
+      "gameUseCases": ["ability-icon", "buff-effect", "healing-skill", "biology-research"],
+      "style": "silhouette",
+      "complexity": "high",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["healing abilities", "health-based skills", "scientific research"],
+      "relevanceScore": {
+        "clearSkies": 3,
+        "medieval": 2,
+        "fantasy": 4
+      }
+    },
+    {
+      "id": "anchor",
+      "filename": "anchor.svg",
+      "description": "Traditional ship anchor with rope and chain, nautical maritime navigation symbol",
+      "visualElements": ["anchor", "rope", "chain", "hook", "nautical"],
+      "tags": ["anchor", "nautical", "ship", "maritime", "naval", "sailing", "rope"],
+      "categories": ["nautical", "tools", "symbols"],
+      "gameUseCases": ["location-icon", "maritime-activity", "settlement-marker", "exploration-symbol"],
+      "style": "silhouette",
+      "complexity": "medium",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["coastal locations", "fishing activities", "sailing abilities", "port settlements"],
+      "relevanceScore": {
+        "clearSkies": 8,
+        "medieval": 9,
+        "fantasy": 8
+      }
+    },
+    {
+      "id": "android-mask",
+      "filename": "android-mask.svg",
+      "description": "Robotic android head mask with geometric features, science-fiction technology design",
+      "visualElements": ["mask", "robot", "geometric", "face", "mechanical"],
+      "tags": ["android", "robot", "mask", "technology", "mechanical", "sci-fi", "artificial"],
+      "categories": ["technology", "sci-fi", "creatures"],
+      "gameUseCases": ["enemy-icon", "creature-type", "buff-effect", "technology-skill"],
+      "style": "silhouette",
+      "complexity": "high",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["robot enemies", "technological artifacts"],
+      "relevanceScore": {
+        "clearSkies": 1,
+        "medieval": 1,
+        "fantasy": 2
+      }
+    },
+    {
+      "id": "andromeda-chain",
+      "filename": "andromeda-chain.svg",
+      "description": "Interconnected chain links forming web-like network pattern, cosmic connectivity theme",
+      "visualElements": ["chain", "links", "network", "web", "interconnected"],
+      "tags": ["chain", "link", "network", "connection", "cosmic", "web", "structure"],
+      "categories": ["symbols", "technology", "structures"],
+      "gameUseCases": ["buff-effect", "ability-icon", "connection-skill", "network-ability"],
+      "style": "silhouette",
+      "complexity": "medium",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["networking abilities", "connection-based skills"],
+      "relevanceScore": {
+        "clearSkies": 2,
+        "medieval": 2,
+        "fantasy": 5
+      }
+    },
+    {
+      "id": "angel-outfit",
+      "filename": "angel-outfit.svg",
+      "description": "Flowing robe or gown with wing collar and celestial styling, holy celestial clothing",
+      "visualElements": ["robe", "gown", "wings", "collar", "flowing"],
+      "tags": ["clothing", "outfit", "robes", "angel", "celestial", "holy", "divine"],
+      "categories": ["armor", "clothing", "holy", "celestial"],
+      "gameUseCases": ["armor-item", "equipment", "cosmetic-item", "holy-symbol"],
+      "style": "silhouette",
+      "complexity": "medium",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["holy armor", "celestial equipment", "divine robes", "priest/paladin garb"],
+      "relevanceScore": {
+        "clearSkies": 7,
+        "medieval": 8,
+        "fantasy": 9
+      }
     }
   ],
   "categories": {
-    "items": ["ace"],
+    "items": ["ace", "alligator-clip"],
     "games": ["ace"],
-    "symbols": ["ace", "alien-skull"],
-    "creatures": ["acid-blob", "alien-skull"],
-    "enemies": ["acid-blob", "alien-skull"],
-    "monsters": ["acid-blob"],
-    "resources": ["acorn"],
+    "symbols": ["ace", "alien-skull", "all-for-one", "anchor", "andromeda-chain"],
+    "creatures": ["acid-blob", "alien-skull", "alien-stare", "android-mask"],
+    "enemies": ["acid-blob", "alien-skull", "alien-stare", "android-mask"],
+    "monsters": ["acid-blob", "alien-stare"],
+    "resources": ["acorn", "ammonite", "ammonite-fossil"],
     "consumables": ["acorn", "aerosol"],
-    "nature": ["acorn"],
+    "nature": ["acorn", "ammonite", "ammonite-fossil"],
     "gathering": ["acorn"],
-    "technology": ["aerial-signal"],
+    "technology": ["aerial-signal", "alligator-clip", "android-mask", "andromeda-chain"],
     "communication": ["aerial-signal"],
-    "structures": ["aerial-signal"],
+    "structures": ["aerial-signal", "andromeda-chain"],
     "ui-elements": ["aerial-signal"],
-    "weapons": ["aerodynamic-harpoon"],
+    "weapons": ["aerodynamic-harpoon", "all-for-one"],
     "projectiles": ["aerodynamic-harpoon"],
-    "tools": ["aerodynamic-harpoon", "aerosol"],
-    "fishing": ["aerodynamic-harpoon"],
+    "tools": ["aerodynamic-harpoon", "aerosol", "alligator-clip", "anchor"],
+    "fishing": ["aerodynamic-harpoon", "anchor"],
     "effects": ["aerosol", "afterburn", "air-zigzag", "alien-fire"],
     "magic": ["afterburn", "air-zigzag", "alien-fire"],
     "damage-types": ["afterburn"],
-    "abilities": ["afterburn", "air-zigzag", "alien-fire"],
+    "abilities": ["afterburn", "air-zigzag", "alien-fire", "all-for-one"],
     "elements": ["air-zigzag"],
     "supernatural": ["alien-fire"],
-    "death": ["alien-skull"]
+    "death": ["alien-skull"],
+    "combat": ["all-for-one"],
+    "archaeological": ["ammonite", "ammonite-fossil"],
+    "medical": ["anatomy"],
+    "nautical": ["anchor"],
+    "celestial": ["angel-outfit"],
+    "holy": ["angel-outfit"],
+    "armor": ["angel-outfit"],
+    "clothing": ["angel-outfit"],
+    "sci-fi": ["android-mask"]
   },
   "stats": {
     "byComplexity": {
       "low": 2,
-      "medium": 6,
-      "high": 2
+      "medium": 11,
+      "high": 7
     },
     "topRelevanceForClearSkies": [
       { "id": "acorn", "score": 10 },
       { "id": "aerodynamic-harpoon", "score": 9 },
-      { "id": "acid-blob", "score": 8 }
+      { "id": "acid-blob", "score": 8 },
+      { "id": "anchor", "score": 8 },
+      { "id": "ammonite", "score": 7 },
+      { "id": "ammonite-fossil", "score": 7 },
+      { "id": "angel-outfit", "score": 7 },
+      { "id": "all-for-one", "score": 6 }
     ]
   }
 }
