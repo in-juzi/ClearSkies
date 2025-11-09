@@ -26,6 +26,10 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Response validation middleware (development only)
+const responseValidator = require('./middleware/responseValidator');
+app.use(responseValidator);
+
 // Basic route
 app.get('/', (req, res) => {
   res.json({ message: 'Welcome to ClearSkies API' });
