@@ -1,0 +1,76 @@
+<div class="chat-container" [class.collapsed]="isCollapsed()">
+  <!-- Chat Header -->
+  <div class="chat-header" (click)="toggleCollapse()">
+    <div class="chat-title">
+      <span class="chat-icon">💬</span>
+      <span>Global Chat</span>
+      <span class="connection-status" [class]="getStatusClass()">
+        {{ getStatusText() }}
+      </span>
+    </div>
+    <button class="collapse-btn" type="button">
+      {{ isCollapsed() ? '▲' : '▼' }}
+    </button>
+  </div>
+
+  <!-- Chat Body -->
+  <div class="chat-body" *ngIf="!isCollapsed()">
+    <!-- Message List -->
+    <div class="message-list" #messageList>
+      <div class="no-messages" *ngIf="chatService.messages().length === 0">
+        No messages yet. Start the conversation!
+      </div>
+
+      <div
+        class="message"
+        *ngFor="let msg of chatService.messages()"
+        [class.own-message]="isOwnMessage(msg)"
+      >
+        <span class="message-time">{{ formatTime(msg.createdAt) }}</span>
+        <span class="message-username">{{ msg.username }}:</span>
+        <span class="message-text">{{ msg.message }}</span>
+      </div>
+    </div>
+
+    <!-- Error Message -->
+    <div class="error-message" *ngIf="errorMessage()">
+      {{ errorMessage() }}
+    </div>
+
+    <!-- Input Area -->
+    <div class="chat-input-area">
+      <!-- Command Autocomplete Dropdown -->
+      <div class="autocomplete-dropdown" *ngIf="showSuggestions()">
+        <div
+          class="suggestion-item"
+          *ngFor="let suggestion of commandSuggestions(); let i = index"
+          [class.selected]="i === selectedSuggestionIndex()"
+          (click)="selectSuggestion(i)"
+        >
+          <span class="suggestion-name">{{ suggestion.name }}</span>
+          <span class="suggestion-description">{{ suggestion.description }}</span>
+        </div>
+      </div>
+
+      <input
+        type="text"
+        class="chat-input"
+        placeholder="Type a message or /help for commands"
+        [(ngModel)]="messageInput"
+        (ngModelChange)="onInputChange()"
+        (keypress)="onKeyPress($event)"
+        (keydown)="onKeyDown($event)"
+        [disabled]="sendingMessage() || chatService.connectionStatus() !== 'connected'"
+        maxlength="500"
+      />
+      <button
+        class="send-btn"
+        type="button"
+        (click)="sendMessage()"
+        [disabled]="!messageInput().trim() || sendingMessage() || chatService.connectionStatus() !== 'connected'"
+      >
+        {{ sendingMessage() ? '...' : 'Send' }}
+      </button>
+    </div>
+  </div>
+</div>
