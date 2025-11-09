@@ -1,6 +1,7 @@
 const Player = require('../models/Player');
 const locationService = require('../services/locationService');
 const itemService = require('../services/itemService');
+const { jsonSafe } = require('../utils/jsonSafe');
 
 /**
  * Get all discovered locations
@@ -516,11 +517,20 @@ exports.completeActivity = async (req, res) => {
       const qualities = itemService.generateRandomQualities(itemReward.itemId);
       const traits = itemService.generateRandomTraits(itemReward.itemId);
       const itemInstance = itemService.createItemInstance(itemReward.itemId, itemReward.quantity, qualities, traits);
+
+      // Store the instanceId before adding to player (to avoid circular ref after add)
+      const instanceId = itemInstance.instanceId;
+
       await player.addItem(itemInstance);
+
+      // Get item definition for display
+      const itemDef = itemService.getItemDefinition(itemReward.itemId);
+
       itemsAdded.push({
         itemId: itemReward.itemId,
+        name: itemDef?.name || itemReward.itemId,
         quantity: itemReward.quantity,
-        instanceId: itemInstance.instanceId
+        instanceId: instanceId
       });
     }
 

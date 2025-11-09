@@ -5,6 +5,7 @@
   "type": "resource-gathering",
   "icon": "fishing",
   "activities": [
+    "activity-fish-shrimp",
     "activity-fish-cod",
     "activity-fish-salmon"
   ]

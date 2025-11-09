@@ -160,5 +160,23 @@
     },
     "allowedQualities": ["freshness"],
     "allowedTraits": ["pristine"]
+  },
+  "shrimp": {
+    "itemId": "shrimp",
+    "name": "Shrimp",
+    "description": "Small shellfish caught in shallow waters",
+    "category": "consumable",
+    "baseValue": 8,
+    "rarity": "common",
+    "stackable": true,
+    "maxStack": 50,
+    "properties": {
+      "weight": 0.5,
+      "material": "fish",
+      "tier": 1,
+      "skillSource": "fishing"
+    },
+    "allowedQualities": ["freshness"],
+    "allowedTraits": ["pristine"]
   }
 }

@@ -7,7 +7,10 @@
   "requirements": {
     "skills": {
       "mining": 5
-    }
+    },
+    "equipped": [
+      { "subtype": "mining-pickaxe" }
+    ]
   },
   "rewards": {
     "experience": {
