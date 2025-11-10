@@ -4,7 +4,11 @@
     "name": "Oak Log",
     "description": "A sturdy oak log, useful for construction and crafting",
     "category": "resource",
-    "subcategories": ["wood", "timber", "building-material"],
+    "subcategories": [
+      "wood",
+      "timber",
+      "building-material"
+    ],
     "baseValue": 25,
     "rarity": "common",
     "stackable": true,
@@ -15,15 +19,32 @@
       "tier": 1,
       "skillSource": "woodcutting"
     },
-    "allowedQualities": ["woodGrain", "moisture", "age"],
-    "allowedTraits": ["fragrant", "knotted", "weathered", "pristine"]
+    "allowedQualities": [
+      "woodGrain",
+      "moisture",
+      "age"
+    ],
+    "allowedTraits": [
+      "fragrant",
+      "knotted",
+      "weathered",
+      "pristine"
+    ],
+    "icon": {
+      "path": "item-categories/item_cat_material.svg",
+      "material": "wood"
+    }
   },
   "willow_log": {
     "itemId": "willow_log",
     "name": "Willow Log",
     "description": "A flexible willow log, prized for its magical properties",
     "category": "resource",
-    "subcategories": ["wood", "timber", "magical"],
+    "subcategories": [
+      "wood",
+      "timber",
+      "magical"
+    ],
     "baseValue": 50,
     "rarity": "uncommon",
     "stackable": true,
@@ -34,15 +55,32 @@
       "tier": 2,
       "skillSource": "woodcutting"
     },
-    "allowedQualities": ["woodGrain", "moisture", "age"],
-    "allowedTraits": ["fragrant", "knotted", "weathered", "pristine"]
+    "allowedQualities": [
+      "woodGrain",
+      "moisture",
+      "age"
+    ],
+    "allowedTraits": [
+      "fragrant",
+      "knotted",
+      "weathered",
+      "pristine"
+    ],
+    "icon": {
+      "path": "item-categories/item_cat_material.svg",
+      "material": "wood"
+    }
   },
   "maple_log": {
     "itemId": "maple_log",
     "name": "Maple Log",
     "description": "A fine maple log with beautiful grain patterns",
     "category": "resource",
-    "subcategories": ["wood", "timber", "crafting-material"],
+    "subcategories": [
+      "wood",
+      "timber",
+      "crafting-material"
+    ],
     "baseValue": 75,
     "rarity": "uncommon",
     "stackable": true,
@@ -53,15 +91,32 @@
       "tier": 3,
       "skillSource": "woodcutting"
     },
-    "allowedQualities": ["woodGrain", "moisture", "age"],
-    "allowedTraits": ["fragrant", "knotted", "weathered", "pristine"]
+    "allowedQualities": [
+      "woodGrain",
+      "moisture",
+      "age"
+    ],
+    "allowedTraits": [
+      "fragrant",
+      "knotted",
+      "weathered",
+      "pristine"
+    ],
+    "icon": {
+      "path": "item-categories/item_cat_material.svg",
+      "material": "wood"
+    }
   },
   "copper_ore": {
     "itemId": "copper_ore",
     "name": "Copper Ore",
     "description": "Raw copper ore, ready to be smelted",
     "category": "resource",
-    "subcategories": ["ore", "mineral", "metal"],
+    "subcategories": [
+      "ore",
+      "mineral",
+      "metal"
+    ],
     "baseValue": 30,
     "rarity": "common",
     "stackable": true,
@@ -72,15 +127,27 @@
       "tier": 1,
       "skillSource": "mining"
     },
-    "allowedQualities": ["purity"],
-    "allowedTraits": ["pristine"]
+    "allowedQualities": [
+      "purity"
+    ],
+    "allowedTraits": [
+      "pristine"
+    ],
+    "icon": {
+      "path": "item-categories/item_cat_ore.svg",
+      "material": "ore"
+    }
   },
   "iron_ore": {
     "itemId": "iron_ore",
     "name": "Iron Ore",
     "description": "Raw iron ore, the backbone of any smithy",
     "category": "resource",
-    "subcategories": ["ore", "mineral", "metal"],
+    "subcategories": [
+      "ore",
+      "mineral",
+      "metal"
+    ],
     "baseValue": 60,
     "rarity": "common",
     "stackable": true,
@@ -91,15 +158,29 @@
       "tier": 2,
       "skillSource": "mining"
     },
-    "allowedQualities": ["purity"],
-    "allowedTraits": ["pristine", "cursed"]
+    "allowedQualities": [
+      "purity"
+    ],
+    "allowedTraits": [
+      "pristine",
+      "cursed"
+    ],
+    "icon": {
+      "path": "item-categories/item_cat_ore.svg",
+      "material": "ore"
+    }
   },
   "silver_ore": {
     "itemId": "silver_ore",
     "name": "Silver Ore",
     "description": "Precious silver ore with a lustrous shine",
     "category": "resource",
-    "subcategories": ["ore", "mineral", "metal", "precious"],
+    "subcategories": [
+      "ore",
+      "mineral",
+      "metal",
+      "precious"
+    ],
     "baseValue": 120,
     "rarity": "uncommon",
     "stackable": true,
@@ -110,8 +191,17 @@
       "tier": 3,
       "skillSource": "mining"
     },
-    "allowedQualities": ["purity"],
-    "allowedTraits": ["pristine", "blessed"]
+    "allowedQualities": [
+      "purity"
+    ],
+    "allowedTraits": [
+      "pristine",
+      "blessed"
+    ],
+    "icon": {
+      "path": "item-categories/item_cat_ore.svg",
+      "material": "ore"
+    }
   },
   "trout": {
     "itemId": "trout",
@@ -128,8 +218,16 @@
       "tier": 1,
       "skillSource": "fishing"
     },
-    "allowedQualities": ["freshness"],
-    "allowedTraits": ["pristine"]
+    "allowedQualities": [
+      "freshness"
+    ],
+    "allowedTraits": [
+      "pristine"
+    ],
+    "icon": {
+      "path": "item-categories/item_cat_meat.svg",
+      "material": "fish"
+    }
   },
   "salmon": {
     "itemId": "salmon",
@@ -146,8 +244,17 @@
       "tier": 2,
       "skillSource": "fishing"
     },
-    "allowedQualities": ["freshness"],
-    "allowedTraits": ["pristine", "blessed"]
+    "allowedQualities": [
+      "freshness"
+    ],
+    "allowedTraits": [
+      "pristine",
+      "blessed"
+    ],
+    "icon": {
+      "path": "item-categories/item_cat_meat.svg",
+      "material": "fish"
+    }
   },
   "pike": {
     "itemId": "pike",
@@ -164,8 +271,16 @@
       "tier": 3,
       "skillSource": "fishing"
     },
-    "allowedQualities": ["freshness"],
-    "allowedTraits": ["pristine"]
+    "allowedQualities": [
+      "freshness"
+    ],
+    "allowedTraits": [
+      "pristine"
+    ],
+    "icon": {
+      "path": "item-categories/item_cat_meat.svg",
+      "material": "fish"
+    }
   },
   "shrimp": {
     "itemId": "shrimp",
@@ -182,15 +297,28 @@
       "tier": 1,
       "skillSource": "fishing"
     },
-    "allowedQualities": ["freshness"],
-    "allowedTraits": ["pristine"]
+    "allowedQualities": [
+      "freshness"
+    ],
+    "allowedTraits": [
+      "pristine"
+    ],
+    "icon": {
+      "path": "item-categories/item_cat_meat.svg",
+      "material": "fish"
+    }
   },
   "chamomile": {
     "itemId": "chamomile",
     "name": "Chamomile",
     "description": "Delicate white flowers with a soothing aroma, commonly used in teas and healing salves",
     "category": "resource",
-    "subcategories": ["flower", "herb", "seasoning", "medicinal"],
+    "subcategories": [
+      "flower",
+      "herb",
+      "seasoning",
+      "medicinal"
+    ],
     "baseValue": 12,
     "rarity": "common",
     "stackable": true,
@@ -201,15 +329,30 @@
       "tier": 1,
       "skillSource": "herbalism"
     },
-    "allowedQualities": ["freshness", "purity"],
-    "allowedTraits": ["fragrant", "pristine"]
+    "allowedQualities": [
+      "freshness",
+      "purity"
+    ],
+    "allowedTraits": [
+      "fragrant",
+      "pristine"
+    ],
+    "icon": {
+      "path": "item-categories/item_cat_mushroom.svg",
+      "material": "herb"
+    }
   },
   "sage": {
     "itemId": "sage",
     "name": "Sage",
     "description": "Silvery-green leaves prized for their medicinal properties and protective qualities",
     "category": "resource",
-    "subcategories": ["herb", "seasoning", "medicinal", "protective"],
+    "subcategories": [
+      "herb",
+      "seasoning",
+      "medicinal",
+      "protective"
+    ],
     "baseValue": 18,
     "rarity": "common",
     "stackable": true,
@@ -220,15 +363,30 @@
       "tier": 1,
       "skillSource": "herbalism"
     },
-    "allowedQualities": ["freshness", "purity"],
-    "allowedTraits": ["fragrant", "pristine", "blessed"]
+    "allowedQualities": [
+      "freshness",
+      "purity"
+    ],
+    "allowedTraits": [
+      "fragrant",
+      "pristine",
+      "blessed"
+    ],
+    "icon": {
+      "path": "item-categories/item_cat_mushroom.svg",
+      "material": "herb"
+    }
   },
   "nettle": {
     "itemId": "nettle",
     "name": "Nettle",
     "description": "Stinging leaves that, when properly prepared, provide remarkable healing properties",
     "category": "resource",
-    "subcategories": ["herb", "leaf", "medicinal"],
+    "subcategories": [
+      "herb",
+      "leaf",
+      "medicinal"
+    ],
     "baseValue": 25,
     "rarity": "uncommon",
     "stackable": true,
@@ -239,15 +397,30 @@
       "tier": 2,
       "skillSource": "herbalism"
     },
-    "allowedQualities": ["freshness", "purity"],
-    "allowedTraits": ["pristine", "cursed"]
+    "allowedQualities": [
+      "freshness",
+      "purity"
+    ],
+    "allowedTraits": [
+      "pristine",
+      "cursed"
+    ],
+    "icon": {
+      "path": "item-categories/item_cat_mushroom.svg",
+      "material": "herb"
+    }
   },
   "mandrake_root": {
     "itemId": "mandrake_root",
     "name": "Mandrake Root",
     "description": "A mystical root shaped like a human form, whispered to have powerful magical properties",
     "category": "resource",
-    "subcategories": ["root", "herb", "alchemical", "magical"],
+    "subcategories": [
+      "root",
+      "herb",
+      "alchemical",
+      "magical"
+    ],
     "baseValue": 45,
     "rarity": "uncommon",
     "stackable": true,
@@ -258,15 +431,32 @@
       "tier": 2,
       "skillSource": "herbalism"
     },
-    "allowedQualities": ["freshness", "purity"],
-    "allowedTraits": ["pristine", "blessed", "cursed"]
+    "allowedQualities": [
+      "freshness",
+      "purity"
+    ],
+    "allowedTraits": [
+      "pristine",
+      "blessed",
+      "cursed"
+    ],
+    "icon": {
+      "path": "item-categories/item_cat_mushroom.svg",
+      "material": "herb"
+    }
   },
   "moonpetal": {
     "itemId": "moonpetal",
     "name": "Moonpetal",
     "description": "Luminescent white petals that shimmer in moonlight, used in the most potent elixirs",
     "category": "resource",
-    "subcategories": ["flower", "herb", "alchemical", "magical", "rare"],
+    "subcategories": [
+      "flower",
+      "herb",
+      "alchemical",
+      "magical",
+      "rare"
+    ],
     "baseValue": 80,
     "rarity": "rare",
     "stackable": true,
@@ -277,15 +467,33 @@
       "tier": 3,
       "skillSource": "herbalism"
     },
-    "allowedQualities": ["freshness", "purity"],
-    "allowedTraits": ["fragrant", "pristine", "blessed", "masterwork"]
+    "allowedQualities": [
+      "freshness",
+      "purity"
+    ],
+    "allowedTraits": [
+      "fragrant",
+      "pristine",
+      "blessed",
+      "masterwork"
+    ],
+    "icon": {
+      "path": "item-categories/item_cat_mushroom.svg",
+      "material": "herb"
+    }
   },
   "dragons_breath": {
     "itemId": "dragons_breath",
     "name": "Dragon's Breath",
     "description": "Rare crimson flowers that grow in volcanic soil, their petals warm to the touch",
     "category": "resource",
-    "subcategories": ["flower", "herb", "alchemical", "magical", "rare"],
+    "subcategories": [
+      "flower",
+      "herb",
+      "alchemical",
+      "magical",
+      "rare"
+    ],
     "baseValue": 100,
     "rarity": "rare",
     "stackable": true,
@@ -296,7 +504,18 @@
       "tier": 3,
       "skillSource": "herbalism"
     },
-    "allowedQualities": ["freshness", "purity"],
-    "allowedTraits": ["pristine", "cursed", "masterwork"]
+    "allowedQualities": [
+      "freshness",
+      "purity"
+    ],
+    "allowedTraits": [
+      "pristine",
+      "cursed",
+      "masterwork"
+    ],
+    "icon": {
+      "path": "item-categories/item_cat_mushroom.svg",
+      "material": "herb"
+    }
   }
 }

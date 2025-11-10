@@ -4,13 +4,22 @@
     "name": "Copper Sword",
     "description": "A basic sword made of copper",
     "category": "equipment",
-    "subcategories": ["weapon", "sword", "melee", "one-handed"],
+    "subcategories": [
+      "weapon",
+      "sword",
+      "melee",
+      "one-handed"
+    ],
     "subtype": "sword",
     "slot": "mainHand",
     "baseValue": 100,
     "rarity": "common",
     "stackable": false,
     "maxStack": 1,
+    "icon": {
+      "path": "item-categories/item_cat_sword.svg",
+      "material": "copper"
+    },
     "properties": {
       "weight": 4,
       "material": "copper",
@@ -19,21 +28,38 @@
       "durability": 100,
       "requiredLevel": 1
     },
-    "allowedQualities": ["purity"],
-    "allowedTraits": ["knotted", "pristine", "cursed", "blessed", "masterwork"]
+    "allowedQualities": [
+      "purity"
+    ],
+    "allowedTraits": [
+      "knotted",
+      "pristine",
+      "cursed",
+      "blessed",
+      "masterwork"
+    ]
   },
   "iron_sword": {
     "itemId": "iron_sword",
     "name": "Iron Sword",
     "description": "A reliable iron sword",
     "category": "equipment",
-    "subcategories": ["weapon", "sword", "melee", "one-handed"],
+    "subcategories": [
+      "weapon",
+      "sword",
+      "melee",
+      "one-handed"
+    ],
     "subtype": "sword",
     "slot": "mainHand",
     "baseValue": 250,
     "rarity": "common",
     "stackable": false,
     "maxStack": 1,
+    "icon": {
+      "path": "item-categories/item_cat_sword.svg",
+      "material": "iron"
+    },
     "properties": {
       "weight": 5,
       "material": "iron",
@@ -42,21 +68,36 @@
       "durability": 150,
       "requiredLevel": 5
     },
-    "allowedQualities": ["purity"],
-    "allowedTraits": ["pristine", "cursed", "blessed", "masterwork"]
+    "allowedQualities": [
+      "purity"
+    ],
+    "allowedTraits": [
+      "pristine",
+      "cursed",
+      "blessed",
+      "masterwork"
+    ]
   },
   "wooden_shield": {
     "itemId": "wooden_shield",
     "name": "Wooden Shield",
     "description": "A simple wooden shield for basic protection",
     "category": "equipment",
-    "subcategories": ["armor", "shield", "defensive"],
+    "subcategories": [
+      "armor",
+      "shield",
+      "defensive"
+    ],
     "subtype": "shield",
     "slot": "offHand",
     "baseValue": 50,
     "rarity": "common",
     "stackable": false,
     "maxStack": 1,
+    "icon": {
+      "path": "item-categories/item_cat_body.svg",
+      "material": "oak"
+    },
     "properties": {
       "weight": 3,
       "material": "wood",
@@ -65,21 +106,37 @@
       "durability": 80,
       "requiredLevel": 1
     },
-    "allowedQualities": ["woodGrain"],
-    "allowedTraits": ["weathered", "pristine", "blessed", "masterwork"]
+    "allowedQualities": [
+      "woodGrain"
+    ],
+    "allowedTraits": [
+      "weathered",
+      "pristine",
+      "blessed",
+      "masterwork"
+    ]
   },
   "iron_helm": {
     "itemId": "iron_helm",
     "name": "Iron Helm",
     "description": "A sturdy iron helmet",
     "category": "equipment",
-    "subcategories": ["armor", "headgear", "heavy-armor", "metal"],
+    "subcategories": [
+      "armor",
+      "headgear",
+      "heavy-armor",
+      "metal"
+    ],
     "subtype": "helm",
     "slot": "head",
     "baseValue": 150,
     "rarity": "common",
     "stackable": false,
     "maxStack": 1,
+    "icon": {
+      "path": "item-categories/item_cat_body.svg",
+      "material": "iron"
+    },
     "properties": {
       "weight": 6,
       "material": "iron",
@@ -88,21 +145,37 @@
       "durability": 120,
       "requiredLevel": 3
     },
-    "allowedQualities": ["purity"],
-    "allowedTraits": ["pristine", "cursed", "blessed", "masterwork"]
+    "allowedQualities": [
+      "purity"
+    ],
+    "allowedTraits": [
+      "pristine",
+      "cursed",
+      "blessed",
+      "masterwork"
+    ]
   },
   "hemp_coif": {
     "itemId": "hemp_coif",
     "name": "Hemp Coif",
     "description": "A simple cloth head covering made from hemp",
     "category": "equipment",
-    "subcategories": ["armor", "headgear", "light-armor", "cloth"],
+    "subcategories": [
+      "armor",
+      "headgear",
+      "light-armor",
+      "cloth"
+    ],
     "subtype": "coif",
     "slot": "head",
     "baseValue": 20,
     "rarity": "common",
     "stackable": false,
     "maxStack": 1,
+    "icon": {
+      "path": "item-categories/item_cat_body.svg",
+      "material": "hemp"
+    },
     "properties": {
       "weight": 1,
       "material": "cloth",
@@ -112,20 +185,33 @@
       "requiredLevel": 1
     },
     "allowedQualities": [],
-    "allowedTraits": ["weathered", "pristine", "blessed"]
+    "allowedTraits": [
+      "weathered",
+      "pristine",
+      "blessed"
+    ]
   },
   "leather_tunic": {
     "itemId": "leather_tunic",
     "name": "Leather Tunic",
     "description": "A basic leather chest piece",
     "category": "equipment",
-    "subcategories": ["armor", "body-armor", "medium-armor", "leather"],
+    "subcategories": [
+      "armor",
+      "body-armor",
+      "medium-armor",
+      "leather"
+    ],
     "subtype": "tunic",
     "slot": "body",
     "baseValue": 75,
     "rarity": "common",
     "stackable": false,
     "maxStack": 1,
+    "icon": {
+      "path": "item-categories/item_cat_body.svg",
+      "material": "leather"
+    },
     "properties": {
       "weight": 5,
       "material": "leather",
@@ -135,44 +221,73 @@
       "requiredLevel": 1
     },
     "allowedQualities": [],
-    "allowedTraits": ["weathered", "pristine", "blessed", "masterwork"]
+    "allowedTraits": [
+      "weathered",
+      "pristine",
+      "blessed",
+      "masterwork"
+    ]
   },
   "bronze_woodcutting_axe": {
     "itemId": "bronze_woodcutting_axe",
     "name": "Bronze Woodcutting Axe",
     "description": "A basic axe for chopping trees",
     "category": "equipment",
-    "subcategories": ["tool", "gathering", "woodcutting", "axe"],
+    "subcategories": [
+      "tool",
+      "gathering",
+      "woodcutting",
+      "axe"
+    ],
     "subtype": "woodcutting-axe",
     "slot": "mainHand",
     "baseValue": 80,
     "rarity": "common",
     "stackable": false,
     "maxStack": 1,
+    "icon": {
+      "path": "item-categories/item_cat_axe_SPLIT.svg",
+      "material": "bronze"
+    },
     "properties": {
       "weight": 4,
       "material": "bronze",
       "tier": 1,
       "damage": 3,
-      "toolEfficiency": 1.0,
+      "toolEfficiency": 1,
       "durability": 100,
       "requiredLevel": 1
     },
-    "allowedQualities": ["purity"],
-    "allowedTraits": ["pristine", "blessed", "masterwork"]
+    "allowedQualities": [
+      "purity"
+    ],
+    "allowedTraits": [
+      "pristine",
+      "blessed",
+      "masterwork"
+    ]
   },
   "iron_woodcutting_axe": {
     "itemId": "iron_woodcutting_axe",
     "name": "Iron Woodcutting Axe",
     "description": "A sturdy iron axe for chopping trees",
     "category": "equipment",
-    "subcategories": ["tool", "gathering", "woodcutting", "axe"],
+    "subcategories": [
+      "tool",
+      "gathering",
+      "woodcutting",
+      "axe"
+    ],
     "subtype": "woodcutting-axe",
     "slot": "mainHand",
     "baseValue": 200,
     "rarity": "common",
     "stackable": false,
     "maxStack": 1,
+    "icon": {
+      "path": "item-categories/item_cat_axe_SPLIT.svg",
+      "material": "iron"
+    },
     "properties": {
       "weight": 5,
       "material": "iron",
@@ -182,45 +297,75 @@
       "durability": 150,
       "requiredLevel": 5
     },
-    "allowedQualities": ["purity"],
-    "allowedTraits": ["pristine", "blessed", "masterwork"]
+    "allowedQualities": [
+      "purity"
+    ],
+    "allowedTraits": [
+      "pristine",
+      "blessed",
+      "masterwork"
+    ]
   },
   "bronze_mining_pickaxe": {
     "itemId": "bronze_mining_pickaxe",
     "name": "Bronze Mining Pickaxe",
     "description": "A basic pickaxe for mining ore",
     "category": "equipment",
-    "subcategories": ["tool", "gathering", "mining", "pickaxe"],
+    "subcategories": [
+      "tool",
+      "gathering",
+      "mining",
+      "pickaxe"
+    ],
     "subtype": "mining-pickaxe",
     "slot": "mainHand",
     "baseValue": 90,
     "rarity": "common",
     "stackable": false,
     "maxStack": 1,
+    "icon": {
+      "path": "item-categories/item_cat_tool.svg",
+      "material": "bronze"
+    },
     "properties": {
       "weight": 5,
       "material": "bronze",
       "tier": 1,
       "damage": 3,
-      "toolEfficiency": 1.0,
+      "toolEfficiency": 1,
       "durability": 100,
       "requiredLevel": 1
     },
-    "allowedQualities": ["purity"],
-    "allowedTraits": ["pristine", "blessed", "masterwork"]
+    "allowedQualities": [
+      "purity"
+    ],
+    "allowedTraits": [
+      "pristine",
+      "blessed",
+      "masterwork"
+    ]
   },
   "iron_mining_pickaxe": {
     "itemId": "iron_mining_pickaxe",
     "name": "Iron Mining Pickaxe",
     "description": "A sturdy iron pickaxe for mining ore",
     "category": "equipment",
-    "subcategories": ["tool", "gathering", "mining", "pickaxe"],
+    "subcategories": [
+      "tool",
+      "gathering",
+      "mining",
+      "pickaxe"
+    ],
     "subtype": "mining-pickaxe",
     "slot": "mainHand",
     "baseValue": 220,
     "rarity": "common",
     "stackable": false,
     "maxStack": 1,
+    "icon": {
+      "path": "item-categories/item_cat_tool.svg",
+      "material": "iron"
+    },
     "properties": {
       "weight": 6,
       "material": "iron",
@@ -230,21 +375,36 @@
       "durability": 150,
       "requiredLevel": 5
     },
-    "allowedQualities": ["purity"],
-    "allowedTraits": ["pristine", "blessed", "masterwork"]
+    "allowedQualities": [
+      "purity"
+    ],
+    "allowedTraits": [
+      "pristine",
+      "blessed",
+      "masterwork"
+    ]
   },
   "rare_iron_mining_pickaxe_offhand": {
     "itemId": "rare_iron_mining_pickaxe_offhand",
     "name": "Twin-Strike Mining Pickaxe",
     "description": "A rare lightweight pickaxe that can be wielded in the off-hand for dual-mining techniques",
     "category": "equipment",
-    "subcategories": ["tool", "gathering", "mining", "pickaxe"],
+    "subcategories": [
+      "tool",
+      "gathering",
+      "mining",
+      "pickaxe"
+    ],
     "subtype": "mining-pickaxe",
     "slot": "offHand",
     "baseValue": 450,
     "rarity": "rare",
     "stackable": false,
     "maxStack": 1,
+    "icon": {
+      "path": "item-categories/item_cat_tool.svg",
+      "material": "iron"
+    },
     "properties": {
       "weight": 4,
       "material": "iron",
@@ -254,45 +414,74 @@
       "durability": 120,
       "requiredLevel": 8
     },
-    "allowedQualities": ["purity"],
-    "allowedTraits": ["pristine", "blessed", "masterwork"]
+    "allowedQualities": [
+      "purity"
+    ],
+    "allowedTraits": [
+      "pristine",
+      "blessed",
+      "masterwork"
+    ]
   },
   "bamboo_fishing_rod": {
     "itemId": "bamboo_fishing_rod",
     "name": "Bamboo Fishing Rod",
     "description": "A simple fishing rod made from bamboo",
     "category": "equipment",
-    "subcategories": ["tool", "gathering", "fishing", "rod"],
+    "subcategories": [
+      "tool",
+      "gathering",
+      "fishing",
+      "rod"
+    ],
     "subtype": "fishing-rod",
     "slot": "mainHand",
     "baseValue": 50,
     "rarity": "common",
     "stackable": false,
     "maxStack": 1,
+    "icon": {
+      "path": "item-categories/item_cat_tool.svg",
+      "material": "bamboo"
+    },
     "properties": {
       "weight": 2,
       "material": "bamboo",
       "tier": 1,
       "damage": 1,
-      "toolEfficiency": 1.0,
+      "toolEfficiency": 1,
       "durability": 80,
       "requiredLevel": 1
     },
-    "allowedQualities": ["woodGrain"],
-    "allowedTraits": ["pristine", "blessed"]
+    "allowedQualities": [
+      "woodGrain"
+    ],
+    "allowedTraits": [
+      "pristine",
+      "blessed"
+    ]
   },
   "willow_fishing_rod": {
     "itemId": "willow_fishing_rod",
     "name": "Willow Fishing Rod",
     "description": "A flexible fishing rod made from willow wood",
     "category": "equipment",
-    "subcategories": ["tool", "gathering", "fishing", "rod"],
+    "subcategories": [
+      "tool",
+      "gathering",
+      "fishing",
+      "rod"
+    ],
     "subtype": "fishing-rod",
     "slot": "mainHand",
     "baseValue": 150,
     "rarity": "common",
     "stackable": false,
     "maxStack": 1,
+    "icon": {
+      "path": "item-categories/item_cat_tool.svg",
+      "material": "willow"
+    },
     "properties": {
       "weight": 2,
       "material": "willow",
@@ -302,7 +491,13 @@
       "durability": 120,
       "requiredLevel": 5
     },
-    "allowedQualities": ["woodGrain"],
-    "allowedTraits": ["pristine", "blessed", "masterwork"]
+    "allowedQualities": [
+      "woodGrain"
+    ],
+    "allowedTraits": [
+      "pristine",
+      "blessed",
+      "masterwork"
+    ]
   }
 }
