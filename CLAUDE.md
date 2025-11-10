@@ -15,16 +15,16 @@
 - ✅ Multi-channel icon colorization (completed - path-level SVG colorization with 40+ materials)
 
 **Recent Changes** (Last 10 commits):
+- docs: document SVG path splitting system and utilities
+- fix: update icon paths to use non-SPLIT filenames
+- feat: integrate IconComponent into equipment slots
+- feat: add autoSize option to IconComponent
+- feat: split weapon icons into multi-channel paths
+- feat: add SVG path splitting utilities for multi-channel icons
+- docs: update CLAUDE.md with icon system documentation
 - refactor: UI cleanup and polish across game components
 - feat: enhance crafting UI with icon display and improved feedback
 - fix: improve crafting ingredient consumption and validation
-- feat: create XpMiniComponent for inline XP display
-- chore: add build-check slash command
-- chore: increase component stylesheet size budget
-- feat: integrate icon system into inventory and location UIs
-- feat: add data-channel attributes to SVG icons
-- feat: add icon field to all item definitions
-- feat: add multi-channel SVG icon colorization system
 
 **Known Issues**:
 - None currently identified
