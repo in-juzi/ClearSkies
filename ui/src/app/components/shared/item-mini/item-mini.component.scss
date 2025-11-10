@@ -12,6 +12,10 @@
     font-size: var(--font-size-m);
   }
 
+  .item-icon-svg {
+    flex-shrink: 0;
+  }
+
   .item-quantity {
     color: var(--color-text-primary);
     font-weight: var(--font-weight-medium);

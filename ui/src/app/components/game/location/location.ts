@@ -8,10 +8,11 @@ import { ConfirmDialogService } from '../../../services/confirm-dialog.service';
 import { VendorComponent } from '../vendor/vendor.component';
 import { CraftingComponent } from '../crafting/crafting.component';
 import { ItemMiniComponent } from '../../shared/item-mini/item-mini.component';
+import { XpMiniComponent } from '../../shared/xp-mini/xp-mini.component';
 
 @Component({
   selector: 'app-location',
-  imports: [CommonModule, VendorComponent, CraftingComponent, ItemMiniComponent],
+  imports: [CommonModule, VendorComponent, CraftingComponent, ItemMiniComponent, XpMiniComponent],
   templateUrl: './location.html',
   styleUrl: './location.scss',
   standalone: true

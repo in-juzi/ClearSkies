@@ -65,12 +65,17 @@
                 <app-item-mini [item]="item"></app-item-mini>
               }
               @for (exp of entry.rewards.experience | keyvalue; track exp.key) {
-                <span class="reward-mini xp">
-                  ⭐ {{ formatXPDisplay(exp.key, exp.value, entry.rewards.rawExperience) }}
-                  @if (exp.value.leveledUp || exp.value.skill?.leveledUp) {
-                    <span class="level-up-mini">↑</span>
-                  }
-                </span>
+                <app-xp-mini
+                  [skillName]="exp.key"
+                  [xp]="exp.value.skill?.experience || exp.value.experience"
+                  [rawXp]="entry.rewards.rawExperience?.[exp.key]"
+                  [showIcon]="true"
+                  [showSkillName]="true"
+                  [showScaling]="true">
+                </app-xp-mini>
+                @if (exp.value.leveledUp || exp.value.skill?.leveledUp) {
+                  <span class="level-up-mini">↑</span>
+                }
               }
             </div>
           </div>

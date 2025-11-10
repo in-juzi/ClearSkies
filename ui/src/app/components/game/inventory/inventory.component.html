@@ -28,8 +28,13 @@
       (dragend)="onItemDragEnd($event)">
       <!-- Item icon (left side) -->
       <div class="item-icon">
-        <!-- Placeholder for item icon -->
-        <span class="item-tier">T{{ item.definition.properties.tier }}</span>
+        <app-icon
+          *ngIf="item.definition.icon"
+          [icon]="item.definition.icon"
+          [size]="40"
+          [alt]="item.definition.name">
+        </app-icon>
+        <span *ngIf="!item.definition.icon" class="item-tier">T{{ item.definition.properties.tier }}</span>
       </div>
 
       <!-- Item content (right side - vertical stack) -->
@@ -217,7 +222,7 @@
         <span class="stat-icon">💰</span>
         <div class="stat-content">
           <span class="stat-label">Gold</span>
-          <span class="stat-value text-gold-400">{{ inventoryService.gold() }}g</span>
+          <span class="stat-value text-gold-400">{{ inventoryService.gold() }} g</span>
         </div>
       </div>
     </div>

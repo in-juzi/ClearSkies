@@ -4,11 +4,12 @@ import { InventoryService } from '../../../services/inventory.service';
 import { ConfirmDialogService } from '../../../services/confirm-dialog.service';
 import { ItemDetails } from '../../../models/inventory.model';
 import { ItemModifiersComponent } from '../../shared/item-modifiers/item-modifiers.component';
+import { IconComponent } from '../../shared/icon/icon.component';
 
 @Component({
   selector: 'app-inventory',
   standalone: true,
-  imports: [CommonModule, ItemModifiersComponent],
+  imports: [CommonModule, ItemModifiersComponent, IconComponent],
   templateUrl: './inventory.component.html',
   styleUrl: './inventory.component.css'
 })
