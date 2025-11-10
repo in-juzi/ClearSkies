@@ -2,6 +2,7 @@ import { Component, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { VendorService } from '../../../services/vendor.service';
 import { InventoryService } from '../../../services/inventory.service';
+import { AuthService } from '../../../services/auth.service';
 import { VendorStockItem } from '../../../models/vendor.model';
 
 @Component({
@@ -14,6 +15,10 @@ import { VendorStockItem } from '../../../models/vendor.model';
 export class VendorComponent {
   vendorService = inject(VendorService);
   inventoryService = inject(InventoryService);
+  authService = inject(AuthService);
+
+  // Expose Object for template use
+  Object = Object;
 
   // Signals
   activeTab = signal<'buy' | 'sell'>('buy');
@@ -58,7 +63,7 @@ export class VendorComponent {
           this.inventoryService.setInventory(response.inventory);
         }
         if (response.gold !== undefined) {
-          this.inventoryService.setGold(response.gold);
+          this.authService.updatePlayerGold(response.gold);
         }
         this.selectedBuyItem.set(null);
       },
@@ -84,7 +89,7 @@ export class VendorComponent {
           this.inventoryService.setInventory(response.inventory);
         }
         if (response.gold !== undefined) {
-          this.inventoryService.setGold(response.gold);
+          this.authService.updatePlayerGold(response.gold);
         }
       },
       error: (error) => {
@@ -98,9 +103,9 @@ export class VendorComponent {
    * Calculate sell price for an item (50% of vendor price)
    */
   calculateSellPrice(item: any): number {
-    // This is a simplified calculation - the backend will calculate the exact price
-    // including quality and trait bonuses
-    return Math.floor((item.baseValue || 0) * 0.5);
+    // Use vendorPrice from ItemDetails (already calculated with quality/trait bonuses)
+    // Vendors buy items at 50% of their vendor price
+    return Math.floor((item.vendorPrice || 0) * 0.5);
   }
 
   /**
@@ -137,5 +142,16 @@ export class VendorComponent {
       'legendary': 'rarity-legendary'
     };
     return rarityMap[rarity] || 'rarity-common';
+  }
+
+  /**
+   * Get sellable items sorted by quality+trait score (descending)
+   */
+  getSortedSellableItems() {
+    // Filter out equipped items, then sort by score
+    const sellable = this.inventory().filter(item => !item.equipped);
+    return sellable.sort((a, b) => {
+      return this.inventoryService.calculateItemScore(b) - this.inventoryService.calculateItemScore(a);
+    });
   }
 }

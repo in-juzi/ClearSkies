@@ -177,4 +177,17 @@ export class AuthService {
       this.router.navigate(['/login']);
     }
   }
+
+  /**
+   * Update player gold (used after transactions)
+   */
+  updatePlayerGold(newGold: number): void {
+    const currentPlayer = this.currentPlayerSignal();
+    if (currentPlayer) {
+      this.currentPlayerSignal.set({
+        ...currentPlayer,
+        gold: newGold
+      });
+    }
+  }
 }

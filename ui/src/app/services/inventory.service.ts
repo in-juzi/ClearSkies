@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject, effect } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import {
@@ -9,12 +9,15 @@ import {
   AddItemRequest,
   RemoveItemRequest
 } from '../models/inventory.model';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class InventoryService {
   private apiUrl = 'http://localhost:3000/api/inventory';
+  private authService = inject(AuthService);
+  private http = inject(HttpClient);
 
   // Signals for reactive state
   inventory = signal<ItemDetails[]>([]);
@@ -24,7 +27,15 @@ export class InventoryService {
   gold = signal<number>(0);
   itemDefinitions = signal<ItemDefinition[]>([]);
 
-  constructor(private http: HttpClient) {}
+  constructor() {
+    // Sync gold from auth service whenever player data changes
+    effect(() => {
+      const player = this.authService.currentPlayer();
+      if (player?.gold !== undefined) {
+        this.gold.set(player.gold);
+      }
+    });
+  }
 
   /**
    * Fetch player's inventory
@@ -202,5 +213,47 @@ export class InventoryService {
   setInventory(items: ItemDetails[]): void {
     this.inventory.set(items);
     this.inventorySize.set(items.reduce((sum, item) => sum + item.quantity, 0));
+  }
+
+  /**
+   * Calculate total quality+trait score for an item (for sorting)
+   */
+  calculateItemScore(item: ItemDetails): number {
+    let score = 0;
+
+    // Sum all quality levels
+    if (item.qualities) {
+      Object.values(item.qualities).forEach(level => {
+        score += level;
+      });
+    }
+
+    // Sum all trait levels
+    if (item.traits) {
+      Object.values(item.traits).forEach(level => {
+        score += level;
+      });
+    }
+
+    return score;
+  }
+
+  /**
+   * Get sorted inventory by quality+trait score (descending)
+   */
+  getSortedInventory(): ItemDetails[] {
+    return [...this.inventory()].sort((a, b) => {
+      return this.calculateItemScore(b) - this.calculateItemScore(a);
+    });
+  }
+
+  /**
+   * Get sorted items by category
+   */
+  getSortedItemsByCategory(category: string): ItemDetails[] {
+    const filtered = this.inventory().filter(item => item.definition.category === category);
+    return filtered.sort((a, b) => {
+      return this.calculateItemScore(b) - this.calculateItemScore(a);
+    });
   }
 }
