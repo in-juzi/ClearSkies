@@ -1,3 +1,8 @@
+export interface ItemIcon {
+  path: string; // Relative path to SVG icon (e.g., "item-categories/item_cat_sword.svg")
+  material: string; // Material name for colorization (e.g., "copper", "iron", "oak")
+}
+
 export interface ItemDefinition {
   itemId: string;
   name: string;
@@ -8,6 +13,7 @@ export interface ItemDefinition {
   subtype?: string; // Item subtype (woodcutting-axe, mining-pickaxe, fishing-rod, etc.)
   consumableType?: string; // Deprecated: use subcategories instead
   slot?: string; // Equipment slot (head, body, mainHand, etc.)
+  icon?: ItemIcon; // SVG icon configuration with colorization
   baseValue: number;
   rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
   stackable: boolean;
