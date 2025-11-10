@@ -5,6 +5,7 @@ const cors = require('cors');
 const connectDB = require('./config/database');
 const itemService = require('./services/itemService');
 const locationService = require('./services/locationService');
+const vendorService = require('./services/vendorService');
 
 const app = express();
 const server = http.createServer(app);
@@ -22,6 +23,9 @@ itemService.loadDefinitions()
 locationService.loadAll()
   .then(() => console.log('✓ Location definitions loaded'))
   .catch(err => console.error('Failed to load location definitions:', err));
+
+// Load vendor definitions
+vendorService.loadVendorDefinitions();
 
 // Middleware
 app.use(cors());
@@ -53,6 +57,7 @@ const attributesRoutes = require('./routes/attributes');
 const inventoryRoutes = require('./routes/inventory');
 const locationRoutes = require('./routes/locations');
 const manualRoutes = require('./routes/manual');
+const vendorRoutes = require('./routes/vendors');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/skills', skillsRoutes);
@@ -60,6 +65,7 @@ app.use('/api/attributes', attributesRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/locations', locationRoutes);
 app.use('/api/manual', manualRoutes); // Public routes (no auth required)
+app.use('/api/vendors', vendorRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
