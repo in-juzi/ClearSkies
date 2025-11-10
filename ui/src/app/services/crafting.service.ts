@@ -62,13 +62,19 @@ export class CraftingService {
   completeCrafting(): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/complete`, {}).pipe(
       tap(response => {
-        this.lastResult.set(response);
+        // Clear crafting state first
         this.activeCrafting.set(null);
         this.isCrafting.set(false);
         this.remainingTime.set(0);
 
         // Refresh inventory to show new items and removed ingredients
-        this.inventoryService.getInventory().subscribe();
+        // IMPORTANT: Do this BEFORE setting lastResult to ensure inventory updates
+        // before any auto-restart logic runs
+        this.inventoryService.getInventory().subscribe(() => {
+          // Set lastResult after inventory refresh completes
+          // This triggers auto-restart with updated inventory
+          this.lastResult.set(response);
+        });
       })
     );
   }
