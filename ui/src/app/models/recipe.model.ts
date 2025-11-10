@@ -17,7 +17,8 @@ export interface Recipe {
   requiredLevel: number;
   duration: number; // seconds
   ingredients: Ingredient[];
-  output: RecipeOutput;
+  output?: RecipeOutput; // Legacy single output (deprecated)
+  outputs?: RecipeOutput[]; // New multi-output schema
   experience: number;
 }
 
@@ -28,15 +29,19 @@ export interface ActiveCrafting {
   selectedIngredients?: { [itemId: string]: string[] };
 }
 
+export interface CraftingOutputItem {
+  itemId: string;
+  name?: string; // Display name of the item
+  instanceId: string;
+  quantity: number;
+  qualities?: { [key: string]: number };
+  traits?: { [key: string]: number };
+}
+
 export interface CraftingResult {
   message: string;
-  output: {
-    itemId: string;
-    instanceId: string;
-    quantity: number;
-    qualities?: { [key: string]: number };
-    traits?: { [key: string]: number };
-  };
+  output?: CraftingOutputItem; // Legacy single output (deprecated)
+  outputs?: CraftingOutputItem[]; // New multi-output schema
   experience: {
     skill: string;
     xp: number;

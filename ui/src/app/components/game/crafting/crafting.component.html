@@ -82,7 +82,12 @@
                 [showItemId]="true"
                 [showModifiers]="true">
               </app-item-mini>
-              <span class="log-xp">⭐ +{{ entry.experience }} {{ entry.skill }} XP</span>
+              <app-xp-mini
+                [skillName]="entry.skill"
+                [xp]="entry.experience"
+                [showIcon]="true"
+                [showSkillName]="true">
+              </app-xp-mini>
             </div>
           </div>
         }
@@ -230,15 +235,17 @@
       </div>
 
       <div class="output-section">
-        <h3>Output</h3>
-        <div class="output-item">
-          <span class="output-name">{{ selectedRecipe()!.output.itemId }}</span>
-          <span class="output-quantity">x{{ selectedRecipe()!.output.quantity }}</span>
-        </div>
-        @if (selectedRecipe()!.output.qualityModifier === 'inherit') {
-          <div class="quality-note">
-            Quality will be inherited from ingredients and affected by your {{ skill }} level.
+        <h3>Output{{ getRecipeOutputs(selectedRecipe()!).length > 1 ? 's' : '' }}</h3>
+        @for (output of getRecipeOutputs(selectedRecipe()!); track output.itemId) {
+          <div class="output-item">
+            <span class="output-name">{{ output.itemId }}</span>
+            <span class="output-quantity">x{{ output.quantity }}</span>
           </div>
+          @if (output.qualityModifier === 'inherit') {
+            <div class="quality-note">
+              Quality will be inherited from ingredients and affected by your {{ skill }} level.
+            </div>
+          }
         }
       </div>
 

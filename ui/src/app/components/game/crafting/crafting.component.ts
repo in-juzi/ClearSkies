@@ -7,11 +7,12 @@ import { AuthService } from '../../../services/auth.service';
 import { Recipe } from '../../../models/recipe.model';
 import { ItemModifiersComponent } from '../../shared/item-modifiers/item-modifiers.component';
 import { ItemMiniComponent } from '../../shared/item-mini/item-mini.component';
+import { XpMiniComponent } from '../../shared/xp-mini/xp-mini.component';
 
 @Component({
   selector: 'app-crafting',
   standalone: true,
-  imports: [CommonModule, ItemModifiersComponent, ItemMiniComponent],
+  imports: [CommonModule, ItemModifiersComponent, ItemMiniComponent, XpMiniComponent],
   templateUrl: './crafting.component.html',
   styleUrls: ['./crafting.component.scss']
 })
@@ -36,6 +37,7 @@ export class CraftingComponent implements OnInit {
     skill: string;
     output: {
       itemId: string;
+      name?: string; // Display name of the item
       quantity: number;
       qualities?: { [key: string]: number };
       traits?: { [key: string]: number };
@@ -124,19 +126,25 @@ export class CraftingComponent implements OnInit {
 
       // If we just completed crafting and auto-restart is enabled, and we're not already restarting
       if (lastResult && autoRestart && !isCrafting && !isRestarting) {
-        // Add to crafting log
-        this.craftingLog.unshift({
-          timestamp: new Date(),
-          recipeName: lastResult.recipe.name,
-          experience: lastResult.experience.xp,
-          skill: lastResult.experience.skill,
-          output: {
-            itemId: lastResult.output.itemId,
-            quantity: lastResult.output.quantity,
-            qualities: lastResult.output.qualities,
-            traits: lastResult.output.traits
-          }
-        });
+        // Get outputs (support both old and new schema)
+        const outputs = lastResult.outputs || (lastResult.output ? [lastResult.output] : []);
+
+        // Add to crafting log (one entry per output)
+        for (const output of outputs) {
+          this.craftingLog.unshift({
+            timestamp: new Date(),
+            recipeName: lastResult.recipe.name,
+            experience: lastResult.experience.xp,
+            skill: lastResult.experience.skill,
+            output: {
+              itemId: output.itemId,
+              name: output.name, // Include display name
+              quantity: output.quantity,
+              qualities: output.qualities,
+              traits: output.traits
+            }
+          });
+        }
 
         // Keep only the last 10 entries
         if (this.craftingLog.length > 10) {
@@ -555,6 +563,13 @@ export class CraftingComponent implements OnInit {
       ...instance,
       quantity: usedQuantity
     };
+  }
+
+  /**
+   * Get recipe outputs as array (handles both old and new schema)
+   */
+  getRecipeOutputs(recipe: Recipe) {
+    return recipe.outputs || (recipe.output ? [recipe.output] : []);
   }
 
   /**
