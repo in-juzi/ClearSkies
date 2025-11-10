@@ -262,39 +262,142 @@ This log tracks the batch-by-batch processing of the Lorc icon collection (1,429
 
 ---
 
-## Summary Statistics (After Batch 7)
+---
+
+## Batch 9 (Icons 110-124)
+**Date**: 2025-11-09
+**Status**: ✓ Complete
+**Icons**: 15
+
+### Icons Added
+111. blade-drag (7/10) - Movement/exhaustion attack effect
+112. blade-fall (7/10) - Aerial sword attack
+113. bleeding-eye (6/10) - Vision debuff/curse
+114. bleeding-heart (7/10) - Health loss/poison effect
+115. bleeding-wound (7/10) - Bleeding damage over time
+116. bloody-stash (5/10) - Battlefield aftermath/loot
+117. bloody-sword (8/10) - Combat weapon with blood effect
+118. blunderbuss (6/10) - Renaissance firearm
+119. boar-tusks (9/10) ⭐ - Hunting trophy/alchemy material
+120. body-swapping (5/10) - Transformation/polymorph spell
+121. boiling-bubbles (8/10) - Alchemy brewing effect
+122. bolas (7/10) - Throwing/entanglement weapon
+123. bolter-gun (3/10) - Sci-fi heavy weapon
+124. bolt-eye (6/10) - Perception/lightning ability
+125. bolt-saw (6/10) - Trap/siege weapon
+
+### Notable High-Scoring Icons
+- **boar-tusks** (9/10) ⭐ - Excellent hunting trophy and alchemy ingredient
+- **bloody-sword** (8/10) - Perfect combat weapon with visceral detail
+- **boiling-bubbles** (8/10) - Excellent alchemy/brewing effect
+
+### Categories Impact
+- Updated existing categories: weapons, effects, abilities, death, combat, debuffs, status, health, ranged, damage, attacks, modern, movement, perception, resources, magic, throwing, traps, hunting, crafting, body-parts, trophies, alchemy-ingredients
+- Added 4 new categories: alchemy, guns, siege, spells
+
+### Stats Impact
+- **Complexity**: low: 10 (0), medium: 58 (+6), high: 57 (+9)
+- **Top Relevance**: 38 icons with score 8+ (including 8 perfect 10s)
+- **Added to top relevance**: boar-tusks (9), bloody-sword (8), boiling-bubbles (8)
+
+### Processing Notes
+- Categories and stats sections fully updated
+- Found excellent medieval content: boar-tusks (9), bloody-sword (8)
+- Perfect alchemy system icon: boiling-bubbles (8)
+- Low-relevance items: bolter-gun (3), body-swapping (5), bloody-stash (5)
+- Good weapon diversity: blade weapons, firearms, throwing weapons, traps
+- Strong debuff/status effect additions: bleeding effects, vision debuff
+
+---
+
+---
+
+## Batch 10 (Icons 125-139)
+**Date**: 2025-11-09
+**Status**: ✓ Complete
+**Icons**: 15
+
+### Icons Added
+126. bolt-shield (8/10) - Lightning protection shield
+127. bombing-run (4/10) - Aerial bombardment attack
+128. bone-gnawer (7/10) - Feral scavenger creature
+129. bone-knife (8/10) - Primitive tribal weapon
+130. book-aura (9/10) ⭐ - Magical spellbook
+131. book-cover (9/10) ⭐ - Tome or manual item
+132. bookmark (7/10) - Quest tracking UI element
+133. bookmarklet (7/10) - Library/book collection
+134. book-storm (8/10) - Powerful wind spell
+135. boomerang-sun (6/10) - Returning celestial weapon
+136. boot-kick (7/10) - Melee kick ability
+137. boot-prints (8/10) - Tracking/movement trail
+138. boots (9/10) ⭐ - Footwear equipment
+139. boot-stomp (7/10) - Ground slam ability
+140. bordered-shield (9/10) ⭐ - Ornate heraldic shield
+
+### Notable High-Scoring Icons
+- **book-aura** (9/10, 10/10 fantasy!) ⭐ - Perfect spellbook for magic systems
+- **book-cover** (9/10) ⭐ - Excellent tome/manual item
+- **boots** (9/10) ⭐ - Perfect footwear equipment slot
+- **bordered-shield** (9/10, 10/10 medieval!) ⭐ - Ornate defensive equipment
+- **bolt-shield** (8/10) - Lightning/elemental defense
+- **bone-knife** (8/10) - Primitive crafting/weapon
+- **book-storm** (8/10) - Powerful spell effect
+- **boot-prints** (8/10) - Tracking/stealth mechanic
+
+### Categories Impact
+- Updated existing categories: items, creatures, enemies, monsters, consumables, ui-elements, weapons, tools, effects, magic, abilities, elements, combat, celestial, holy, armor, clothing, crafting, defense, destruction, equipment, attacks, modern, military, melee, movement, throwing, exotic, dark, heraldry, shields
+- Added 4 new categories: books, knowledge, tracking, primitive
+
+### Stats Impact
+- **Complexity**: low: 11 (+1), medium: 62 (+4), high: 67 (+10)
+- **Top Relevance**: 49 icons with score 8+ (including 8 perfect 10s)
+- **Added to top relevance**: book-aura (9), book-cover (9), boots (9), bordered-shield (9), bolt-shield (8), bone-knife (8), book-storm (8), boot-prints (8)
+
+### Processing Notes
+- Categories and stats sections fully updated
+- Found exceptional medieval/fantasy content: book-aura (10/10 fantasy!), bordered-shield (10/10 medieval!)
+- Strong book/knowledge system additions (5 book-related icons)
+- Excellent equipment diversity: boots, shields, weapons
+- Low-relevance items: bombing-run (4), boomerang-sun (6)
+- Perfect additions for magic, equipment, and crafting systems
+- High complexity batch: 10 high-detail icons
+
+---
+
+## Summary Statistics (After Batch 10)
 
 ### Overall Progress
-- **Icons Analyzed**: 95 / 1,429 (6.6%)
-- **Batches Completed**: 7
-- **Estimated Remaining Batches**: ~89
+- **Icons Analyzed**: 140 / 1,429 (9.8%)
+- **Batches Completed**: 10
+- **Estimated Remaining Batches**: ~86
 
 ### Quality Distribution
-- **Perfect 10s**: 7 icons (acorn, anvil, axe-in-stump, axe-swing, barbute, battle-axe, battle-gear, beech)
-- **Score 9**: 3 icons (aerodynamic-harpoon, anvil-impact, arrowhead, beer-stein)
-- **Score 8**: 16 icons (diverse combat, creatures, resources, equipment)
-- **Score 7+**: 42 icons total (44% of analyzed)
+- **Perfect 10s**: 8 icons (acorn, anvil, axe-in-stump, axe-swing, barbute, battle-axe, battle-gear, beech)
+- **Score 9**: 9 icons (aerodynamic-harpoon, anvil-impact, arrowhead, beer-stein, blackcurrant, boar-tusks, book-aura, book-cover, boots, bordered-shield)
+- **Score 8**: 32 icons (diverse combat, creatures, resources, equipment, alchemy, books, shields)
+- **Score 7+**: 69 icons total (49.3% of analyzed)
 
 ### Complexity Breakdown
-- **Low**: 10 (10.5%)
-- **Medium**: 46 (48.4%)
-- **High**: 39 (41.1%)
+- **Low**: 11 (7.9%)
+- **Medium**: 62 (44.3%)
+- **High**: 67 (47.9%)
 
 ### Top Categories by Icon Count
-1. **weapons**: 19 icons
-2. **abilities**: 19 icons
-3. **effects**: 16 icons
-4. **magic**: 9 icons
-5. **armor**: 8 icons
-6. **creatures**: 11 icons
-7. **resources**: 10 icons
-8. **consumables**: 7 icons
+1. **weapons**: 29 icons (+2)
+2. **effects**: 31 icons (+2)
+3. **abilities**: 29 icons (+6)
+4. **armor**: 13 icons (+3)
+5. **magic**: 16 icons (+3)
+6. **shields**: 5 icons (+2)
+7. **combat**: 18 icons (+2)
+8. **books**: 5 icons (new)
+9. **knowledge**: 5 icons (new)
 
 ### Medieval/Fantasy Relevance
-- **Excellent fit (8-10)**: 26 icons (27.4%)
-- **Good fit (6-7)**: 16 icons (16.8%)
-- **Moderate fit (4-5)**: 26 icons (27.4%)
-- **Poor fit (1-3)**: 27 icons (28.4%)
+- **Excellent fit (8-10)**: 49 icons (35.0%)
+- **Good fit (6-7)**: 34 icons (24.3%)
+- **Moderate fit (4-5)**: 29 icons (20.7%)
+- **Poor fit (1-3)**: 28 icons (20.0%)
 
 ---
 
