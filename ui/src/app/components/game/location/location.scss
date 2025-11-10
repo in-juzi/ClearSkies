@@ -229,6 +229,50 @@
   border-radius: 3px;
   color: var(--color-text-label);
   white-space: nowrap;
+
+  &.item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.1rem;
+  }
+}
+
+.quality-badge-mini {
+  padding: 0.1rem 0.3rem;
+  border-radius: var(--radius-s);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+
+  &.common {
+    background: rgba(128, 128, 128, 0.2);
+    color: #aaa;
+  }
+
+  &.uncommon {
+    background: rgba(76, 175, 80, 0.2);
+    color: #4caf50;
+  }
+
+  &.rare {
+    background: rgba(33, 150, 243, 0.2);
+    color: #2196f3;
+  }
+
+  &.epic {
+    background: rgba(156, 39, 176, 0.2);
+    color: #9c27b0;
+  }
+
+  &.legendary {
+    background: rgba(255, 152, 0, 0.2);
+    color: #ff9800;
+  }
+}
+
+.item-details-mini {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-style: italic;
 }
 
 .level-up-mini {
