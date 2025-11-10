@@ -4,6 +4,7 @@
   "description": "Dark tunnels lead deep into the mountain where rich veins of ore can be found.",
   "type": "resource-gathering",
   "icon": "mining",
+  "vendorId": "mountain-mine-merchant",
   "activities": [
     "activity-mine-iron"
   ]

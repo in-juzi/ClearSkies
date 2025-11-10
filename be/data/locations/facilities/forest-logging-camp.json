@@ -4,6 +4,7 @@
   "description": "A clearing filled with tree stumps and the sound of axes striking wood.",
   "type": "resource-gathering",
   "icon": "woodcutting",
+  "vendorId": "forest-clearing-merchant",
   "activities": [
     "activity-chop-oak"
   ]
