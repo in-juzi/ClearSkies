@@ -84,6 +84,8 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 - [be/utils/add-item.js](be/utils/add-item.js) - Add items to player inventory
 - [be/utils/content-generator.js](be/utils/content-generator.js) - Interactive content creation
 - [be/utils/test-xp-scaling.js](be/utils/test-xp-scaling.js) - XP formula testing
+- [project/utils/split-svg-paths.js](project/utils/split-svg-paths.js) - Split SVG paths (basic, no normalization)
+- [project/utils/split-svg-paths-normalized.js](project/utils/split-svg-paths-normalized.js) - Split SVG paths with coordinate normalization (recommended)
 
 ## Project Structure (Key Files Only)
 
@@ -1150,6 +1152,45 @@ Icons use `data-channel` attributes to tag paths explicitly:
 - Integrated throughout UI: inventory grid, location lists, crafting, vendor
 - Default size: 40px (inventory), 24px (mini), configurable via `[size]` input
 - Colorization enabled by default, can disable with `[disableColor]="true"`
+
+**SVG Path Splitting:**
+To prepare icons for multi-channel colorization, single-path SVGs must be split into separate paths:
+
+1. **Use the normalized splitting script (recommended):**
+   ```bash
+   # First time setup
+   cd project && npm install svgpath
+
+   # Split and normalize
+   node project/utils/split-svg-paths-normalized.js ui/src/assets/icons/item-categories/icon.svg
+   ```
+   This converts relative coordinates to absolute, then splits paths at `M` commands and creates `icon_SPLIT.svg`
+
+   **Alternative (basic script, no normalization):**
+   ```bash
+   node project/utils/split-svg-paths.js ui/src/assets/icons/item-categories/icon.svg
+   ```
+   Only use if the SVG already uses absolute coordinates (all uppercase commands like `M`, `L`, `C`)
+
+2. **Add semantic channels manually:**
+   - Review each generated path to understand what it represents
+   - Add `data-channel` attributes based on the icon type:
+     - Weapons: `blade`, `edge`, `handle`, `guard`, `decoration`
+     - Tools: `head`, `handle`, `detail`
+     - Armor: `body`, `trim`, `detail`, `padding`
+   - Update comments with descriptive names
+
+3. **Example workflow:**
+   ```svg
+   <!-- Before: Single path -->
+   <path fill="#fff" d="M145.75 19.78...z M222.844 46.687...z" />
+
+   <!-- After: Split with channels -->
+   <path fill="#fff" data-channel="blade" d="M145.75 19.78...z" />
+   <path fill="#fff" data-channel="handle" d="M222.844 46.687...z" />
+   ```
+
+**Full documentation:** [project/docs/svg-path-splitting-process.md](project/docs/svg-path-splitting-process.md)
 
 ## XP System
 
