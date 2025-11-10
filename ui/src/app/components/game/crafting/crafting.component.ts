@@ -73,7 +73,8 @@ export class CraftingComponent implements OnInit {
     if (!activeCrafting || !activeCrafting.selectedIngredients) return [];
 
     const items: any[] = [];
-    const inventory = this.playerInventory();
+    // Explicitly read from inventoryService to ensure reactivity
+    const inventory = this.inventoryService.inventory();
     if (!inventory) return [];
 
     // Group ingredients by itemId
@@ -94,7 +95,13 @@ export class CraftingComponent implements OnInit {
       for (const [instanceId, count] of Object.entries(instanceCounts)) {
         const item = inventory.find(i => i.instanceId === instanceId);
         if (item) {
-          ingredientGroups[itemId].instances.push({ ...item, usedQuantity: count });
+          // Show current quantity in inventory as "remaining"
+          // This represents what's available right now, before this craft consumes it
+          ingredientGroups[itemId].instances.push({
+            ...item,
+            usedQuantity: count,
+            remainingQuantity: item.quantity
+          });
         }
       }
     }
@@ -146,8 +153,13 @@ export class CraftingComponent implements OnInit {
             // Set restarting flag to prevent duplicate triggers
             this.isRestarting.set(true);
 
-            // Auto-select ingredients again
-            this.autoSelectBestQuality(recipe);
+            // Try to reuse the same ingredient instances if possible
+            const reused = this.reuseIngredientSelection(recipe);
+
+            if (!reused) {
+              // Can't reuse, try auto-selecting new instances
+              this.autoSelectBestQuality(recipe);
+            }
 
             // Check if we have enough selected
             if (this.hasSelectedEnough(recipe)) {
@@ -442,6 +454,62 @@ export class CraftingComponent implements OnInit {
         return false;
       }
     }
+    return true;
+  }
+
+  /**
+   * Try to reuse the same ingredient instances from the previous selection
+   * Returns true if successful, false if we need to reselect
+   */
+  reuseIngredientSelection(recipe: Recipe): boolean {
+    const currentSelection = this.selectedIngredients();
+    if (currentSelection.size === 0) {
+      return false; // No previous selection to reuse
+    }
+
+    const inventory = this.playerInventory();
+    if (!inventory) return false;
+
+    const newSelection = new Map<string, string[]>();
+
+    // Try to reuse the same instances for each ingredient
+    for (const ingredient of recipe.ingredients) {
+      const previousInstanceIds = currentSelection.get(ingredient.itemId) || [];
+      const instanceIds: string[] = [];
+      let remaining = ingredient.quantity;
+
+      // Count how many times each instance was used previously
+      const instanceCounts: { [instanceId: string]: number } = {};
+      for (const instanceId of previousInstanceIds) {
+        instanceCounts[instanceId] = (instanceCounts[instanceId] || 0) + 1;
+      }
+
+      // Try to reuse the same instances in the same order
+      for (const [instanceId, prevCount] of Object.entries(instanceCounts)) {
+        if (remaining <= 0) break;
+
+        // Find this instance in current inventory
+        const item = inventory.find(i => i.instanceId === instanceId && !i.equipped);
+        if (item) {
+          // Use as many as we need and as many as are available
+          const available = Math.min(item.quantity, remaining, prevCount);
+          for (let i = 0; i < available; i++) {
+            instanceIds.push(instanceId);
+          }
+          remaining -= available;
+        }
+      }
+
+      // If we couldn't fulfill the requirement with the same instances, fail
+      if (remaining > 0) {
+        return false;
+      }
+
+      newSelection.set(ingredient.itemId, instanceIds);
+    }
+
+    // Successfully reused all instances
+    this.selectedIngredients.set(newSelection);
     return true;
   }
 
