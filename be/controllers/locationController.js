@@ -532,11 +532,17 @@ exports.completeActivity = async (req, res) => {
       // Get item definition for display
       const itemDef = itemService.getItemDefinition(itemReward.itemId);
 
+      // Convert Maps to plain objects for JSON response
+      const plainQualities = qualities instanceof Map ? Object.fromEntries(qualities) : qualities;
+      const plainTraits = traits instanceof Map ? Object.fromEntries(traits) : traits;
+
       itemsAdded.push({
         itemId: itemReward.itemId,
         name: itemDef?.name || itemReward.itemId,
         quantity: itemReward.quantity,
-        instanceId: instanceId
+        instanceId: instanceId,
+        qualities: plainQualities,
+        traits: plainTraits
       });
     }
 

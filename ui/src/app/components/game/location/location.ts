@@ -6,10 +6,12 @@ import { Location, Facility, Activity, ActivityRewards } from '../../../models/l
 import { Vendor } from '../../../models/vendor.model';
 import { ConfirmDialogService } from '../../../services/confirm-dialog.service';
 import { VendorComponent } from '../vendor/vendor.component';
+import { CraftingComponent } from '../crafting/crafting.component';
+import { ItemModifiersComponent } from '../../shared/item-modifiers/item-modifiers.component';
 
 @Component({
   selector: 'app-location',
-  imports: [CommonModule, VendorComponent],
+  imports: [CommonModule, VendorComponent, CraftingComponent, ItemModifiersComponent],
   templateUrl: './location.html',
   styleUrl: './location.scss',
   standalone: true
@@ -18,6 +20,9 @@ export class LocationComponent implements OnInit, OnDestroy {
   private confirmDialog = inject(ConfirmDialogService);
   private locationService = inject(LocationService);
   vendorService = inject(VendorService);
+
+  // Expose Object for template use
+  Object = Object;
 
   // Exposed signals from service
   currentLocation = this.locationService.currentLocation;
@@ -189,6 +194,16 @@ export class LocationComponent implements OnInit, OnDestroy {
     }
 
     return [];
+  }
+
+  /**
+   * Get crafting skill for a facility
+   */
+  getCraftingSkill(facility: Facility | null): string {
+    if (!facility || !facility.craftingSkills || facility.craftingSkills.length === 0) {
+      return 'cooking'; // Default to cooking
+    }
+    return facility.craftingSkills[0]; // Use first crafting skill
   }
 
   /**

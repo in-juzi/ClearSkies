@@ -64,11 +64,12 @@ export interface Facility {
   facilityId: string;
   name: string;
   description: string;
-  type: 'resource-gathering' | 'resource-refinement' | 'combat' | 'trading' | 'npc-interaction';
+  type: 'resource-gathering' | 'resource-refinement' | 'combat' | 'trading' | 'npc-interaction' | 'crafting';
   icon: string;
   activities: Activity[];
   vendorId?: string; // Deprecated: use vendorIds instead
   vendorIds?: string[]; // Array of vendor IDs for multiple vendors
+  craftingSkills?: string[]; // Skills that can be used at this crafting facility
   stub?: boolean;
   stubMessage?: string;
 }
@@ -106,6 +107,8 @@ export interface ActivityRewards {
     itemId: string;
     quantity: number;
     instanceId: string;
+    qualities?: { [key: string]: number };
+    traits?: { [key: string]: number };
   }>;
   gold: number;
 }
