@@ -1,0 +1,14 @@
+<div class="item-mini">
+  @if (showIcon && icon) {
+    <span class="item-icon">{{ icon }}</span>
+  }
+  @if (showQuantity && item?.quantity) {
+    <span class="item-quantity">x{{ item.quantity }}</span>
+  }
+  @if (showItemId && item?.itemId) {
+    <span class="item-name">{{ item.itemId }}</span>
+  }
+  @if (showModifiers && item) {
+    <app-item-modifiers [item]="item" displayMode="badge-level" size="mini"></app-item-modifiers>
+  }
+</div>

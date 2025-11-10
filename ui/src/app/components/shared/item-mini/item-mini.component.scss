@@ -1,0 +1,23 @@
+.item-mini {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-s);
+  background: var(--color-bg-overlay);
+  border-radius: var(--radius-s);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+
+  .item-icon {
+    font-size: var(--font-size-m);
+  }
+
+  .item-quantity {
+    color: var(--color-text-primary);
+    font-weight: var(--font-weight-medium);
+  }
+
+  .item-name {
+    color: var(--color-text-primary);
+  }
+}
