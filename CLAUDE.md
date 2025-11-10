@@ -10,15 +10,16 @@
 - ✅ XP scaling display (completed - shows raw vs scaled XP)
 - ✅ Real-time chat system (completed - Socket.io with commands and autocomplete)
 - ✅ Icon organization (completed - 220+ icons organized into 6 categories)
+- ✅ Vendor/NPC trading system (completed - buy/sell at gathering locations)
 
 **Recent Changes** (Last 7 commits):
-- refactor: update UI components for icon path changes
-- feat: enhance manual system with item icons and filtering
-- feat: add iconPath field to item definitions
-- refactor: reorganize icons into categorized subdirectories
-- feat: integrate chat component into game UI
-- feat: implement frontend real-time chat UI
-- feat: implement backend real-time chat system
+- feat: add gold signal and vendor helper methods to inventory service
+- feat: integrate vendor system into location UI
+- feat: create vendor UI component
+- feat: add vendor frontend models and service
+- feat: register vendor routes and load vendor definitions
+- feat: link vendors to gathering facilities
+- feat: implement vendor trading system backend
 
 **Known Issues**:
 - None currently identified
@@ -26,6 +27,7 @@
 **Next Priorities**:
 - Alchemy system (quality-based crafting)
 - Combat system implementation
+- Vendor enhancements (restocking, skill-based pricing)
 - Player housing
 - Guild/party system
 
@@ -43,10 +45,10 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 ### Frequently Modified Files
 
 **Backend Core:**
-- Controllers: [be/controllers/inventoryController.js](be/controllers/inventoryController.js), [be/controllers/locationController.js](be/controllers/locationController.js), [be/controllers/skillsController.js](be/controllers/skillsController.js), [be/controllers/attributesController.js](be/controllers/attributesController.js), [be/controllers/authController.js](be/controllers/authController.js), [be/controllers/manualController.js](be/controllers/manualController.js)
+- Controllers: [be/controllers/inventoryController.js](be/controllers/inventoryController.js), [be/controllers/locationController.js](be/controllers/locationController.js), [be/controllers/skillsController.js](be/controllers/skillsController.js), [be/controllers/attributesController.js](be/controllers/attributesController.js), [be/controllers/authController.js](be/controllers/authController.js), [be/controllers/manualController.js](be/controllers/manualController.js), [be/controllers/vendorController.js](be/controllers/vendorController.js)
 - Models: [be/models/Player.js](be/models/Player.js), [be/models/User.js](be/models/User.js), [be/models/ChatMessage.js](be/models/ChatMessage.js)
-- Services: [be/services/itemService.js](be/services/itemService.js), [be/services/locationService.js](be/services/locationService.js), [be/services/dropTableService.js](be/services/dropTableService.js)
-- Routes: [be/routes/inventory.js](be/routes/inventory.js), [be/routes/locations.js](be/routes/locations.js), [be/routes/skills.js](be/routes/skills.js), [be/routes/attributes.js](be/routes/attributes.js), [be/routes/auth.js](be/routes/auth.js), [be/routes/manual.js](be/routes/manual.js)
+- Services: [be/services/itemService.js](be/services/itemService.js), [be/services/locationService.js](be/services/locationService.js), [be/services/dropTableService.js](be/services/dropTableService.js), [be/services/vendorService.js](be/services/vendorService.js)
+- Routes: [be/routes/inventory.js](be/routes/inventory.js), [be/routes/locations.js](be/routes/locations.js), [be/routes/skills.js](be/routes/skills.js), [be/routes/attributes.js](be/routes/attributes.js), [be/routes/auth.js](be/routes/auth.js), [be/routes/manual.js](be/routes/manual.js), [be/routes/vendors.js](be/routes/vendors.js)
 - Sockets: [be/sockets/chatHandler.js](be/sockets/chatHandler.js)
 
 **Frontend Core:**
@@ -56,8 +58,9 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 - Skills: [ui/src/app/components/game/skills/skills.ts](ui/src/app/components/game/skills/skills.ts)
 - Equipment: [ui/src/app/components/game/equipment/equipment.component.ts](ui/src/app/components/game/equipment/equipment.component.ts)
 - Chat: [ui/src/app/components/game/chat/chat.component.ts](ui/src/app/components/game/chat/chat.component.ts)
+- Vendor: [ui/src/app/components/game/vendor/vendor.component.ts](ui/src/app/components/game/vendor/vendor.component.ts), [ui/src/app/components/game/vendor/vendor.component.html](ui/src/app/components/game/vendor/vendor.component.html)
 - Manual: [ui/src/app/components/manual/manual.component.ts](ui/src/app/components/manual/manual.component.ts), [ui/src/app/components/manual/sections/](ui/src/app/components/manual/sections/)
-- Services: [ui/src/app/services/inventory.service.ts](ui/src/app/services/inventory.service.ts), [ui/src/app/services/location.service.ts](ui/src/app/services/location.service.ts), [ui/src/app/services/skills.service.ts](ui/src/app/services/skills.service.ts), [ui/src/app/services/auth.service.ts](ui/src/app/services/auth.service.ts), [ui/src/app/services/manual.service.ts](ui/src/app/services/manual.service.ts), [ui/src/app/services/chat.service.ts](ui/src/app/services/chat.service.ts)
+- Services: [ui/src/app/services/inventory.service.ts](ui/src/app/services/inventory.service.ts), [ui/src/app/services/location.service.ts](ui/src/app/services/location.service.ts), [ui/src/app/services/skills.service.ts](ui/src/app/services/skills.service.ts), [ui/src/app/services/auth.service.ts](ui/src/app/services/auth.service.ts), [ui/src/app/services/manual.service.ts](ui/src/app/services/manual.service.ts), [ui/src/app/services/chat.service.ts](ui/src/app/services/chat.service.ts), [ui/src/app/services/vendor.service.ts](ui/src/app/services/vendor.service.ts)
 
 **Game Data:**
 - Item Definitions: [be/data/items/definitions/](be/data/items/definitions/)
@@ -65,6 +68,7 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 - Activities: [be/data/locations/activities/](be/data/locations/activities/)
 - Drop Tables: [be/data/locations/drop-tables/](be/data/locations/drop-tables/)
 - Facilities: [be/data/locations/facilities/](be/data/locations/facilities/)
+- Vendors: [be/data/vendors/](be/data/vendors/)
 
 **Utilities:**
 - [be/utils/add-item.js](be/utils/add-item.js) - Add items to player inventory
@@ -688,6 +692,11 @@ All endpoints except auth register/login require JWT token (protected).
 - GET `/attributes` - All attribute definitions for manual
 - GET `/items` - All item definitions for manual
 - GET `/locations` - All location/facility/activity data for manual
+
+**Vendors**: `/api/vendors` (all protected)
+- GET `/:vendorId` - Get vendor info and stock with item definitions
+- POST `/:vendorId/buy` - Buy item from vendor - Body: `{ itemId, quantity }`
+- POST `/:vendorId/sell` - Sell item to vendor - Body: `{ instanceId, quantity }`
 
 ## Development Quick Rules
 
@@ -1347,6 +1356,118 @@ The chat component uses medieval fantasy theme matching the game design:
 - Message length validation (max 500 characters)
 - Rate limiting to prevent spam
 - XSS protection via Angular's built-in sanitization
+
+## Vendor/NPC Trading System
+
+The vendor system provides NPC merchants at gathering locations for buying tools and selling resources.
+
+### Architecture
+
+**Backend** ([be/services/vendorService.js](be/services/vendorService.js), [be/controllers/vendorController.js](be/controllers/vendorController.js)):
+- VendorService: Load vendor definitions, calculate buy/sell prices
+- VendorController: Handle buy/sell transactions with gold validation
+- API routes at `/api/vendors` with JWT auth
+- Vendor definitions in `be/data/vendors/` (JSON files)
+
+**Frontend** ([ui/src/app/services/vendor.service.ts](ui/src/app/services/vendor.service.ts), [ui/src/app/components/game/vendor/](ui/src/app/components/game/vendor/)):
+- Socket-free REST API integration
+- Signal-based state management
+- Buy/Sell tabbed interface with transaction feedback
+- Integrated into location component (replaces activity view)
+
+### Features
+
+**Vendor Locations**:
+- Fishing Dock → Dockmaster Halvard (bamboo fishing rod)
+- Logging Camp → Woodsman Bjorn (bronze woodcutting axe)
+- Mountain Mine → Miner Gerta (bronze mining pickaxe)
+- Herb Garden → Herbalist Miriam (future herb supplies)
+
+**Stock System**:
+- **Infinite stock**: Vendors never run out (architecture supports limited stock)
+- Buy prices fixed per item in vendor definition
+- Sell prices: 50% of calculated vendor price (includes quality/trait bonuses)
+
+**Transactions**:
+```typescript
+// Buy item
+POST /api/vendors/:vendorId/buy
+Body: { itemId: "bamboo_fishing_rod", quantity: 5 }
+Response: { gold, inventory, transaction }
+
+// Sell item
+POST /api/vendors/:vendorId/sell
+Body: { instanceId: "uuid-123", quantity: 10 }
+Response: { gold, inventory, transaction }
+```
+
+**UI Features**:
+- Buy tab: Stock list with buy 1/5/10 buttons
+- Sell tab: Inventory list with sell 1/5/10/all buttons
+- Gold display at top
+- Success/error message feedback
+- Medieval fantasy theme (purple/gold colors)
+
+### Configuration
+
+**Vendor Definition** (`be/data/vendors/{vendorId}.json`):
+```json
+{
+  "vendorId": "kennik-dock-merchant",
+  "name": "Dockmaster Halvard",
+  "description": "A weathered fisherman...",
+  "greeting": "Looking for fishing gear?",
+  "iconPath": "assets/icons/ui/merchant.svg",
+  "acceptsAllItems": true,
+  "sellPriceMultiplier": 0.5,
+  "stock": [
+    {
+      "itemId": "bamboo_fishing_rod",
+      "buyPrice": 25,
+      "stockType": "infinite"
+    }
+  ]
+}
+```
+
+**Facility Link** (add `vendorId` to facility definition):
+```json
+{
+  "facilityId": "kennik-fishing-dock",
+  "vendorId": "kennik-dock-merchant",
+  ...
+}
+```
+
+### Pricing
+
+**Buy Price**: Fixed in vendor definition (e.g., 25 gold for bamboo rod)
+
+**Sell Price**: Calculated dynamically
+```javascript
+// Backend calculation
+const vendorPrice = itemService.calculateVendorPrice(itemInstance);
+// ^ Includes base value + quality bonuses + trait bonuses
+const sellPrice = Math.floor(vendorPrice * 0.5); // 50% of vendor price
+```
+
+### Security
+
+- JWT authentication required for all vendor endpoints
+- Gold validation prevents negative balances
+- Inventory validation checks item ownership
+- Equipped items cannot be sold (must unequip first)
+- Transaction atomicity (gold and inventory updated together)
+
+### Future Enhancements
+
+The architecture supports:
+- **Restocking**: Change `stockType: "infinite"` to `"limited"` with restock timers
+- **Category filtering**: Set `acceptsAllItems: false` and add `acceptedCategories`
+- **Skill-based pricing**: Modify `sellPriceMultiplier` based on charisma/merchant skill
+- **Vendor reputation**: Track player-vendor relationship for discounts
+- **Special offers**: Time-limited deals, bulk purchase discounts
+- **Quest integration**: Vendors offering quests or accepting quest items
 
 ## Platform-Specific Tool Notes
 
