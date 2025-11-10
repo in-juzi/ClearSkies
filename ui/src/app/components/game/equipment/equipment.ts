@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { EquipmentService } from '../../../services/equipment.service';
 import { InventoryService } from '../../../services/inventory.service';
 import { ItemDetails, EquipmentSlot } from '../../../models/inventory.model';
+import { IconComponent } from '../../shared/icon/icon.component';
 
 interface SlotConfig {
   name: EquipmentSlot;
@@ -14,7 +15,7 @@ interface SlotConfig {
 @Component({
   selector: 'app-equipment',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, IconComponent],
   templateUrl: './equipment.html',
   styleUrl: './equipment.scss',
 })

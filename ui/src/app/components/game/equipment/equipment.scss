@@ -97,6 +97,9 @@
   .item-icon {
     font-size: var(--font-size-5xl);
     text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .item-info {
