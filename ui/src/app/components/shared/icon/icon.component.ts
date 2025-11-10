@@ -27,6 +27,9 @@ import { ColorChannels, getMaterialColors, MATERIAL_COLORS } from '../../../cons
  *   [size]="48">
  * </app-icon>
  *
+ * <!-- Auto-size (let container control dimensions) -->
+ * <app-icon [icon]="item.icon" [autoSize]="true"></app-icon>
+ *
  * <!-- Disable colorization (show white icon) -->
  * <app-icon [icon]="item.icon" [disableColor]="true" [size]="40"></app-icon>
  * ```
@@ -38,8 +41,9 @@ import { ColorChannels, getMaterialColors, MATERIAL_COLORS } from '../../../cons
   template: `
     <div
       class="icon-container"
-      [style.width.px]="size"
-      [style.height.px]="size"
+      [style.width.px]="autoSize ? null : size"
+      [style.height.px]="autoSize ? null : size"
+      [class.auto-size]="autoSize"
       [innerHTML]="svgContent$ | async"
       [class]="customClass"
       [class.icon-error]="hasError"
@@ -54,6 +58,11 @@ import { ColorChannels, getMaterialColors, MATERIAL_COLORS } from '../../../cons
     .icon-container {
       display: block;
       line-height: 0;
+    }
+
+    .icon-container.auto-size {
+      width: 100%;
+      height: 100%;
     }
 
     .icon-container ::ng-deep svg {
@@ -83,6 +92,9 @@ export class IconComponent implements OnInit, OnChanges {
 
   /** Icon size in pixels */
   @Input() size = 40;
+
+  /** Auto-size: don't set width/height, let container control size */
+  @Input() autoSize = false;
 
   /** Alt text for accessibility */
   @Input() alt?: string;
