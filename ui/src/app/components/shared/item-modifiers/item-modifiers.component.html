@@ -5,7 +5,7 @@
       @for (quality of getQualityEntries(); track quality[0]) {
         <span class="quality-badge"
               [class]="getQualityColor(quality[1])"
-              [title]="quality[0] + ' Level ' + quality[1]">
+              [title]="getQualityTooltip(quality[0], quality[1])">
           {{ getQualityShorthand(quality[0]) }}{{ quality[1] }}
         </span>
       }
@@ -14,7 +14,7 @@
       @for (trait of getTraitEntries(); track trait[0]) {
         <span class="trait-badge"
               [class]="getTraitColor(trait[1])"
-              [title]="trait[0] + ' Level ' + trait[1]">
+              [title]="getTraitTooltip(trait[0], trait[1])">
           {{ getTraitShorthand(trait[0]) }}{{ trait[1] }}
         </span>
       }

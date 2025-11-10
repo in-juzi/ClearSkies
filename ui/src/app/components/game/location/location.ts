@@ -7,11 +7,11 @@ import { Vendor } from '../../../models/vendor.model';
 import { ConfirmDialogService } from '../../../services/confirm-dialog.service';
 import { VendorComponent } from '../vendor/vendor.component';
 import { CraftingComponent } from '../crafting/crafting.component';
-import { ItemModifiersComponent } from '../../shared/item-modifiers/item-modifiers.component';
+import { ItemMiniComponent } from '../../shared/item-mini/item-mini.component';
 
 @Component({
   selector: 'app-location',
-  imports: [CommonModule, VendorComponent, CraftingComponent, ItemModifiersComponent],
+  imports: [CommonModule, VendorComponent, CraftingComponent, ItemMiniComponent],
   templateUrl: './location.html',
   styleUrl: './location.scss',
   standalone: true

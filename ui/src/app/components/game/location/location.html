@@ -58,15 +58,20 @@
           <div class="log-content">
             <div class="log-activity">{{ entry.activityName }}</div>
             <div class="log-rewards">
-              <span *ngIf="entry.rewards.gold > 0" class="reward-mini gold">💰 {{ entry.rewards.gold }}</span>
-              <span *ngFor="let item of entry.rewards.items" class="reward-mini item">
-                📦 {{ item.quantity }}x {{ item.itemId }}
-                <app-item-modifiers [item]="item" displayMode="badge-level" size="mini"></app-item-modifiers>
-              </span>
-              <span *ngFor="let exp of entry.rewards.experience | keyvalue" class="reward-mini xp">
-                ⭐ {{ formatXPDisplay(exp.key, exp.value, entry.rewards.rawExperience) }}
-                <span *ngIf="exp.value.leveledUp || exp.value.skill?.leveledUp" class="level-up-mini">↑</span>
-              </span>
+              @if (entry.rewards.gold > 0) {
+                <span class="reward-mini gold">💰 {{ entry.rewards.gold }}</span>
+              }
+              @for (item of entry.rewards.items; track item.instanceId) {
+                <app-item-mini [item]="item"></app-item-mini>
+              }
+              @for (exp of entry.rewards.experience | keyvalue; track exp.key) {
+                <span class="reward-mini xp">
+                  ⭐ {{ formatXPDisplay(exp.key, exp.value, entry.rewards.rawExperience) }}
+                  @if (exp.value.leveledUp || exp.value.skill?.leveledUp) {
+                    <span class="level-up-mini">↑</span>
+                  }
+                </span>
+              }
             </div>
           </div>
         </div>

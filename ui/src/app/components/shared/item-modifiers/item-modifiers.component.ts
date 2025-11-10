@@ -1,5 +1,6 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { InventoryService } from '../../../services/inventory.service';
 
 @Component({
   selector: 'app-item-modifiers',
@@ -14,6 +15,9 @@ export class ItemModifiersComponent {
   @Input() showQualities: boolean = true;
   @Input() showTraits: boolean = true;
   @Input() size: 'mini' | 'normal' | 'large' = 'normal';
+
+  // Inject inventory service for quality/trait definitions
+  private inventoryService = inject(InventoryService);
 
   // Expose Object for template use
   Object = Object;
@@ -153,5 +157,61 @@ export class ItemModifiersComponent {
   getTraitEntries(): Array<[string, number]> {
     if (!this.item?.traits) return [];
     return Object.entries(this.item.traits) as Array<[string, number]>;
+  }
+
+  /**
+   * Get rich tooltip for quality badge
+   */
+  getQualityTooltip(qualityId: string, level: number): string {
+    const qualityNames: { [key: string]: string } = {
+      'purity': 'Purity',
+      'freshness': 'Freshness',
+      'woodGrain': 'Wood Grain',
+      'moisture': 'Moisture',
+      'age': 'Age'
+    };
+
+    const levelNames: { [key: number]: string } = {
+      1: 'Poor',
+      2: 'Fair',
+      3: 'Good',
+      4: 'Fine',
+      5: 'Perfect'
+    };
+
+    const qualityName = qualityNames[qualityId] || qualityId;
+    const levelName = levelNames[level] || `Level ${level}`;
+
+    return `${qualityName} - ${levelName}\nAffects: Vendor Price, Alchemy Potency, Crafting Quality`;
+  }
+
+  /**
+   * Get rich tooltip for trait badge
+   */
+  getTraitTooltip(traitId: string, level: number): string {
+    const traitNames: { [key: string]: string } = {
+      'fragrant': 'Fragrant',
+      'knotted': 'Knotted',
+      'weathered': 'Weathered',
+      'pristine': 'Pristine',
+      'cursed': 'Cursed',
+      'blessed': 'Blessed',
+      'masterwork': 'Masterwork'
+    };
+
+    const traitDescriptions: { [key: string]: string } = {
+      'fragrant': 'Pleasant aroma enhances alchemy',
+      'knotted': 'Structural defects reduce effectiveness',
+      'weathered': 'Age and exposure add character',
+      'pristine': 'Exceptional condition boosts value',
+      'cursed': 'Dark magic reduces quality',
+      'blessed': 'Divine touch increases potency',
+      'masterwork': 'Crafted with exceptional skill'
+    };
+
+    const traitName = traitNames[traitId] || traitId;
+    const description = traitDescriptions[traitId] || 'Special property';
+
+    return `${traitName} (Level ${level})\n${description}\nAffects: Vendor Price, Crafting Outcomes`;
   }
 }
