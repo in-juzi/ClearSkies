@@ -2,7 +2,7 @@
   "metadata": {
     "lastUpdated": "2025-11-09",
     "totalIcons": 1429,
-    "analyzed": 20,
+    "analyzed": 50,
     "collection": "lorc",
     "sourcePath": "C:\\Users\\trace\\OneDrive\\Documents\\Projects\\Game Icons Project\\icons\\ffffff\\000000\\1x1\\lorc (1429)",
     "format": "svg",
@@ -10,12 +10,12 @@
     "style": "silhouette-icons",
     "colorScheme": "white-on-black",
     "batchTracking": {
-      "currentBatch": 2,
-      "batchSize": 10,
-      "lastAnalyzedFile": "angel-outfit.svg",
-      "nextBatchStartIndex": 20,
+      "currentBatch": 4,
+      "batchSize": 15,
+      "lastAnalyzedFile": "aura.svg",
+      "nextBatchStartIndex": 50,
       "analysisComplete": false,
-      "resumeInstruction": "Continue from index 20 in alphabetically sorted file list"
+      "resumeInstruction": "Continue from index 50 in alphabetically sorted file list"
     }
   },
   "icons": [
@@ -378,18 +378,468 @@
         "medieval": 8,
         "fantasy": 9
       }
+    },
+    {
+      "id": "angel-wings",
+      "filename": "angel-wings.svg",
+      "description": "Pair of detailed feathered wings spread in celestial pose, divine or angelic symbolism",
+      "visualElements": ["wings", "feathers", "spread", "symmetrical", "celestial"],
+      "tags": ["wings", "angel", "celestial", "holy", "divine", "flying", "feathers"],
+      "categories": ["celestial", "holy", "symbols", "abilities"],
+      "gameUseCases": ["ability-icon", "buff-effect", "cosmetic-item", "holy-symbol"],
+      "style": "silhouette",
+      "complexity": "high",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["flight abilities", "holy buffs", "celestial powers", "divine blessings"],
+      "relevanceScore": {
+        "clearSkies": 7,
+        "medieval": 8,
+        "fantasy": 9
+      }
+    },
+    {
+      "id": "angler-fish",
+      "filename": "angler-fish.svg",
+      "description": "Deep sea fish with bioluminescent lure extending from head, sharp teeth and menacing appearance",
+      "visualElements": ["fish", "lure", "teeth", "deep-sea", "bioluminescent"],
+      "tags": ["fish", "creature", "deep-sea", "monster", "fishing", "aquatic", "predator"],
+      "categories": ["creatures", "fishing", "enemies", "aquatic"],
+      "gameUseCases": ["enemy-icon", "fishing-catch", "creature-type", "aquatic-monster"],
+      "style": "silhouette",
+      "complexity": "high",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["rare fish catches", "aquatic enemies", "deep-sea fishing", "water monsters"],
+      "relevanceScore": {
+        "clearSkies": 8,
+        "medieval": 6,
+        "fantasy": 8
+      }
+    },
+    {
+      "id": "angular-spider",
+      "filename": "angular-spider.svg",
+      "description": "Geometric stylized spider with angular legs and sharp edges, abstract arachnid design",
+      "visualElements": ["spider", "angular", "geometric", "legs", "abstract"],
+      "tags": ["spider", "creature", "insect", "enemy", "arachnid", "angular", "geometric"],
+      "categories": ["creatures", "enemies", "monsters", "insects"],
+      "gameUseCases": ["enemy-icon", "creature-type", "status-effect", "monster-marker"],
+      "style": "silhouette",
+      "complexity": "medium",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["spider enemies", "cave creatures", "poison effects", "web abilities"],
+      "relevanceScore": {
+        "clearSkies": 7,
+        "medieval": 8,
+        "fantasy": 8
+      }
+    },
+    {
+      "id": "animal-skull",
+      "filename": "animal-skull.svg",
+      "description": "Horned animal skull with curved horns and teeth, death or hunting trophy symbol",
+      "visualElements": ["skull", "horns", "teeth", "bones", "animal"],
+      "tags": ["skull", "death", "bones", "animal", "horns", "trophy", "hunting"],
+      "categories": ["symbols", "death", "hunting", "resources"],
+      "gameUseCases": ["trophy-item", "quest-marker", "death-indicator", "hunting-reward"],
+      "style": "silhouette",
+      "complexity": "medium",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["hunting trophies", "death markers", "wilderness loot", "crafting materials"],
+      "relevanceScore": {
+        "clearSkies": 8,
+        "medieval": 9,
+        "fantasy": 8
+      }
+    },
+    {
+      "id": "ankh",
+      "filename": "ankh.svg",
+      "description": "Ancient Egyptian ankh symbol with loop and cross, representing eternal life and divine power",
+      "visualElements": ["ankh", "cross", "loop", "symbol", "ancient"],
+      "tags": ["ankh", "symbol", "ancient", "life", "divine", "egyptian", "holy"],
+      "categories": ["symbols", "holy", "artifacts", "ancient"],
+      "gameUseCases": ["artifact-item", "holy-symbol", "quest-item", "magical-item"],
+      "style": "silhouette",
+      "complexity": "low",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["holy artifacts", "life-based abilities", "ancient relics", "resurrection items"],
+      "relevanceScore": {
+        "clearSkies": 6,
+        "medieval": 5,
+        "fantasy": 8
+      }
+    },
+    {
+      "id": "anthem",
+      "filename": "anthem.svg",
+      "description": "Three figures standing together with raised arms in triumphant or celebratory pose",
+      "visualElements": ["figures", "people", "raised-arms", "celebration", "unity"],
+      "tags": ["people", "celebration", "victory", "unity", "group", "anthem", "triumph"],
+      "categories": ["symbols", "social", "celebration"],
+      "gameUseCases": ["buff-icon", "group-ability", "celebration-effect", "morale-boost"],
+      "style": "silhouette",
+      "complexity": "medium",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["group buffs", "morale abilities", "celebration events", "victory effects"],
+      "relevanceScore": {
+        "clearSkies": 5,
+        "medieval": 6,
+        "fantasy": 6
+      }
+    },
+    {
+      "id": "anvil",
+      "filename": "anvil.svg",
+      "description": "Blacksmith's anvil with flat top and horn, traditional metalworking tool",
+      "visualElements": ["anvil", "metal", "horn", "flat-top", "tool"],
+      "tags": ["anvil", "smithing", "blacksmith", "crafting", "metal", "tool", "forge"],
+      "categories": ["tools", "crafting", "smithing", "buildings"],
+      "gameUseCases": ["facility-icon", "crafting-station", "smithing-activity", "building-marker"],
+      "style": "silhouette",
+      "complexity": "low",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["smithing stations", "forges", "crafting facilities", "metalworking activities"],
+      "relevanceScore": {
+        "clearSkies": 10,
+        "medieval": 10,
+        "fantasy": 9
+      }
+    },
+    {
+      "id": "anvil-impact",
+      "filename": "anvil-impact.svg",
+      "description": "Anvil being struck with sparks and impact effects, active smithing work in progress",
+      "visualElements": ["anvil", "impact", "sparks", "hammer", "action"],
+      "tags": ["anvil", "smithing", "impact", "sparks", "crafting", "blacksmith", "forging"],
+      "categories": ["crafting", "smithing", "abilities", "effects"],
+      "gameUseCases": ["ability-icon", "crafting-animation", "smithing-effect", "attack-ability"],
+      "style": "silhouette",
+      "complexity": "medium",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["smithing abilities", "forging effects", "combat abilities", "crafting animations"],
+      "relevanceScore": {
+        "clearSkies": 9,
+        "medieval": 10,
+        "fantasy": 9
+      }
+    },
+    {
+      "id": "apple-maggot",
+      "filename": "apple-maggot.svg",
+      "description": "Apple fruit with worm or maggot emerging from hole, decay or pest infestation theme",
+      "visualElements": ["apple", "worm", "maggot", "hole", "decay"],
+      "tags": ["apple", "worm", "maggot", "decay", "pest", "food", "corruption"],
+      "categories": ["consumables", "nature", "effects"],
+      "gameUseCases": ["consumable-item", "debuff-effect", "status-effect", "corrupted-food"],
+      "style": "silhouette",
+      "complexity": "medium",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["corrupted food items", "decay effects", "poison debuffs", "spoiled goods"],
+      "relevanceScore": {
+        "clearSkies": 4,
+        "medieval": 6,
+        "fantasy": 5
+      }
+    },
+    {
+      "id": "apple-seeds",
+      "filename": "apple-seeds.svg",
+      "description": "Cross-section of apple showing seed chamber with visible seeds inside",
+      "visualElements": ["apple", "seeds", "cross-section", "core", "chamber"],
+      "tags": ["apple", "seeds", "fruit", "food", "planting", "farming", "agriculture"],
+      "categories": ["consumables", "resources", "farming", "nature"],
+      "gameUseCases": ["consumable-item", "planting-resource", "farming-seed", "crafting-material"],
+      "style": "silhouette",
+      "complexity": "medium",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["food items", "farming seeds", "planting materials", "cooking ingredients"],
+      "relevanceScore": {
+        "clearSkies": 7,
+        "medieval": 8,
+        "fantasy": 7
+      }
+    },
+    {
+      "id": "armoured-shell",
+      "filename": "armoured-shell.svg",
+      "description": "Turtle or creature with armored protective shell, defensive natural armor",
+      "visualElements": ["shell", "turtle", "armor", "protection", "creature"],
+      "tags": ["shell", "armor", "defense", "turtle", "creature", "protection", "natural-armor"],
+      "categories": ["creatures", "armor", "defense", "nature"],
+      "gameUseCases": ["armor-icon", "defense-buff", "creature-type", "shield-ability"],
+      "style": "silhouette",
+      "complexity": "high",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["defensive armor", "shield abilities", "turtle creatures", "protection buffs"],
+      "relevanceScore": {
+        "clearSkies": 7,
+        "medieval": 7,
+        "fantasy": 8
+      }
+    },
+    {
+      "id": "arrow-cluster",
+      "filename": "arrow-cluster.svg",
+      "description": "Multiple arrows flying together in formation, volley or barrage attack",
+      "visualElements": ["arrows", "multiple", "cluster", "volley", "projectiles"],
+      "tags": ["arrows", "volley", "barrage", "projectile", "ranged", "attack", "multiple"],
+      "categories": ["weapons", "combat", "projectiles", "abilities"],
+      "gameUseCases": ["ability-icon", "attack-effect", "ranged-ability", "volley-attack"],
+      "style": "silhouette",
+      "complexity": "high",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["arrow volley abilities", "multi-shot attacks", "barrage effects", "ranged AOE"],
+      "relevanceScore": {
+        "clearSkies": 8,
+        "medieval": 9,
+        "fantasy": 8
+      }
+    },
+    {
+      "id": "arrow-dunk",
+      "filename": "arrow-dunk.svg",
+      "description": "Arrow striking downward with curved trajectory, diving or plunging shot",
+      "visualElements": ["arrow", "diving", "downward", "curved", "trajectory"],
+      "tags": ["arrow", "ranged", "projectile", "dive", "plunging", "attack", "trajectory"],
+      "categories": ["weapons", "combat", "projectiles", "abilities"],
+      "gameUseCases": ["ability-icon", "attack-effect", "ranged-ability", "special-shot"],
+      "style": "silhouette",
+      "complexity": "medium",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["plunging shot abilities", "diving attacks", "special arrow techniques"],
+      "relevanceScore": {
+        "clearSkies": 7,
+        "medieval": 8,
+        "fantasy": 7
+      }
+    },
+    {
+      "id": "arrowed",
+      "filename": "arrowed.svg",
+      "description": "Shield or surface pierced by multiple arrows, taking heavy ranged damage",
+      "visualElements": ["arrows", "pierced", "shield", "damage", "multiple-hits"],
+      "tags": ["arrows", "damage", "pierced", "shield", "wounded", "defense", "attack"],
+      "categories": ["combat", "effects", "damage", "defense"],
+      "gameUseCases": ["status-effect", "damage-indicator", "debuff-icon", "defense-broken"],
+      "style": "silhouette",
+      "complexity": "high",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["pierced debuff", "damage indicators", "defense broken status", "wounded effects"],
+      "relevanceScore": {
+        "clearSkies": 6,
+        "medieval": 8,
+        "fantasy": 7
+      }
+    },
+    {
+      "id": "arrow-flights",
+      "filename": "arrow-flights.svg",
+      "description": "Arrow fletching feathers in detailed pattern, crafting component or upgrade material",
+      "visualElements": ["feathers", "fletching", "arrows", "crafting", "detailed"],
+      "tags": ["fletching", "feathers", "arrows", "crafting", "upgrade", "component", "ranged"],
+      "categories": ["crafting", "resources", "weapons", "upgrades"],
+      "gameUseCases": ["crafting-material", "upgrade-item", "arrow-component", "resource-item"],
+      "style": "silhouette",
+      "complexity": "high",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["arrow crafting materials", "fletching resources", "weapon upgrades", "ranged equipment"],
+      "relevanceScore": {
+        "clearSkies": 8,
+        "medieval": 9,
+        "fantasy": 7
+      }
+    },
+    {
+      "id": "arrowhead",
+      "filename": "arrowhead.svg",
+      "description": "Sharp pointed arrowhead tip with geometric design, weapon component or resource",
+      "visualElements": ["arrowhead", "sharp", "pointed", "geometric", "weapon-component"],
+      "tags": ["arrowhead", "arrow", "tip", "crafting", "resource", "weapon", "sharp"],
+      "categories": ["crafting", "resources", "weapons", "components"],
+      "gameUseCases": ["crafting-material", "resource-item", "weapon-component", "upgrade-item"],
+      "style": "silhouette",
+      "complexity": "low",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["arrow crafting", "weapon components", "smithing materials", "ranged equipment"],
+      "relevanceScore": {
+        "clearSkies": 9,
+        "medieval": 10,
+        "fantasy": 8
+      }
+    },
+    {
+      "id": "arrow-scope",
+      "filename": "arrow-scope.svg",
+      "description": "Targeting scope with arrow and crosshairs, precision aiming or ranged focus ability",
+      "visualElements": ["scope", "targeting", "crosshairs", "arrow", "precision"],
+      "tags": ["scope", "targeting", "aim", "precision", "ranged", "focus", "accuracy"],
+      "categories": ["abilities", "combat", "ranged", "buffs"],
+      "gameUseCases": ["ability-icon", "buff-effect", "aiming-skill", "precision-ability"],
+      "style": "silhouette",
+      "complexity": "high",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["precision aim abilities", "accuracy buffs", "targeting skills", "ranged focus"],
+      "relevanceScore": {
+        "clearSkies": 7,
+        "medieval": 7,
+        "fantasy": 7
+      }
+    },
+    {
+      "id": "arrows-shield",
+      "filename": "arrows-shield.svg",
+      "description": "Shield with crossed arrows behind it, defense and ranged combat combination",
+      "visualElements": ["shield", "arrows", "crossed", "defense", "combined"],
+      "tags": ["shield", "arrows", "defense", "ranged", "protection", "combat", "heraldry"],
+      "categories": ["weapons", "armor", "symbols", "combat"],
+      "gameUseCases": ["emblem-icon", "guild-symbol", "ability-icon", "equipment-icon"],
+      "style": "silhouette",
+      "complexity": "medium",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["guild emblems", "defensive ranged builds", "heraldry symbols", "archer shields"],
+      "relevanceScore": {
+        "clearSkies": 7,
+        "medieval": 9,
+        "fantasy": 8
+      }
+    },
+    {
+      "id": "arson",
+      "filename": "arson.svg",
+      "description": "Building on fire with flames engulfing structure, destructive fire or burning effect",
+      "visualElements": ["building", "fire", "flames", "destruction", "burning"],
+      "tags": ["fire", "burning", "arson", "destruction", "flames", "building", "damage"],
+      "categories": ["effects", "destruction", "fire", "buildings"],
+      "gameUseCases": ["status-effect", "damage-effect", "destruction-icon", "fire-damage"],
+      "style": "silhouette",
+      "complexity": "high",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["fire damage effects", "building destruction", "arson abilities", "burn status"],
+      "relevanceScore": {
+        "clearSkies": 5,
+        "medieval": 7,
+        "fantasy": 7
+      }
+    },
+    {
+      "id": "artificial-hive",
+      "filename": "artificial-hive.svg",
+      "description": "Geometric honeycomb structure with hexagonal pattern, beekeeping or insect nest",
+      "visualElements": ["hexagons", "honeycomb", "pattern", "geometric", "structure"],
+      "tags": ["hive", "honeycomb", "bees", "hexagon", "pattern", "structure", "beekeeping"],
+      "categories": ["structures", "nature", "resources", "buildings"],
+      "gameUseCases": ["building-icon", "resource-structure", "gathering-location", "crafting-facility"],
+      "style": "silhouette",
+      "complexity": "high",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["beekeeping structures", "honey resources", "gathering facilities", "nature buildings"],
+      "relevanceScore": {
+        "clearSkies": 7,
+        "medieval": 8,
+        "fantasy": 7
+      }
+    },
+    {
+      "id": "assassin-pocket",
+      "filename": "assassin-pocket.svg",
+      "description": "Hidden pocket or pouch with concealed items, stealth storage or hidden inventory",
+      "visualElements": ["pocket", "pouch", "hidden", "concealed", "storage"],
+      "tags": ["pocket", "pouch", "hidden", "stealth", "storage", "concealment", "rogue"],
+      "categories": ["items", "equipment", "stealth", "storage"],
+      "gameUseCases": ["inventory-upgrade", "stealth-item", "rogue-equipment", "storage-ability"],
+      "style": "silhouette",
+      "complexity": "medium",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["rogue equipment", "hidden storage", "stealth abilities", "inventory upgrades"],
+      "relevanceScore": {
+        "clearSkies": 6,
+        "medieval": 7,
+        "fantasy": 7
+      }
+    },
+    {
+      "id": "atomic-slashes",
+      "filename": "atomic-slashes.svg",
+      "description": "Dynamic slashing energy lines with explosive force, high-speed or atomic cutting attack",
+      "visualElements": ["slashes", "energy", "explosive", "dynamic", "cutting"],
+      "tags": ["slash", "attack", "energy", "cutting", "explosive", "combat", "speed"],
+      "categories": ["combat", "abilities", "effects", "attacks"],
+      "gameUseCases": ["ability-icon", "attack-effect", "combat-skill", "slash-ability"],
+      "style": "silhouette",
+      "complexity": "medium",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["fast slash abilities", "energy attacks", "cutting techniques", "combo finishers"],
+      "relevanceScore": {
+        "clearSkies": 4,
+        "medieval": 5,
+        "fantasy": 7
+      }
+    },
+    {
+      "id": "at-sea",
+      "filename": "at-sea.svg",
+      "description": "Ocean waves with circular pattern, maritime environment or water location",
+      "visualElements": ["waves", "ocean", "water", "circular", "maritime"],
+      "tags": ["sea", "ocean", "waves", "water", "maritime", "nautical", "location"],
+      "categories": ["nautical", "environment", "locations", "nature"],
+      "gameUseCases": ["location-icon", "environment-marker", "water-area", "maritime-zone"],
+      "style": "silhouette",
+      "complexity": "high",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["ocean locations", "water environments", "maritime areas", "sea zones"],
+      "relevanceScore": {
+        "clearSkies": 8,
+        "medieval": 8,
+        "fantasy": 8
+      }
+    },
+    {
+      "id": "aubergine",
+      "filename": "aubergine.svg",
+      "description": "Eggplant vegetable with curved shape and stem, farming or cooking ingredient",
+      "visualElements": ["eggplant", "vegetable", "curved", "stem", "food"],
+      "tags": ["eggplant", "aubergine", "vegetable", "food", "farming", "cooking", "ingredient"],
+      "categories": ["consumables", "farming", "resources", "food"],
+      "gameUseCases": ["food-item", "farming-crop", "cooking-ingredient", "resource-item"],
+      "style": "silhouette",
+      "complexity": "low",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["farming crops", "cooking ingredients", "food items", "vegetable resources"],
+      "relevanceScore": {
+        "clearSkies": 6,
+        "medieval": 7,
+        "fantasy": 6
+      }
+    },
+    {
+      "id": "aura",
+      "filename": "aura.svg",
+      "description": "Radiating energy field or spiritual glow surrounding center, magical aura or buff effect",
+      "visualElements": ["radiance", "glow", "energy", "circular", "emanating"],
+      "tags": ["aura", "energy", "magic", "glow", "radiance", "buff", "spiritual"],
+      "categories": ["effects", "magic", "buffs", "abilities"],
+      "gameUseCases": ["buff-icon", "aura-effect", "magical-ability", "passive-skill"],
+      "style": "silhouette",
+      "complexity": "medium",
+      "colorScheme": "monochrome-white-on-black",
+      "suggestedFor": ["magical auras", "buff effects", "passive abilities", "spiritual powers"],
+      "relevanceScore": {
+        "clearSkies": 7,
+        "medieval": 7,
+        "fantasy": 9
+      }
     }
   ],
   "categories": {
     "items": ["ace", "alligator-clip"],
     "games": ["ace"],
-    "symbols": ["ace", "alien-skull", "all-for-one", "anchor", "andromeda-chain"],
-    "creatures": ["acid-blob", "alien-skull", "alien-stare", "android-mask"],
-    "enemies": ["acid-blob", "alien-skull", "alien-stare", "android-mask"],
-    "monsters": ["acid-blob", "alien-stare"],
-    "resources": ["acorn", "ammonite", "ammonite-fossil"],
-    "consumables": ["acorn", "aerosol"],
-    "nature": ["acorn", "ammonite", "ammonite-fossil"],
+    "symbols": ["ace", "alien-skull", "all-for-one", "anchor", "andromeda-chain", "angel-wings", "animal-skull", "ankh", "anthem"],
+    "creatures": ["acid-blob", "alien-skull", "alien-stare", "android-mask", "angler-fish", "angular-spider"],
+    "enemies": ["acid-blob", "alien-skull", "alien-stare", "android-mask", "angler-fish", "angular-spider"],
+    "monsters": ["acid-blob", "alien-stare", "angular-spider"],
+    "resources": ["acorn", "ammonite", "ammonite-fossil", "animal-skull", "apple-seeds"],
+    "consumables": ["acorn", "aerosol", "apple-maggot", "apple-seeds"],
+    "nature": ["acorn", "ammonite", "ammonite-fossil", "apple-maggot", "apple-seeds"],
     "gathering": ["acorn"],
     "technology": ["aerial-signal", "alligator-clip", "android-mask", "andromeda-chain"],
     "communication": ["aerial-signal"],
@@ -397,40 +847,57 @@
     "ui-elements": ["aerial-signal"],
     "weapons": ["aerodynamic-harpoon", "all-for-one"],
     "projectiles": ["aerodynamic-harpoon"],
-    "tools": ["aerodynamic-harpoon", "aerosol", "alligator-clip", "anchor"],
-    "fishing": ["aerodynamic-harpoon", "anchor"],
-    "effects": ["aerosol", "afterburn", "air-zigzag", "alien-fire"],
+    "tools": ["aerodynamic-harpoon", "aerosol", "alligator-clip", "anchor", "anvil"],
+    "fishing": ["aerodynamic-harpoon", "anchor", "angler-fish"],
+    "effects": ["aerosol", "afterburn", "air-zigzag", "alien-fire", "anvil-impact", "apple-maggot"],
     "magic": ["afterburn", "air-zigzag", "alien-fire"],
     "damage-types": ["afterburn"],
-    "abilities": ["afterburn", "air-zigzag", "alien-fire", "all-for-one"],
+    "abilities": ["afterburn", "air-zigzag", "alien-fire", "all-for-one", "angel-wings", "anvil-impact"],
     "elements": ["air-zigzag"],
     "supernatural": ["alien-fire"],
-    "death": ["alien-skull"],
+    "death": ["alien-skull", "animal-skull"],
     "combat": ["all-for-one"],
     "archaeological": ["ammonite", "ammonite-fossil"],
     "medical": ["anatomy"],
     "nautical": ["anchor"],
-    "celestial": ["angel-outfit"],
-    "holy": ["angel-outfit"],
+    "celestial": ["angel-outfit", "angel-wings"],
+    "holy": ["angel-outfit", "angel-wings", "ankh"],
     "armor": ["angel-outfit"],
     "clothing": ["angel-outfit"],
-    "sci-fi": ["android-mask"]
+    "sci-fi": ["android-mask"],
+    "aquatic": ["angler-fish"],
+    "insects": ["angular-spider"],
+    "hunting": ["animal-skull"],
+    "artifacts": ["ankh"],
+    "ancient": ["ankh"],
+    "social": ["anthem"],
+    "celebration": ["anthem"],
+    "crafting": ["anvil", "anvil-impact"],
+    "smithing": ["anvil", "anvil-impact"],
+    "buildings": ["anvil"],
+    "farming": ["apple-seeds"]
   },
   "stats": {
     "byComplexity": {
-      "low": 2,
-      "medium": 11,
-      "high": 7
+      "low": 3,
+      "medium": 20,
+      "high": 12
     },
     "topRelevanceForClearSkies": [
       { "id": "acorn", "score": 10 },
+      { "id": "anvil", "score": 10 },
       { "id": "aerodynamic-harpoon", "score": 9 },
+      { "id": "anvil-impact", "score": 9 },
       { "id": "acid-blob", "score": 8 },
       { "id": "anchor", "score": 8 },
+      { "id": "angler-fish", "score": 8 },
+      { "id": "animal-skull", "score": 8 },
       { "id": "ammonite", "score": 7 },
       { "id": "ammonite-fossil", "score": 7 },
       { "id": "angel-outfit", "score": 7 },
-      { "id": "all-for-one", "score": 6 }
+      { "id": "angel-wings", "score": 7 },
+      { "id": "angular-spider", "score": 7 },
+      { "id": "apple-seeds", "score": 7 }
     ]
   }
 }
