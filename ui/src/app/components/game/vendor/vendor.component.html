@@ -1,0 +1,136 @@
+@if (vendor(); as currentVendor) {
+  <div class="vendor-container">
+    <!-- Header -->
+    <div class="vendor-header">
+      <button class="close-btn" (click)="closeVendor()" title="Close vendor">✕</button>
+      <h2>{{ currentVendor.name }}</h2>
+      <p class="vendor-greeting">{{ currentVendor.greeting }}</p>
+      <p class="vendor-description">{{ currentVendor.description }}</p>
+      <div class="player-gold">
+        <span class="gold-icon">💰</span>
+        <span class="gold-amount">{{ playerGold() }} gold</span>
+      </div>
+    </div>
+
+    <!-- Message Display -->
+    @if (message(); as msg) {
+      <div class="message" [class.success]="msg.type === 'success'" [class.error]="msg.type === 'error'">
+        {{ msg.text }}
+      </div>
+    }
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button
+        class="tab"
+        [class.active]="activeTab() === 'buy'"
+        (click)="setTab('buy')">
+        Buy
+      </button>
+      <button
+        class="tab"
+        [class.active]="activeTab() === 'sell'"
+        (click)="setTab('sell')">
+        Sell
+      </button>
+    </div>
+
+    <!-- Buy Tab Content -->
+    @if (activeTab() === 'buy') {
+      <div class="tab-content buy-tab">
+        @if (currentVendor.stock.length === 0) {
+          <p class="empty-message">This vendor has no items for sale.</p>
+        } @else {
+          <div class="stock-list">
+            @for (stockItem of currentVendor.stock; track stockItem.itemId) {
+              <div class="stock-item" [class.selected]="selectedBuyItem()?.itemId === stockItem.itemId">
+                <div class="item-info" (click)="selectBuyItem(stockItem)">
+                  @if (stockItem.itemDefinition) {
+                    <div class="item-icon">
+                      @if (stockItem.itemDefinition.iconPath) {
+                        <img [src]="stockItem.itemDefinition.iconPath" [alt]="stockItem.itemDefinition.name">
+                      }
+                    </div>
+                    <div class="item-details">
+                      <h4 class="item-name" [ngClass]="getRarityClass(stockItem.itemDefinition.rarity)">
+                        {{ stockItem.itemDefinition.name }}
+                      </h4>
+                      <p class="item-description">{{ stockItem.itemDefinition.description }}</p>
+                      <div class="item-meta">
+                        <span class="price">💰 {{ stockItem.buyPrice }} gold</span>
+                        <span class="stock-type">{{ stockItem.stockType === 'infinite' ? '∞' : 'Limited' }}</span>
+                      </div>
+                    </div>
+                  }
+                </div>
+                <div class="item-actions">
+                  <button class="buy-btn" (click)="buyItem(stockItem.itemId, 1)">
+                    Buy 1
+                  </button>
+                  <button class="buy-btn" (click)="buyItem(stockItem.itemId, 5)">
+                    Buy 5
+                  </button>
+                  <button class="buy-btn" (click)="buyItem(stockItem.itemId, 10)">
+                    Buy 10
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Sell Tab Content -->
+    @if (activeTab() === 'sell') {
+      <div class="tab-content sell-tab">
+        @if (inventory().length === 0) {
+          <p class="empty-message">Your inventory is empty.</p>
+        } @else {
+          <div class="inventory-list">
+            @for (item of inventory(); track item.instanceId) {
+              <div class="inventory-item" [class.equipped]="item.equipped">
+                <div class="item-info">
+                  <div class="item-icon">
+                    <!-- Item icon will go here in the future -->
+                  </div>
+                  <div class="item-details">
+                    <h4 class="item-name">{{ item.itemId }}</h4>
+                    <p class="item-quantity">Quantity: {{ item.quantity }}</p>
+                    @if (item.equipped) {
+                      <p class="equipped-notice">⚔️ Equipped (unequip to sell)</p>
+                    } @else {
+                      <p class="sell-price">Sell price: ~{{ calculateSellPrice(item) }} gold each (50%)</p>
+                    }
+                  </div>
+                </div>
+                @if (!item.equipped) {
+                  <div class="item-actions">
+                    <button class="sell-btn" (click)="sellItem(item.instanceId, 1)">
+                      Sell 1
+                    </button>
+                    @if (item.quantity >= 5) {
+                      <button class="sell-btn" (click)="sellItem(item.instanceId, 5)">
+                        Sell 5
+                      </button>
+                    }
+                    @if (item.quantity >= 10) {
+                      <button class="sell-btn" (click)="sellItem(item.instanceId, 10)">
+                        Sell 10
+                      </button>
+                    }
+                    @if (item.quantity > 1) {
+                      <button class="sell-btn sell-all" (click)="sellItem(item.instanceId, item.quantity)">
+                        Sell All ({{ item.quantity }})
+                      </button>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+  </div>
+}
