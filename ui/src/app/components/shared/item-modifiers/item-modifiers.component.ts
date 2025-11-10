@@ -1,0 +1,157 @@
+import { Component, Input } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+@Component({
+  selector: 'app-item-modifiers',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './item-modifiers.component.html',
+  styleUrls: ['./item-modifiers.component.scss']
+})
+export class ItemModifiersComponent {
+  @Input() item: any; // Item with qualities/traits
+  @Input() displayMode: 'badge-level' | 'badge-tier' | 'inline-text' = 'badge-level';
+  @Input() showQualities: boolean = true;
+  @Input() showTraits: boolean = true;
+  @Input() size: 'mini' | 'normal' | 'large' = 'normal';
+
+  // Expose Object for template use
+  Object = Object;
+
+  /**
+   * Get quality shorthand (first letter uppercase or from definition)
+   */
+  getQualityShorthand(qualityId: string): string {
+    // Map of known quality shorthands
+    const shorthands: { [key: string]: string } = {
+      'purity': 'P',
+      'freshness': 'F',
+      'woodGrain': 'W',
+      'moisture': 'M',
+      'age': 'A'
+    };
+
+    return shorthands[qualityId] || qualityId.charAt(0).toUpperCase();
+  }
+
+  /**
+   * Get trait shorthand (first letter uppercase or from definition)
+   */
+  getTraitShorthand(traitId: string): string {
+    // Map of known trait shorthands
+    const shorthands: { [key: string]: string } = {
+      'fragrant': 'Fr',
+      'knotted': 'Kn',
+      'weathered': 'We',
+      'pristine': 'Pr',
+      'cursed': 'Cu',
+      'blessed': 'Bl',
+      'masterwork': 'Ma'
+    };
+
+    return shorthands[traitId] || traitId.charAt(0).toUpperCase();
+  }
+
+  /**
+   * Get quality level color class
+   */
+  getQualityColor(level: number): string {
+    if (level >= 5) return 'level-5'; // Purple - Perfect
+    if (level >= 4) return 'level-4'; // Green - Fine
+    if (level >= 3) return 'level-3'; // Blue - Good
+    if (level >= 2) return 'level-2'; // Yellow - Fair
+    return 'level-1';                  // Red - Poor
+  }
+
+  /**
+   * Get trait level color class
+   */
+  getTraitColor(level: number): string {
+    if (level >= 3) return 'trait-3'; // Purple - Max level
+    if (level >= 2) return 'trait-2'; // Blue - Mid level
+    return 'trait-1';                  // Green - Base level
+  }
+
+  /**
+   * Calculate average quality level
+   */
+  getAverageQuality(item: any): number {
+    if (!item.qualities || Object.keys(item.qualities).length === 0) return 0;
+    const qualities = Object.values(item.qualities) as number[];
+    if (qualities.length === 0) return 0;
+    return qualities.reduce((sum, level) => sum + level, 0) / qualities.length;
+  }
+
+  /**
+   * Get quality tier based on average quality level
+   */
+  getQualityTier(avgQuality: number): string {
+    if (avgQuality >= 4.5) return 'Legendary';
+    if (avgQuality >= 3.5) return 'Epic';
+    if (avgQuality >= 2.5) return 'Rare';
+    if (avgQuality >= 1.5) return 'Uncommon';
+    return 'Common';
+  }
+
+  /**
+   * Get tier color class
+   */
+  getTierColor(tier: string): string {
+    return tier.toLowerCase();
+  }
+
+  /**
+   * Format qualities and traits as inline text
+   */
+  formatInlineText(item: any): string {
+    const parts: string[] = [];
+
+    // Add qualities
+    if (item.qualities && Object.keys(item.qualities).length > 0) {
+      const qualityParts = Object.entries(item.qualities)
+        .map(([name, level]) => `${name}: ${level}`)
+        .join(', ');
+      parts.push(qualityParts);
+    }
+
+    // Add traits
+    if (item.traits && Object.keys(item.traits).length > 0) {
+      const traitParts = Object.entries(item.traits)
+        .map(([name, level]) => `${name}: ${level}`)
+        .join(', ');
+      parts.push(traitParts);
+    }
+
+    return parts.length > 0 ? `(${parts.join(' | ')})` : '';
+  }
+
+  /**
+   * Check if item has qualities
+   */
+  hasQualities(): boolean {
+    return this.item?.qualities && Object.keys(this.item.qualities).length > 0;
+  }
+
+  /**
+   * Check if item has traits
+   */
+  hasTraits(): boolean {
+    return this.item?.traits && Object.keys(this.item.traits).length > 0;
+  }
+
+  /**
+   * Get quality entries with proper typing
+   */
+  getQualityEntries(): Array<[string, number]> {
+    if (!this.item?.qualities) return [];
+    return Object.entries(this.item.qualities) as Array<[string, number]>;
+  }
+
+  /**
+   * Get trait entries with proper typing
+   */
+  getTraitEntries(): Array<[string, number]> {
+    if (!this.item?.traits) return [];
+    return Object.entries(this.item.traits) as Array<[string, number]>;
+  }
+}

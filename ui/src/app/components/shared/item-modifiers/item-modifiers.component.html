@@ -1,0 +1,40 @@
+<div class="item-modifiers" [class]="size">
+  <!-- Badge-Level Mode: Shows shorthand + level (P3, F2) -->
+  @if (displayMode === 'badge-level') {
+    @if (showQualities && hasQualities()) {
+      @for (quality of getQualityEntries(); track quality[0]) {
+        <span class="quality-badge"
+              [class]="getQualityColor(quality[1])"
+              [title]="quality[0] + ' Level ' + quality[1]">
+          {{ getQualityShorthand(quality[0]) }}{{ quality[1] }}
+        </span>
+      }
+    }
+    @if (showTraits && hasTraits()) {
+      @for (trait of getTraitEntries(); track trait[0]) {
+        <span class="trait-badge"
+              [class]="getTraitColor(trait[1])"
+              [title]="trait[0] + ' Level ' + trait[1]">
+          {{ getTraitShorthand(trait[0]) }}{{ trait[1] }}
+        </span>
+      }
+    }
+  }
+
+  <!-- Badge-Tier Mode: Shows average quality tier (Common, Rare, Epic) -->
+  @if (displayMode === 'badge-tier') {
+    @if (hasQualities()) {
+      <span class="tier-badge"
+            [class]="getTierColor(getQualityTier(getAverageQuality(item)))">
+        {{ getQualityTier(getAverageQuality(item)) }}
+      </span>
+    }
+  }
+
+  <!-- Inline-Text Mode: Shows as text string (freshness: 1, purity: 3) -->
+  @if (displayMode === 'inline-text') {
+    @if (formatInlineText(item)) {
+      <span class="inline-text">{{ formatInlineText(item) }}</span>
+    }
+  }
+</div>
