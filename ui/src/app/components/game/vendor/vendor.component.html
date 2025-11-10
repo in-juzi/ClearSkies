@@ -1,8 +1,10 @@
 @if (vendor(); as currentVendor) {
   <div class="vendor-container">
+    <!-- Back Button -->
+    <button (click)="closeVendor()" class="btn-back">← Back to Facility</button>
+
     <!-- Header -->
     <div class="vendor-header">
-      <button class="close-btn" (click)="closeVendor()" title="Close vendor">✕</button>
       <h2>{{ currentVendor.name }}</h2>
       <p class="vendor-greeting">{{ currentVendor.greeting }}</p>
       <p class="vendor-description">{{ currentVendor.description }}</p>
@@ -84,48 +86,72 @@
     <!-- Sell Tab Content -->
     @if (activeTab() === 'sell') {
       <div class="tab-content sell-tab">
-        @if (inventory().length === 0) {
-          <p class="empty-message">Your inventory is empty.</p>
+        @if (getSortedSellableItems().length === 0) {
+          <p class="empty-message">You have no items to sell.</p>
         } @else {
           <div class="inventory-list">
-            @for (item of inventory(); track item.instanceId) {
-              <div class="inventory-item" [class.equipped]="item.equipped">
+            @for (item of getSortedSellableItems(); track item.instanceId) {
+              <div class="inventory-item">
                 <div class="item-info">
                   <div class="item-icon">
-                    <!-- Item icon will go here in the future -->
+                    <!-- Item icon placeholder -->
+                    <span class="item-tier">T{{ item.definition.properties.tier }}</span>
                   </div>
                   <div class="item-details">
-                    <h4 class="item-name">{{ item.itemId }}</h4>
-                    <p class="item-quantity">Quantity: {{ item.quantity }}</p>
-                    @if (item.equipped) {
-                      <p class="equipped-notice">⚔️ Equipped (unequip to sell)</p>
-                    } @else {
-                      <p class="sell-price">Sell price: ~{{ calculateSellPrice(item) }} gold each (50%)</p>
+                    <div class="item-header">
+                      <h4 class="item-name" [ngClass]="getRarityClass(item.definition.rarity)">
+                        {{ item.definition.name }}
+                      </h4>
+                      @if (item.quantity > 1) {
+                        <span class="item-quantity">x{{ item.quantity }}</span>
+                      }
+                    </div>
+
+                    <!-- Quality/Trait badges -->
+                    @if (Object.keys(item.qualities || {}).length > 0 || Object.keys(item.traits || {}).length > 0) {
+                      <div class="item-badges">
+                        <!-- Quality indicators -->
+                        @for (qualityId of Object.keys(item.qualities || {}); track qualityId) {
+                          <span class="quality-badge"
+                                [title]="item.qualityDetails[qualityId]?.name + ' Level ' + item.qualities[qualityId]"
+                                [ngClass]="inventoryService.getQualityColor(item.qualities[qualityId])">
+                            {{ item.qualityDetails[qualityId]?.shorthand || qualityId.charAt(0).toUpperCase() }}{{ item.qualities[qualityId] }}
+                          </span>
+                        }
+                        <!-- Trait indicators -->
+                        @for (traitId of Object.keys(item.traits || {}); track traitId) {
+                          <span class="trait-badge"
+                                [title]="item.traitDetails[traitId]?.name + ' Level ' + item.traits[traitId]"
+                                [ngClass]="inventoryService.getTraitLevelColor(item.traits[traitId])">
+                            {{ item.traitDetails[traitId]?.shorthand || traitId.charAt(0).toUpperCase() }}{{ item.traits[traitId] }}
+                          </span>
+                        }
+                      </div>
                     }
+
+                    <p class="sell-price">💰 {{ calculateSellPrice(item) }}g each (50% of value)</p>
                   </div>
                 </div>
-                @if (!item.equipped) {
-                  <div class="item-actions">
-                    <button class="sell-btn" (click)="sellItem(item.instanceId, 1)">
-                      Sell 1
+                <div class="item-actions">
+                  <button class="sell-btn" (click)="sellItem(item.instanceId, 1)">
+                    Sell 1
+                  </button>
+                  @if (item.quantity >= 5) {
+                    <button class="sell-btn" (click)="sellItem(item.instanceId, 5)">
+                      Sell 5
                     </button>
-                    @if (item.quantity >= 5) {
-                      <button class="sell-btn" (click)="sellItem(item.instanceId, 5)">
-                        Sell 5
-                      </button>
-                    }
-                    @if (item.quantity >= 10) {
-                      <button class="sell-btn" (click)="sellItem(item.instanceId, 10)">
-                        Sell 10
-                      </button>
-                    }
-                    @if (item.quantity > 1) {
-                      <button class="sell-btn sell-all" (click)="sellItem(item.instanceId, item.quantity)">
-                        Sell All ({{ item.quantity }})
-                      </button>
-                    }
-                  </div>
-                }
+                  }
+                  @if (item.quantity >= 10) {
+                    <button class="sell-btn" (click)="sellItem(item.instanceId, 10)">
+                      Sell 10
+                    </button>
+                  }
+                  @if (item.quantity > 1) {
+                    <button class="sell-btn sell-all" (click)="sellItem(item.instanceId, item.quantity)">
+                      Sell All ({{ item.quantity }})
+                    </button>
+                  }
+                </div>
               </div>
             }
           </div>

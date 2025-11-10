@@ -61,9 +61,9 @@ export class InventoryComponent implements OnInit {
 
   getFilteredInventory(): ItemDetails[] {
     if (this.selectedCategory === 'all') {
-      return this.inventoryService.inventory();
+      return this.inventoryService.getSortedInventory();
     }
-    return this.inventoryService.getItemsByCategory(this.selectedCategory);
+    return this.inventoryService.getSortedItemsByCategory(this.selectedCategory);
   }
 
   selectItem(item: ItemDetails): void {
