@@ -86,61 +86,21 @@
             <!-- Character Tab -->
             @if (rightSidebarTab() === 'character') {
               <div class="panel">
-                <div class="character-info">
-                  <div class="level-badge">
-                    Level {{ currentPlayer()!.level }}
-                  </div>
-                  <div class="experience-bar">
-                    <div class="bar-label">Experience</div>
-                    <div class="bar-container">
-                      <div class="bar exp-bar" [style.width.%]="(currentPlayer()!.experience % 100)">
-                      </div>
-                      <span class="bar-text">{{ currentPlayer()!.experience }} XP</span>
+                <div class="character-summary">
+                  <h3>{{ currentUser()?.username }}</h3>
+                  <div class="total-levels">
+                    <div class="total-level-item">
+                      <span class="total-level-label">Total Skill Level:</span>
+                      <span class="total-level-value">{{ getTotalSkillLevel() }}</span>
+                    </div>
+                    <div class="total-level-item">
+                      <span class="total-level-label">Total Attribute Level:</span>
+                      <span class="total-level-value">{{ getTotalAttributeLevel() }}</span>
                     </div>
                   </div>
                 </div>
-
-                <div class="vital-stats">
-                  <div class="stat-bar">
-                    <div class="bar-label">Health</div>
-                    <div class="bar-container">
-                      <div class="bar health-bar"
-                           [style.width.%]="(currentPlayer()!.stats.health.current / currentPlayer()!.stats.health.max) * 100">
-                      </div>
-                      <span class="bar-text">
-                        {{ currentPlayer()!.stats.health.current }} / {{ currentPlayer()!.stats.health.max }}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="stat-bar">
-                    <div class="bar-label">Mana</div>
-                    <div class="bar-container">
-                      <div class="bar mana-bar"
-                           [style.width.%]="(currentPlayer()!.stats.mana.current / currentPlayer()!.stats.mana.max) * 100">
-                      </div>
-                      <span class="bar-text">
-                        {{ currentPlayer()!.stats.mana.current }} / {{ currentPlayer()!.stats.mana.max }}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="attributes-summary">
-                  <h4>Attributes</h4>
-                  @if (attributes()) {
-                    <div class="attribute-list">
-                      @for (attrName of getAttributeNames(); track attrName) {
-                        <div class="attribute-item">
-                          <span class="attribute-label">{{ capitalize(attrName) }}</span>
-                          <span class="attribute-value">Lv {{ attributes()![attrName].level }}</span>
-                        </div>
-                      }
-                    </div>
-                  } @else {
-                    <div class="loading-attributes">Loading...</div>
-                  }
-                </div>
+                <app-skills></app-skills>
+                <app-attributes></app-attributes>
               </div>
             }
 

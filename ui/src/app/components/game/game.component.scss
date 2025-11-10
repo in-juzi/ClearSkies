@@ -327,89 +327,43 @@
     overflow-x: hidden;
   }
 
-  .character-info {
+  .character-summary {
     padding: var(--spacing-xl);
     border-bottom: var(--border-width-medium) solid var(--color-bg-tertiary);
 
-    .level-badge {
-      background: var(--gradient-primary);
-      color: var(--color-text-primary);
-      font-size: var(--font-size-xl);
+    h3 {
+      color: var(--color-primary);
+      font-size: var(--font-size-2xl);
       font-weight: var(--font-weight-bold);
-      padding: var(--spacing-m) var(--spacing-xl);
-      border-radius: var(--radius-card);
       text-align: center;
-      margin-bottom: var(--spacing-xl);
-      box-shadow: var(--shadow-m);
+      margin: 0 0 var(--spacing-l) 0;
     }
 
-    .experience-bar {
-      .bar-label {
-        color: var(--color-text-muted);
-        font-size: var(--font-size-s);
-        margin-bottom: var(--spacing-xs);
-        text-transform: uppercase;
-        letter-spacing: var(--letter-spacing-wide);
-      }
-    }
-  }
-
-  .vital-stats {
-    padding: var(--spacing-xl);
-    border-bottom: var(--border-width-medium) solid var(--color-bg-tertiary);
-
-    .stat-bar {
-      margin-bottom: var(--spacing-xl);
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-
-      .bar-label {
-        color: var(--color-text-muted);
-        font-size: var(--font-size-s);
-        margin-bottom: var(--spacing-xs);
-        text-transform: uppercase;
-        letter-spacing: var(--letter-spacing-wide);
-      }
-    }
-  }
-
-  .attributes-summary {
-    padding: var(--spacing-xl);
-
-    .attribute-list {
+    .total-levels {
       display: flex;
       flex-direction: column;
       gap: var(--spacing-m);
 
-      .attribute-item {
+      .total-level-item {
         background: var(--color-bg-tertiary);
-        padding: var(--spacing-m) var(--spacing-xl);
+        padding: var(--spacing-m) var(--spacing-l);
         border-radius: var(--radius-card);
         display: flex;
         justify-content: space-between;
         align-items: center;
 
-        .attribute-label {
+        .total-level-label {
           color: var(--color-text-muted);
           font-size: var(--font-size-m);
           font-weight: var(--font-weight-semibold);
         }
 
-        .attribute-value {
-          color: var(--color-accent-blue);
-          font-size: var(--font-size-l);
+        .total-level-value {
+          color: var(--color-accent-gold);
+          font-size: var(--font-size-xl);
           font-weight: var(--font-weight-bold);
         }
       }
-    }
-
-    .loading-attributes {
-      text-align: center;
-      color: var(--color-text-muted);
-      font-size: var(--font-size-m);
-      padding: var(--spacing-m);
     }
   }
 }

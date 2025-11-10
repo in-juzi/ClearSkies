@@ -279,6 +279,11 @@
   min-height: 300px;
   transition: all var(--transition-normal);
 
+  // Ensure all child elements allow drag events to bubble
+  * {
+    pointer-events: auto;
+  }
+
   &.drag-over {
     background: rgba(102, 126, 234, 0.1);
     border: var(--border-width-medium) dashed var(--color-accent-purple);
@@ -300,6 +305,7 @@
       border-radius: var(--radius-card);
       border: var(--border-width-medium) solid var(--color-accent-purple);
       box-shadow: var(--shadow-glow-purple);
+      z-index: 10; // Ensure overlay appears above content
     }
   }
 }

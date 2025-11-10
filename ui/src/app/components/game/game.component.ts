@@ -12,6 +12,7 @@ import { LocationComponent } from './location/location';
 import { Equipment } from './equipment/equipment';
 import { CharacterStatus } from './character-status/character-status';
 import { ChatComponent } from './chat/chat.component';
+import { ALL_SKILLS, ALL_ATTRIBUTES } from '../../constants/game-data.constants';
 
 @Component({
   selector: 'app-game',
@@ -55,11 +56,31 @@ export class GameComponent implements OnInit {
 
   // Get attribute names for iteration
   getAttributeNames(): string[] {
-    return ['strength', 'endurance', 'magic', 'perception', 'dexterity', 'will', 'charisma'];
+    return [...ALL_ATTRIBUTES];
   }
 
   // Capitalize first letter
   capitalize(str: string): string {
     return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
+  // Calculate total skill level
+  getTotalSkillLevel(): number {
+    const player = this.currentPlayer();
+    if (!player || !player.skills) return 0;
+
+    return ALL_SKILLS.reduce((total, skillName) => {
+      return total + (player.skills[skillName]?.level || 0);
+    }, 0);
+  }
+
+  // Calculate total attribute level
+  getTotalAttributeLevel(): number {
+    const attrs = this.attributes();
+    if (!attrs) return 0;
+
+    return ALL_ATTRIBUTES.reduce((total, attrName) => {
+      return total + (attrs[attrName]?.level || 0);
+    }, 0);
   }
 }

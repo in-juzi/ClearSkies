@@ -2,6 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AttributesService } from '../../../services/attributes.service';
 import { AttributesResponse, AttributeName } from '../../../models/user.model';
+import { ALL_ATTRIBUTES, ATTRIBUTE_ICONS } from '../../../constants/game-data.constants';
 
 @Component({
   selector: 'app-attributes',
@@ -15,7 +16,8 @@ export class AttributesComponent implements OnInit {
   loading = signal<boolean>(true);
   error = signal<string | null>(null);
 
-  attributeList: AttributeName[] = ['strength', 'endurance', 'magic', 'perception', 'dexterity', 'will', 'charisma'];
+  // Use centralized constants
+  attributeList: AttributeName[] = [...ALL_ATTRIBUTES];
 
   constructor(private attributesService: AttributesService) {}
 
@@ -38,9 +40,9 @@ export class AttributesComponent implements OnInit {
     });
   }
 
-  getAttributeIcon(attributeName: string): string {
-    // Return icon path for each attribute
-    return `assets/icons/attributes/attr_${attributeName}.svg`;
+  getAttributeIcon(attributeName: AttributeName): string {
+    // Use centralized icon mapping
+    return ATTRIBUTE_ICONS[attributeName];
   }
 
   capitalizeFirst(str: string): string {

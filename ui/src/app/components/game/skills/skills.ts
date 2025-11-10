@@ -2,6 +2,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SkillsService } from '../../../services/skills.service';
 import { SkillName, SkillWithProgress } from '../../../models/user.model';
+import { ALL_SKILLS, SKILL_DISPLAY_NAMES, SKILL_ICONS } from '../../../constants/game-data.constants';
 
 @Component({
   selector: 'app-skills',
@@ -16,37 +17,9 @@ export class Skills implements OnInit {
   loading = signal(true);
   error = signal<string | null>(null);
 
-  // Skill icons mapping (path to SVG files in assets)
-  skillIcons: Record<SkillName, string> = {
-    woodcutting: 'assets/icons/skills/skill_woodcutting.svg',
-    mining: 'assets/icons/ui/ui_dig_1.svg',
-    fishing: 'assets/icons/ui/ui_fishing_new.svg',
-    smithing: 'assets/icons/skills/skill_blacksmithing.svg',
-    cooking: 'assets/icons/skills/skill_cooking.svg',
-    herbalism: 'assets/icons/skills/skill_herbalism.svg',
-    oneHanded: 'assets/icons/abilities/ability_quick_slash.svg',
-    dualWield: 'assets/icons/abilities/ability_slash_2.svg',
-    twoHanded: 'assets/icons/abilities/ability_hammer_smash.svg',
-    ranged: 'assets/icons/abilities/ability_piercing_arrow.svg',
-    casting: 'assets/icons/abilities/ability_lightning_strike.svg',
-    gun: 'assets/icons/abilities/ability_plasma_shot.svg'
-  };
-
-  // Skill display names
-  skillNames: Record<SkillName, string> = {
-    woodcutting: 'Woodcutting',
-    mining: 'Mining',
-    fishing: 'Fishing',
-    smithing: 'Smithing',
-    cooking: 'Cooking',
-    herbalism: 'Herbalism',
-    oneHanded: 'One-Handed',
-    dualWield: 'Dual Wield',
-    twoHanded: 'Two-Handed',
-    ranged: 'Ranged',
-    casting: 'Casting',
-    gun: 'Gun'
-  };
+  // Use centralized constants
+  skillIcons = SKILL_ICONS;
+  skillNames = SKILL_DISPLAY_NAMES;
 
   ngOnInit(): void {
     this.loadSkills();
@@ -69,7 +42,7 @@ export class Skills implements OnInit {
   }
 
   getSkillKeys(): SkillName[] {
-    return ['woodcutting', 'mining', 'fishing', 'smithing', 'cooking', 'herbalism', 'oneHanded', 'dualWield', 'twoHanded', 'ranged', 'casting', 'gun'];
+    return [...ALL_SKILLS];
   }
 
   getExperienceToNext(experience: number): number {

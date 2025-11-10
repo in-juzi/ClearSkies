@@ -175,7 +175,16 @@ export class VendorComponent {
   onDragLeave(event: DragEvent): void {
     event.preventDefault();
     event.stopPropagation();
-    this.isDragOver.set(false);
+
+    // Only remove drag-over state if we're actually leaving the drop zone
+    // (not just entering a child element)
+    const target = event.target as HTMLElement;
+    const relatedTarget = event.relatedTarget as HTMLElement;
+
+    // Check if we're leaving for a non-child element
+    if (relatedTarget && !target.contains(relatedTarget)) {
+      this.isDragOver.set(false);
+    }
   }
 
   /**

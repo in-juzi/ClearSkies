@@ -91,11 +91,19 @@
            (dragleave)="onDragLeave($event)"
            [class.drag-over]="isDragOver()">
         @if (getSortedSellableItems().length === 0) {
-          <p class="empty-message drop-hint">You have no items to sell. Drag items from your inventory here to sell them.</p>
+          <p class="empty-message drop-hint"
+             (dragover)="onDragOver($event)"
+             (drop)="onDrop($event)">
+            You have no items to sell. Drag items from your inventory here to sell them.
+          </p>
         } @else {
-          <div class="inventory-list">
+          <div class="inventory-list"
+               (dragover)="onDragOver($event)"
+               (drop)="onDrop($event)">
             @for (item of getSortedSellableItems(); track item.instanceId) {
-              <div class="inventory-item">
+              <div class="inventory-item"
+                   (dragover)="onDragOver($event)"
+                   (drop)="onDrop($event)">
                 <div class="item-info">
                   <div class="item-icon">
                     <!-- Item icon placeholder -->
