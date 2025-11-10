@@ -1,0 +1,59 @@
+@use '../../../../design-tokens.scss' as *;
+
+.xp-mini {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: var(--spacing-xs) var(--spacing-s);
+  background: var(--color-bg-overlay);
+  border-radius: var(--radius-s);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-primary);
+  line-height: 1.4;
+
+  // Compact mode (smaller, tighter spacing)
+  &.compact {
+    font-size: calc(var(--font-size-xs) * 0.9);
+    gap: 0.25rem;
+    padding: calc(var(--spacing-xs) * 0.75) var(--spacing-xs);
+  }
+
+  .xp-icon {
+    font-size: var(--font-size-m);
+    flex-shrink: 0;
+
+    .compact & {
+      font-size: calc(var(--font-size-m) * 0.85);
+    }
+  }
+
+  .xp-skill-name {
+    color: var(--color-accent-purple);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .xp-amount {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-weight: 500;
+    color: var(--color-success);
+
+    .xp-raw {
+      color: var(--color-text-muted);
+      text-decoration: line-through;
+      font-size: 0.85em;
+    }
+
+    .xp-arrow {
+      color: var(--color-text-muted);
+      font-size: 0.85em;
+    }
+
+    .xp-scaled {
+      color: var(--color-success);
+      font-weight: 600;
+    }
+  }
+}

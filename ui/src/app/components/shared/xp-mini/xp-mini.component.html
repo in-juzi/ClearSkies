@@ -1,0 +1,24 @@
+<div class="xp-mini" [class.compact]="compact">
+  <!-- Icon (optional) -->
+  <span class="xp-icon" *ngIf="showIcon">{{ icon }}</span>
+
+  <!-- Skill/Attribute name (optional) -->
+  <span class="xp-skill-name" *ngIf="showSkillName && skillName">
+    {{ formattedSkillName }}:
+  </span>
+
+  <!-- XP amount with scaling info -->
+  <span class="xp-amount">
+    <!-- Show raw → scaled if different -->
+    <ng-container *ngIf="wasScaled">
+      <span class="xp-raw">{{ rawXp }} XP</span>
+      <span class="xp-arrow">→</span>
+      <span class="xp-scaled">{{ xp }} XP</span>
+    </ng-container>
+
+    <!-- Show simple XP if not scaled or scaling disabled -->
+    <ng-container *ngIf="!wasScaled">
+      +{{ xp }} XP
+    </ng-container>
+  </span>
+</div>
