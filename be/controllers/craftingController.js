@@ -161,12 +161,13 @@ exports.completeCrafting = async (req, res) => {
     const selectedIngredients = player.activeCrafting.selectedIngredients || {};
 
     for (const ingredient of recipe.ingredients) {
-      // Check if specific instances were selected
-      if (selectedIngredients[ingredient.itemId] && selectedIngredients[ingredient.itemId].length > 0) {
-        // Use selected instances
-        const selectedInstanceIds = selectedIngredients[ingredient.itemId];
+      // selectedIngredients is a Mongoose Map, so we need to use .get() method
+      const instanceIds = selectedIngredients.get ? selectedIngredients.get(ingredient.itemId) : selectedIngredients[ingredient.itemId];
 
-        for (const instanceId of selectedInstanceIds) {
+      // Check if specific instances were selected
+      if (instanceIds && instanceIds.length > 0) {
+        // Use selected instances
+        for (const instanceId of instanceIds) {
           const item = player.getItem(instanceId);
 
           if (!item) {
@@ -240,9 +241,18 @@ exports.completeCrafting = async (req, res) => {
 
     await player.save();
 
+    // Convert output item Maps to plain objects for JSON response
+    const plainOutputItem = {
+      itemId: outputItem.itemId,
+      instanceId: outputItem.instanceId,
+      quantity: outputItem.quantity,
+      qualities: outputItem.qualities instanceof Map ? Object.fromEntries(outputItem.qualities) : outputItem.qualities,
+      traits: outputItem.traits instanceof Map ? Object.fromEntries(outputItem.traits) : outputItem.traits
+    };
+
     res.json({
       message: `Crafted ${recipe.name}`,
-      output: outputItem,
+      output: plainOutputItem,
       experience: {
         skill: recipe.skill,
         xp: recipe.experience,
