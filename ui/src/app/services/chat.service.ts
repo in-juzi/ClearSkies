@@ -63,8 +63,7 @@ export class ChatService {
       this.isConnected.set(true);
       this.errorMessageSignal.set(null);
 
-      // Load chat history on connect
-      this.loadHistory();
+      // Don't load history - users only see messages from when they connect
     });
 
     socket.on('connect_error', (error) => {
