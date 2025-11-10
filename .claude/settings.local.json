@@ -9,7 +9,8 @@
       "Bash(printf:*)",
       "Bash(done)",
       "Bash(ng generate:*)",
-      "Bash(node -e:*)"
+      "Bash(node -e:*)",
+      "Bash(cmd //c \"dir /b \"\"C:\\Users\\trace\\OneDrive\\Documents\\Projects\\ClearSkies\\project\\icon-source\\lorc\"\" | head -5\")"
     ],
     "deny": [],
     "ask": []
