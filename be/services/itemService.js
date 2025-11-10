@@ -288,8 +288,19 @@ class ItemService {
       }
     }
 
+    // Convert Mongoose document to plain object if needed
+    const plainInstance = itemInstance.toObject ? itemInstance.toObject() : itemInstance;
+
+    // Convert Mongoose Maps to plain objects
+    if (plainInstance.qualities instanceof Map) {
+      plainInstance.qualities = Object.fromEntries(plainInstance.qualities);
+    }
+    if (plainInstance.traits instanceof Map) {
+      plainInstance.traits = Object.fromEntries(plainInstance.traits);
+    }
+
     return {
-      ...itemInstance,
+      ...plainInstance,
       definition: itemDef,
       vendorPrice,
       qualityDetails,

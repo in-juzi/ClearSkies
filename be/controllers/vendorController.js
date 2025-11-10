@@ -104,16 +104,9 @@ exports.buyItem = async (req, res) => {
 
     await player.save();
 
-    // Get updated inventory
+    // Get updated inventory with full item details
     const inventory = player.inventory.map(item => {
-      const plainItem = item.toObject();
-      if (plainItem.qualities instanceof Map) {
-        plainItem.qualities = Object.fromEntries(plainItem.qualities);
-      }
-      if (plainItem.traits instanceof Map) {
-        plainItem.traits = Object.fromEntries(plainItem.traits);
-      }
-      return plainItem;
+      return itemService.getItemDetails(item);
     });
 
     res.json({
@@ -212,16 +205,9 @@ exports.sellItem = async (req, res) => {
 
     await player.save();
 
-    // Get updated inventory
+    // Get updated inventory with full item details
     const inventory = player.inventory.map(item => {
-      const plainItem = item.toObject();
-      if (plainItem.qualities instanceof Map) {
-        plainItem.qualities = Object.fromEntries(plainItem.qualities);
-      }
-      if (plainItem.traits instanceof Map) {
-        plainItem.traits = Object.fromEntries(plainItem.traits);
-      }
-      return plainItem;
+      return itemService.getItemDetails(item);
     });
 
     res.json({

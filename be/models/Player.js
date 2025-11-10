@@ -248,18 +248,16 @@ playerSchema.methods.addExperience = async function(amount) {
 };
 
 // Add gold
-playerSchema.methods.addGold = async function(amount) {
+playerSchema.methods.addGold = function(amount) {
   this.gold += amount;
-  await this.save();
 };
 
 // Remove gold (with validation)
-playerSchema.methods.removeGold = async function(amount) {
+playerSchema.methods.removeGold = function(amount) {
   if (this.gold < amount) {
     throw new Error('Insufficient gold');
   }
   this.gold -= amount;
-  await this.save();
 };
 
 // Add attribute experience and handle attribute leveling
@@ -357,7 +355,7 @@ playerSchema.methods.getSkillProgress = function(skillName) {
 // Inventory Management Methods
 
 // Add item to inventory
-playerSchema.methods.addItem = async function(itemInstance) {
+playerSchema.methods.addItem = function(itemInstance) {
   // Check inventory capacity
   const currentSize = this.inventory.reduce((sum, item) => sum + item.quantity, 0);
   if (currentSize + itemInstance.quantity > this.inventoryCapacity) {
@@ -385,12 +383,11 @@ playerSchema.methods.addItem = async function(itemInstance) {
     this.inventory.push(itemInstance);
   }
 
-  await this.save();
   return itemInstance;
 };
 
 // Remove item from inventory by instance ID
-playerSchema.methods.removeItem = async function(instanceId, quantity = null) {
+playerSchema.methods.removeItem = function(instanceId, quantity = null) {
   const itemIndex = this.inventory.findIndex(item => item.instanceId === instanceId);
 
   if (itemIndex === -1) {
@@ -410,7 +407,6 @@ playerSchema.methods.removeItem = async function(instanceId, quantity = null) {
     item.quantity -= quantity;
   }
 
-  await this.save();
   return item;
 };
 

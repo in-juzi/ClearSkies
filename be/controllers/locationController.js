@@ -527,7 +527,7 @@ exports.completeActivity = async (req, res) => {
       // Store the instanceId before adding to player (to avoid circular ref after add)
       const instanceId = itemInstance.instanceId;
 
-      await player.addItem(itemInstance);
+      player.addItem(itemInstance);
 
       // Get item definition for display
       const itemDef = itemService.getItemDefinition(itemReward.itemId);
@@ -542,7 +542,7 @@ exports.completeActivity = async (req, res) => {
 
     // Award gold
     if (rewards.gold > 0) {
-      await player.addGold(rewards.gold);
+      player.addGold(rewards.gold);
     }
 
     // Store activity info before restarting

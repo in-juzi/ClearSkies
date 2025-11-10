@@ -13,7 +13,7 @@
       "targetLocationId": "forest-clearing",
       "name": "Return to Forest",
       "description": "Descend back to the forest clearing",
-      "travelTime": 120,
+      "travelTime": 12,
       "requirements": {},
       "encounters": []
     }

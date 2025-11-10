@@ -13,7 +13,7 @@
       "targetLocationId": "forest-clearing",
       "name": "Forest Path",
       "description": "A worn dirt path leading into the dense forest",
-      "travelTime": 60,
+      "travelTime": 6,
       "requirements": {},
       "encounters": []
     }

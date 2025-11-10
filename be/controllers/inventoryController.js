@@ -59,7 +59,8 @@ exports.addItem = async (req, res) => {
     const itemInstance = itemService.createItemInstance(itemId, quantity, qualities, traits);
 
     // Add to player inventory
-    await player.addItem(itemInstance);
+    player.addItem(itemInstance);
+    await player.save();
 
     // Get enhanced item details
     const details = itemService.getItemDetails(itemInstance);
@@ -100,7 +101,8 @@ exports.addRandomItem = async (req, res) => {
     const itemInstance = itemService.createItemInstance(itemId, quantity, qualities, traits);
 
     // Add to player inventory
-    await player.addItem(itemInstance);
+    player.addItem(itemInstance);
+    await player.save();
 
     // Get enhanced item details
     const details = itemService.getItemDetails(itemInstance);
@@ -134,7 +136,8 @@ exports.removeItem = async (req, res) => {
     }
 
     // Remove item
-    const removedItem = await player.removeItem(instanceId, quantity);
+    const removedItem = player.removeItem(instanceId, quantity);
+    await player.save();
 
     res.json({
       message: 'Item removed from inventory',

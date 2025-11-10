@@ -27,7 +27,7 @@ async function addItemToPlayer() {
     const itemInstance = itemService.createItemInstance('bronze_woodcutting_axe', 1);
 
     // Add to inventory
-    await player.addItem(itemInstance);
+    player.addItem(itemInstance);
     await player.save();
 
     console.log('✅ Added bronze_woodcutting_axe to Juzi\'s inventory');
