@@ -24,5 +24,8 @@
     "browser-game"
   ],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "svgpath": "^2.6.0"
+  }
 }
