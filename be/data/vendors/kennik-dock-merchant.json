@@ -1,0 +1,16 @@
+{
+  "vendorId": "kennik-dock-merchant",
+  "name": "Dockmaster Halvard",
+  "description": "A weathered fisherman with sun-darkened skin and keen eyes. He's spent decades on the waters and knows every fishing spot around Kennik.",
+  "greeting": "Looking for fishing gear? I've got the basics to get you started.",
+  "iconPath": "assets/icons/ui/merchant.svg",
+  "acceptsAllItems": true,
+  "sellPriceMultiplier": 0.5,
+  "stock": [
+    {
+      "itemId": "bamboo_fishing_rod",
+      "buyPrice": 25,
+      "stockType": "infinite"
+    }
+  ]
+}
