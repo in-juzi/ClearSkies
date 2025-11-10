@@ -274,13 +274,9 @@ export class InventoryComponent implements OnInit {
     this.hasBeenDragged = false;
   }
 
-  // Item drag-and-drop handlers for equipment
+  // Item drag-and-drop handlers for equipment and vendor selling
   onItemDragStart(event: DragEvent, item: ItemDetails): void {
-    if (item.definition.category !== 'equipment') {
-      event.preventDefault();
-      return;
-    }
-
+    // Allow all items to be dragged (for equipment slots or vendor selling)
     // Set the drag data as JSON
     event.dataTransfer!.effectAllowed = 'move';
     event.dataTransfer!.setData('application/json', JSON.stringify(item));

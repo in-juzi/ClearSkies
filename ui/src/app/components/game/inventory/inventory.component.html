@@ -22,7 +22,7 @@
       class="inventory-item"
       [class]="getRarityClass(item.definition.rarity)"
       [class.equipped]="item.equipped"
-      [draggable]="item.definition.category === 'equipment'"
+      [draggable]="true"
       (click)="selectItem(item)"
       (dragstart)="onItemDragStart($event, item)"
       (dragend)="onItemDragEnd($event)">
@@ -223,16 +223,4 @@
     </div>
   </div>
 
-  <!-- Dev Tools (remove in production) -->
-  <div class="dev-tools" *ngIf="true">
-    <h4>Dev Tools</h4>
-    <div class="dev-buttons">
-      <button (click)="addTestItem('oak_log')" class="dev-btn">Add Oak Log</button>
-      <button (click)="addTestItem('willow_log')" class="dev-btn">Add Willow Log</button>
-      <button (click)="addTestItem('copper_ore')" class="dev-btn">Add Copper Ore</button>
-      <button (click)="addTestItem('trout')" class="dev-btn">Add Trout</button>
-      <button (click)="addTestItem('copper_sword')" class="dev-btn">Add Copper Sword</button>
-      <button (click)="dropAllItems()" class="dev-btn dev-btn-danger">Drop All Items</button>
-    </div>
-  </div>
 </div>
