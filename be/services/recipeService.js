@@ -160,67 +160,26 @@ class RecipeService {
    * @param {Array} ingredientInstances - Actual ingredient items from inventory
    * @param {number} playerSkillLevel - Player's skill level
    * @param {Object} itemService - ItemService instance
-   * @returns {Object} Output item with calculated qualities/traits
+   * @returns {Array} Array of output items with calculated qualities/traits
    */
   calculateCraftingOutcome(recipe, ingredientInstances, playerSkillLevel, itemService) {
-    const output = {
-      itemId: recipe.output.itemId,
-      quantity: recipe.output.quantity,
-      qualities: new Map(),
-      traits: new Map()
-    };
+    // Support both old (single output) and new (outputs array) schema
+    const outputs = recipe.outputs ? recipe.outputs : [recipe.output];
+    const outputItems = [];
 
-    // Quality inheritance based on qualityModifier
-    if (recipe.output.qualityModifier === 'inherit' && ingredientInstances.length > 0) {
-      // Collect all qualities from ingredients
-      const qualityMaps = [];
-
-      for (const ingredient of ingredientInstances) {
-        if (ingredient.qualities && ingredient.qualities.size > 0) {
-          qualityMaps.push(ingredient.qualities);
-        }
-      }
-
-      // If we have qualities, inherit the maximum level for each quality type
-      if (qualityMaps.length > 0) {
-        const allQualityTypes = new Set();
-        for (const qualMap of qualityMaps) {
-          for (const qualityType of qualMap.keys()) {
-            allQualityTypes.add(qualityType);
-          }
-        }
-
-        // For each quality type, take the max level from ingredients
-        for (const qualityType of allQualityTypes) {
-          let maxLevel = 0;
-          for (const qualMap of qualityMaps) {
-            const level = qualMap.get(qualityType) || 0;
-            if (level > maxLevel) {
-              maxLevel = level;
-            }
-          }
-          if (maxLevel > 0) {
-            output.qualities.set(qualityType, maxLevel);
-          }
-        }
+    // Collect ingredient qualities and traits once (shared across all outputs)
+    const qualityMaps = [];
+    for (const ingredient of ingredientInstances) {
+      if (ingredient.qualities && ingredient.qualities.size > 0) {
+        qualityMaps.push(ingredient.qualities);
       }
     }
 
-    // Skill bonus: Every 10 skill levels = +1 quality level bonus (max +2)
-    const skillBonus = Math.min(2, Math.floor(playerSkillLevel / 10));
-
-    if (skillBonus > 0 && output.qualities.size > 0) {
-      // Apply skill bonus to the primary quality (first one)
-      const primaryQuality = Array.from(output.qualities.keys())[0];
-      const currentLevel = output.qualities.get(primaryQuality);
-      const newLevel = Math.min(5, currentLevel + skillBonus); // Cap at level 5
-      output.qualities.set(primaryQuality, newLevel);
-    }
-
-    // Trait inheritance: Inherit traits from best ingredient
+    let bestIngredient = null;
+    let bestTraitCount = 0;
     if (ingredientInstances.length > 0) {
-      let bestIngredient = ingredientInstances[0];
-      let bestTraitCount = bestIngredient.traits ? bestIngredient.traits.size : 0;
+      bestIngredient = ingredientInstances[0];
+      bestTraitCount = bestIngredient.traits ? bestIngredient.traits.size : 0;
 
       for (const ingredient of ingredientInstances) {
         const traitCount = ingredient.traits ? ingredient.traits.size : 0;
@@ -229,19 +188,72 @@ class RecipeService {
           bestTraitCount = traitCount;
         }
       }
-
-      if (bestIngredient.traits && bestIngredient.traits.size > 0) {
-        output.traits = new Map(bestIngredient.traits);
-      }
     }
 
-    // Create item instance using itemService
-    return itemService.createItemInstance(
-      output.itemId,
-      output.quantity,
-      output.qualities,
-      output.traits
-    );
+    // Process each output
+    for (const outputDef of outputs) {
+      const output = {
+        itemId: outputDef.itemId,
+        quantity: outputDef.quantity,
+        qualities: new Map(),
+        traits: new Map()
+      };
+
+      // Quality inheritance based on qualityModifier
+      if (outputDef.qualityModifier === 'inherit' && ingredientInstances.length > 0) {
+        // If we have qualities, inherit the maximum level for each quality type
+        if (qualityMaps.length > 0) {
+          const allQualityTypes = new Set();
+          for (const qualMap of qualityMaps) {
+            for (const qualityType of qualMap.keys()) {
+              allQualityTypes.add(qualityType);
+            }
+          }
+
+          // For each quality type, take the max level from ingredients
+          for (const qualityType of allQualityTypes) {
+            let maxLevel = 0;
+            for (const qualMap of qualityMaps) {
+              const level = qualMap.get(qualityType) || 0;
+              if (level > maxLevel) {
+                maxLevel = level;
+              }
+            }
+            if (maxLevel > 0) {
+              output.qualities.set(qualityType, maxLevel);
+            }
+          }
+        }
+
+        // Skill bonus: Every 10 skill levels = +1 quality level bonus (max +2)
+        const skillBonus = Math.min(2, Math.floor(playerSkillLevel / 10));
+
+        if (skillBonus > 0 && output.qualities.size > 0) {
+          // Apply skill bonus to the primary quality (first one)
+          const primaryQuality = Array.from(output.qualities.keys())[0];
+          const currentLevel = output.qualities.get(primaryQuality);
+          const newLevel = Math.min(5, currentLevel + skillBonus); // Cap at level 5
+          output.qualities.set(primaryQuality, newLevel);
+        }
+
+        // Trait inheritance: Inherit traits from best ingredient
+        if (bestIngredient && bestIngredient.traits && bestIngredient.traits.size > 0) {
+          output.traits = new Map(bestIngredient.traits);
+        }
+      }
+
+      // Create item instance using itemService
+      const itemInstance = itemService.createItemInstance(
+        output.itemId,
+        output.quantity,
+        output.qualities,
+        output.traits
+      );
+
+      outputItems.push(itemInstance);
+    }
+
+    return outputItems;
   }
 
   /**

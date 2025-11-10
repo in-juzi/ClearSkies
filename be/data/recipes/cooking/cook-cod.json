@@ -11,10 +11,12 @@
       "quantity": 1
     }
   ],
-  "output": {
-    "itemId": "cooked_cod",
-    "quantity": 1,
-    "qualityModifier": "inherit"
-  },
+  "outputs": [
+    {
+      "itemId": "cooked_cod",
+      "quantity": 1,
+      "qualityModifier": "inherit"
+    }
+  ],
   "experience": 45
 }

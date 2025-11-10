@@ -217,17 +217,19 @@ exports.completeCrafting = async (req, res) => {
       }
     }
 
-    // Calculate crafting outcome
+    // Calculate crafting outcome (returns array of items)
     const playerSkillLevel = player.skills[recipe.skill].level;
-    const outputItem = recipeService.calculateCraftingOutcome(
+    const outputItems = recipeService.calculateCraftingOutcome(
       recipe,
       ingredientInstances,
       playerSkillLevel,
       itemService
     );
 
-    // Add output to inventory
-    player.addItem(outputItem);
+    // Add all outputs to inventory
+    for (const outputItem of outputItems) {
+      player.addItem(outputItem);
+    }
 
     // Award XP
     const xpResult = await player.addSkillExperience(recipe.skill, recipe.experience);
@@ -241,18 +243,22 @@ exports.completeCrafting = async (req, res) => {
 
     await player.save();
 
-    // Convert output item Maps to plain objects for JSON response
-    const plainOutputItem = {
-      itemId: outputItem.itemId,
-      instanceId: outputItem.instanceId,
-      quantity: outputItem.quantity,
-      qualities: outputItem.qualities instanceof Map ? Object.fromEntries(outputItem.qualities) : outputItem.qualities,
-      traits: outputItem.traits instanceof Map ? Object.fromEntries(outputItem.traits) : outputItem.traits
-    };
+    // Convert output items to plain objects for JSON response
+    const plainOutputItems = outputItems.map(outputItem => {
+      const itemDef = itemService.getItemDefinition(outputItem.itemId);
+      return {
+        itemId: outputItem.itemId,
+        name: itemDef ? itemDef.name : outputItem.itemId,
+        instanceId: outputItem.instanceId,
+        quantity: outputItem.quantity,
+        qualities: outputItem.qualities instanceof Map ? Object.fromEntries(outputItem.qualities) : outputItem.qualities,
+        traits: outputItem.traits instanceof Map ? Object.fromEntries(outputItem.traits) : outputItem.traits
+      };
+    });
 
     res.json({
       message: `Crafted ${recipe.name}`,
-      output: plainOutputItem,
+      outputs: plainOutputItems, // Changed from 'output' (singular) to 'outputs' (array)
       experience: {
         skill: recipe.skill,
         xp: recipe.experience,
