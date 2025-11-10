@@ -85,9 +85,13 @@
 
     <!-- Sell Tab Content -->
     @if (activeTab() === 'sell') {
-      <div class="tab-content sell-tab">
+      <div class="tab-content sell-tab drop-zone"
+           (dragover)="onDragOver($event)"
+           (drop)="onDrop($event)"
+           (dragleave)="onDragLeave($event)"
+           [class.drag-over]="isDragOver()">
         @if (getSortedSellableItems().length === 0) {
-          <p class="empty-message">You have no items to sell.</p>
+          <p class="empty-message drop-hint">You have no items to sell. Drag items from your inventory here to sell them.</p>
         } @else {
           <div class="inventory-list">
             @for (item of getSortedSellableItems(); track item.instanceId) {

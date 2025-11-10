@@ -273,6 +273,41 @@
   }
 }
 
+// Drop zone styling
+.drop-zone {
+  position: relative;
+  min-height: 300px;
+  transition: all var(--transition-normal);
+
+  &.drag-over {
+    background: rgba(102, 126, 234, 0.1);
+    border: var(--border-width-medium) dashed var(--color-accent-purple);
+    border-radius: var(--radius-card);
+
+    &::after {
+      content: '💰 Drop here to sell';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: var(--font-size-2xl);
+      color: var(--color-accent-purple);
+      font-weight: var(--font-weight-bold);
+      pointer-events: none;
+      text-align: center;
+      background: var(--color-bg-primary);
+      padding: var(--spacing-xl);
+      border-radius: var(--radius-card);
+      border: var(--border-width-medium) solid var(--color-accent-purple);
+      box-shadow: var(--shadow-glow-purple);
+    }
+  }
+}
+
+.drop-hint {
+  color: var(--color-text-secondary);
+}
+
 // Scrollbar styling
 .tab-content::-webkit-scrollbar {
   width: 8px;

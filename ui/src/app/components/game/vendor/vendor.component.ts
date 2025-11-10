@@ -26,6 +26,7 @@ export class VendorComponent {
   selectedBuyItem = signal<VendorStockItem | null>(null);
   buyQuantity = signal<number>(1);
   message = signal<{ text: string; type: 'success' | 'error' } | null>(null);
+  isDragOver = signal<boolean>(false);
 
   // Computed signals
   vendor = this.vendorService.currentVendor;
@@ -154,5 +155,61 @@ export class VendorComponent {
     return sellable.sort((a, b) => {
       return this.inventoryService.calculateItemScore(b) - this.inventoryService.calculateItemScore(a);
     });
+  }
+
+  /**
+   * Handle drag over event - allow drop
+   */
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragOver.set(true);
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = 'move';
+    }
+  }
+
+  /**
+   * Handle drag leave event - remove visual feedback
+   */
+  onDragLeave(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragOver.set(false);
+  }
+
+  /**
+   * Handle drop event - sell the entire stack
+   */
+  onDrop(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragOver.set(false);
+
+    try {
+      const itemData = event.dataTransfer?.getData('application/json');
+      if (!itemData) {
+        this.showMessage('Invalid item data', 'error');
+        return;
+      }
+
+      const item = JSON.parse(itemData);
+      if (!item.instanceId || !item.quantity) {
+        this.showMessage('Invalid item', 'error');
+        return;
+      }
+
+      // Check if item is equipped
+      if (item.equipped) {
+        this.showMessage('Cannot sell equipped items. Unequip the item first.', 'error');
+        return;
+      }
+
+      // Sell entire stack
+      this.sellItem(item.instanceId, item.quantity);
+    } catch (error) {
+      console.error('Error handling drop:', error);
+      this.showMessage('Failed to process item', 'error');
+    }
   }
 }
