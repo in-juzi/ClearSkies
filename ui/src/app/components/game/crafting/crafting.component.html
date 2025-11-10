@@ -1,0 +1,218 @@
+<div class="crafting-container">
+  <!-- Message Display -->
+  @if (message()) {
+    <div class="message" [class]="message()!.type">
+      {{ message()!.text }}
+    </div>
+  }
+
+  <!-- Active Crafting Progress -->
+  @if (craftingService.isCrafting() || isRestarting()) {
+    <div class="active-crafting">
+      <h3>Crafting in Progress</h3>
+      @if (activeRecipe()) {
+        <div class="recipe-name-active">{{ activeRecipe()!.name }}</div>
+      }
+      <div class="progress-bar-container">
+        <div class="progress-bar"
+             [style.width.%]="craftingProgress()">
+        </div>
+      </div>
+      <div class="time-remaining">
+        {{ formatTime(craftingService.remainingTime()) }} remaining
+      </div>
+      <div class="auto-restart-toggle">
+        <label>
+          <input type="checkbox"
+                 [checked]="autoRestartEnabled()"
+                 (change)="toggleAutoRestart()">
+          Auto-restart when ingredients available
+        </label>
+      </div>
+      <button class="btn-cancel" (click)="cancelCrafting()">
+        Cancel
+      </button>
+    </div>
+  }
+
+  <!-- Crafting Log -->
+  @if (craftingLog.length > 0 && autoRestartEnabled()) {
+    <div class="crafting-log">
+      <h3>Recent Completions</h3>
+      <div class="log-entries">
+        @for (entry of craftingLog; track entry.timestamp) {
+          <div class="log-entry">
+            <span class="log-recipe">{{ entry.recipeName }}</span>
+            <span class="log-xp">+{{ entry.experience }} {{ entry.skill }} XP</span>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Last Crafting Result -->
+  @if (craftingService.lastResult() && !autoRestartEnabled()) {
+    <div class="crafting-result">
+      <h3>Crafting Complete!</h3>
+      <div class="result-item">
+        <div class="item-name">{{ craftingService.lastResult()!.recipe.name }}</div>
+        <div class="xp-gain">+{{ craftingService.lastResult()!.experience.xp }} {{ craftingService.lastResult()!.experience.skill }} XP</div>
+      </div>
+      <button class="btn-close" (click)="clearResult()">
+        Close
+      </button>
+    </div>
+  }
+
+  <!-- Recipe List -->
+  @if (!craftingService.isCrafting() && !selectedRecipe() && !isRestarting()) {
+    <div class="recipe-list-container">
+      <h2>{{ skill | titlecase }} Recipes</h2>
+
+      @if (recipeService.loading()) {
+        <div class="loading">Loading recipes...</div>
+      } @else if (filteredRecipes().length === 0) {
+        <div class="empty-message">No recipes available for {{ skill }}</div>
+      } @else {
+        <div class="recipe-list">
+          @for (recipe of filteredRecipes(); track recipe.recipeId) {
+            <div class="recipe-card"
+                 (click)="selectRecipe(recipe)"
+                 [class.can-craft]="canCraft(recipe).canCraft"
+                 [class.cannot-craft]="!canCraft(recipe).canCraft">
+              <div class="recipe-header">
+                <div class="recipe-name">{{ recipe.name }}</div>
+                <div class="recipe-level">Lvl {{ recipe.requiredLevel }}</div>
+              </div>
+              <div class="recipe-description">{{ recipe.description }}</div>
+              <div class="recipe-ingredients">
+                @for (ingredient of recipe.ingredients; track ingredient.itemId) {
+                  <span class="ingredient"
+                        [class.has-enough]="hasEnoughIngredient(ingredient.itemId, ingredient.quantity)"
+                        [class.not-enough]="!hasEnoughIngredient(ingredient.itemId, ingredient.quantity)">
+                    {{ ingredient.itemId }} ({{ getIngredientDisplay(ingredient.itemId, ingredient.quantity) }})
+                  </span>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Recipe Details -->
+  @if (selectedRecipe() && !craftingService.isCrafting()) {
+    <div class="recipe-details">
+      <button class="btn-back" (click)="selectedRecipe.set(null)">
+        ← Back to Recipes
+      </button>
+
+      <div class="recipe-header-detail">
+        <h2>{{ selectedRecipe()!.name }}</h2>
+        <div class="recipe-meta">
+          <span class="level-req">Requires {{ skill | titlecase }} Level {{ selectedRecipe()!.requiredLevel }}</span>
+          <span class="duration">Duration: {{ selectedRecipe()!.duration }}s</span>
+          <span class="xp-reward">+{{ selectedRecipe()!.experience }} XP</span>
+        </div>
+      </div>
+
+      <div class="recipe-description-detail">
+        {{ selectedRecipe()!.description }}
+      </div>
+
+      <div class="ingredients-section">
+        <h3>Required Ingredients</h3>
+
+        @for (ingredient of selectedRecipe()!.ingredients; track ingredient.itemId) {
+          <div class="ingredient-group">
+            <div class="ingredient-header">
+              <span class="ingredient-name">{{ ingredient.itemId }}</span>
+              <span class="ingredient-selection-count">
+                Selected: {{ getTotalSelected(ingredient.itemId) }} / {{ ingredient.quantity }}
+              </span>
+            </div>
+
+            <div class="instance-list">
+              @for (instance of getAvailableInstances(ingredient.itemId); track instance.instanceId) {
+                <div class="instance-card"
+                     (click)="toggleInstanceSelection(ingredient.itemId, instance.instanceId, instance.quantity, ingredient.quantity)"
+                     [class.selected]="getSelectedQuantity(instance.instanceId) > 0"
+                     [class.fully-selected]="getSelectedQuantity(instance.instanceId) === instance.quantity">
+                  <div class="instance-info">
+                    <span class="instance-quantity">x{{ instance.quantity }}</span>
+                    <app-item-modifiers [item]="instance" displayMode="badge-tier" size="normal"></app-item-modifiers>
+                  </div>
+
+                  @if (getSelectedQuantity(instance.instanceId) > 0) {
+                    <div class="selection-indicator">
+                      ✓ {{ getSelectedQuantity(instance.instanceId) }} selected
+                    </div>
+                  }
+
+                  @if (instance.qualities && Object.keys(instance.qualities).length > 0) {
+                    <div class="qualities">
+                      @for (quality of Object.entries(instance.qualities); track quality[0]) {
+                        <span class="quality-item">{{ quality[0] }}: {{ quality[1] }}</span>
+                      }
+                    </div>
+                  }
+
+                  @if (instance.traits && Object.keys(instance.traits).length > 0) {
+                    <div class="traits">
+                      @for (trait of Object.entries(instance.traits); track trait[0]) {
+                        <span class="trait-item">{{ trait[0] }}: {{ trait[1] }}</span>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+
+              @if (getAvailableInstances(ingredient.itemId).length === 0) {
+                <div class="no-instances">
+                  No {{ ingredient.itemId }} available
+                </div>
+              }
+            </div>
+
+            <div class="ingredient-actions">
+              <button class="btn-auto-select"
+                      (click)="autoSelectBestQuality(selectedRecipe()!)">
+                Auto-select Best
+              </button>
+              <button class="btn-clear-selection"
+                      (click)="clearSelection()">
+                Clear Selection
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="output-section">
+        <h3>Output</h3>
+        <div class="output-item">
+          <span class="output-name">{{ selectedRecipe()!.output.itemId }}</span>
+          <span class="output-quantity">x{{ selectedRecipe()!.output.quantity }}</span>
+        </div>
+        @if (selectedRecipe()!.output.qualityModifier === 'inherit') {
+          <div class="quality-note">
+            Quality will be inherited from ingredients and affected by your {{ skill }} level.
+          </div>
+        }
+      </div>
+
+      <div class="craft-actions">
+        @if (canCraft(selectedRecipe()!).canCraft) {
+          <button class="btn-craft" (click)="startCrafting(selectedRecipe()!)">
+            Start Crafting
+          </button>
+        } @else {
+          <div class="cannot-craft-message">
+            {{ canCraft(selectedRecipe()!).message }}
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

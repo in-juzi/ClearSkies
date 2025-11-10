@@ -39,6 +39,46 @@
     "allowedQualities": ["freshness"],
     "allowedTraits": ["pristine", "blessed"]
   },
+  "cooked_cod": {
+    "itemId": "cooked_cod",
+    "name": "Cooked Cod",
+    "description": "A hearty piece of baked cod with tender, flaky meat",
+    "category": "consumable",
+    "subcategories": ["food", "fish", "cooked", "healing"],
+    "baseValue": 75,
+    "rarity": "uncommon",
+    "stackable": true,
+    "maxStack": 50,
+    "properties": {
+      "weight": 1.0,
+      "material": "food",
+      "tier": 3,
+      "healthRestore": 50,
+      "craftedFrom": "cod"
+    },
+    "allowedQualities": ["freshness"],
+    "allowedTraits": ["pristine", "blessed"]
+  },
+  "cooked_shrimp": {
+    "itemId": "cooked_shrimp",
+    "name": "Cooked Shrimp",
+    "description": "Succulent garlic shrimp, perfectly seasoned and cooked",
+    "category": "consumable",
+    "subcategories": ["food", "fish", "cooked", "healing"],
+    "baseValue": 35,
+    "rarity": "common",
+    "stackable": true,
+    "maxStack": 50,
+    "properties": {
+      "weight": 0.3,
+      "material": "food",
+      "tier": 1,
+      "healthRestore": 25,
+      "craftedFrom": "shrimp"
+    },
+    "allowedQualities": ["freshness"],
+    "allowedTraits": ["pristine", "blessed"]
+  },
   "health_potion_minor": {
     "itemId": "health_potion_minor",
     "name": "Minor Health Potion",

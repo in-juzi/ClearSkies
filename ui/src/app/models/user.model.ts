@@ -16,6 +16,11 @@ export interface Player {
   gold: number;
   location: Location;
   inventory: InventoryItem[];
+  activeCrafting?: {
+    recipeId: string;
+    startTime: Date;
+    endTime: Date;
+  };
   lastPlayed: Date;
 }
 

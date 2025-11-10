@@ -99,6 +99,12 @@ const playerSchema = new mongoose.Schema({
     startTime: { type: Date },
     endTime: { type: Date }
   },
+  activeCrafting: {
+    recipeId: { type: String },
+    startTime: { type: Date },
+    endTime: { type: Date },
+    selectedIngredients: { type: Map, of: [String] }
+  },
   questProgress: [{
     questId: { type: mongoose.Schema.Types.ObjectId, ref: 'Quest' },
     status: {

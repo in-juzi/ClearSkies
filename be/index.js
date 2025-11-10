@@ -6,6 +6,7 @@ const connectDB = require('./config/database');
 const itemService = require('./services/itemService');
 const locationService = require('./services/locationService');
 const vendorService = require('./services/vendorService');
+const recipeService = require('./services/recipeService');
 
 const app = express();
 const server = http.createServer(app);
@@ -26,6 +27,9 @@ locationService.loadAll()
 
 // Load vendor definitions
 vendorService.loadVendorDefinitions();
+
+// Load recipe definitions
+recipeService.loadRecipes();
 
 // Middleware
 app.use(cors());
@@ -58,6 +62,7 @@ const inventoryRoutes = require('./routes/inventory');
 const locationRoutes = require('./routes/locations');
 const manualRoutes = require('./routes/manual');
 const vendorRoutes = require('./routes/vendors');
+const craftingRoutes = require('./routes/crafting');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/skills', skillsRoutes);
@@ -66,6 +71,7 @@ app.use('/api/inventory', inventoryRoutes);
 app.use('/api/locations', locationRoutes);
 app.use('/api/manual', manualRoutes); // Public routes (no auth required)
 app.use('/api/vendors', vendorRoutes);
+app.use('/api/crafting', craftingRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
