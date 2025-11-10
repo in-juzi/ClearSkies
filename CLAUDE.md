@@ -11,6 +11,7 @@
 - ✅ Real-time chat system (completed - Socket.io with commands and autocomplete)
 - ✅ Icon organization (completed - 220+ icons organized into 6 categories)
 - ✅ Vendor/NPC trading system (completed - buy/sell at gathering locations)
+- ✅ Cooking/Crafting system (completed - quality inheritance, instance selection)
 
 **Recent Changes** (Last 10 commits):
 - refactor: backend cleanup and optimization
@@ -28,7 +29,8 @@
 - None currently identified
 
 **Next Priorities**:
-- Alchemy system (quality-based crafting)
+- Smithing system (equipment crafting with tier progression)
+- Alchemy system (potion brewing with quality-based effects)
 - Combat system implementation
 - Vendor enhancements (restocking, skill-based pricing)
 - Player housing
@@ -48,10 +50,10 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 ### Frequently Modified Files
 
 **Backend Core:**
-- Controllers: [be/controllers/inventoryController.js](be/controllers/inventoryController.js), [be/controllers/locationController.js](be/controllers/locationController.js), [be/controllers/skillsController.js](be/controllers/skillsController.js), [be/controllers/attributesController.js](be/controllers/attributesController.js), [be/controllers/authController.js](be/controllers/authController.js), [be/controllers/manualController.js](be/controllers/manualController.js), [be/controllers/vendorController.js](be/controllers/vendorController.js)
+- Controllers: [be/controllers/inventoryController.js](be/controllers/inventoryController.js), [be/controllers/locationController.js](be/controllers/locationController.js), [be/controllers/skillsController.js](be/controllers/skillsController.js), [be/controllers/attributesController.js](be/controllers/attributesController.js), [be/controllers/authController.js](be/controllers/authController.js), [be/controllers/manualController.js](be/controllers/manualController.js), [be/controllers/vendorController.js](be/controllers/vendorController.js), [be/controllers/craftingController.js](be/controllers/craftingController.js)
 - Models: [be/models/Player.js](be/models/Player.js), [be/models/User.js](be/models/User.js), [be/models/ChatMessage.js](be/models/ChatMessage.js)
-- Services: [be/services/itemService.js](be/services/itemService.js), [be/services/locationService.js](be/services/locationService.js), [be/services/dropTableService.js](be/services/dropTableService.js), [be/services/vendorService.js](be/services/vendorService.js)
-- Routes: [be/routes/inventory.js](be/routes/inventory.js), [be/routes/locations.js](be/routes/locations.js), [be/routes/skills.js](be/routes/skills.js), [be/routes/attributes.js](be/routes/attributes.js), [be/routes/auth.js](be/routes/auth.js), [be/routes/manual.js](be/routes/manual.js), [be/routes/vendors.js](be/routes/vendors.js)
+- Services: [be/services/itemService.js](be/services/itemService.js), [be/services/locationService.js](be/services/locationService.js), [be/services/dropTableService.js](be/services/dropTableService.js), [be/services/vendorService.js](be/services/vendorService.js), [be/services/recipeService.js](be/services/recipeService.js)
+- Routes: [be/routes/inventory.js](be/routes/inventory.js), [be/routes/locations.js](be/routes/locations.js), [be/routes/skills.js](be/routes/skills.js), [be/routes/attributes.js](be/routes/attributes.js), [be/routes/auth.js](be/routes/auth.js), [be/routes/manual.js](be/routes/manual.js), [be/routes/vendors.js](be/routes/vendors.js), [be/routes/crafting.js](be/routes/crafting.js)
 - Sockets: [be/sockets/chatHandler.js](be/sockets/chatHandler.js)
 
 **Frontend Core:**
@@ -62,8 +64,9 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 - Equipment: [ui/src/app/components/game/equipment/equipment.component.ts](ui/src/app/components/game/equipment/equipment.component.ts)
 - Chat: [ui/src/app/components/game/chat/chat.component.ts](ui/src/app/components/game/chat/chat.component.ts)
 - Vendor: [ui/src/app/components/game/vendor/vendor.component.ts](ui/src/app/components/game/vendor/vendor.component.ts), [ui/src/app/components/game/vendor/vendor.component.html](ui/src/app/components/game/vendor/vendor.component.html)
+- Crafting: [ui/src/app/components/game/crafting/crafting.component.ts](ui/src/app/components/game/crafting/crafting.component.ts), [ui/src/app/components/game/crafting/crafting.component.html](ui/src/app/components/game/crafting/crafting.component.html)
 - Manual: [ui/src/app/components/manual/manual.component.ts](ui/src/app/components/manual/manual.component.ts), [ui/src/app/components/manual/sections/](ui/src/app/components/manual/sections/)
-- Services: [ui/src/app/services/inventory.service.ts](ui/src/app/services/inventory.service.ts), [ui/src/app/services/location.service.ts](ui/src/app/services/location.service.ts), [ui/src/app/services/skills.service.ts](ui/src/app/services/skills.service.ts), [ui/src/app/services/auth.service.ts](ui/src/app/services/auth.service.ts), [ui/src/app/services/manual.service.ts](ui/src/app/services/manual.service.ts), [ui/src/app/services/chat.service.ts](ui/src/app/services/chat.service.ts), [ui/src/app/services/vendor.service.ts](ui/src/app/services/vendor.service.ts)
+- Services: [ui/src/app/services/inventory.service.ts](ui/src/app/services/inventory.service.ts), [ui/src/app/services/location.service.ts](ui/src/app/services/location.service.ts), [ui/src/app/services/skills.service.ts](ui/src/app/services/skills.service.ts), [ui/src/app/services/auth.service.ts](ui/src/app/services/auth.service.ts), [ui/src/app/services/manual.service.ts](ui/src/app/services/manual.service.ts), [ui/src/app/services/chat.service.ts](ui/src/app/services/chat.service.ts), [ui/src/app/services/vendor.service.ts](ui/src/app/services/vendor.service.ts), [ui/src/app/services/recipe.service.ts](ui/src/app/services/recipe.service.ts), [ui/src/app/services/crafting.service.ts](ui/src/app/services/crafting.service.ts)
 
 **Game Data:**
 - Item Definitions: [be/data/items/definitions/](be/data/items/definitions/)
@@ -72,6 +75,7 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 - Drop Tables: [be/data/locations/drop-tables/](be/data/locations/drop-tables/)
 - Facilities: [be/data/locations/facilities/](be/data/locations/facilities/)
 - Vendors: [be/data/vendors/](be/data/vendors/)
+- Recipes: [be/data/recipes/](be/data/recipes/)
 
 **Utilities:**
 - [be/utils/add-item.js](be/utils/add-item.js) - Add items to player inventory
@@ -568,7 +572,15 @@ The agent will autonomously:
 - ✅ Gold sync system (auth service as single source of truth, automatic sync via Angular effects)
 - ✅ Item sorting by quality/trait scores (descending order by total tier levels)
 - ✅ Vendor name and greeting display in location UI
-- ✅ Multiple vendors per facility support (vendorIds array architecture)
+- ✅ Multiple vendors per facility (vendorIds array support)
+- ✅ Cooking/Crafting system (4 cooking recipes, quality inheritance with skill bonus)
+- ✅ Recipe-based crafting (JSON recipe definitions with ingredients, outputs, XP)
+- ✅ Time-based crafting with auto-completion (6-12 second durations)
+- ✅ Ingredient instance selection (choose specific items by quality/traits)
+- ✅ Quality badges (Common, Uncommon, Rare, Epic, Legendary visual indicators)
+- ✅ Auto-select best quality feature (one-click optimal ingredient selection)
+- ✅ Crafting UI with instance cards, selection validation, and progress display
+- ✅ Crafting API endpoints (GET recipes, POST start/complete/cancel)
 
 ### Database Models
 
@@ -1487,6 +1499,195 @@ The architecture supports:
 - **Vendor reputation**: Track player-vendor relationship for discounts
 - **Special offers**: Time-limited deals, bulk purchase discounts
 - **Quest integration**: Vendors offering quests or accepting quest items
+
+## Cooking/Crafting System
+
+The crafting system enables players to create items from ingredients with quality inheritance and instance selection.
+
+### Architecture
+
+**Backend** ([be/services/recipeService.js](be/services/recipeService.js), [be/controllers/craftingController.js](be/controllers/craftingController.js)):
+- RecipeService: Load recipe definitions, validate requirements, calculate quality outcomes
+- CraftingController: Handle start/complete/cancel crafting with time-based progression
+- API routes at `/api/crafting` with JWT auth
+- Recipe definitions in `be/data/recipes/{skill}/` (JSON files)
+- Player.activeCrafting field stores current crafting state with selected ingredients
+
+**Frontend** ([ui/src/app/services/crafting.service.ts](ui/src/app/services/crafting.service.ts), [ui/src/app/services/recipe.service.ts](ui/src/app/services/recipe.service.ts), [ui/src/app/components/game/crafting/](ui/src/app/components/game/crafting/)):
+- CraftingService: Timer management, auto-completion, inventory refresh
+- RecipeService: Recipe loading, client-side validation
+- CraftingComponent: Recipe browser, ingredient instance selection, quality display
+- Integrated into location component (shown for crafting facilities)
+
+### Features
+
+**Crafting Skills**:
+- Cooking (kennik-kitchen facility) - Cook raw fish/meat into consumables
+- Smithing (future) - Craft equipment from ore and materials
+- Alchemy (future) - Brew potions from herbs
+
+**Cooking Recipes** (Level 1-10):
+- Cook Shrimp (L1, 6s, 25 XP) - shrimp → cooked_shrimp
+- Cook Trout (L1, 8s, 20 XP) - trout → cooked_trout
+- Cook Salmon (L5, 10s, 35 XP) - salmon → cooked_salmon
+- Cook Cod (L10, 12s, 45 XP) - cod → cooked_cod
+
+**Quality Inheritance System**:
+```javascript
+// Max quality from ingredients + skill bonus
+const maxQuality = Math.max(...ingredientQualities);
+const skillBonus = Math.min(2, Math.floor(playerSkillLevel / 10));
+const outputQuality = Math.min(5, maxQuality + skillBonus);
+```
+
+**Key Features**:
+- **Instance Selection**: Choose specific item instances to craft with (select high-quality, sell low-quality)
+- **Quality Badges**: Visual indicators (Common, Uncommon, Rare, Epic, Legendary)
+- **Auto-select Best**: One-click to select highest quality ingredients
+- **Time-based Crafting**: Activities take time to complete (6-12 seconds per craft)
+- **Auto-completion**: Timer triggers completion automatically when done
+- **Quality Display**: Shows qualities and traits for each instance
+- **Selection Validation**: Ensures correct quantity selected before starting
+
+### Transactions
+
+```typescript
+// Start crafting with selected instances
+POST /api/crafting/start
+Body: {
+  recipeId: "cook-shrimp",
+  selectedIngredients: {
+    "shrimp": ["instance-uuid-1"]  // Specific instance IDs
+  }
+}
+Response: { activeCrafting: { recipeId, startTime, endTime } }
+
+// Complete crafting (consumes ingredients, creates output)
+POST /api/crafting/complete
+Response: {
+  recipe: { recipeId, name },
+  output: { itemId, quantity, qualities, traits },
+  experience: { skill, xp, newLevel }
+}
+
+// Cancel active crafting
+POST /api/crafting/cancel
+```
+
+### UI Experience
+
+**Recipe Browser**:
+- Shows all recipes for current skill (cooking, smithing, etc.)
+- Color-coded borders: green (can craft), gray (cannot craft)
+- Displays level requirement, duration, XP reward
+- Shows ingredient availability (X/Y format)
+
+**Recipe Details View**:
+1. Ingredient Groups (one per ingredient type)
+   - Selection counter: "Selected: 1 / 1"
+   - Instance cards showing quantity, quality badge, traits
+   - Click to select/deselect instances
+   - Visual feedback: purple border (selected), gold (fully selected)
+
+2. Action Buttons
+   - **Auto-select Best**: Automatically selects highest quality instances
+   - **Clear Selection**: Deselect all ingredients
+   - **Start Crafting**: Begins time-based crafting process
+
+3. Active Crafting Display
+   - Progress bar with time remaining
+   - Cancel button to abort crafting
+   - Auto-completion when timer reaches zero
+
+4. Result Display
+   - Shows crafted item name
+   - Displays XP gained
+   - Auto-refreshes inventory
+
+### Configuration
+
+**Recipe Definition** (`be/data/recipes/cooking/{recipe-id}.json`):
+```json
+{
+  "recipeId": "cook-shrimp",
+  "name": "Cook Shrimp",
+  "description": "Sauté plump shrimp in garlic and oil...",
+  "skill": "cooking",
+  "requiredLevel": 1,
+  "duration": 6,
+  "ingredients": [
+    { "itemId": "shrimp", "quantity": 1 }
+  ],
+  "output": {
+    "itemId": "cooked_shrimp",
+    "quantity": 1,
+    "qualityModifier": "inherit"
+  },
+  "experience": 25
+}
+```
+
+**Crafting Facility** (`be/data/locations/facilities/{facility-id}.json`):
+```json
+{
+  "facilityId": "kennik-kitchen",
+  "name": "Kitchen",
+  "description": "A well-equipped cooking area...",
+  "type": "crafting",
+  "craftingSkills": ["cooking"]
+}
+```
+
+### Quality System
+
+**Skill Bonus Formula**:
+- Every 10 skill levels = +1 quality level bonus (max +2)
+- L1-9: +0 quality, L10-19: +1 quality, L20+: +2 quality
+- Applied to primary quality type (e.g., freshness for cooked fish)
+
+**Example Quality Calculation**:
+```
+Input: Shrimp with freshness: 3
+Player: Cooking L15 (skill bonus = +1)
+Output: Cooked shrimp with freshness: 4 (3 + 1)
+```
+
+**Quality Tier Badges**:
+- Common: Avg quality < 1.5 (gray)
+- Uncommon: Avg quality 1.5-2.5 (green)
+- Rare: Avg quality 2.5-3.5 (blue)
+- Epic: Avg quality 3.5-4.5 (purple)
+- Legendary: Avg quality ≥ 4.5 (orange)
+
+### Database Schema
+
+**Player.activeCrafting**:
+```javascript
+activeCrafting: {
+  recipeId: String,
+  startTime: Date,
+  endTime: Date,
+  selectedIngredients: Map<String, [String]>  // itemId -> instanceId[]
+}
+```
+
+### Security
+
+- JWT authentication required for all crafting endpoints
+- Validates recipe requirements (skill level, ingredients)
+- Verifies selected instances exist and are available
+- Prevents crafting with equipped items
+- Transaction atomicity (ingredients consumed, output added together)
+
+### Future Enhancements
+
+The architecture supports:
+- **Smithing**: Equipment crafting with ore, wood, leather
+- **Alchemy**: Potion brewing with herbs and quality-based effects
+- **Bulk Crafting**: Queue multiple crafts of the same recipe
+- **Crafting Speed**: Bonuses from equipment or attributes
+- **Critical Success**: Chance for bonus output or quality
+- **Failure Chance**: Risk of losing ingredients (at higher tiers)
 
 ## Platform-Specific Tool Notes
 
