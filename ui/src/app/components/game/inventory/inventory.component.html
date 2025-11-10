@@ -43,19 +43,8 @@
         </div>
 
         <!-- Bottom row: Quality/Trait badges -->
-        <div class="item-badges" *ngIf="getQualityKeys(item.qualities).length > 0 || getQualityKeys(item.traits).length > 0">
-          <!-- Quality indicators inline -->
-          <span class="quality-badge" *ngFor="let qualityId of getQualityKeys(item.qualities)"
-                [title]="item.qualityDetails[qualityId]?.name + ' Level ' + item.qualities[qualityId]"
-                [class]="inventoryService.getQualityColor(item.qualities[qualityId])">
-            {{ item.qualityDetails[qualityId]?.shorthand || qualityId.charAt(0).toUpperCase() }}{{ item.qualities[qualityId] }}
-          </span>
-          <!-- Trait indicators inline (now showing trait levels) -->
-          <span class="trait-badge" *ngFor="let traitId of getQualityKeys(item.traits)"
-                [title]="item.traitDetails[traitId]?.name + ' Level ' + item.traits[traitId]"
-                [class]="inventoryService.getTraitLevelColor(item.traits[traitId])">
-            {{ item.traitDetails[traitId]?.shorthand || traitId.charAt(0).toUpperCase() }}{{ item.traits[traitId] }}
-          </span>
+        <div class="item-badges">
+          <app-item-modifiers [item]="item" displayMode="badge-level" size="normal"></app-item-modifiers>
         </div>
       </div>
     </div>

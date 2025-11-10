@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { InventoryService } from '../../../services/inventory.service';
 import { ConfirmDialogService } from '../../../services/confirm-dialog.service';
 import { ItemDetails } from '../../../models/inventory.model';
+import { ItemModifiersComponent } from '../../shared/item-modifiers/item-modifiers.component';
 
 @Component({
   selector: 'app-inventory',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ItemModifiersComponent],
   templateUrl: './inventory.component.html',
   styleUrl: './inventory.component.css'
 })
