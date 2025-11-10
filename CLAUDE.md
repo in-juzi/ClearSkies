@@ -12,14 +12,17 @@
 - ✅ Icon organization (completed - 220+ icons organized into 6 categories)
 - ✅ Vendor/NPC trading system (completed - buy/sell at gathering locations)
 
-**Recent Changes** (Last 7 commits):
-- feat: add gold signal and vendor helper methods to inventory service
-- feat: integrate vendor system into location UI
-- feat: create vendor UI component
-- feat: add vendor frontend models and service
-- feat: register vendor routes and load vendor definitions
-- feat: link vendors to gathering facilities
-- feat: implement vendor trading system backend
+**Recent Changes** (Last 10 commits):
+- refactor: backend cleanup and optimization
+- chore: update Claude Code local settings
+- docs: add ASCII art mode todo task
+- chore: update gitignore
+- docs: update icon catalog documentation
+- feat: add market vendors (potion seller and cook)
+- feat: enable multiple vendors per facility
+- feat: display vendor names and greetings in location UI
+- feat: implement item sorting by quality/trait scores
+- feat: add gold sync system between auth and inventory services
 
 **Known Issues**:
 - None currently identified
@@ -562,6 +565,10 @@ The agent will autonomously:
 - ✅ Chat commands (/help, /online, /clear) with keyboard navigation
 - ✅ Icon organization system (220+ icons organized into 6 categories)
 - ✅ Item icon paths (all items include iconPath field for visual display)
+- ✅ Gold sync system (auth service as single source of truth, automatic sync via Angular effects)
+- ✅ Item sorting by quality/trait scores (descending order by total tier levels)
+- ✅ Vendor name and greeting display in location UI
+- ✅ Multiple vendors per facility support (vendorIds array architecture)
 
 ### Database Models
 
@@ -1382,6 +1389,7 @@ The vendor system provides NPC merchants at gathering locations for buying tools
 - Logging Camp → Woodsman Bjorn (bronze woodcutting axe)
 - Mountain Mine → Miner Gerta (bronze mining pickaxe)
 - Herb Garden → Herbalist Miriam (future herb supplies)
+- Market → Alchemist Elara (health potions), Cook Marta (cooked fish)
 
 **Stock System**:
 - **Infinite stock**: Vendors never run out (architecture supports limited stock)
@@ -1403,10 +1411,12 @@ Response: { gold, inventory, transaction }
 
 **UI Features**:
 - Buy tab: Stock list with buy 1/5/10 buttons
-- Sell tab: Inventory list with sell 1/5/10/all buttons
-- Gold display at top
+- Sell tab: Inventory list with sell 1/5/10/all buttons (sorted by quality/trait scores)
+- Gold display at top (synced with auth service)
+- Vendor name and greeting displayed in location UI
 - Success/error message feedback
 - Medieval fantasy theme (purple/gold colors)
+- Item sorting by total quality+trait tier levels (descending)
 
 ### Configuration
 
@@ -1430,11 +1440,20 @@ Response: { gold, inventory, transaction }
 }
 ```
 
-**Facility Link** (add `vendorId` to facility definition):
+**Facility Link** (add `vendorIds` array to facility definition):
 ```json
 {
   "facilityId": "kennik-fishing-dock",
-  "vendorId": "kennik-dock-merchant",
+  "vendorIds": ["kennik-dock-merchant"],
+  ...
+}
+```
+
+**Multiple Vendors** (facilities can have multiple vendors):
+```json
+{
+  "facilityId": "kennik-market",
+  "vendorIds": ["kennik-potion-seller", "kennik-cook"],
   ...
 }
 ```
