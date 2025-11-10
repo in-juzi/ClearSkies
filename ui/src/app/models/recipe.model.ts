@@ -25,11 +25,18 @@ export interface ActiveCrafting {
   recipeId: string;
   startTime: Date;
   endTime: Date;
+  selectedIngredients?: { [itemId: string]: string[] };
 }
 
 export interface CraftingResult {
   message: string;
-  output: any; // ItemInstance
+  output: {
+    itemId: string;
+    instanceId: string;
+    quantity: number;
+    qualities?: { [key: string]: number };
+    traits?: { [key: string]: number };
+  };
   experience: {
     skill: string;
     xp: number;

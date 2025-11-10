@@ -6,11 +6,12 @@ import { InventoryService } from '../../../services/inventory.service';
 import { AuthService } from '../../../services/auth.service';
 import { Recipe } from '../../../models/recipe.model';
 import { ItemModifiersComponent } from '../../shared/item-modifiers/item-modifiers.component';
+import { ItemMiniComponent } from '../../shared/item-mini/item-mini.component';
 
 @Component({
   selector: 'app-crafting',
   standalone: true,
-  imports: [CommonModule, ItemModifiersComponent],
+  imports: [CommonModule, ItemModifiersComponent, ItemMiniComponent],
   templateUrl: './crafting.component.html',
   styleUrls: ['./crafting.component.scss']
 })
@@ -28,7 +29,18 @@ export class CraftingComponent implements OnInit {
   autoRestartEnabled = signal<boolean>(false); // Auto-restart crafting flag
   lastCraftedRecipeId = signal<string | null>(null); // Track last crafted recipe for auto-restart
   isRestarting = signal<boolean>(false); // Prevent multiple simultaneous restart attempts
-  craftingLog: Array<{ timestamp: Date; recipeName: string; experience: number; skill: string }> = [];
+  craftingLog: Array<{
+    timestamp: Date;
+    recipeName: string;
+    experience: number;
+    skill: string;
+    output: {
+      itemId: string;
+      quantity: number;
+      qualities?: { [key: string]: number };
+      traits?: { [key: string]: number };
+    };
+  }> = [];
 
   // Computed values
   filteredRecipes = computed(() => {
@@ -55,6 +67,41 @@ export class CraftingComponent implements OnInit {
     return (elapsed / recipe.duration) * 100;
   });
 
+  // Get selected ingredient items for display
+  activeIngredientItems = computed(() => {
+    const activeCrafting = this.craftingService.activeCrafting();
+    if (!activeCrafting || !activeCrafting.selectedIngredients) return [];
+
+    const items: any[] = [];
+    const inventory = this.playerInventory();
+    if (!inventory) return [];
+
+    // Group ingredients by itemId
+    const ingredientGroups: { [itemId: string]: { itemId: string; instances: any[] } } = {};
+
+    for (const [itemId, instanceIds] of Object.entries(activeCrafting.selectedIngredients)) {
+      if (!ingredientGroups[itemId]) {
+        ingredientGroups[itemId] = { itemId, instances: [] };
+      }
+
+      // Count instances
+      const instanceCounts: { [instanceId: string]: number } = {};
+      for (const instanceId of instanceIds) {
+        instanceCounts[instanceId] = (instanceCounts[instanceId] || 0) + 1;
+      }
+
+      // Find instances in inventory (they may have been consumed)
+      for (const [instanceId, count] of Object.entries(instanceCounts)) {
+        const item = inventory.find(i => i.instanceId === instanceId);
+        if (item) {
+          ingredientGroups[itemId].instances.push({ ...item, usedQuantity: count });
+        }
+      }
+    }
+
+    return Object.values(ingredientGroups);
+  });
+
   constructor(
     public recipeService: RecipeService,
     public craftingService: CraftingService,
@@ -75,7 +122,13 @@ export class CraftingComponent implements OnInit {
           timestamp: new Date(),
           recipeName: lastResult.recipe.name,
           experience: lastResult.experience.xp,
-          skill: lastResult.experience.skill
+          skill: lastResult.experience.skill,
+          output: {
+            itemId: lastResult.output.itemId,
+            quantity: lastResult.output.quantity,
+            qualities: lastResult.output.qualities,
+            traits: lastResult.output.traits
+          }
         });
 
         // Keep only the last 10 entries
@@ -424,6 +477,16 @@ export class CraftingComponent implements OnInit {
    */
   clearSelection(): void {
     this.selectedIngredients.set(new Map());
+  }
+
+  /**
+   * Create item object for display with custom quantity
+   */
+  createItemForDisplay(instance: any, usedQuantity: number): any {
+    return {
+      ...instance,
+      quantity: usedQuantity
+    };
   }
 
   /**

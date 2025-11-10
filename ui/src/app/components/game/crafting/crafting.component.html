@@ -21,6 +21,30 @@
       <div class="time-remaining">
         {{ formatTime(craftingService.remainingTime()) }} remaining
       </div>
+
+      <!-- Crafting With Ingredients -->
+      @if (activeIngredientItems().length > 0) {
+        <div class="crafting-with">
+          <h4>Using:</h4>
+          <div class="ingredient-items">
+            @for (group of activeIngredientItems(); track group.itemId) {
+              <div class="ingredient-group-display">
+                <span class="ingredient-label">{{ group.itemId }}:</span>
+                <div class="ingredient-instances-display">
+                  @for (instance of group.instances; track instance.instanceId) {
+                    <app-item-mini
+                      [item]="createItemForDisplay(instance, instance.usedQuantity)"
+                      [showIcon]="false"
+                      [showItemId]="false">
+                    </app-item-mini>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
       <div class="auto-restart-toggle">
         <label>
           <input type="checkbox"
@@ -42,8 +66,12 @@
       <div class="log-entries">
         @for (entry of craftingLog; track entry.timestamp) {
           <div class="log-entry">
-            <span class="log-recipe">{{ entry.recipeName }}</span>
-            <span class="log-xp">+{{ entry.experience }} {{ entry.skill }} XP</span>
+            <div class="log-timestamp">{{ entry.timestamp | date:'HH:mm:ss' }}</div>
+            <div class="log-content">
+              <span class="log-recipe">{{ entry.recipeName }}</span>
+              <app-item-mini [item]="entry.output"></app-item-mini>
+              <span class="log-xp">⭐ +{{ entry.experience }} {{ entry.skill }} XP</span>
+            </div>
           </div>
         }
       </div>

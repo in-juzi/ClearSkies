@@ -46,7 +46,8 @@ export class CraftingService {
           this.activeCrafting.set({
             recipeId: response.activeCrafting.recipeId,
             startTime: new Date(response.activeCrafting.startTime),
-            endTime: new Date(response.activeCrafting.endTime)
+            endTime: new Date(response.activeCrafting.endTime),
+            selectedIngredients: response.activeCrafting.selectedIngredients
           });
           this.isCrafting.set(true);
           this.updateRemainingTime();
