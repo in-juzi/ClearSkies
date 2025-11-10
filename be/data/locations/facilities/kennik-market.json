@@ -1,10 +1,9 @@
 {
   "facilityId": "kennik-market",
   "name": "Village Market",
-  "description": "A small marketplace where locals trade goods and supplies.",
+  "description": "A bustling marketplace where locals trade goods and supplies. The aroma of fresh cooking and the glint of potion vials beckon travelers to browse the wares.",
   "type": "trading",
   "icon": "market",
-  "activities": [],
-  "stub": true,
-  "stubMessage": "The market is closed for now. Trading system coming soon!"
+  "vendorIds": ["kennik-potion-seller", "kennik-cook"],
+  "activities": []
 }

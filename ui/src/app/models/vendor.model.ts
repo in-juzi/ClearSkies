@@ -2,6 +2,8 @@
  * Vendor Model - TypeScript interfaces for vendor system
  */
 
+import { ItemDetails } from './inventory.model';
+
 export interface Vendor {
   vendorId: string;
   name: string;
@@ -50,7 +52,7 @@ export interface TransactionResponse {
   message: string;
   transaction?: Transaction;
   gold?: number;
-  inventory?: any[];
+  inventory?: ItemDetails[];
 }
 
 export interface Transaction {

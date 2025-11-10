@@ -67,7 +67,8 @@ export interface Facility {
   type: 'resource-gathering' | 'resource-refinement' | 'combat' | 'trading' | 'npc-interaction';
   icon: string;
   activities: Activity[];
-  vendorId?: string;
+  vendorId?: string; // Deprecated: use vendorIds instead
+  vendorIds?: string[]; // Array of vendor IDs for multiple vendors
   stub?: boolean;
   stubMessage?: string;
 }
