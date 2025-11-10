@@ -29,14 +29,20 @@
           <div class="ingredient-items">
             @for (group of activeIngredientItems(); track group.itemId) {
               <div class="ingredient-group-display">
-                <span class="ingredient-label">{{ group.itemId }}:</span>
+                <div class="ingredient-header">
+                  <span class="ingredient-label">{{ group.itemId }}</span>
+                </div>
                 <div class="ingredient-instances-display">
                   @for (instance of group.instances; track instance.instanceId) {
-                    <app-item-mini
-                      [item]="createItemForDisplay(instance, instance.usedQuantity)"
-                      [showIcon]="false"
-                      [showItemId]="false">
-                    </app-item-mini>
+                    <div class="instance-with-remaining">
+                      <app-item-mini
+                        [item]="createItemForDisplay(instance, instance.usedQuantity)"
+                        [showIcon]="false"
+                        [showItemId]="false"
+                        [showModifiers]="true">
+                      </app-item-mini>
+                      <span class="remaining-text">({{ instance.remainingQuantity }} left)</span>
+                    </div>
                   }
                 </div>
               </div>
@@ -69,7 +75,13 @@
             <div class="log-timestamp">{{ entry.timestamp | date:'HH:mm:ss' }}</div>
             <div class="log-content">
               <span class="log-recipe">{{ entry.recipeName }}</span>
-              <app-item-mini [item]="entry.output"></app-item-mini>
+              <app-item-mini
+                [item]="entry.output"
+                [showIcon]="true"
+                [showQuantity]="true"
+                [showItemId]="true"
+                [showModifiers]="true">
+              </app-item-mini>
               <span class="log-xp">⭐ +{{ entry.experience }} {{ entry.skill }} XP</span>
             </div>
           </div>
