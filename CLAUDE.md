@@ -246,6 +246,46 @@ if (plainItem.traits instanceof Map) {
 }
 ```
 
+### ⚠️ CRITICAL: Accessing Mongoose Maps (Backend Pattern)
+**IMPORTANT**: Mongoose Map fields **DO NOT** support bracket notation access. You **MUST** use `.get()` method.
+
+**Problem**: Fields defined as `{ type: Map, of: ... }` in schemas return `undefined` with bracket notation.
+
+**Examples in codebase**:
+- `player.activeCrafting.selectedIngredients` (Map<string, string[]>) - in Player schema
+- `player.equipmentSlots` (Map<string, string|null>) - in Player schema
+- Item `qualities` and `traits` (Map<string, number>) - in inventory items
+
+**❌ WRONG - Returns undefined**:
+```javascript
+const selectedIngredients = player.activeCrafting.selectedIngredients;
+const instanceIds = selectedIngredients[ingredient.itemId]; // undefined!
+```
+
+**✅ CORRECT - Use .get() method**:
+```javascript
+const selectedIngredients = player.activeCrafting.selectedIngredients;
+const instanceIds = selectedIngredients.get(ingredient.itemId); // works!
+
+// Safe fallback pattern for optional Maps:
+const instanceIds = selectedIngredients.get
+  ? selectedIngredients.get(ingredient.itemId)
+  : selectedIngredients[ingredient.itemId];
+```
+
+**Why this matters**:
+- Bracket notation silently fails (returns `undefined`)
+- No error is thrown, making debugging difficult
+- Affects all Mongoose Map types in schemas
+- Common source of "data exists but can't access it" bugs
+
+**When to use .get()**:
+- Accessing Map values in controllers
+- Iterating over Map entries (use `.entries()` or `for...of`)
+- Checking if Map has a key (use `.has(key)`)
+
+**Real bug example**: Crafting ingredients weren't being consumed because `selectedIngredients[itemId]` returned `undefined`, causing the code to skip ingredient consumption logic entirely.
+
 ### Content Generator Agent
 
 **Agent**: `.claude/agents/content-generator.md`
