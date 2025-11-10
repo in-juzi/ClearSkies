@@ -67,6 +67,7 @@ export interface Facility {
   type: 'resource-gathering' | 'resource-refinement' | 'combat' | 'trading' | 'npc-interaction';
   icon: string;
   activities: Activity[];
+  vendorId?: string;
   stub?: boolean;
   stubMessage?: string;
 }

@@ -165,8 +165,13 @@
       </button>
     </div>
 
+    <!-- Vendor View -->
+    <div class="vendor-view" *ngIf="vendorService.isVendorOpen()">
+      <app-vendor></app-vendor>
+    </div>
+
     <!-- Facility Detail View -->
-    <div class="facility-detail" *ngIf="selectedFacility() && !selectedActivity">
+    <div class="facility-detail" *ngIf="selectedFacility() && !selectedActivity && !vendorService.isVendorOpen()">
       <button (click)="backToFacilities()" class="btn-back">← Back to Facilities</button>
       <h2>{{ selectedFacility()?.name }}</h2>
       <p>{{ selectedFacility()?.description }}</p>

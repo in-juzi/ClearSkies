@@ -1,12 +1,14 @@
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LocationService } from '../../../services/location.service';
+import { VendorService } from '../../../services/vendor.service';
 import { Location, Facility, Activity, ActivityRewards } from '../../../models/location.model';
 import { ConfirmDialogService } from '../../../services/confirm-dialog.service';
+import { VendorComponent } from '../vendor/vendor.component';
 
 @Component({
   selector: 'app-location',
-  imports: [CommonModule],
+  imports: [CommonModule, VendorComponent],
   templateUrl: './location.html',
   styleUrl: './location.scss',
   standalone: true
@@ -14,6 +16,7 @@ import { ConfirmDialogService } from '../../../services/confirm-dialog.service';
 export class LocationComponent implements OnInit, OnDestroy {
   private confirmDialog = inject(ConfirmDialogService);
   private locationService = inject(LocationService);
+  vendorService = inject(VendorService);
 
   // Exposed signals from service
   currentLocation = this.locationService.currentLocation;
@@ -81,7 +84,7 @@ export class LocationComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Select a facility to view its activities
+   * Select a facility to view its activities or vendor
    */
   selectFacility(facility: Facility) {
     if (facility.stub) {
@@ -90,6 +93,13 @@ export class LocationComponent implements OnInit, OnDestroy {
       return;
     }
 
+    // Check if facility has a vendor
+    if (facility.vendorId) {
+      this.openVendor(facility.vendorId);
+      return;
+    }
+
+    // Otherwise, load activities as normal
     this.locationService.getFacility(facility.facilityId).subscribe({
       next: () => {
         this.selectedActivity = null;
@@ -102,11 +112,28 @@ export class LocationComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Open vendor interface
+   */
+  openVendor(vendorId: string) {
+    this.vendorService.getVendor(vendorId).subscribe({
+      next: () => {
+        // Vendor is loaded and signal is set by the service
+      },
+      error: (err) => {
+        this.errorMessage = err.error?.message || 'Failed to load vendor';
+        console.error('Error loading vendor:', err);
+        setTimeout(() => this.errorMessage = null, 3000);
+      }
+    });
+  }
+
+  /**
    * Go back to facility list
    */
   backToFacilities() {
     this.locationService.selectedFacility.set(null);
     this.selectedActivity = null;
+    this.vendorService.closeVendor();
   }
 
   /**
