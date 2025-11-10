@@ -246,7 +246,7 @@
     "stackable": false,
     "maxStack": 1,
     "icon": {
-      "path": "item-categories/item_cat_axe_SPLIT.svg",
+      "path": "item-categories/item_cat_axe.svg",
       "material": "bronze"
     },
     "properties": {
@@ -285,7 +285,7 @@
     "stackable": false,
     "maxStack": 1,
     "icon": {
-      "path": "item-categories/item_cat_axe_SPLIT.svg",
+      "path": "item-categories/item_cat_axe.svg",
       "material": "iron"
     },
     "properties": {
