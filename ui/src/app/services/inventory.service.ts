@@ -21,6 +21,7 @@ export class InventoryService {
   inventoryCapacity = signal<number>(100);
   inventorySize = signal<number>(0);
   inventoryValue = signal<number>(0);
+  gold = signal<number>(0);
   itemDefinitions = signal<ItemDefinition[]>([]);
 
   constructor(private http: HttpClient) {}
@@ -186,5 +187,20 @@ export class InventoryService {
     if (level >= 3) return 'text-purple-400'; // Max level
     if (level >= 2) return 'text-blue-400';   // Mid level
     return 'text-green-400';                   // Base level
+  }
+
+  /**
+   * Set gold amount (used by vendor service)
+   */
+  setGold(amount: number): void {
+    this.gold.set(amount);
+  }
+
+  /**
+   * Set inventory (used by vendor service after transactions)
+   */
+  setInventory(items: ItemDetails[]): void {
+    this.inventory.set(items);
+    this.inventorySize.set(items.reduce((sum, item) => sum + item.quantity, 0));
   }
 }
