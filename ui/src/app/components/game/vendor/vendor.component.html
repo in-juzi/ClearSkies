@@ -108,26 +108,7 @@
                     </div>
 
                     <!-- Quality/Trait badges -->
-                    @if (Object.keys(item.qualities || {}).length > 0 || Object.keys(item.traits || {}).length > 0) {
-                      <div class="item-badges">
-                        <!-- Quality indicators -->
-                        @for (qualityId of Object.keys(item.qualities || {}); track qualityId) {
-                          <span class="quality-badge"
-                                [title]="item.qualityDetails[qualityId]?.name + ' Level ' + item.qualities[qualityId]"
-                                [ngClass]="inventoryService.getQualityColor(item.qualities[qualityId])">
-                            {{ item.qualityDetails[qualityId]?.shorthand || qualityId.charAt(0).toUpperCase() }}{{ item.qualities[qualityId] }}
-                          </span>
-                        }
-                        <!-- Trait indicators -->
-                        @for (traitId of Object.keys(item.traits || {}); track traitId) {
-                          <span class="trait-badge"
-                                [title]="item.traitDetails[traitId]?.name + ' Level ' + item.traits[traitId]"
-                                [ngClass]="inventoryService.getTraitLevelColor(item.traits[traitId])">
-                            {{ item.traitDetails[traitId]?.shorthand || traitId.charAt(0).toUpperCase() }}{{ item.traits[traitId] }}
-                          </span>
-                        }
-                      </div>
-                    }
+                    <app-item-modifiers [item]="item" displayMode="badge-level" size="normal"></app-item-modifiers>
 
                     <p class="sell-price">💰 {{ calculateSellPrice(item) }}g each (50% of value)</p>
                   </div>

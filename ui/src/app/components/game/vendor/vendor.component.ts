@@ -4,11 +4,12 @@ import { VendorService } from '../../../services/vendor.service';
 import { InventoryService } from '../../../services/inventory.service';
 import { AuthService } from '../../../services/auth.service';
 import { VendorStockItem } from '../../../models/vendor.model';
+import { ItemModifiersComponent } from '../../shared/item-modifiers/item-modifiers.component';
 
 @Component({
   selector: 'app-vendor',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ItemModifiersComponent],
   templateUrl: './vendor.component.html',
   styleUrl: './vendor.component.scss'
 })
