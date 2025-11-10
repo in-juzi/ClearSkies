@@ -1,0 +1,29 @@
+# Icon source files (1429+ SVG files, copied from external project)
+project/icon-source/
+
+# Dependencies
+node_modules/
+be/node_modules/
+ui/node_modules/
+
+# Environment variables
+.env
+be/.env
+
+# Build outputs
+ui/dist/
+ui/.angular/
+
+# Logs
+*.log
+npm-debug.log*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
