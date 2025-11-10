@@ -14,16 +14,16 @@
 - ✅ Cooking/Crafting system (completed - quality inheritance, instance selection)
 
 **Recent Changes** (Last 10 commits):
-- refactor: backend cleanup and optimization
-- chore: update Claude Code local settings
-- docs: add ASCII art mode todo task
-- chore: update gitignore
-- docs: update icon catalog documentation
-- feat: add market vendors (potion seller and cook)
-- feat: enable multiple vendors per facility
-- feat: display vendor names and greetings in location UI
-- feat: implement item sorting by quality/trait scores
-- feat: add gold sync system between auth and inventory services
+- chore: increase CSS budget for component stylesheets
+- feat: integrate ItemMiniComponent into location and crafting
+- feat: create ItemMiniComponent for standardized item display
+- feat: show active crafting ingredients in UI
+- feat: add drag-and-drop selling to vendor
+- refactor: remove dev tools from inventory component
+- docs: update CLAUDE.md with vendor system documentation
+- docs: update icon catalog with batch 2 progress
+- feat: add gold signal and vendor helper methods to inventory service
+- feat: integrate vendor system into location UI
 
 **Known Issues**:
 - None currently identified
@@ -66,6 +66,7 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 - Vendor: [ui/src/app/components/game/vendor/vendor.component.ts](ui/src/app/components/game/vendor/vendor.component.ts), [ui/src/app/components/game/vendor/vendor.component.html](ui/src/app/components/game/vendor/vendor.component.html)
 - Crafting: [ui/src/app/components/game/crafting/crafting.component.ts](ui/src/app/components/game/crafting/crafting.component.ts), [ui/src/app/components/game/crafting/crafting.component.html](ui/src/app/components/game/crafting/crafting.component.html)
 - Manual: [ui/src/app/components/manual/manual.component.ts](ui/src/app/components/manual/manual.component.ts), [ui/src/app/components/manual/sections/](ui/src/app/components/manual/sections/)
+- Shared Components: [ui/src/app/components/shared/item-mini/item-mini.component.ts](ui/src/app/components/shared/item-mini/item-mini.component.ts), [ui/src/app/components/shared/item-modifiers/item-modifiers.component.ts](ui/src/app/components/shared/item-modifiers/item-modifiers.component.ts)
 - Services: [ui/src/app/services/inventory.service.ts](ui/src/app/services/inventory.service.ts), [ui/src/app/services/location.service.ts](ui/src/app/services/location.service.ts), [ui/src/app/services/skills.service.ts](ui/src/app/services/skills.service.ts), [ui/src/app/services/auth.service.ts](ui/src/app/services/auth.service.ts), [ui/src/app/services/manual.service.ts](ui/src/app/services/manual.service.ts), [ui/src/app/services/chat.service.ts](ui/src/app/services/chat.service.ts), [ui/src/app/services/vendor.service.ts](ui/src/app/services/vendor.service.ts), [ui/src/app/services/recipe.service.ts](ui/src/app/services/recipe.service.ts), [ui/src/app/services/crafting.service.ts](ui/src/app/services/crafting.service.ts)
 
 **Game Data:**
@@ -571,6 +572,10 @@ The agent will autonomously:
 - ✅ Item icon paths (all items include iconPath field for visual display)
 - ✅ Gold sync system (auth service as single source of truth, automatic sync via Angular effects)
 - ✅ Item sorting by quality/trait scores (descending order by total tier levels)
+- ✅ Drag-and-drop selling to vendors (drag items from inventory to vendor sell tab)
+- ✅ Active crafting ingredient display (shows items being used with quality/trait badges)
+- ✅ Rich crafting completion log (timestamp, output with modifiers, XP gained)
+- ✅ ItemMiniComponent for standardized item display (reusable across all game views)
 - ✅ Vendor name and greeting display in location UI
 - ✅ Multiple vendors per facility (vendorIds array support)
 - ✅ Cooking/Crafting system (4 cooking recipes, quality inheritance with skill bonus)
