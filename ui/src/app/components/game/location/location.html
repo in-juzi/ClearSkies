@@ -165,17 +165,39 @@
       </button>
     </div>
 
-    <!-- Vendor View -->
-    <div class="vendor-view" *ngIf="vendorService.isVendorOpen()">
+    <!-- Vendor View (shown when vendor is open) -->
+    <div class="vendor-view" *ngIf="selectedFacility() && vendorService.isVendorOpen()">
       <app-vendor></app-vendor>
     </div>
 
-    <!-- Facility Detail View -->
+    <!-- Facility Detail View (shown when facility is selected but vendor is not open) -->
     <div class="facility-detail" *ngIf="selectedFacility() && !selectedActivity && !vendorService.isVendorOpen()">
       <button (click)="backToFacilities()" class="btn-back">← Back to Facilities</button>
       <h2>{{ selectedFacility()?.name }}</h2>
       <p>{{ selectedFacility()?.description }}</p>
 
+      <!-- Merchants/Vendors Section -->
+      <div class="vendors-section" *ngIf="getVendorIds(selectedFacility()).length > 0">
+        <h3>Merchants</h3>
+        <div class="vendors-list">
+          <button
+            *ngFor="let vendorId of getVendorIds(selectedFacility())"
+            class="vendor-card"
+            (click)="openVendor(vendorId)">
+            <span class="vendor-icon">🏪</span>
+            <div class="vendor-info">
+              <span class="vendor-name">
+                {{ getVendor(vendorId)?.name || 'Merchant' }}
+              </span>
+              <span class="vendor-greeting" *ngIf="getVendor(vendorId)?.greeting">
+                {{ getVendor(vendorId)?.greeting }}
+              </span>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Activities Section -->
       <h3>Activities</h3>
       <div class="activities-list">
         <div
@@ -194,8 +216,8 @@
       </div>
     </div>
 
-    <!-- Facility List View -->
-    <div class="facilities-view" *ngIf="!selectedFacility()">
+    <!-- Facility List View (shown when no facility is selected) -->
+    <div class="facilities-view" *ngIf="!selectedFacility() && !vendorService.isVendorOpen()">
       <h2>Facilities</h2>
       <div class="facilities-list">
         <div

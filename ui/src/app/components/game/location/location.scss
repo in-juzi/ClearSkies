@@ -338,6 +338,72 @@
   }
 }
 
+// Vendors section
+.vendors-section {
+  margin-bottom: var(--spacing-2xl);
+}
+
+.vendors-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--spacing-m);
+  margin-top: var(--spacing-m);
+}
+
+.vendor-card {
+  background-color: var(--color-bg-elevated);
+  border: var(--border-default);
+  border-radius: var(--radius-card);
+  padding: var(--spacing-l);
+  cursor: pointer;
+  transition: all var(--transition-normal) ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-s);
+  font-size: var(--font-size-m);
+  color: var(--color-text-label);
+
+  &:hover {
+    background-color: var(--color-bg-tertiary);
+    border-color: var(--color-secondary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(138, 43, 226, 0.3);
+  }
+
+  .vendor-icon {
+    font-size: var(--font-size-3xl);
+  }
+
+  .vendor-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xs);
+    text-align: center;
+  }
+
+  .vendor-name {
+    color: var(--color-secondary);
+    font-weight: var(--font-weight-medium);
+    font-size: var(--font-size-l);
+  }
+
+  .vendor-greeting {
+    color: var(--color-text-label);
+    font-size: var(--font-size-s);
+    font-style: italic;
+    opacity: var(--opacity-muted);
+  }
+}
+
+// Vendor view
+.vendor-view {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
 // Activity detail
 .activity-detail,
 .facility-detail {

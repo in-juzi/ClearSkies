@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { LocationService } from '../../../services/location.service';
 import { VendorService } from '../../../services/vendor.service';
 import { Location, Facility, Activity, ActivityRewards } from '../../../models/location.model';
+import { Vendor } from '../../../models/vendor.model';
 import { ConfirmDialogService } from '../../../services/confirm-dialog.service';
 import { VendorComponent } from '../vendor/vendor.component';
 
@@ -31,6 +32,7 @@ export class LocationComponent implements OnInit, OnDestroy {
   errorMessage: string | null = null;
   successMessage: string | null = null;
   activityLog: Array<{ timestamp: Date; rewards: ActivityRewards; activityName: string }> = [];
+  facilityVendors: Map<string, Vendor> = new Map(); // Cache vendor data by vendorId
 
   ngOnInit() {
     // Load current location on component init
@@ -84,7 +86,7 @@ export class LocationComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Select a facility to view its activities or vendor
+   * Select a facility to view its activities and vendors
    */
   selectFacility(facility: Facility) {
     if (facility.stub) {
@@ -93,22 +95,58 @@ export class LocationComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Check if facility has a vendor
-    if (facility.vendorId) {
-      this.openVendor(facility.vendorId);
-      return;
-    }
-
-    // Otherwise, load activities as normal
+    // Always load facility activities (vendors are shown alongside, not instead of)
     this.locationService.getFacility(facility.facilityId).subscribe({
       next: () => {
         this.selectedActivity = null;
+        // Close any open vendor when switching facilities
+        this.vendorService.closeVendor();
+
+        // Load vendor data for this facility
+        this.loadFacilityVendors(facility);
       },
       error: (err) => {
         this.errorMessage = 'Failed to load facility';
         console.error('Error loading facility:', err);
       }
     });
+  }
+
+  /**
+   * Load vendor data for a facility
+   */
+  private loadFacilityVendors(facility: Facility) {
+    const vendorIds = this.getVendorIds(facility);
+
+    if (vendorIds.length === 0) {
+      return;
+    }
+
+    // Load each vendor's data
+    vendorIds.forEach(vendorId => {
+      // Skip if already cached
+      if (this.facilityVendors.has(vendorId)) {
+        return;
+      }
+
+      this.vendorService.getVendor(vendorId).subscribe({
+        next: (response) => {
+          this.facilityVendors.set(vendorId, response.vendor);
+          // Close the vendor immediately (we just want the data, not to open it)
+          this.vendorService.closeVendor();
+        },
+        error: (err) => {
+          console.error(`Failed to load vendor ${vendorId}:`, err);
+        }
+      });
+    });
+  }
+
+  /**
+   * Get vendor data from cache
+   */
+  getVendor(vendorId: string): Vendor | undefined {
+    return this.facilityVendors.get(vendorId);
   }
 
   /**
@@ -125,6 +163,32 @@ export class LocationComponent implements OnInit, OnDestroy {
         setTimeout(() => this.errorMessage = null, 3000);
       }
     });
+  }
+
+  /**
+   * Close vendor and return to facility view
+   */
+  closeVendor() {
+    this.vendorService.closeVendor();
+  }
+
+  /**
+   * Get vendor IDs for a facility (supports both old vendorId and new vendorIds)
+   */
+  getVendorIds(facility: Facility | null): string[] {
+    if (!facility) return [];
+
+    // Support new vendorIds array
+    if (facility.vendorIds && facility.vendorIds.length > 0) {
+      return facility.vendorIds;
+    }
+
+    // Backward compatibility with old vendorId
+    if (facility.vendorId) {
+      return [facility.vendorId];
+    }
+
+    return [];
   }
 
   /**
