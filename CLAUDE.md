@@ -14,16 +14,16 @@
 - ✅ Cooking/Crafting system (completed - quality inheritance, instance selection)
 
 **Recent Changes** (Last 10 commits):
+- docs: add critical warning about Mongoose Map access patterns
+- feat: enhance active crafting ingredient display UI
+- feat: add ingredient instance reuse and remaining count display
+- fix: ensure inventory refresh before auto-restart logic
+- fix: use Mongoose Map .get() method for ingredient access
+- docs: update CLAUDE.md with recent UI enhancements
 - chore: increase CSS budget for component stylesheets
 - feat: integrate ItemMiniComponent into location and crafting
 - feat: create ItemMiniComponent for standardized item display
 - feat: show active crafting ingredients in UI
-- feat: add drag-and-drop selling to vendor
-- refactor: remove dev tools from inventory component
-- docs: update CLAUDE.md with vendor system documentation
-- docs: update icon catalog with batch 2 progress
-- feat: add gold signal and vendor helper methods to inventory service
-- feat: integrate vendor system into location UI
 
 **Known Issues**:
 - None currently identified
