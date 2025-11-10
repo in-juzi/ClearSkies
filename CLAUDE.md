@@ -12,18 +12,19 @@
 - ✅ Icon organization (completed - 220+ icons organized into 6 categories)
 - ✅ Vendor/NPC trading system (completed - buy/sell at gathering locations)
 - ✅ Cooking/Crafting system (completed - quality inheritance, instance selection)
+- ✅ Multi-channel icon colorization (completed - path-level SVG colorization with 40+ materials)
 
 **Recent Changes** (Last 10 commits):
-- docs: add critical warning about Mongoose Map access patterns
-- feat: enhance active crafting ingredient display UI
-- feat: add ingredient instance reuse and remaining count display
-- fix: ensure inventory refresh before auto-restart logic
-- fix: use Mongoose Map .get() method for ingredient access
-- docs: update CLAUDE.md with recent UI enhancements
-- chore: increase CSS budget for component stylesheets
-- feat: integrate ItemMiniComponent into location and crafting
-- feat: create ItemMiniComponent for standardized item display
-- feat: show active crafting ingredients in UI
+- refactor: UI cleanup and polish across game components
+- feat: enhance crafting UI with icon display and improved feedback
+- fix: improve crafting ingredient consumption and validation
+- feat: create XpMiniComponent for inline XP display
+- chore: add build-check slash command
+- chore: increase component stylesheet size budget
+- feat: integrate icon system into inventory and location UIs
+- feat: add data-channel attributes to SVG icons
+- feat: add icon field to all item definitions
+- feat: add multi-channel SVG icon colorization system
 
 **Known Issues**:
 - None currently identified
@@ -66,8 +67,9 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 - Vendor: [ui/src/app/components/game/vendor/vendor.component.ts](ui/src/app/components/game/vendor/vendor.component.ts), [ui/src/app/components/game/vendor/vendor.component.html](ui/src/app/components/game/vendor/vendor.component.html)
 - Crafting: [ui/src/app/components/game/crafting/crafting.component.ts](ui/src/app/components/game/crafting/crafting.component.ts), [ui/src/app/components/game/crafting/crafting.component.html](ui/src/app/components/game/crafting/crafting.component.html)
 - Manual: [ui/src/app/components/manual/manual.component.ts](ui/src/app/components/manual/manual.component.ts), [ui/src/app/components/manual/sections/](ui/src/app/components/manual/sections/)
-- Shared Components: [ui/src/app/components/shared/item-mini/item-mini.component.ts](ui/src/app/components/shared/item-mini/item-mini.component.ts), [ui/src/app/components/shared/item-modifiers/item-modifiers.component.ts](ui/src/app/components/shared/item-modifiers/item-modifiers.component.ts)
-- Services: [ui/src/app/services/inventory.service.ts](ui/src/app/services/inventory.service.ts), [ui/src/app/services/location.service.ts](ui/src/app/services/location.service.ts), [ui/src/app/services/skills.service.ts](ui/src/app/services/skills.service.ts), [ui/src/app/services/auth.service.ts](ui/src/app/services/auth.service.ts), [ui/src/app/services/manual.service.ts](ui/src/app/services/manual.service.ts), [ui/src/app/services/chat.service.ts](ui/src/app/services/chat.service.ts), [ui/src/app/services/vendor.service.ts](ui/src/app/services/vendor.service.ts), [ui/src/app/services/recipe.service.ts](ui/src/app/services/recipe.service.ts), [ui/src/app/services/crafting.service.ts](ui/src/app/services/crafting.service.ts)
+- Shared Components: [ui/src/app/components/shared/item-mini/item-mini.component.ts](ui/src/app/components/shared/item-mini/item-mini.component.ts), [ui/src/app/components/shared/item-modifiers/item-modifiers.component.ts](ui/src/app/components/shared/item-modifiers/item-modifiers.component.ts), [ui/src/app/components/shared/icon/icon.component.ts](ui/src/app/components/shared/icon/icon.component.ts), [ui/src/app/components/shared/xp-mini/xp-mini.component.ts](ui/src/app/components/shared/xp-mini/xp-mini.component.ts)
+- Services: [ui/src/app/services/inventory.service.ts](ui/src/app/services/inventory.service.ts), [ui/src/app/services/location.service.ts](ui/src/app/services/location.service.ts), [ui/src/app/services/skills.service.ts](ui/src/app/services/skills.service.ts), [ui/src/app/services/auth.service.ts](ui/src/app/services/auth.service.ts), [ui/src/app/services/manual.service.ts](ui/src/app/services/manual.service.ts), [ui/src/app/services/chat.service.ts](ui/src/app/services/chat.service.ts), [ui/src/app/services/vendor.service.ts](ui/src/app/services/vendor.service.ts), [ui/src/app/services/recipe.service.ts](ui/src/app/services/recipe.service.ts), [ui/src/app/services/crafting.service.ts](ui/src/app/services/crafting.service.ts), [ui/src/app/services/icon.service.ts](ui/src/app/services/icon.service.ts)
+- Constants: [ui/src/app/constants/material-colors.constants.ts](ui/src/app/constants/material-colors.constants.ts)
 
 **Game Data:**
 - Item Definitions: [be/data/items/definitions/](be/data/items/definitions/)
@@ -1072,6 +1074,82 @@ The item requirements system enables activities to require specific tools and co
 - Frontend displays requirements in activity detail view
 
 **Full documentation:** `project/docs/item-requirements-system.md`
+
+## Icon System
+
+The icon system provides multi-channel SVG colorization for visual distinction between material tiers (copper vs iron vs steel, etc.):
+
+**Architecture:**
+- **IconService** ([ui/src/app/services/icon.service.ts](ui/src/app/services/icon.service.ts)): Fetches SVGs via HttpClient, parses with DOMParser, injects CSS styles
+- **IconComponent** ([ui/src/app/components/shared/icon/icon.component.ts](ui/src/app/components/shared/icon/icon.component.ts)): Renders colorized SVGs using innerHTML with async pipe
+- **Material Colors** ([ui/src/app/constants/material-colors.constants.ts](ui/src/app/constants/material-colors.constants.ts)): 40+ materials with multi-channel color definitions
+- **ItemIcon interface**: `{ path: string, material: string }` stored in item definitions
+
+**Color Channels:**
+Each material defines up to 6 color channels for different icon parts:
+- `primary`: Main color (always used, fallback for all paths)
+- `secondary`: Secondary accent color
+- `handle`: Handle/grip color (for tools/weapons)
+- `blade`: Blade/head color (for tools/weapons)
+- `edge`: Edge/detail color (for highlights)
+- `detail`: Fine detail color (for ornaments)
+
+**Example - Bronze Axe:**
+```typescript
+bronze: {
+  primary: '#CD853F',   // Bronze gold
+  handle: '#6B4423',    // Dark brown handle
+  blade: '#CD853F',     // Bronze blade body
+  edge: '#DAA520',      // Goldenrod edge
+  detail: '#A0826D'     // Tan detail
+}
+```
+
+**SVG Channel Metadata:**
+Icons use `data-channel` attributes to tag paths explicitly:
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <path d="M0 0h512v512H0z" />
+  <path fill="#fff" data-channel="handle" d="..." />
+  <path fill="#fff" data-channel="blade" d="..." />
+  <path fill="#fff" data-channel="edge" d="..." />
+</svg>
+```
+
+**How It Works:**
+1. IconComponent receives `icon: { path: "item_cat_axe_SPLIT.svg", material: "bronze" }`
+2. IconService fetches SVG via HTTP and caches result
+3. DOMParser parses SVG, reads `data-channel` attributes from paths
+4. Service generates CSS rules: `.icon-channel-handle { fill: #6B4423; }`
+5. Injects `<style>` block into SVG with color rules
+6. Returns SafeHtml for innerHTML binding
+7. Result: Bronze axe with brown handle, bronze blade, and golden edge!
+
+**Key Features:**
+- ✅ Metadata-driven (data-channel attributes, not path order)
+- ✅ Self-documenting (SVG files clearly show channel assignments)
+- ✅ Order-independent (can reorder paths without breaking)
+- ✅ Flexible (different icons can use different channel sets)
+- ✅ Graceful fallback (paths without attributes use primary color)
+- ✅ Performance (HTTP caching + in-memory cache)
+
+**Usage in Item Definitions:**
+```json
+{
+  "itemId": "bronze_woodcutting_axe",
+  "name": "Bronze Woodcutting Axe",
+  "icon": {
+    "path": "item-categories/item_cat_axe_SPLIT.svg",
+    "material": "bronze"
+  }
+}
+```
+
+**Integration:**
+- IconComponent used in ItemMiniComponent for standardized display
+- Integrated throughout UI: inventory grid, location lists, crafting, vendor
+- Default size: 40px (inventory), 24px (mini), configurable via `[size]` input
+- Colorization enabled by default, can disable with `[disableColor]="true"`
 
 ## XP System
 
