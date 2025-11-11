@@ -328,12 +328,6 @@ exports.getFacility = async (req, res) => {
       return res.status(404).json({ message: 'Facility not found' });
     }
 
-    // Debug: Log player skills and attributes
-    console.log('[getFacility] Player skills Map:', player.skills);
-    console.log('[getFacility] Player attributes Map:', player.attributes);
-    console.log('[getFacility] Player skills size:', player.skills?.size);
-    console.log('[getFacility] Player attributes size:', player.attributes?.size);
-
     // Check requirements for each activity
     const activitiesWithReqs = facility.activities.map(activity => {
       const reqCheck = locationService.meetsActivityRequirements(activity, player);

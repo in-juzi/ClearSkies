@@ -35,4 +35,7 @@ router.get('/equipment', inventoryController.getEquippedItems);
 router.post('/equipment/equip', inventoryController.equipItem);
 router.post('/equipment/unequip', inventoryController.unequipItem);
 
+// Consumable item routes
+router.post('/use', inventoryController.useItem);
+
 module.exports = router;

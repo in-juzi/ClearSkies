@@ -336,3 +336,93 @@ exports.getEquippedItems = async (req, res) => {
     res.status(500).json({ message: 'Error fetching equipped items', error: error.message });
   }
 };
+
+/**
+ * Use a consumable item
+ */
+exports.useItem = async (req, res) => {
+  try {
+    const { instanceId } = req.body;
+
+    if (!instanceId) {
+      return res.status(400).json({ message: 'Instance ID is required' });
+    }
+
+    const player = await Player.findOne({ userId: req.user._id });
+
+    if (!player) {
+      return res.status(404).json({ message: 'Player not found' });
+    }
+
+    // Find the item in inventory
+    const itemInstance = player.inventory.find(item => item.instanceId === instanceId);
+
+    if (!itemInstance) {
+      return res.status(404).json({ message: 'Item not found in inventory' });
+    }
+
+    // Get item definition
+    const itemDefinition = itemService.getItemDefinition(itemInstance.itemId);
+
+    if (!itemDefinition) {
+      return res.status(404).json({ message: 'Item definition not found' });
+    }
+
+    // Verify item is consumable
+    if (itemDefinition.category !== 'consumable') {
+      return res.status(400).json({ message: 'Item is not consumable' });
+    }
+
+    // Check if player is at full health and mana (don't waste items)
+    const isHealthFull = player.stats.health.current >= player.stats.health.max;
+    const isManaFull = player.stats.mana.current >= player.stats.mana.max;
+    const restoresHealth = itemDefinition.properties?.healthRestore > 0;
+    const restoresMana = itemDefinition.properties?.manaRestore > 0;
+
+    if (restoresHealth && !restoresMana && isHealthFull) {
+      return res.status(400).json({ message: 'Health is already full' });
+    }
+
+    if (restoresMana && !restoresHealth && isManaFull) {
+      return res.status(400).json({ message: 'Mana is already full' });
+    }
+
+    if (restoresHealth && restoresMana && isHealthFull && isManaFull) {
+      return res.status(400).json({ message: 'Health and mana are already full' });
+    }
+
+    // Use the item and apply effects
+    const effects = player.useConsumableItem(itemInstance, itemDefinition);
+
+    // Remove one instance of the item from inventory
+    player.removeItem(instanceId, 1);
+
+    await player.save();
+
+    // Get updated combat state if in combat
+    let combat = null;
+    if (player.isInCombat()) {
+      combat = {
+        ...player.activeCombat.toObject(),
+        playerHealth: player.stats.health,
+        playerMana: player.stats.mana,
+        combatLog: player.activeCombat.combatLog.map(entry => entry.toObject())
+      };
+    }
+
+    res.json({
+      message: 'Item used successfully',
+      effects,
+      health: player.stats.health,
+      mana: player.stats.mana,
+      combat,
+      itemUsed: {
+        itemId: itemDefinition.itemId,
+        name: itemDefinition.name
+      }
+    });
+  } catch (error) {
+    console.error('Use item error:', error);
+    res.status(500).json({ message: 'Error using item', error: error.message });
+  }
+};
