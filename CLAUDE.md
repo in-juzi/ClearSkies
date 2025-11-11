@@ -46,6 +46,17 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 - **Frontend**: Angular 20 (standalone components)
 - **Authentication**: JWT-based with bcrypt password hashing
 
+## Quick Task Guide
+
+**Add items to player:** `cd be && node utils/add-item.js` (edit itemId on line 28)
+**Create content:** Use Content Generator agent - describe what you want in natural language
+**Add recipe:** Template in Common Code Patterns → `be/data/recipes/{skill}/{recipe-id}.json`
+**Fix backend bug:** Check Critical Code Locations section for file:line references
+**Restart servers:** Backend (:3000), Frontend (:4200) - check if already running first!
+**Make migration:** Template in Database Migrations section → `be/migrations/NNN-description.js`
+**Hot-reload items:** POST `/api/inventory/reload` (no restart needed)
+**API endpoints:** See route files in `be/routes/` - all require JWT except auth register/login
+
 ## Quick File Reference
 
 ### Frequently Modified Files
@@ -122,27 +133,13 @@ ui/src/app/
 
 **Script**: `be/utils/add-item.js`
 
-When the user asks to add an item to their character (Juzi), use this script:
-
 ```bash
 cd be && node utils/add-item.js
 ```
 
-**How to modify for different items:**
-1. Open `be/utils/add-item.js`
-2. Change the `itemId` in line 28: `itemService.createItemInstance('ITEM_ID_HERE', QUANTITY)`
-3. Run the script from the `be` directory
+**How to modify:** Edit line 28 in `be/utils/add-item.js` to change `itemId` and quantity.
 
-**Example item IDs:**
-- Resources:
-  - Logs: `oak_log`, `willow_log`, `maple_log`
-  - Ore: `copper_ore`, `iron_ore`, `silver_ore`
-  - Fish: `trout`, `salmon`, `pike`, `shrimp`
-  - Herbs: `chamomile`, `sage`, `nettle`, `mandrake_root`, `moonpetal`, `dragons_breath`
-- Equipment: `bronze_woodcutting_axe`, `iron_woodcutting_axe`, `bronze_mining_pickaxe`, `iron_mining_pickaxe`, `bamboo_fishing_rod`, `willow_fishing_rod`, `copper_sword`, `iron_sword`, `wooden_shield`, `iron_helm`, `hemp_coif`, `leather_tunic`
-- Consumables: `bread`, `health_potion`, `mana_potion`
-
-**Note**: The script initializes the item service, connects to the database, finds the player "Juzi", and adds the specified item to their inventory.
+**Item examples:** See [be/data/items/](be/data/items/) for full catalog organized by category (consumables, equipment, resources).
 
 ## Common Code Patterns (Quick Reference)
 
@@ -290,149 +287,13 @@ const instanceIds = selectedIngredients.get
 
 **Real bug example**: Crafting ingredients weren't being consumed because `selectedIngredients[itemId]` returned `undefined`, causing the code to skip ingredient consumption logic entirely.
 
-### Content Generator Agent
+### Content Generator & Validator Agents
 
-**Agent**: `.claude/agents/content-generator.md`
+**Content Generator** (`.claude/agents/content-generator.md`): Describe what you want in natural language ("Add tuna fishing at dock, level 12"), agent creates drop tables, activities, facilities, locations with validation.
 
-AI-powered agent for creating game content with autonomous operation and comprehensive validation.
-
-**How to Use:**
-
-Simply describe what content you want in natural language:
-
-```
-"Add a mountain mine where players can mine copper ore"
-```
-
-The agent will autonomously:
-- ✓ Verify all item references exist
-- ✓ Create drop tables with balanced weights
-- ✓ Create activities with appropriate requirements
-- ✓ Create facilities and locations
-- ✓ Write medieval fantasy descriptions
-- ✓ Report back with summary
-
-**Example Requests:**
-
-```
-"Create a fishing spot for catching tuna in deep water"
-
-"Add salmon fishing to Kennik dock, requires level 10 fishing"
-
-"I need a forest clearing with logging. Players should be able to
-chop birch trees at level 5 woodcutting"
-
-"Create a drop table for rare gemstone mining with rubies (5%),
-sapphires (10%), and common ore (85%)"
-```
-
-**Features:**
-- Works in background while you continue coding
-- AI-powered validation and balance suggestions
-- Natural language interface (no menus or prompts)
-- Creates entire content chains (drop table → activity → facility → location)
-- Writes evocative medieval fantasy descriptions
-- Checks existing content for consistency
-- Explains design decisions
-
-**What It Creates:**
-1. Drop Tables - Weighted loot pools with item validation
-2. Activities - Actions with requirements and rewards
-3. Facilities - Buildings that house activities
-4. Locations - Areas with facilities and navigation
-
-**Validation:**
-- ✓ All referenced items must exist
-- ✓ Skills, biomes, and references validated
-- ✓ Drop tables checked before activities reference them
-- ✓ Balanced rewards and requirements
-- ✓ Prevents common errors automatically
-
-**Workflow:**
-
-Traditional approach: ~27 minutes + context switching
-With agent: ~30 seconds of your time, agent works in background
+**Content Validator** (`.claude/agents/content-validator.md`): Run "validate all game content" to check references, detect broken links, find unused content.
 
 See [project/docs/content-generator-agent.md](project/docs/content-generator-agent.md) for full documentation.
-
-### Content Validator Agent
-
-**Agent**: `.claude/agents/content-validator.md`
-
-AI-powered agent for validating existing game content and identifying broken references, inconsistencies, and data integrity issues.
-
-**How to Use:**
-
-Simply ask to validate the content:
-
-```
-"Validate all game content"
-
-"Check for broken references in the content files"
-```
-
-The agent will autonomously:
-- ✓ Read all item, quality, trait, drop table, activity, facility, location, and biome definitions
-- ✓ Build reference maps of all valid IDs
-- ✓ Validate all references across content files
-- ✓ Check for broken item references in drop tables
-- ✓ Identify unreferenced drop tables or activities
-- ✓ Verify skill, biome, and subtype references
-- ✓ Check quantity ranges and balance values
-- ✓ Report comprehensive findings with fix suggestions
-
-**What It Validates:**
-
-1. **Item References** - All item IDs in drop tables exist in item definitions
-2. **Drop Table References** - All drop tables referenced by activities exist
-3. **Skill References** - All skills in requirements are valid (woodcutting, mining, fishing, smithing, cooking)
-4. **Biome References** - All biomes referenced by locations exist
-5. **Facility References** - All facilities in locations exist
-6. **Activity References** - All activities in facilities exist
-7. **Navigation Links** - All location links reference existing locations
-8. **Quality/Trait IDs** - All quality and trait references are valid
-9. **Equipment Subtypes** - All subtypes in requirements exist
-10. **Data Integrity** - Quantity ranges, level values, weight values are reasonable
-
-**Error Severity Levels:**
-
-- **CRITICAL**: Breaks functionality (missing items, broken references)
-- **WARNING**: May cause issues (unreferenced content, unusual balance)
-- **INFO**: Best practices (missing descriptions, naming conventions)
-
-**Example Issues Caught:**
-
-```
-[CRITICAL] Forest Clearing - Chop Oak Trees Activity
-  Issue: Drop table references item 'birch_log'
-  Problem: Item 'birch_log' does not exist
-  Fix: Either create birch_log.json or remove from drop table
-
-[WARNING] Woodcutting Pine Drop Table
-  Issue: Drop table defined but never referenced
-  Fix: Remove file or add activity using this table
-
-[INFO] Mountain Pass Location
-  Issue: Missing ambient description
-  Fix: Add atmospheric details for immersion
-```
-
-**Workflow:**
-
-1. Reads all content definitions
-2. Builds reference maps (valid IDs)
-3. Validates each content type systematically
-4. Groups errors by severity
-5. Provides actionable fix suggestions
-6. Reports statistics and health assessment
-
-**Benefits:**
-- Catches broken references before they cause runtime errors
-- Identifies unused content (dead code)
-- Ensures consistent data integrity
-- Provides actionable fix suggestions
-- Works autonomously in background
-- Comprehensive reporting with file locations
 
 ## Optimization Guidelines for AI
 
@@ -538,237 +399,48 @@ The agent will autonomously:
 ## Important Context
 
 ### Completed Features
-- ✅ User authentication system (register/login/logout)
-- ✅ JWT token-based session management with localStorage persistence
-- ✅ Session persistence across page refreshes
-- ✅ Protected routes with async auth guards (authGuard, guestGuard)
-- ✅ HTTP interceptor for automatic JWT token attachment
-- ✅ Player profile with character stats
-- ✅ MongoDB models (User, Player)
-- ✅ Game interface with three-column layout (inventory, location area, character/skills/attributes/equipment)
-- ✅ Tabbed sidebar navigation for character info, equipment, skills, and attributes
-- ✅ Skills system with 12 skills:
-  - Gathering: woodcutting, mining, fishing, herbalism
-  - Crafting: smithing, cooking
-  - Combat: oneHanded, dualWield, twoHanded, ranged, casting, gun
-- ✅ Skills UI with compact 3-column grid layout and hover tooltips
-- ✅ Edge-aware tooltip positioning (prevents cutoff at screen edges)
-- ✅ XP gain and automatic skill leveling (1000 XP per level)
-- ✅ XP scaling system with diminishing returns (polynomial decay based on level difference)
-- ✅ Attributes system with 7 attributes (strength, endurance, magic, perception, dexterity, will, charisma)
-- ✅ Skill-to-attribute XP linking (skills award 50% XP to their main attribute)
-- ✅ Attributes UI with compact 3-column grid and hover details
-- ✅ Database migration system with up/down functions
-- ✅ Skills API endpoints (GET all skills, GET single skill, POST add XP)
-- ✅ Attributes API endpoints (GET all attributes, GET single attribute, POST add XP)
-- ✅ Inventory system with dynamic qualities and traits
-- ✅ JSON-based item definitions (40+ items organized in category subdirectories: consumables, equipment, resources)
-- ✅ Recursive directory loading for item definitions (supports nested category structure)
-- ✅ Quality system (3-tier simplified: woodGrain, moisture, purity, freshness, age)
-- ✅ Trait system (3-tier: fragrant, knotted, weathered, pristine, cursed, blessed, masterwork)
-- ✅ Item instance management with stacking logic
-- ✅ Inventory UI with category filtering and detailed item views
-- ✅ Draggable item details panel (repositionable via header drag)
-- ✅ Random quality/trait generation for items
-- ✅ Dynamic vendor pricing based on qualities and traits
-- ✅ Hot-reload capability for item definitions
-- ✅ Location system with travel and activity management
-- ✅ JSON-based location definitions (locations, biomes, facilities, activities)
-- ✅ Location discovery and travel mechanics
-- ✅ Activity system with skill-based requirements and rewards
-- ✅ Activity progress tracking with time-based completion
-- ✅ Activity completion log with recent rewards history (last 10 entries)
-- ✅ Automatic activity reward claiming (no manual claim button needed)
-- ✅ Location UI with facility and activity browsing
-- ✅ Location API endpoints (GET locations, POST discover, POST start activity, POST travel)
-- ✅ Drop table system for flexible loot distribution
-- ✅ Weighted random drop selection with quality bonuses
-- ✅ Reusable drop tables across multiple activities
-- ✅ Equipment slot system with 10 default slots (head, body, mainHand, offHand, belt, gloves, boots, necklace, ringRight, ringLeft)
-- ✅ Extensible slot architecture (easy to add new slots via addEquipmentSlot method)
-- ✅ Item definitions with slot assignments for equipment items
-- ✅ Equip/unequip functionality with slot validation
-- ✅ Equipment UI with 3x4 grid layout and square slots
-- ✅ Drag-and-drop from inventory to equipment slots
-- ✅ Visual indicators for equipped items (purple border, sword emoji)
-- ✅ Right-click to unequip items from slots
-- ✅ Equipment API endpoints (GET equipped items, POST equip, POST unequip)
-- ✅ Equipment service for managing equipped items state
-- ✅ SVG icon system (222+ scalable icons for abilities, items, skills, attributes, UI elements)
-- ✅ Improved UI layout with viewport overflow fixes (100vh height, proper overflow handling)
-- ✅ Nodemon for backend auto-restart during development
-- ✅ Level-based quality and trait system (simplified to discrete levels 1-3 for both qualities and traits)
-- ✅ Quality and trait display with descriptive names instead of percentages
-- ✅ Improved item stacking based on identical quality/trait levels
-- ✅ Multi-channel icon colorization (40+ materials with 6+ color channels per material)
-- ✅ IconComponent integration across all UI (inventory, crafting, manual, vendors)
-- ✅ Smithing foundation (copper/tin mining, ore smelting, Village Forge facility)
-- ✅ Confirm dialog component for destructive action confirmation
-- ✅ Character status component (placeholder for future features)
-- ✅ JSON safety utilities and response validator middleware
-- ✅ Herbalism system (6 herbs, 4 gathering facilities, herbalism skill linked to Will)
-- ✅ Combat skills framework (6 combat skills: oneHanded, dualWield, twoHanded, ranged, casting, gun)
-- ✅ Manual/help system (comprehensive game guide with 6 tabbed sections)
-- ✅ Quality/trait effect display (enhanced inventory UI showing all effect types)
-- ✅ XP scaling feedback (shows raw vs scaled XP in activity completion)
-- ✅ Development utilities (content generator, validator, duplicate checker, XP tester)
-- ✅ Content generator and validator AI agents (.claude/agents/)
-- ✅ Real-time chat system with Socket.io (global chat room, message persistence, rate limiting)
-- ✅ Chat UI with collapsible window, command system, and autocomplete
-- ✅ Chat commands (/help, /online, /clear) with keyboard navigation
-- ✅ Icon organization system (220+ icons organized into 6 categories)
-- ✅ Item icon paths (all items include iconPath field for visual display)
-- ✅ Gold sync system (auth service as single source of truth, automatic sync via Angular effects)
-- ✅ Item sorting by quality/trait scores (descending order by total tier levels)
-- ✅ Drag-and-drop selling to vendors (drag items from inventory to vendor sell tab)
-- ✅ Active crafting ingredient display (shows items being used with quality/trait badges)
-- ✅ Rich crafting completion log (timestamp, output with modifiers, XP gained)
-- ✅ ItemMiniComponent for standardized item display (reusable across all game views)
-- ✅ Vendor name and greeting display in location UI
-- ✅ Multiple vendors per facility (vendorIds array support)
-- ✅ Cooking/Crafting system (4 cooking recipes, quality inheritance with skill bonus)
-- ✅ Recipe-based crafting (JSON recipe definitions with ingredients, outputs, XP)
-- ✅ Time-based crafting with auto-completion (6-12 second durations)
-- ✅ Ingredient instance selection (choose specific items by quality/traits)
-- ✅ Quality badges (Common, Uncommon, Rare, Epic, Legendary visual indicators)
-- ✅ Auto-select best quality feature (one-click optimal ingredient selection)
-- ✅ Crafting UI with instance cards, selection validation, and progress display
-- ✅ Crafting API endpoints (GET recipes, POST start/complete/cancel)
+
+**Core Systems**: Auth/JWT, Player/User models, MongoDB with migrations
+**Game Mechanics**: Skills (12), Attributes (7), XP scaling with 50% skill→attribute passthrough
+**Inventory**: Items (40+), Quality/Trait (3-tier), Stacking, Equipment slots (10)
+**World**: Locations, Activities, Drop tables, Travel, Time-based completion
+**Crafting**: Cooking/Smithing, Recipe system, Quality inheritance, Instance selection
+**UI**: IconComponent (multi-channel colorization), ItemMiniComponent, Manual/help system
+**Social**: Real-time chat (Socket.io), Vendor trading, Gold system
+
+See [project/docs/completed-features.md](project/docs/completed-features.md) for full list.
 
 ### Database Models
 
-**User** (Authentication):
-- username, email, password (hashed)
-- isActive status, lastLogin timestamp
+**User** ([be/models/User.js](be/models/User.js) ~L10-25): Auth (username, email, password hash, isActive)
 
-**ChatMessage** (Chat System):
-- userId (reference to User)
-- username (denormalized for performance)
-- message (chat text, max 500 chars)
-- channel (default: 'global')
-- createdAt (timestamp)
-- Static method: `getRecentMessages(channel, limit)` - Retrieve chat history
+**ChatMessage** ([be/models/ChatMessage.js](be/models/ChatMessage.js) ~L10-20): Chat history (userId, username, message, channel)
 
-**Player** (Game Data):
-- characterName, level, experience
-- stats (health, mana, strength, dexterity, intelligence, vitality)
-- attributes (strength, endurance, magic, perception, dexterity, will, charisma) - each with level & experience (1000 XP per level)
-- skills (woodcutting, mining, fishing, smithing, cooking, herbalism, oneHanded, dualWield, twoHanded, ranged, casting, gun) - each with level, experience, and mainAttribute
-  - Gathering Skills:
-    - Woodcutting → Strength
-    - Mining → Strength
-    - Fishing → Endurance
-    - Herbalism → Will
-  - Crafting Skills:
-    - Smithing → Endurance
-    - Cooking → Will
-  - Combat Skills:
-    - One-Handed → Strength
-    - Dual Wield → Dexterity
-    - Two-Handed → Strength
-    - Ranged → Dexterity
-    - Casting → Magic
-    - Gun → Perception
-- inventory - array of item instances with:
-  - instanceId (unique ID)
-  - itemId (reference to item definition)
-  - quantity (stack size)
-  - qualities (Map<string, number>) - quality levels as integers (1-5)
-  - traits (Map<string, number>) - trait levels as integers (1-3)
-  - equipped (boolean)
-  - acquiredAt (timestamp)
-- inventoryCapacity (default: 100)
-- equipmentSlots (Map<string, string|null>) - Extensible equipment slot system
-  - Default slots: head, body, mainHand, offHand, belt, gloves, boots, necklace, ringRight, ringLeft
-  - Key = slot name, Value = instanceId of equipped item (or null)
-  - New slots can be added dynamically via addEquipmentSlot() method
-- currentLocation (string, default: 'kennik') - Current location ID
-- discoveredLocations (array of strings, default: ['kennik']) - List of discovered location IDs
-- activeActivity (object, optional) - Currently active activity with:
-  - activityId, facilityId, locationId
-  - startTime, endTime (timestamps)
-- travelState (object, optional) - Travel progress with:
-  - isTravel (boolean)
-  - targetLocationId
-  - startTime, endTime (timestamps)
-- gold, questProgress, achievements
-- Methods:
-  - `addSkillExperience(skillName, xp)` - Awards skill XP and 50% to linked attribute
-  - `getSkillProgress(skillName)`
-  - `addAttributeExperience(attributeName, xp)`
-  - `getAttributeProgress(attributeName)`
-  - `addItem(itemInstance)` - Add item with stacking logic
-  - `removeItem(instanceId, quantity)` - Remove items
-  - `getItem(instanceId)` - Get single item
-  - `getItemsByItemId(itemId)` - Get all of one type
-  - `getInventorySize()` - Total item count
-  - `getInventoryValue()` - Total vendor price
-  - `equipItem(instanceId, slotName)` - Equip item to slot (auto-unequips current item)
-  - `unequipItem(slotName)` - Unequip item from slot
-  - `getEquippedItems()` - Get all equipped items
-  - `isSlotAvailable(slotName)` - Check if slot is empty
-  - `addEquipmentSlot(slotName)` - Add new equipment slot (for extensibility)
-  - `hasEquippedSubtype(subtype, itemService)` - Check if item with subtype is equipped in any slot
-  - `hasInventoryItem(itemId, minQuantity)` - Check if item exists in inventory with min quantity
-  - `getInventoryItemQuantity(itemId)` - Get total quantity of item in inventory
+**Player** ([be/models/Player.js](be/models/Player.js) ~L15-120): Game data
+- Skills (12): woodcutting, mining, fishing, herbalism, smithing, cooking, oneHanded, dualWield, twoHanded, ranged, casting, gun
+- Attributes (7): strength, endurance, magic, perception, dexterity, will, charisma
+- Skill-Attribute links: woodcutting/mining→strength, fishing/smithing→endurance, herbalism/cooking→will, oneHanded/twoHanded→strength, dualWield/ranged→dexterity, casting→magic, gun→perception
+- Inventory: items with qualities (Map), traits (Map), quantities, equipped flag
+- Equipment slots (Map): 10 default slots (head, body, mainHand, offHand, belt, gloves, boots, necklace, ringRight, ringLeft)
+- Location state: currentLocation, discoveredLocations, activeActivity, travelState
+- Gold, questProgress, achievements
 
-### API Endpoints Quick Reference
+**Key Methods:** See [be/models/Player.js](be/models/Player.js) for full list - `addSkillExperience()` ~L145, `addItem()` ~L200, `equipItem()` ~L280, etc.
 
-All endpoints except auth register/login require JWT token (protected).
+### API Routes Reference
 
-**Auth**: `/api/auth`
-- POST `/register` - Create account
-- POST `/login` - Login (returns JWT token)
-- GET `/me` - Get profile
-- POST `/logout` - Logout
+All endpoints require JWT authentication except `/api/auth/register` and `/api/auth/login`.
 
-**Skills**: `/api/skills` (all protected)
-- GET `/` - All player skills with progress
-- GET `/:skillName` - Single skill details
-- POST `/:skillName/experience` - Add XP (awards 50% to linked attribute)
-  - Body: `{ xp }`
-  - Returns: `{ skill: {...}, attribute: {...} }`
-
-**Attributes**: `/api/attributes` (all protected)
-- GET `/` - All player attributes with progress
-- GET `/:attributeName` - Single attribute details
-- POST `/:attributeName/experience` - Add XP
-  - Body: `{ xp }`
-
-**Inventory**: `/api/inventory` (all protected)
-- GET `/` - Full inventory with details
-- GET `/items/:instanceId` - Single item
-- POST `/items` - Add item - Body: `{ itemId, quantity, qualities?, traits? }`
-- POST `/items/random` - Add with random quality/traits - Body: `{ itemId, quantity }`
-- DELETE `/items` - Remove item - Body: `{ instanceId, quantity? }`
-- GET `/definitions` - All item definitions - Query: `?category=resource|equipment|consumable`
-- GET `/definitions/:itemId` - Single definition
-- POST `/reload` - Hot-reload definitions (admin)
-
-**Equipment**: `/api/inventory/equipment` (all protected)
-- GET `/` - All equipped items + available slots
-- POST `/equip` - Equip to slot (auto-unequips current) - Body: `{ instanceId, slotName }`
-- POST `/unequip` - Unequip from slot - Body: `{ slotName }`
-
-**Locations**: `/api/locations` (all protected)
-- GET `/` - All locations (discovered + undiscovered)
-- GET `/:locationId` - Location details
-- POST `/discover` - Discover location - Body: `{ locationId }`
-- POST `/travel` - Travel to location - Body: `{ targetLocationId }`
-- POST `/activity/start` - Start activity - Body: `{ activityId, facilityId }`
-- POST `/activity/complete` - Complete activity, claim rewards
-- POST `/activity/cancel` - Cancel current activity
-
-**Manual**: `/api/manual` (all protected)
-- GET `/skills` - All skill definitions for manual
-- GET `/attributes` - All attribute definitions for manual
-- GET `/items` - All item definitions for manual
-- GET `/locations` - All location/facility/activity data for manual
-
-**Vendors**: `/api/vendors` (all protected)
-- GET `/:vendorId` - Get vendor info and stock with item definitions
-- POST `/:vendorId/buy` - Buy item from vendor - Body: `{ itemId, quantity }`
-- POST `/:vendorId/sell` - Sell item to vendor - Body: `{ instanceId, quantity }`
+**Route Files:**
+- Auth: `/api/auth` → [be/routes/auth.js](be/routes/auth.js)
+- Skills: `/api/skills` → [be/routes/skills.js](be/routes/skills.js)
+- Attributes: `/api/attributes` → [be/routes/attributes.js](be/routes/attributes.js)
+- Inventory: `/api/inventory` → [be/routes/inventory.js](be/routes/inventory.js)
+- Equipment: `/api/inventory/equipment` → [be/routes/inventory.js](be/routes/inventory.js)
+- Locations: `/api/locations` → [be/routes/locations.js](be/routes/locations.js)
+- Vendors: `/api/vendors` → [be/routes/vendors.js](be/routes/vendors.js)
+- Crafting: `/api/crafting` → [be/routes/crafting.js](be/routes/crafting.js)
+- Manual: `/api/manual` → [be/routes/manual.js](be/routes/manual.js)
 
 ## Development Quick Rules
 
@@ -1084,250 +756,51 @@ The item requirements system enables activities to require specific tools and co
 
 ## Icon System
 
-The icon system provides multi-channel SVG colorization for visual distinction between material tiers (copper vs iron vs steel, etc.):
+Multi-channel SVG colorization for visual distinction between material tiers (copper vs iron vs steel).
 
-**Architecture:**
-- **IconService** ([ui/src/app/services/icon.service.ts](ui/src/app/services/icon.service.ts)): Fetches SVGs via HttpClient, parses with DOMParser, injects CSS styles
-- **IconComponent** ([ui/src/app/components/shared/icon/icon.component.ts](ui/src/app/components/shared/icon/icon.component.ts)): Renders colorized SVGs using innerHTML with async pipe
-- **Material Colors** ([ui/src/app/constants/material-colors.constants.ts](ui/src/app/constants/material-colors.constants.ts)): 40+ materials with multi-channel color definitions
-- **ItemIcon interface**: `{ path: string, material: string }` stored in item definitions
-
-**Color Channels:**
-Each material defines up to 6 color channels for different icon parts:
-- `primary`: Main color (always used, fallback for all paths)
-- `secondary`: Secondary accent color
-- `handle`: Handle/grip color (for tools/weapons)
-- `blade`: Blade/head color (for tools/weapons)
-- `edge`: Edge/detail color (for highlights)
-- `detail`: Fine detail color (for ornaments)
-
-**Example - Bronze Axe:**
-```typescript
-bronze: {
-  primary: '#CD853F',   // Bronze gold
-  handle: '#6B4423',    // Dark brown handle
-  blade: '#CD853F',     // Bronze blade body
-  edge: '#DAA520',      // Goldenrod edge
-  detail: '#A0826D'     // Tan detail
-}
-```
-
-**SVG Channel Metadata:**
-Icons use `data-channel` attributes to tag paths explicitly:
-```svg
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <path d="M0 0h512v512H0z" />
-  <path fill="#fff" data-channel="handle" d="..." />
-  <path fill="#fff" data-channel="blade" d="..." />
-  <path fill="#fff" data-channel="edge" d="..." />
-</svg>
-```
+**Key Files:**
+- IconService: [ui/src/app/services/icon.service.ts](ui/src/app/services/icon.service.ts) - HTTP fetch, parsing, CSS injection
+- IconComponent: [ui/src/app/components/shared/icon/icon.component.ts](ui/src/app/components/shared/icon/icon.component.ts) - Renders colorized SVGs
+- Material Colors: [ui/src/app/constants/material-colors.constants.ts](ui/src/app/constants/material-colors.constants.ts) - 40+ materials with 6 color channels each
 
 **How It Works:**
-1. IconComponent receives `icon: { path: "item_cat_axe_SPLIT.svg", material: "bronze" }`
-2. IconService fetches SVG via HTTP and caches result
-3. DOMParser parses SVG, reads `data-channel` attributes from paths
-4. Service generates CSS rules: `.icon-channel-handle { fill: #6B4423; }`
-5. Injects `<style>` block into SVG with color rules
-6. Returns SafeHtml for innerHTML binding
-7. Result: Bronze axe with brown handle, bronze blade, and golden edge!
-
-**Key Features:**
-- ✅ Metadata-driven (data-channel attributes, not path order)
-- ✅ Self-documenting (SVG files clearly show channel assignments)
-- ✅ Order-independent (can reorder paths without breaking)
-- ✅ Flexible (different icons can use different channel sets)
-- ✅ Graceful fallback (paths without attributes use primary color)
-- ✅ Performance (HTTP caching + in-memory cache)
+- SVG paths tagged with `data-channel` attributes (blade, handle, edge, detail, etc.)
+- Material definitions provide colors for each channel (e.g., bronze: handle=#6B4423, blade=#CD853F)
+- IconService fetches SVG, generates CSS rules, injects styles, returns SafeHtml
+- Result: Same SVG, different colors per material
 
 **Usage in Item Definitions:**
 ```json
-{
-  "itemId": "bronze_woodcutting_axe",
-  "name": "Bronze Woodcutting Axe",
-  "icon": {
-    "path": "item-categories/item_cat_axe_SPLIT.svg",
-    "material": "bronze"
-  }
-}
+{ "icon": { "path": "item-categories/item_cat_axe_SPLIT.svg", "material": "bronze" } }
 ```
 
-**Integration:**
-- IconComponent used in ItemMiniComponent for standardized display
-- Integrated throughout UI: inventory grid, location lists, crafting, vendor
-- Default size: 40px (inventory), 24px (mini), configurable via `[size]` input
-- Colorization enabled by default, can disable with `[disableColor]="true"`
-
-**SVG Path Splitting:**
-To prepare icons for multi-channel colorization, single-path SVGs must be split into separate paths:
-
-1. **Use the normalized splitting script (recommended):**
-   ```bash
-   # First time setup
-   cd project && npm install svgpath
-
-   # Split and normalize
-   node project/utils/split-svg-paths-normalized.js ui/src/assets/icons/item-categories/icon.svg
-   ```
-   This converts relative coordinates to absolute, then splits paths at `M` commands and creates `icon_SPLIT.svg`
-
-   **Alternative (basic script, no normalization):**
-   ```bash
-   node project/utils/split-svg-paths.js ui/src/assets/icons/item-categories/icon.svg
-   ```
-   Only use if the SVG already uses absolute coordinates (all uppercase commands like `M`, `L`, `C`)
-
-2. **Add semantic channels manually:**
-   - Review each generated path to understand what it represents
-   - Add `data-channel` attributes based on the icon type:
-     - Weapons: `blade`, `edge`, `handle`, `guard`, `decoration`
-     - Tools: `head`, `handle`, `detail`
-     - Armor: `body`, `trim`, `detail`, `padding`
-   - Update comments with descriptive names
-
-3. **Example workflow:**
-   ```svg
-   <!-- Before: Single path -->
-   <path fill="#fff" d="M145.75 19.78...z M222.844 46.687...z" />
-
-   <!-- After: Split with channels -->
-   <path fill="#fff" data-channel="blade" d="M145.75 19.78...z" />
-   <path fill="#fff" data-channel="handle" d="M222.844 46.687...z" />
-   ```
-
-**Full documentation:** [project/docs/svg-path-splitting-process.md](project/docs/svg-path-splitting-process.md)
+**SVG Preparation:**
+- Split single-path SVGs: `node project/utils/split-svg-paths-normalized.js path/to/icon.svg`
+- Add `data-channel` attributes manually to each path
+- See [project/docs/svg-path-splitting-process.md](project/docs/svg-path-splitting-process.md)
 
 ## XP System
 
-The XP system uses a three-tier architecture with skills, attributes, and intelligent scaling to encourage content progression:
+Three-tier architecture: Skills → Attributes with intelligent scaling to encourage progression.
 
-### 1. **Skills & Attributes**
+**Key Mechanics:**
+- **1000 XP per level** for both skills and attributes
+- **50% XP passthrough**: Skill XP automatically awards 50% to linked attribute (e.g., woodcutting → strength)
+- **Scaling formula**: `1 / (1 + 0.3 * (playerLevel - activityLevel - 1))` with grace range (0-1 levels = full XP)
+- **Minimum floor**: Always awards at least 1 XP
 
-**Skills** (6 gathering/crafting skills):
-- woodcutting → Strength attribute
-- mining → Strength attribute
-- fishing → Endurance attribute
-- smithing → Endurance attribute
-- cooking → Will attribute
-- herbalism → Will attribute
+**Scaling Examples** (L5 activity, 45 raw XP):
+- L5-6: 45 XP (100%, grace range)
+- L7: 34 XP (75%, starts scaling)
+- L10: 20 XP (44%)
+- L15: 12 XP (26%)
 
-**Attributes** (7 total):
-- strength, endurance, magic, perception, dexterity, will, charisma
+**Key Files:**
+- LocationService ~L185-205: [be/services/locationService.js](be/services/locationService.js) - `calculateScaledXP()` formula
+- Player ~L145-165: [be/models/Player.js](be/models/Player.js) - `addSkillExperience()` with attribute linking
+- Test script: [be/utils/test-xp-scaling.js](be/utils/test-xp-scaling.js)
 
-**Leveling:**
-- 1000 XP per level for both skills and attributes
-- Level formula: `Math.floor(xp / 1000) + 1`
-- Example: 2500 XP = Level 3
-
-### 2. **XP Linking (Skills → Attributes)**
-
-When a skill gains XP, **50% of that XP is automatically awarded to its linked attribute**:
-
-```javascript
-// Player completes woodcutting activity → earns 100 XP
-// Woodcutting skill gains 100 XP
-// Strength attribute gains 50 XP (50% of 100)
-```
-
-**Implementation:**
-- `Player.addSkillExperience(skillName, xp)` - Awards skill XP and 50% to linked attribute
-- Returns results for both skill and attribute level-ups
-
-### 3. **XP Scaling System (Diminishing Returns)**
-
-Activities award "raw XP" which is scaled based on the player's skill level vs the activity's level requirement. This prevents low-level activity farming and encourages progression to higher-level content.
-
-**Scaling Formula:**
-```javascript
-calculateScaledXP(rawXP, playerLevel, activityLevel) {
-  const levelDiff = playerLevel - activityLevel;
-
-  // Grace range: 0-1 levels over = full XP
-  if (levelDiff <= 1) {
-    return rawXP;
-  }
-
-  // Polynomial decay: 1 / (1 + 0.3 * (diff - 1))
-  const effectiveDiff = levelDiff - 1;
-  const scalingFactor = 1 / (1 + 0.3 * effectiveDiff);
-
-  // Apply floor of 1 XP
-  return Math.max(1, Math.floor(rawXP * scalingFactor));
-}
-```
-
-**Example Scaling** (Mine Iron: L5 requirement, 45 raw XP):
-
-| Player Level | Level Diff | Scaled XP | % of Raw | Notes |
-|--------------|------------|-----------|----------|-------|
-| L5 | 0 | 45 XP | 100% | At-level |
-| L6 | +1 | 45 XP | 100% | Grace range |
-| L7 | +2 | 34 XP | 75% | Starts scaling |
-| L10 | +5 | 20 XP | 44% | Half effectiveness |
-| L15 | +10 | 12 XP | 26% | Very low |
-| L25 | +20 | 6 XP | 13% | Minimum effective |
-
-**Key Properties:**
-- **Grace Range**: 0-1 levels over = full XP (forgiving for near-level content)
-- **Polynomial Curve**: Smoother than linear, gentler than exponential
-- **Minimum Floor**: Always awards at least 1 XP (symbolic reward)
-- **Intuitive**: Players can estimate "about 75% at +2 levels, 50% at +5 levels"
-- **Predictable**: Same formula applies consistently everywhere
-
-**Implementation:**
-- `LocationService.calculateScaledXP(rawXP, playerLevel, activityLevel)` - Scaling logic
-- `LocationService.calculateActivityRewards(activity, { player })` - Applies scaling automatically
-- Activity's skill requirement used as activity level reference
-- Both raw and scaled XP returned in API responses for UI display
-
-**UI Display:**
-- Activity completion log shows: "woodcutting: 30 XP → 23 XP" (when scaled)
-- Or simply: "woodcutting: +30 XP" (when at-level/in grace range)
-- Clear feedback helps players understand the system
-
-**Testing:**
-- Test script available: `be/utils/test-xp-scaling.js`
-- Verifies formula behavior across level ranges
-- Confirms minimum floor is enforced
-
-### 4. **How Players Earn XP**
-
-**Activities** (Primary XP Source):
-- Activities award skill XP when completed (time-based)
-- XP values defined in activity JSON files
-- Scaled automatically based on player level
-- Attribute XP calculated from scaled value (50% passthrough)
-
-**Example Flow:**
-1. Player starts "Mine Iron" activity (45 raw mining XP)
-2. Player is level 7, activity requires level 5 (+2 difference)
-3. Scaled XP: 45 × 77% = 34 XP
-4. Mining skill gains 34 XP
-5. Strength attribute gains 17 XP (50% of 34)
-
-### 5. **API Endpoints**
-
-**Skills:**
-- `POST /api/skills/:skillName/experience` - Add XP to skill, returns both skill and attribute results
-
-**Attributes:**
-- `POST /api/attributes/:attributeName/experience` - Add XP to attribute
-
-**Activities:**
-- Activity completion automatically awards scaled XP via `POST /api/locations/activities/complete`
-- Response includes both `experience` (scaled) and `rawExperience` (original) values
-
-### 6. **Balance Notes**
-
-- **1000 XP per level**: Consistent progression across skills and attributes
-- **50% XP flow**: Ensures attributes level slower than skills (as intended)
-- **Activity XP ranges**: 20-50 XP per completion (raw values)
-- **Activity durations**: 5-50 seconds (prevents instant grinding)
-- **Grace range**: Allows players to continue activities 1 level below comfortably
-- **Scaling curve**: Pushes players to upgrade to higher-level activities without hard forcing
-
-**Design Philosophy:**
-The XP scaling system encourages natural progression while respecting player freedom. Players can still farm lower-level content if desired (minimum 1 XP), but they're gently incentivized to seek level-appropriate challenges for maximum efficiency.
+**Balance:** 20-50 XP per activity, 5-50 second durations, encourages level-appropriate content without hard forcing.
 
 ## Content Generator Agent
 
@@ -1547,332 +1020,51 @@ The chat component uses medieval fantasy theme matching the game design:
 
 ## Vendor/NPC Trading System
 
-The vendor system provides NPC merchants at gathering locations for buying tools and selling resources.
+NPC merchants at gathering locations for buying tools and selling resources.
 
-### Architecture
+**Key Files:**
+- VendorService: [be/services/vendorService.js](be/services/vendorService.js) - Load definitions, calculate prices
+- VendorController: [be/controllers/vendorController.js](be/controllers/vendorController.js) - Buy/sell transactions
+- Vendor Component: [ui/src/app/components/game/vendor/](ui/src/app/components/game/vendor/) - Buy/Sell tabs
+- Vendor definitions: [be/data/vendors/](be/data/vendors/)
 
-**Backend** ([be/services/vendorService.js](be/services/vendorService.js), [be/controllers/vendorController.js](be/controllers/vendorController.js)):
-- VendorService: Load vendor definitions, calculate buy/sell prices
-- VendorController: Handle buy/sell transactions with gold validation
-- API routes at `/api/vendors` with JWT auth
-- Vendor definitions in `be/data/vendors/` (JSON files)
+**Key Features:**
+- Infinite stock (architecture supports limited)
+- Buy prices: Fixed per item in vendor JSON
+- Sell prices: 50% of vendor price (base + quality/trait bonuses)
+- Drag-and-drop selling from inventory
+- Gold sync via auth service
 
-**Frontend** ([ui/src/app/services/vendor.service.ts](ui/src/app/services/vendor.service.ts), [ui/src/app/components/game/vendor/](ui/src/app/components/game/vendor/)):
-- Socket-free REST API integration
-- Signal-based state management
-- Buy/Sell tabbed interface with transaction feedback
-- Integrated into location component (replaces activity view)
-
-### Features
-
-**Vendor Locations**:
-- Fishing Dock → Dockmaster Halvard (bamboo fishing rod)
-- Logging Camp → Woodsman Bjorn (bronze woodcutting axe)
-- Mountain Mine → Miner Gerta (bronze mining pickaxe)
-- Herb Garden → Herbalist Miriam (future herb supplies)
-- Market → Alchemist Elara (health potions), Cook Marta (cooked fish)
-
-**Stock System**:
-- **Infinite stock**: Vendors never run out (architecture supports limited stock)
-- Buy prices fixed per item in vendor definition
-- Sell prices: 50% of calculated vendor price (includes quality/trait bonuses)
-
-**Transactions**:
-```typescript
-// Buy item
-POST /api/vendors/:vendorId/buy
-Body: { itemId: "bamboo_fishing_rod", quantity: 5 }
-Response: { gold, inventory, transaction }
-
-// Sell item
-POST /api/vendors/:vendorId/sell
-Body: { instanceId: "uuid-123", quantity: 10 }
-Response: { gold, inventory, transaction }
-```
-
-**UI Features**:
-- Buy tab: Stock list with buy 1/5/10 buttons
-- Sell tab: Inventory list with sell 1/5/10/all buttons (sorted by quality/trait scores)
-- Gold display at top (synced with auth service)
-- Vendor name and greeting displayed in location UI
-- Success/error message feedback
-- Medieval fantasy theme (purple/gold colors)
-- Item sorting by total quality+trait tier levels (descending)
-
-### Configuration
-
-**Vendor Definition** (`be/data/vendors/{vendorId}.json`):
-```json
-{
-  "vendorId": "kennik-dock-merchant",
-  "name": "Dockmaster Halvard",
-  "description": "A weathered fisherman...",
-  "greeting": "Looking for fishing gear?",
-  "iconPath": "assets/icons/ui/merchant.svg",
-  "acceptsAllItems": true,
-  "sellPriceMultiplier": 0.5,
-  "stock": [
-    {
-      "itemId": "bamboo_fishing_rod",
-      "buyPrice": 25,
-      "stockType": "infinite"
-    }
-  ]
-}
-```
-
-**Facility Link** (add `vendorIds` array to facility definition):
-```json
-{
-  "facilityId": "kennik-fishing-dock",
-  "vendorIds": ["kennik-dock-merchant"],
-  ...
-}
-```
-
-**Multiple Vendors** (facilities can have multiple vendors):
-```json
-{
-  "facilityId": "kennik-market",
-  "vendorIds": ["kennik-potion-seller", "kennik-cook"],
-  ...
-}
-```
-
-### Pricing
-
-**Buy Price**: Fixed in vendor definition (e.g., 25 gold for bamboo rod)
-
-**Sell Price**: Calculated dynamically
-```javascript
-// Backend calculation
-const vendorPrice = itemService.calculateVendorPrice(itemInstance);
-// ^ Includes base value + quality bonuses + trait bonuses
-const sellPrice = Math.floor(vendorPrice * 0.5); // 50% of vendor price
-```
-
-### Security
-
-- JWT authentication required for all vendor endpoints
-- Gold validation prevents negative balances
-- Inventory validation checks item ownership
-- Equipped items cannot be sold (must unequip first)
-- Transaction atomicity (gold and inventory updated together)
-
-### Future Enhancements
-
-The architecture supports:
-- **Restocking**: Change `stockType: "infinite"` to `"limited"` with restock timers
-- **Category filtering**: Set `acceptsAllItems: false` and add `acceptedCategories`
-- **Skill-based pricing**: Modify `sellPriceMultiplier` based on charisma/merchant skill
-- **Vendor reputation**: Track player-vendor relationship for discounts
-- **Special offers**: Time-limited deals, bulk purchase discounts
-- **Quest integration**: Vendors offering quests or accepting quest items
+**Configuration:**
+- Vendor JSON: `be/data/vendors/{vendorId}.json` with stock array
+- Facility link: Add `vendorIds` array to facility JSON
+- Multiple vendors per facility supported
 
 ## Cooking/Crafting System
 
-The crafting system enables players to create items from ingredients with quality inheritance and instance selection.
+Create items from ingredients with quality inheritance and instance selection.
 
-### Architecture
+**Key Files:**
+- RecipeService: [be/services/recipeService.js](be/services/recipeService.js) - Load recipes, validate, calculate quality
+- CraftingController: [be/controllers/craftingController.js](be/controllers/craftingController.js) - Start/complete/cancel
+- Crafting Component: [ui/src/app/components/game/crafting/](ui/src/app/components/game/crafting/) - Recipe browser, instance selection
+- Recipe definitions: [be/data/recipes/{skill}/](be/data/recipes/)
 
-**Backend** ([be/services/recipeService.js](be/services/recipeService.js), [be/controllers/craftingController.js](be/controllers/craftingController.js)):
-- RecipeService: Load recipe definitions, validate requirements, calculate quality outcomes
-- CraftingController: Handle start/complete/cancel crafting with time-based progression
-- API routes at `/api/crafting` with JWT auth
-- Recipe definitions in `be/data/recipes/{skill}/` (JSON files)
-- Player.activeCrafting field stores current crafting state with selected ingredients
+**Key Features:**
+- **Instance selection**: Choose specific items by quality/traits (Player.activeCrafting.selectedIngredients Map)
+- **Quality inheritance**: Max ingredient quality + skill bonus (every 10 levels = +1, max +2)
+- **Time-based**: 6-12 second durations with auto-completion
+- **Auto-select best**: One-click highest quality ingredient selection
+- **Quality badges**: Common, Uncommon, Rare, Epic, Legendary
 
-**Frontend** ([ui/src/app/services/crafting.service.ts](ui/src/app/services/crafting.service.ts), [ui/src/app/services/recipe.service.ts](ui/src/app/services/recipe.service.ts), [ui/src/app/components/game/crafting/](ui/src/app/components/game/crafting/)):
-- CraftingService: Timer management, auto-completion, inventory refresh
-- RecipeService: Recipe loading, client-side validation
-- CraftingComponent: Recipe browser, ingredient instance selection, quality display
-- Integrated into location component (shown for crafting facilities)
+**Current Skills:**
+- Cooking (4 recipes: shrimp/trout/salmon/cod at kennik-kitchen)
+- Smithing (future: equipment from ore/wood/leather)
+- Alchemy (future: potions from herbs)
 
-### Features
-
-**Crafting Skills**:
-- Cooking (kennik-kitchen facility) - Cook raw fish/meat into consumables
-- Smithing (future) - Craft equipment from ore and materials
-- Alchemy (future) - Brew potions from herbs
-
-**Cooking Recipes** (Level 1-10):
-- Cook Shrimp (L1, 6s, 25 XP) - shrimp → cooked_shrimp
-- Cook Trout (L1, 8s, 20 XP) - trout → cooked_trout
-- Cook Salmon (L5, 10s, 35 XP) - salmon → cooked_salmon
-- Cook Cod (L10, 12s, 45 XP) - cod → cooked_cod
-
-**Quality Inheritance System**:
-```javascript
-// Max quality from ingredients + skill bonus
-const maxQuality = Math.max(...ingredientQualities);
-const skillBonus = Math.min(2, Math.floor(playerSkillLevel / 10));
-const outputQuality = Math.min(5, maxQuality + skillBonus);
-```
-
-**Key Features**:
-- **Instance Selection**: Choose specific item instances to craft with (select high-quality, sell low-quality)
-- **Quality Badges**: Visual indicators (Common, Uncommon, Rare, Epic, Legendary)
-- **Auto-select Best**: One-click to select highest quality ingredients
-- **Time-based Crafting**: Activities take time to complete (6-12 seconds per craft)
-- **Auto-completion**: Timer triggers completion automatically when done
-- **Quality Display**: Shows qualities and traits for each instance
-- **Selection Validation**: Ensures correct quantity selected before starting
-
-### Transactions
-
-```typescript
-// Start crafting with selected instances
-POST /api/crafting/start
-Body: {
-  recipeId: "cook-shrimp",
-  selectedIngredients: {
-    "shrimp": ["instance-uuid-1"]  // Specific instance IDs
-  }
-}
-Response: { activeCrafting: { recipeId, startTime, endTime } }
-
-// Complete crafting (consumes ingredients, creates output)
-POST /api/crafting/complete
-Response: {
-  recipe: { recipeId, name },
-  output: { itemId, quantity, qualities, traits },
-  experience: { skill, xp, newLevel }
-}
-
-// Cancel active crafting
-POST /api/crafting/cancel
-```
-
-### UI Experience
-
-**Recipe Browser**:
-- Shows all recipes for current skill (cooking, smithing, etc.)
-- Color-coded borders: green (can craft), gray (cannot craft)
-- Displays level requirement, duration, XP reward
-- Shows ingredient availability (X/Y format)
-
-**Recipe Details View**:
-1. Ingredient Groups (one per ingredient type)
-   - Selection counter: "Selected: 1 / 1"
-   - Instance cards showing quantity, quality badge, traits
-   - Click to select/deselect instances
-   - Visual feedback: purple border (selected), gold (fully selected)
-
-2. Action Buttons
-   - **Auto-select Best**: Automatically selects highest quality instances
-   - **Clear Selection**: Deselect all ingredients
-   - **Start Crafting**: Begins time-based crafting process
-
-3. Active Crafting Display
-   - Progress bar with time remaining
-   - Cancel button to abort crafting
-   - Auto-completion when timer reaches zero
-
-4. Result Display
-   - Shows crafted item name
-   - Displays XP gained
-   - Auto-refreshes inventory
-
-### Configuration
-
-**Recipe Definition** (`be/data/recipes/cooking/{recipe-id}.json`):
-```json
-{
-  "recipeId": "cook-shrimp",
-  "name": "Cook Shrimp",
-  "description": "Sauté plump shrimp in garlic and oil...",
-  "skill": "cooking",
-  "requiredLevel": 1,
-  "duration": 6,
-  "ingredients": [
-    { "itemId": "shrimp", "quantity": 1 }
-  ],
-  "output": {
-    "itemId": "cooked_shrimp",
-    "quantity": 1,
-    "qualityModifier": "inherit"
-  },
-  "experience": 25
-}
-```
-
-**Crafting Facility** (`be/data/locations/facilities/{facility-id}.json`):
-```json
-{
-  "facilityId": "kennik-kitchen",
-  "name": "Kitchen",
-  "description": "A well-equipped cooking area...",
-  "type": "crafting",
-  "craftingSkills": ["cooking"]
-}
-```
-
-### Quality System
-
-**Skill Bonus Formula**:
-- Every 10 skill levels = +1 quality level bonus (max +2)
-- L1-9: +0 quality, L10-19: +1 quality, L20+: +2 quality
-- Applied to primary quality type (e.g., freshness for cooked fish)
-
-**Example Quality Calculation**:
-```
-Input: Shrimp with freshness: 3
-Player: Cooking L15 (skill bonus = +1)
-Output: Cooked shrimp with freshness: 4 (3 + 1)
-```
-
-**Quality Tier Badges**:
-- Common: Avg quality < 1.5 (gray)
-- Uncommon: Avg quality 1.5-2.5 (green)
-- Rare: Avg quality 2.5-3.5 (blue)
-- Epic: Avg quality 3.5-4.5 (purple)
-- Legendary: Avg quality ≥ 4.5 (orange)
-
-### Database Schema
-
-**Player.activeCrafting**:
-```javascript
-activeCrafting: {
-  recipeId: String,
-  startTime: Date,
-  endTime: Date,
-  selectedIngredients: Map<String, [String]>  // itemId -> instanceId[]
-}
-```
-
-### Security
-
-- JWT authentication required for all crafting endpoints
-- Validates recipe requirements (skill level, ingredients)
-- Verifies selected instances exist and are available
-- Prevents crafting with equipped items
-- Transaction atomicity (ingredients consumed, output added together)
-
-### Future Enhancements
-
-The architecture supports:
-- **Smithing**: Equipment crafting with ore, wood, leather
-- **Alchemy**: Potion brewing with herbs and quality-based effects
-- **Bulk Crafting**: Queue multiple crafts of the same recipe
-- **Crafting Speed**: Bonuses from equipment or attributes
-- **Critical Success**: Chance for bonus output or quality
-- **Failure Chance**: Risk of losing ingredients (at higher tiers)
-
-## Platform-Specific Tool Notes
-
-### Windows (MSYS/Git Bash)
-
-**taskkill command:**
-- **Correct usage**: `taskkill //F //PID <pid>`
-- **Incorrect usage**: `taskkill /F /PID <pid>` (fails with "Invalid argument/option - 'F:/'")
-- The forward slashes need to be doubled (`//`) in MSYS/Git Bash environments
-- Example: `taskkill //F //PID 35732`
-
-**move vs mv command:**
-- **Correct usage**: `mv source destination` (Unix/MSYS command)
-- **Incorrect usage**: `move source destination` (Windows CMD command, not available in MSYS/Git Bash)
-- MSYS/Git Bash uses Unix commands, so use `mv` for moving/renaming files
-- Example: `mv test-levels.js be/test-levels.js`
+**Configuration:**
+- Recipe JSON: `be/data/recipes/{skill}/{recipe-id}.json` with ingredients, output, qualityModifier
+- Facility: Set `type: "crafting"` and `craftingSkills: ["cooking"]` in facility JSON
 
 ## Next Steps / Ideas
 
