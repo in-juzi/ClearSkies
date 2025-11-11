@@ -1,0 +1,288 @@
+.item-button {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 2px solid var(--color-border);
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(26, 26, 46, 0.8), rgba(22, 33, 62, 0.6));
+  cursor: pointer;
+  transition: all 0.2s ease;
+  overflow: visible;
+
+  &:hover {
+    border-color: var(--color-secondary);
+    background: linear-gradient(135deg, rgba(26, 26, 46, 0.9), rgba(22, 33, 62, 0.7));
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+
+    .item-tooltip {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(212, 175, 55, 0.2);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+
+    &:hover {
+      transform: none;
+      box-shadow: none;
+      border-color: var(--color-border);
+      background: linear-gradient(135deg, rgba(26, 26, 46, 0.8), rgba(22, 33, 62, 0.6));
+    }
+  }
+}
+
+// Size variants
+.item-button-small {
+  width: 48px;
+  height: 48px;
+  padding: 6px;
+}
+
+.item-button-medium {
+  width: 64px;
+  height: 64px;
+  padding: 8px;
+}
+
+.item-button-large {
+  width: 96px;
+  height: auto;
+  min-height: 96px;
+  padding: 12px;
+  gap: 8px;
+}
+
+// State classes
+.item-disabled {
+  border-color: rgba(75, 85, 99, 0.5);
+  background: linear-gradient(135deg, rgba(26, 26, 46, 0.4), rgba(22, 33, 62, 0.3));
+
+  .item-icon {
+    opacity: 0.4;
+    filter: grayscale(100%);
+  }
+}
+
+.item-empty {
+  border-color: rgba(239, 68, 68, 0.6);
+
+  .item-icon {
+    opacity: 0.3;
+    filter: grayscale(100%);
+  }
+
+  .item-quantity {
+    background-color: var(--color-error);
+    animation: pulse-error 1s ease-in-out infinite;
+  }
+}
+
+.item-unusable {
+  pointer-events: none;
+}
+
+// Icon container
+.item-icon-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.item-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: opacity 0.2s ease, filter 0.2s ease;
+}
+
+.item-icon-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(26, 26, 46, 0.5);
+  border-radius: 4px;
+}
+
+.item-icon-text {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--color-text-secondary);
+}
+
+// Item name
+.item-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  text-align: center;
+  margin-top: 4px;
+  line-height: 1.2;
+}
+
+// Quantity badge
+.item-quantity {
+  position: absolute;
+  bottom: -6px;
+  right: -6px;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-secondary);
+  color: #1a1a2e;
+  font-size: 11px;
+  font-weight: bold;
+  border-radius: 12px;
+  border: 2px solid #1a1a2e;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: background-color 0.2s ease;
+  z-index: 2;
+}
+
+// Tooltip
+.item-tooltip {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  width: 280px;
+  padding: 12px;
+  background: linear-gradient(135deg, rgba(26, 26, 46, 0.98), rgba(22, 33, 62, 0.98));
+  border: 2px solid var(--color-secondary);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  pointer-events: none;
+  z-index: 1000;
+
+  // Tooltip arrow
+  &::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid var(--color-secondary);
+  }
+}
+
+.tooltip-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.tooltip-name {
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--color-secondary);
+}
+
+.tooltip-type {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  padding: 2px 6px;
+  background: rgba(212, 175, 55, 0.2);
+  border-radius: 4px;
+}
+
+.tooltip-description {
+  font-size: 13px;
+  color: var(--color-text-primary);
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+
+.tooltip-effects {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.tooltip-effect {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.effect-icon {
+  color: #4ade80;
+  font-weight: bold;
+}
+
+.effect-text {
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+
+.tooltip-disabled-reason {
+  margin-top: 8px;
+  padding: 6px 8px;
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-radius: 4px;
+  font-size: 11px;
+  color: var(--color-error);
+  font-weight: 600;
+  text-align: center;
+}
+
+// Animations
+@keyframes pulse-error {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .item-tooltip {
+    width: 240px;
+  }
+
+  .tooltip-name {
+    font-size: 14px;
+  }
+
+  .tooltip-description {
+    font-size: 12px;
+  }
+}

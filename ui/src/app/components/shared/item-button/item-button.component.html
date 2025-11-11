@@ -1,0 +1,69 @@
+<button
+  [class]="buttonClasses()"
+  [disabled]="!canUse()"
+  (click)="handleClick($event)"
+  (mouseenter)="handleHover()"
+  type="button">
+
+  <!-- Item Icon -->
+  <div class="item-icon-container">
+    @if (item().definition.icon) {
+      <app-icon
+        [path]="item().definition.icon!.path"
+        [material]="item().definition.icon!.material"
+        [autoSize]="true"
+        class="item-icon">
+      </app-icon>
+    } @else {
+      <div class="item-icon-placeholder">
+        <span class="item-icon-text">{{ item().definition.name.charAt(0) }}</span>
+      </div>
+    }
+  </div>
+
+  <!-- Item Name (for larger sizes) -->
+  @if (size() === 'large') {
+    <div class="item-name">{{ item().definition.name }}</div>
+  }
+
+  <!-- Quantity Badge -->
+  @if (showQuantity() && item().quantity > 0) {
+    <div class="item-quantity">
+      {{ item().quantity }}
+    </div>
+  }
+
+  <!-- Tooltip -->
+  @if (showTooltip()) {
+    <div class="item-tooltip">
+      <div class="tooltip-header">
+        <div class="tooltip-name">{{ item().definition.name }}</div>
+        @if (item().definition.category) {
+          <div class="tooltip-type">{{ item().definition.category }}</div>
+        }
+      </div>
+
+      <div class="tooltip-description">
+        {{ item().definition.description }}
+      </div>
+
+      @if (effectText().length > 0) {
+        <div class="tooltip-effects">
+          @for (effect of effectText(); track effect) {
+            <div class="tooltip-effect">
+              <span class="effect-icon">✓</span>
+              <span class="effect-text">{{ effect }}</span>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Disabled reason -->
+      @if (!canUse() && disabledReasonText()) {
+        <div class="tooltip-disabled-reason">
+          {{ disabledReasonText() }}
+        </div>
+      }
+    </div>
+  }
+</button>
