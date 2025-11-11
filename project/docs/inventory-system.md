@@ -30,7 +30,7 @@ The ClearSkies inventory system is a flexible, extensible framework for managing
 be/
 ├── data/items/
 │   ├── definitions/
-│   │   ├── resources.json      # Wood, ore, fish
+│   │   ├── resources/          # Individual resource item files
 │   │   ├── equipment.json      # Weapons, armor
 │   │   └── consumables.json    # Food, potions
 │   ├── qualities/

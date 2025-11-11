@@ -4,6 +4,15 @@
 
 The quality and trait system has been redesigned to use **discrete levels** instead of decimal values (0-1). This makes the system more intuitive for players, enables better item stacking, and provides clear progression paths.
 
+## Design Philosophy: Qualities are Always Positive
+
+**IMPORTANT**: All qualities provide **strictly positive modifiers** (≥1.0). This design decision ensures that:
+
+1. **Clarity**: If an item has quality modifiers, players know it's better than an item without them
+2. **No Confusion**: Players never see qualities that make items worse
+3. **Positive Experience**: Finding qualities always feels rewarding
+4. **Negative Traits**: Any negative modifiers (if implemented in future) will be conveyed through **single-tier traits**, not qualities
+
 ## Key Changes
 
 ### Old System (Decimal-Based)
@@ -13,32 +22,43 @@ The quality and trait system has been redesigned to use **discrete levels** inst
 - **Display**: Showed percentages (e.g., "65%") which were unclear
 
 ### New System (Level-Based)
-- **Qualities**: Integer levels 1-5 (e.g., Level 3 = "Good Grain")
+- **Qualities**: Integer levels 1-3 (e.g., Level 2 = "Superior Grain")
+- **All quality modifiers are positive** (≥1.0) - no penalties
 - **Traits**: Map of traitId → level (1-3) (e.g., `{ fragrant: 2 }`)
 - **Stacking**: Items with identical levels stack together
-- **Display**: Shows descriptive names (e.g., "Fine Grain - Level 4")
+- **Display**: Shows descriptive names (e.g., "Fine Grain - Level 1")
 
 ## Quality Levels
 
-Each quality has 5 levels with explicit names, descriptions, and effects:
+Each quality has 3 levels with explicit names, descriptions, and effects. **All modifiers are positive** (≥1.0).
 
 ### Example: Wood Grain Quality
 
 | Level | Name | Description | Alchemy | Vendor Price |
 |-------|------|-------------|---------|--------------|
-| 1 | Poor Grain | Rough, inconsistent grain | 0.8x | 0.85x |
-| 2 | Fair Grain | Minor irregularities | 0.9x | 0.95x |
-| 3 | Good Grain | Solid, consistent pattern | 1.0x | 1.0x |
-| 4 | Fine Grain | Smooth, uniform grain | 1.15x | 1.15x |
-| 5 | Perfect Grain | Flawless grain pattern | 1.3x | 1.35x |
+| 1 | Fine Grain | Smooth, uniform grain | 1.15x | 1.15x |
+| 2 | Superior Grain | Exceptional grain pattern | 1.25x | 1.25x |
+| 3 | Perfect Grain | Flawless grain pattern | 1.35x | 1.35x |
 
 ### All Qualities
 
-1. **Wood Grain** (5 levels) - For wood resources
-2. **Moisture** (5 levels) - For wood resources (lower is better for most uses)
-3. **Age** (5 levels) - For wood resources (older = better for alchemy)
-4. **Purity** (5 levels) - For ores and metals
-5. **Freshness** (5 levels) - For fish and food
+1. **Wood Grain** (3 levels) - For wood resources
+   - L1: Fine Grain (1.15x), L2: Superior Grain (1.25x), L3: Perfect Grain (1.35x)
+
+2. **Dryness** (3 levels) - For wood resources (replaces "Moisture")
+   - L1: Well-Seasoned (1.1x), L2: Kiln-Dried (1.2x), L3: Perfectly Dried (1.3x)
+
+3. **Age** (3 levels) - For wood resources (older = better for alchemy)
+   - L1: Aged (1.1x), L2: Mature (1.25x), L3: Ancient (1.4x)
+
+4. **Purity** (3 levels) - For ores and metals
+   - L1: High Purity (1.2x), L2: Refined (1.35x/1.4x), L3: Flawless (1.5x/1.6x)
+
+5. **Sheen** (3 levels) - For metals and gemstones
+   - L1: Polished (1.1x), L2: Brilliant (1.2x), L3: Radiant (1.3x)
+
+**Removed Quality:**
+- **Freshness** - Removed to avoid implying time-decay mechanics
 
 ## Trait Levels
 
@@ -54,23 +74,25 @@ Each trait has 3 levels with escalating effects:
 
 ### All Traits
 
-1. **Fragrant** (3 levels) - Pleasant scent, rare drop
-2. **Knotted** (3 levels) - Harder to work with, common drop
-3. **Weathered** (3 levels) - Elemental exposure, uncommon drop
-4. **Pristine** (3 levels) - Perfect condition, rare drop
-5. **Cursed** (3 levels) - Mysterious curse, rare drop
-6. **Blessed** (3 levels) - Divine blessing, epic drop
-7. **Masterwork** (3 levels) - Master craftsmanship, epic drop
+1. **Fragrant** (3 levels) - Pleasant scent, uncommon drop
+2. **Weathered** (3 levels) - Elemental exposure, uncommon drop
+3. **Pristine** (3 levels) - Perfect condition, rare drop
+4. **Cursed** (1 level) - Mysterious curse with combat bonus but health drain, rare drop
+5. **Blessed** (3 levels) - Divine blessing, epic drop
+6. **Masterwork** (3 levels) - Master craftsmanship, epic drop
+
+**Removed Trait:**
+- **Knotted** - Removed as it was purely negative (conflicted with "qualities are positive" philosophy)
 
 ## Random Generation
 
 ### Quality Level Distribution
 
-Quality levels are generated based on item tier:
+Quality levels are generated based on item tier (now 1-3 instead of 1-5):
 
-- **Tier 1**: Favors levels 1-3 (25% L1, 40% L2, 25% L3, 8% L4, 2% L5)
-- **Tier 2**: Favors levels 2-4 (10% L1, 25% L2, 35% L3, 25% L4, 5% L5)
-- **Tier 3+**: Favors levels 3-5 (5% L1, 10% L2, 25% L3, 35% L4, 25% L5)
+- **Tier 1**: Favors lower levels (50% L1, 35% L2, 15% L3)
+- **Tier 2**: Balanced distribution (30% L1, 45% L2, 25% L3)
+- **Tier 3+**: Favors higher levels (15% L1, 35% L2, 50% L3)
 
 ### Trait Level Distribution
 
@@ -224,12 +246,14 @@ Tests:
 
 ## Benefits
 
-1. **Player Clarity**: "Fine Grain - Level 4" is clearer than "65%"
+1. **Player Clarity**: "Fine Grain - Level 1" is clearer than "65%"
 2. **Better Stacking**: Items with same levels stack together
-3. **Progression**: Clear upgrade path from Level 1 → Level 5
+3. **Progression**: Clear upgrade path from Level 1 → Level 3
 4. **Balancing**: Easy to adjust bonuses per level in JSON files
 5. **Memorization**: Players can learn what each level means
 6. **Reduced Inventory Clutter**: More items stack together
+7. **Positive Psychology**: Qualities always feel like rewards, never penalties
+8. **No Confusion**: Players don't wonder if qualities can hurt them
 
 ## Future Enhancements
 

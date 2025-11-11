@@ -213,7 +213,7 @@ Herbalism awards 50% of earned XP to the Will attribute:
 ### Backend Files
 - **Model**: `be/models/Player.js` (lines 171-175)
 - **Migration**: `be/migrations/006-add-herbalism-skill.js`
-- **Item Definitions**: `be/data/items/definitions/resources.json` (lines 182-290)
+- **Item Definitions**: `be/data/items/definitions/resources/` (herb item files)
 - **Drop Tables**: `be/data/locations/drop-tables/herbalism-*.json` (6 files)
 - **Activities**: `be/data/locations/activities/gather-*.json` (6 files)
 - **Facilities**: `be/data/locations/facilities/*-herb-*.json` (4 files)
