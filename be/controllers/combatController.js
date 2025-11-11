@@ -6,7 +6,7 @@ const dropTableService = require('../services/dropTableService');
 // Start combat with a monster
 exports.startCombat = async (req, res) => {
   try {
-    const { monsterId } = req.body;
+    const { monsterId, activityId } = req.body;
 
     if (!monsterId) {
       return res.status(400).json({ message: 'Monster ID is required' });
@@ -31,6 +31,12 @@ exports.startCombat = async (req, res) => {
     // Initialize combat
     const monsterInstance = combatService.initializeCombat(player, monsterId, itemService);
 
+    // Store activityId if provided (for restart functionality)
+    if (activityId) {
+      player.activeCombat.activityId = activityId;
+      player.lastCombatActivityId = activityId; // Persist even after combat ends
+    }
+
     await player.save();
 
     // Get player weapon to determine available abilities
@@ -41,6 +47,7 @@ exports.startCombat = async (req, res) => {
 
     // Convert combat state for response
     const combatState = {
+      activityId: player.activeCombat.activityId || null,
       monsterId: monsterInstance.monsterId,
       monsterName: monsterInstance.name,
       monsterLevel: monsterInstance.level,
@@ -158,6 +165,7 @@ exports.executeAction = async (req, res) => {
 
     // Convert combat state for response
     const combatState = {
+      activityId: player.activeCombat.activityId || null,
       monsterId: monsterInstance.monsterId,
       monsterName: monsterInstance.name,
       monsterLevel: monsterInstance.level,
@@ -241,6 +249,7 @@ exports.getCombatStatus = async (req, res) => {
 
     // Convert combat state for response
     const combatState = {
+      activityId: player.activeCombat.activityId || null,
       monsterId: monsterInstance.monsterId,
       monsterName: monsterInstance.name,
       monsterLevel: monsterInstance.level,
@@ -296,5 +305,93 @@ exports.flee = async (req, res) => {
   } catch (error) {
     console.error('Flee error:', error);
     res.status(500).json({ message: error.message || 'Failed to flee' });
+  }
+};
+
+// Restart combat with the same activity
+exports.restartCombat = async (req, res) => {
+  try {
+    // Get player
+    const player = await Player.findOne({ userId: req.user._id });
+    if (!player) {
+      return res.status(404).json({ message: 'Player not found' });
+    }
+
+    // Check if there was a previous combat activity
+    const activityId = player.lastCombatActivityId;
+    if (!activityId) {
+      return res.status(400).json({ message: 'No activity to restart' });
+    }
+
+    // Get the activity to find the monster
+    const locationService = require('../services/locationService');
+    const activity = locationService.getActivity(activityId);
+
+    if (!activity || activity.type !== 'combat') {
+      return res.status(400).json({ message: 'Invalid combat activity' });
+    }
+
+    const monsterId = activity.combatConfig?.monsterId;
+    if (!monsterId) {
+      return res.status(400).json({ message: 'Activity has no monster configured' });
+    }
+
+    // Clear previous combat state
+    player.activeCombat = {
+      activityId: null,
+      monsterId: null,
+      monsterInstance: null,
+      playerLastAttackTime: null,
+      monsterLastAttackTime: null,
+      playerNextAttackTime: null,
+      monsterNextAttackTime: null,
+      turnCount: 0,
+      abilityCooldowns: new Map(),
+      combatLog: [],
+      startTime: null
+    };
+
+    // Initialize new combat with same monster
+    const monsterInstance = combatService.initializeCombat(player, monsterId, itemService);
+    player.activeCombat.activityId = activityId;
+
+    await player.save();
+
+    // Get player weapon to determine available abilities
+    const weapon = combatService.getEquippedWeapon(player, itemService);
+    const availableAbilities = weapon ?
+      combatService.getAbilitiesForWeapon(weapon.skillScalar) :
+      [];
+
+    // Convert combat state for response
+    const combatState = {
+      activityId: player.activeCombat.activityId || null,
+      monsterId: monsterInstance.monsterId,
+      monsterName: monsterInstance.name,
+      monsterLevel: monsterInstance.level,
+      monsterHealth: monsterInstance.stats.health,
+      playerHealth: {
+        current: player.stats.health.current,
+        max: player.stats.health.max
+      },
+      playerMana: {
+        current: player.stats.mana.current,
+        max: player.stats.mana.max
+      },
+      playerNextAttackTime: player.activeCombat.playerNextAttackTime,
+      monsterNextAttackTime: player.activeCombat.monsterNextAttackTime,
+      turnCount: player.activeCombat.turnCount,
+      combatLog: player.activeCombat.combatLog.slice(-10), // Last 10 entries
+      availableAbilities,
+      abilityCooldowns: Object.fromEntries(player.activeCombat.abilityCooldowns)
+    };
+
+    res.json({
+      message: `New combat started with ${monsterInstance.name}!`,
+      combat: combatState
+    });
+  } catch (error) {
+    console.error('Restart combat error:', error);
+    res.status(500).json({ message: error.message || 'Failed to restart combat' });
   }
 };

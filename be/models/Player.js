@@ -107,6 +107,7 @@ const playerSchema = new mongoose.Schema({
   },
   // Combat system
   activeCombat: {
+    activityId: { type: String }, // Activity that started this combat (for restart)
     monsterId: { type: String },
     monsterInstance: { type: Map, of: mongoose.Schema.Types.Mixed }, // Full monster state
     playerLastAttackTime: { type: Date },
@@ -122,6 +123,7 @@ const playerSchema = new mongoose.Schema({
     }],
     startTime: { type: Date }
   },
+  lastCombatActivityId: { type: String }, // Last combat activity for restart (persists after combat ends)
   combatStats: {
     monstersDefeated: { type: Number, default: 0 },
     totalDamageDealt: { type: Number, default: 0 },
@@ -650,6 +652,52 @@ playerSchema.methods.restoreMana = function(amount) {
   }
 
   this.stats.mana.current = Math.min(this.stats.mana.max, this.stats.mana.current + amount);
+};
+
+// Use a consumable item and apply its effects
+playerSchema.methods.useConsumableItem = function(itemInstance, itemDefinition) {
+  if (!itemInstance || !itemDefinition) {
+    throw new Error('Item instance and definition are required');
+  }
+
+  if (itemDefinition.category !== 'consumable') {
+    throw new Error('Item is not consumable');
+  }
+
+  const effects = {
+    healthRestored: 0,
+    manaRestored: 0
+  };
+
+  // Apply health restoration
+  if (itemDefinition.properties?.healthRestore) {
+    const healAmount = itemDefinition.properties.healthRestore;
+    const beforeHealth = this.stats.health.current;
+    this.heal(healAmount);
+    effects.healthRestored = this.stats.health.current - beforeHealth;
+  }
+
+  // Apply mana restoration
+  if (itemDefinition.properties?.manaRestore) {
+    const manaAmount = itemDefinition.properties.manaRestore;
+    const beforeMana = this.stats.mana.current;
+    this.restoreMana(manaAmount);
+    effects.manaRestored = this.stats.mana.current - beforeMana;
+  }
+
+  // Add combat log entry if in combat
+  if (this.isInCombat()) {
+    let message = `Used ${itemDefinition.name}`;
+    if (effects.healthRestored > 0) {
+      message += ` - Restored ${effects.healthRestored} HP`;
+    }
+    if (effects.manaRestored > 0) {
+      message += ` - Restored ${effects.manaRestored} Mana`;
+    }
+    this.addCombatLog(message, 'heal');
+  }
+
+  return effects;
 };
 
 // Check if player is in combat

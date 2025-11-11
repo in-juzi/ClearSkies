@@ -18,4 +18,7 @@ router.get('/status', combatController.getCombatStatus);
 // POST /api/combat/flee - Flee from combat
 router.post('/flee', combatController.flee);
 
+// POST /api/combat/restart - Restart combat with same activity
+router.post('/restart', combatController.restartCombat);
+
 module.exports = router;
