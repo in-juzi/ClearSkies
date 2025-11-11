@@ -14,13 +14,6 @@
       </div>
     </div>
 
-    <!-- Message Display -->
-    @if (message(); as msg) {
-      <div class="message" [class.success]="msg.type === 'success'" [class.error]="msg.type === 'error'">
-        {{ msg.text }}
-      </div>
-    }
-
     <!-- Tabs -->
     <div class="tabs">
       <button

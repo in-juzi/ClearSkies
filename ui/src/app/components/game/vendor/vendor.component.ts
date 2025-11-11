@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { VendorService } from '../../../services/vendor.service';
 import { InventoryService } from '../../../services/inventory.service';
 import { AuthService } from '../../../services/auth.service';
+import { ChatService } from '../../../services/chat.service';
 import { VendorStockItem } from '../../../models/vendor.model';
 import { ItemModifiersComponent } from '../../shared/item-modifiers/item-modifiers.component';
 import { IconComponent } from '../../shared/icon/icon.component';
@@ -18,6 +19,7 @@ export class VendorComponent {
   vendorService = inject(VendorService);
   inventoryService = inject(InventoryService);
   authService = inject(AuthService);
+  chatService = inject(ChatService);
 
   // Expose Object for template use
   Object = Object;
@@ -26,7 +28,6 @@ export class VendorComponent {
   activeTab = signal<'buy' | 'sell'>('buy');
   selectedBuyItem = signal<VendorStockItem | null>(null);
   buyQuantity = signal<number>(1);
-  message = signal<{ text: string; type: 'success' | 'error' } | null>(null);
   isDragOver = signal<boolean>(false);
 
   // Computed signals
@@ -39,7 +40,6 @@ export class VendorComponent {
    */
   setTab(tab: 'buy' | 'sell'): void {
     this.activeTab.set(tab);
-    this.clearMessage();
   }
 
   /**
@@ -48,7 +48,6 @@ export class VendorComponent {
   selectBuyItem(item: VendorStockItem): void {
     this.selectedBuyItem.set(item);
     this.buyQuantity.set(1);
-    this.clearMessage();
   }
 
   /**
@@ -119,18 +118,16 @@ export class VendorComponent {
   }
 
   /**
-   * Show message to user
+   * Show message to user via chat
    */
   private showMessage(text: string, type: 'success' | 'error'): void {
-    this.message.set({ text, type });
-    setTimeout(() => this.clearMessage(), 3000);
-  }
-
-  /**
-   * Clear message
-   */
-  private clearMessage(): void {
-    this.message.set(null);
+    const prefix = type === 'error' ? '❌ ' : '✅ ';
+    this.chatService.addLocalMessage({
+      userId: 'system',
+      username: 'Vendor',
+      message: `${prefix}${text}`,
+      createdAt: new Date()
+    });
   }
 
   /**

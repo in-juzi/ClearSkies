@@ -10,6 +10,7 @@
   font-size: var(--font-size-xs);
   color: var(--color-text-primary);
   line-height: 1.4;
+  height: var(--spacing-3xl);
 
   // Compact mode (smaller, tighter spacing)
   &.compact {

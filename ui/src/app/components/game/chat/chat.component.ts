@@ -27,7 +27,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   @ViewChild('messageList') private messageList!: ElementRef;
 
   // Component state
-  isCollapsed = signal(false);
+  isCollapsed = signal(true);
   messageInput = signal('');
   sendingMessage = signal(false);
   errorMessage = signal<string | null>(null);

@@ -227,10 +227,16 @@
         <button class="btn-primary" *ngIf="selectedItem.definition.category === 'consumable'">
           Use
         </button>
-        <button class="btn-primary" *ngIf="selectedItem.definition.category === 'equipment' && !selectedItem.equipped">
+        <button
+          class="btn-primary"
+          *ngIf="selectedItem.definition.category === 'equipment' && !selectedItem.equipped"
+          (click)="equipItem(selectedItem.instanceId)">
           Equip
         </button>
-        <button class="btn-secondary" *ngIf="selectedItem.definition.category === 'equipment' && selectedItem.equipped">
+        <button
+          class="btn-secondary"
+          *ngIf="selectedItem.definition.category === 'equipment' && selectedItem.equipped"
+          (click)="unequipItem(selectedItem.instanceId)">
           Unequip
         </button>
         <button

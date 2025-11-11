@@ -256,4 +256,22 @@ export class InventoryService {
       return this.calculateItemScore(b) - this.calculateItemScore(a);
     });
   }
+
+  /**
+   * Equip an item to a specific slot
+   */
+  equipItem(instanceId: string, slot: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/equipment/equip`, { instanceId, slotName: slot }).pipe(
+      tap(() => this.getInventory().subscribe())
+    );
+  }
+
+  /**
+   * Unequip an item from a specific slot
+   */
+  unequipItem(slot: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/equipment/unequip`, { slotName: slot }).pipe(
+      tap(() => this.getInventory().subscribe())
+    );
+  }
 }

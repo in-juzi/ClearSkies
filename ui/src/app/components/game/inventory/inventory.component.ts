@@ -166,6 +166,64 @@ export class InventoryComponent implements OnInit {
     });
   }
 
+  /**
+   * Equip an item
+   */
+  equipItem(instanceId: string): void {
+    if (!this.selectedItem) return;
+
+    const slot = this.selectedItem.definition.slot;
+    if (!slot) {
+      console.error('Item has no slot defined');
+      return;
+    }
+
+    this.inventoryService.equipItem(instanceId, slot).subscribe({
+      next: () => {
+        console.log('Item equipped');
+        // Wait for inventory to reload, then update selected item
+        setTimeout(() => {
+          const updatedItem = this.inventoryService.inventory().find(i => i.instanceId === instanceId);
+          if (updatedItem) {
+            this.selectedItem = updatedItem;
+          }
+        }, 100);
+      },
+      error: (error: any) => {
+        console.error('Error equipping item:', error);
+      }
+    });
+  }
+
+  /**
+   * Unequip an item
+   */
+  unequipItem(instanceId: string): void {
+    if (!this.selectedItem) return;
+
+    const slot = this.selectedItem.definition.slot;
+    if (!slot) {
+      console.error('Item has no slot defined');
+      return;
+    }
+
+    this.inventoryService.unequipItem(slot).subscribe({
+      next: () => {
+        console.log('Item unequipped');
+        // Wait for inventory to reload, then update selected item
+        setTimeout(() => {
+          const updatedItem = this.inventoryService.inventory().find(i => i.instanceId === instanceId);
+          if (updatedItem) {
+            this.selectedItem = updatedItem;
+          }
+        }, 100);
+      },
+      error: (error: any) => {
+        console.error('Error unequipping item:', error);
+      }
+    });
+  }
+
   updateDropQuantity(value: number): void {
     if (!this.selectedItem) return;
 

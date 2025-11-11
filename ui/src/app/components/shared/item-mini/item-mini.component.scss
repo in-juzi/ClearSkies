@@ -1,12 +1,13 @@
 .item-mini {
   display: inline-flex;
   align-items: center;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-s);
   padding: var(--spacing-xs) var(--spacing-s);
   background: var(--color-bg-overlay);
   border-radius: var(--radius-s);
   font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
+  height: var(--spacing-3xl);
 
   .item-icon {
     font-size: var(--font-size-m);
