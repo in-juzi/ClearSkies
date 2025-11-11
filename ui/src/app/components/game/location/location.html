@@ -189,13 +189,16 @@
       <app-vendor></app-vendor>
     </div>
 
-    <!-- Combat Section (when in combat or showing rewards) - MOVED OUTSIDE facility detail -->
-    <div class="combat-section" *ngIf="inCombat() || combatService.lastRewards()">
+    <!-- Combat Section (when in combat or combat ended for review) - MOVED OUTSIDE facility detail -->
+    <div class="combat-section" *ngIf="inCombat() || combatService.combatEnded()">
+      <!-- Return to Facility Button (shown during combat or after combat ends) -->
+      <button (click)="fleeCombat()" class="btn-back">← Return to Facility</button>
+
       <app-combat></app-combat>
     </div>
 
     <!-- Facility Detail View (shown when facility is selected but vendor is not open and not in combat) -->
-    <div class="facility-detail" *ngIf="selectedFacility() && !selectedActivity && !vendorService.isVendorOpen() && !inCombat()">
+    <div class="facility-detail" *ngIf="selectedFacility() && !selectedActivity && !vendorService.isVendorOpen() && !inCombat() && !combatService.combatEnded()">
       <button (click)="backToFacilities()" class="btn-back">← Back to Facilities</button>
       <h2>{{ selectedFacility()?.name }}</h2>
       <p>{{ selectedFacility()?.description }}</p>
@@ -242,7 +245,7 @@
     </div>
 
     <!-- Facility List View (shown when no facility is selected and not in combat) -->
-    <div class="facilities-view" *ngIf="!selectedFacility() && !vendorService.isVendorOpen() && !inCombat()">
+    <div class="facilities-view" *ngIf="!selectedFacility() && !vendorService.isVendorOpen() && !inCombat() && !combatService.combatEnded()">
       <h2>Facilities</h2>
       <div class="facilities-list">
         <div *ngFor="let facility of currentLocation()?.facilities" class="facility-card"

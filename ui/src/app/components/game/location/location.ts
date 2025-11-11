@@ -405,7 +405,7 @@ export class LocationComponent implements OnInit, OnDestroy {
       }
 
       // Start combat instead of regular activity
-      this.combatService.startCombat(monsterId).subscribe({
+      this.combatService.startCombat(monsterId, this.selectedActivity.activityId).subscribe({
         next: (response) => {
           this.logToChat(response.message || 'Combat started!', 'success');
           this.selectedActivity = null;
@@ -473,6 +473,38 @@ export class LocationComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         this.logToChat(err.error?.message || 'Failed to cancel activity', 'error');
+      }
+    });
+  }
+
+  /**
+   * Flee from combat or return to facility (after combat ends)
+   */
+  async fleeCombat() {
+    // If combat has ended, just dismiss without confirmation
+    if (this.combatService.combatEnded()) {
+      this.combatService.dismissCombat();
+      return;
+    }
+
+    // Active combat - show confirmation dialog
+    const confirmed = await this.confirmDialog.confirm({
+      title: 'Flee from Combat',
+      message: 'Are you sure you want to flee? You will not receive any rewards.',
+      confirmLabel: 'Yes, Flee',
+      cancelLabel: 'No, Continue Fighting'
+    });
+
+    if (!confirmed) {
+      return;
+    }
+
+    this.combatService.flee().subscribe({
+      next: (response) => {
+        this.logToChat(response.message || 'You fled from combat!', 'success');
+      },
+      error: (err) => {
+        this.logToChat(err.error?.message || 'Failed to flee from combat', 'error');
       }
     });
   }
