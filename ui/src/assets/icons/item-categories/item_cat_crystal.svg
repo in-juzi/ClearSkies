@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M0 0h512v512H0z"/>
+    <!-- Main crystal body (center vertical facet) -->
+    <path fill="#fff" data-channel="body" d="M253.8 15.56L173.9 99.67 176.2 158.5 226.8 194.7 258.7 376.7 269.5 349.8 281.3 114.4 300 115.4 290.9 296.4 319.2 225.6 327.4 117.6 328.3 99.67Z"/>
+    <!-- Upper right facet (secondary crystal) -->
+    <path fill="#fff" data-channel="facet" d="M392.8 66.13L346.2 116.9 342.3 168 352.9 141.8 383.3 128.1C386.5 107.5 389.6 86.8 392.8 66.13Z"/>
+    <!-- Right side large facet (main body) -->
+    <path fill="#fff" data-channel="body" d="M453.1 117.3L367.4 155.7 264.8 411.6 279.4 494.9H287.2L434.8 201.8 451.5 210.2 308.1 494.9H332.5L479.1 203.1Z"/>
+    <!-- Left side large facet (main body) -->
+    <path fill="#fff" data-channel="body" d="M112.9 136.2L58.79 235.3 127.9 494.9H221.5L170.4 220.1 188.7 216.7 240.5 494.9H260.4L209.7 205.5Z"/>
+    <!-- Bottom right accent (edge highlight) -->
+    <path fill="#fff" data-channel="edge" d="M471.2 396.6L405.4 391.4 355.6 490.6 425.4 453.9Z"/>
+    <!-- Bottom left accent (edge highlight) -->
+    <path fill="#fff" data-channel="edge" d="M35.24 368.6L77.71 495.3H108.7L80.6 389.9Z"/></svg>
