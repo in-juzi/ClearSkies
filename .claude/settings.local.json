@@ -9,7 +9,9 @@
       "Bash(printf:*)",
       "Bash(done)",
       "Bash(ng generate:*)",
-      "Bash(node -e:*)"
+      "Bash(node -e:*)",
+      "Bash(node utils/add-item.js:*)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []
