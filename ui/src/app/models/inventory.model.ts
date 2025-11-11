@@ -17,7 +17,6 @@ export interface ItemDefinition {
   baseValue: number;
   rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
   stackable: boolean;
-  maxStack: number;
   properties: {
     weight: number;
     material: string;

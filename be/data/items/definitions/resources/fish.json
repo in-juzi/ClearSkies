@@ -4,17 +4,17 @@
     "name": "Shrimp",
     "description": "Small shellfish caught in shallow waters",
     "category": "consumable",
+    "subcategories": ["fish", "shellfish", "saltwater"],
     "baseValue": 8,
     "rarity": "common",
     "stackable": true,
-    "maxStack": 50,
     "properties": {
       "weight": 0.5,
       "material": "fish",
       "tier": 1,
       "skillSource": "fishing"
     },
-    "allowedQualities": [],
+    "allowedQualities": ["size", "juicy"],
     "allowedTraits": [
       "pristine"
     ],
@@ -28,17 +28,17 @@
     "name": "Trout",
     "description": "A freshly caught trout",
     "category": "consumable",
+    "subcategories": ["fish", "freshwater"],
     "baseValue": 15,
     "rarity": "common",
     "stackable": true,
-    "maxStack": 50,
     "properties": {
       "weight": 1,
       "material": "fish",
       "tier": 1,
       "skillSource": "fishing"
     },
-    "allowedQualities": [],
+    "allowedQualities": ["size", "juicy"],
     "allowedTraits": [
       "pristine"
     ],
@@ -52,17 +52,17 @@
     "name": "Salmon",
     "description": "A prized salmon, rich in flavor",
     "category": "consumable",
+    "subcategories": ["fish", "freshwater"],
     "baseValue": 35,
     "rarity": "uncommon",
     "stackable": true,
-    "maxStack": 50,
     "properties": {
       "weight": 1.5,
       "material": "fish",
       "tier": 2,
       "skillSource": "fishing"
     },
-    "allowedQualities": [],
+    "allowedQualities": ["size", "juicy"],
     "allowedTraits": [
       "pristine",
       "blessed"
@@ -77,17 +77,17 @@
     "name": "Pike",
     "description": "A fierce pike with sharp teeth",
     "category": "consumable",
+    "subcategories": ["fish", "freshwater"],
     "baseValue": 50,
     "rarity": "uncommon",
     "stackable": true,
-    "maxStack": 50,
     "properties": {
       "weight": 2,
       "material": "fish",
       "tier": 3,
       "skillSource": "fishing"
     },
-    "allowedQualities": [],
+    "allowedQualities": ["size", "juicy"],
     "allowedTraits": [
       "pristine"
     ],

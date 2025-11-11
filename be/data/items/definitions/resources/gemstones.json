@@ -13,7 +13,6 @@
     "baseValue": 15,
     "rarity": "common",
     "stackable": true,
-    "maxStack": 100,
     "properties": {
       "weight": 0.2,
       "material": "gemstone",
@@ -45,7 +44,6 @@
     "baseValue": 25,
     "rarity": "common",
     "stackable": true,
-    "maxStack": 100,
     "properties": {
       "weight": 0.2,
       "material": "gemstone",
@@ -78,7 +76,6 @@
     "baseValue": 35,
     "rarity": "common",
     "stackable": true,
-    "maxStack": 100,
     "properties": {
       "weight": 0.2,
       "material": "gemstone",
@@ -111,7 +108,6 @@
     "baseValue": 50,
     "rarity": "uncommon",
     "stackable": true,
-    "maxStack": 100,
     "properties": {
       "weight": 0.2,
       "material": "gemstone",
@@ -144,7 +140,6 @@
     "baseValue": 60,
     "rarity": "uncommon",
     "stackable": true,
-    "maxStack": 100,
     "properties": {
       "weight": 0.2,
       "material": "gemstone",
@@ -177,7 +172,6 @@
     "baseValue": 100,
     "rarity": "uncommon",
     "stackable": true,
-    "maxStack": 100,
     "properties": {
       "weight": 0.2,
       "material": "gemstone",
@@ -211,7 +205,6 @@
     "baseValue": 120,
     "rarity": "uncommon",
     "stackable": true,
-    "maxStack": 100,
     "properties": {
       "weight": 0.2,
       "material": "gemstone",
@@ -245,7 +238,6 @@
     "baseValue": 140,
     "rarity": "uncommon",
     "stackable": true,
-    "maxStack": 100,
     "properties": {
       "weight": 0.2,
       "material": "gemstone",
@@ -279,7 +271,6 @@
     "baseValue": 250,
     "rarity": "rare",
     "stackable": true,
-    "maxStack": 100,
     "properties": {
       "weight": 0.2,
       "material": "gemstone",
@@ -313,7 +304,6 @@
     "baseValue": 280,
     "rarity": "rare",
     "stackable": true,
-    "maxStack": 100,
     "properties": {
       "weight": 0.2,
       "material": "gemstone",
@@ -347,7 +337,6 @@
     "baseValue": 300,
     "rarity": "rare",
     "stackable": true,
-    "maxStack": 100,
     "properties": {
       "weight": 0.2,
       "material": "gemstone",

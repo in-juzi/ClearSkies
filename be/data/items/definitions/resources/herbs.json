@@ -13,7 +13,6 @@
     "baseValue": 10,
     "rarity": "common",
     "stackable": true,
-    "maxStack": 100,
     "properties": {
       "weight": 0.1,
       "material": "herb",
@@ -44,7 +43,6 @@
     "baseValue": 12,
     "rarity": "common",
     "stackable": true,
-    "maxStack": 100,
     "properties": {
       "weight": 0.1,
       "material": "herb",
@@ -76,7 +74,6 @@
     "baseValue": 15,
     "rarity": "common",
     "stackable": true,
-    "maxStack": 100,
     "properties": {
       "weight": 0.1,
       "material": "herb",
@@ -108,7 +105,6 @@
     "baseValue": 18,
     "rarity": "common",
     "stackable": true,
-    "maxStack": 100,
     "properties": {
       "weight": 0.1,
       "material": "herb",
@@ -141,7 +137,6 @@
     "baseValue": 22,
     "rarity": "uncommon",
     "stackable": true,
-    "maxStack": 100,
     "properties": {
       "weight": 0.1,
       "material": "herb",
@@ -174,7 +169,6 @@
     "baseValue": 28,
     "rarity": "uncommon",
     "stackable": true,
-    "maxStack": 100,
     "properties": {
       "weight": 0.15,
       "material": "herb",
@@ -205,7 +199,6 @@
     "baseValue": 25,
     "rarity": "uncommon",
     "stackable": true,
-    "maxStack": 100,
     "properties": {
       "weight": 0.15,
       "material": "herb",
@@ -236,7 +229,6 @@
     "baseValue": 45,
     "rarity": "uncommon",
     "stackable": true,
-    "maxStack": 100,
     "properties": {
       "weight": 0.3,
       "material": "herb",
@@ -269,7 +261,6 @@
     "baseValue": 50,
     "rarity": "rare",
     "stackable": true,
-    "maxStack": 100,
     "properties": {
       "weight": 0.15,
       "material": "herb",
@@ -303,7 +294,6 @@
     "baseValue": 60,
     "rarity": "rare",
     "stackable": true,
-    "maxStack": 100,
     "properties": {
       "weight": 0.2,
       "material": "herb",
@@ -336,7 +326,6 @@
     "baseValue": 80,
     "rarity": "rare",
     "stackable": true,
-    "maxStack": 100,
     "properties": {
       "weight": 0.1,
       "material": "herb",
@@ -370,7 +359,6 @@
     "baseValue": 100,
     "rarity": "rare",
     "stackable": true,
-    "maxStack": 100,
     "properties": {
       "weight": 0.2,
       "material": "herb",
@@ -404,7 +392,6 @@
     "baseValue": 120,
     "rarity": "epic",
     "stackable": true,
-    "maxStack": 100,
     "properties": {
       "weight": 0.1,
       "material": "herb",
@@ -439,7 +426,6 @@
     "baseValue": 150,
     "rarity": "epic",
     "stackable": true,
-    "maxStack": 100,
     "properties": {
       "weight": 0.2,
       "material": "herb",

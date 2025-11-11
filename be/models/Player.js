@@ -376,10 +376,9 @@ playerSchema.methods.addItem = function(itemInstance) {
 
   if (existingItem) {
     const itemDef = itemService.getItemDefinition(itemInstance.itemId);
-    const newQuantity = existingItem.quantity + itemInstance.quantity;
 
-    if (itemDef.stackable && newQuantity <= itemDef.maxStack) {
-      existingItem.quantity = newQuantity;
+    if (itemDef.stackable) {
+      existingItem.quantity += itemInstance.quantity;
     } else {
       // Can't stack, add as new item
       this.inventory.push(itemInstance);

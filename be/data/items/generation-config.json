@@ -1,0 +1,21 @@
+{
+  "qualityGeneration": {
+    "countDistribution": {
+      "0": 0.35,
+      "1": 0.45,
+      "2": 0.15,
+      "3": 0.05
+    },
+    "tierBasedLevels": true,
+    "comment": "Quality count probabilities are tier-independent. Level distribution still uses tier-based weights."
+  },
+  "traitGeneration": {
+    "appearanceRates": {
+      "common": 0.02,
+      "uncommon": 0.08,
+      "rare": 0.15,
+      "epic": 0.30
+    },
+    "comment": "Reduced from previous rates (common: 5%, uncommon: 15%, rare: 30%, epic: 50%) to make traits more special"
+  }
+}

@@ -75,8 +75,8 @@ import { CommonModule } from '@angular/common';
           <ul>
             <li><strong>Identical Items Stack:</strong> Items with the same quality/trait levels combine into one stack</li>
             <li><strong>Different Levels Separate:</strong> Oak log with Quality L3 won't stack with Quality L4</li>
-            <li><strong>Max Stack Size:</strong> Resources stack up to their defined limit (e.g., 999)</li>
-            <li><strong>Equipment Don't Stack:</strong> Equipment items have maxStack: 1</li>
+            <li><strong>Unlimited Stacking:</strong> Stackable items can be stacked infinitely</li>
+            <li><strong>Equipment Don't Stack:</strong> Equipment items are marked as non-stackable</li>
           </ul>
         </div>
 

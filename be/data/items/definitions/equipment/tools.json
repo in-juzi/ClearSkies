@@ -15,7 +15,6 @@
     "baseValue": 80,
     "rarity": "common",
     "stackable": false,
-    "maxStack": 1,
     "icon": {
       "path": "item-categories/item_cat_axe.svg",
       "material": "bronze_woodcutting_axe"
@@ -52,7 +51,6 @@
     "baseValue": 200,
     "rarity": "common",
     "stackable": false,
-    "maxStack": 1,
     "icon": {
       "path": "item-categories/item_cat_axe.svg",
       "material": "iron_woodcutting_axe"
@@ -89,7 +87,6 @@
     "baseValue": 90,
     "rarity": "common",
     "stackable": false,
-    "maxStack": 1,
     "icon": {
       "path": "items/pickaxe.svg",
       "material": "bronze_mining_pickaxe"
@@ -126,7 +123,6 @@
     "baseValue": 220,
     "rarity": "common",
     "stackable": false,
-    "maxStack": 1,
     "icon": {
       "path": "items/pickaxe.svg",
       "material": "iron_mining_pickaxe"
@@ -163,7 +159,6 @@
     "baseValue": 450,
     "rarity": "rare",
     "stackable": false,
-    "maxStack": 1,
     "icon": {
       "path": "item-categories/item_cat_tool.svg",
       "material": "iron"
@@ -200,7 +195,6 @@
     "baseValue": 50,
     "rarity": "common",
     "stackable": false,
-    "maxStack": 1,
     "icon": {
       "path": "items/fishing-pole.svg",
       "material": "bamboo_fishing_rod"
@@ -238,7 +232,6 @@
     "baseValue": 150,
     "rarity": "common",
     "stackable": false,
-    "maxStack": 1,
     "icon": {
       "path": "items/fishing-pole.svg",
       "material": "willow_fishing_rod"

@@ -38,6 +38,10 @@ export class GameComponent implements OnInit {
   // Track which tab is active in the left sidebar
   leftSidebarTab = signal<'inventory'>('inventory');
 
+  // Track collapse state of sidebars
+  leftSidebarCollapsed = signal(false);
+  rightSidebarCollapsed = signal(false);
+
   ngOnInit(): void {
     // Fetch latest player data
     this.authService.getProfile().subscribe();
@@ -82,5 +86,14 @@ export class GameComponent implements OnInit {
     return ALL_ATTRIBUTES.reduce((total, attrName) => {
       return total + (attrs[attrName]?.level || 0);
     }, 0);
+  }
+
+  // Toggle sidebar collapse state
+  toggleLeftSidebar(): void {
+    this.leftSidebarCollapsed.update(collapsed => !collapsed);
+  }
+
+  toggleRightSidebar(): void {
+    this.rightSidebarCollapsed.update(collapsed => !collapsed);
   }
 }

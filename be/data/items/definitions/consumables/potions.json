@@ -13,7 +13,6 @@
     "baseValue": 50,
     "rarity": "common",
     "stackable": true,
-    "maxStack": 20,
     "properties": {
       "weight": 0.3,
       "material": "potion",

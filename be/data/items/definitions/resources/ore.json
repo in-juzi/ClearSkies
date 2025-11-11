@@ -12,7 +12,6 @@
     "baseValue": 25,
     "rarity": "common",
     "stackable": true,
-    "maxStack": 100,
     "properties": {
       "weight": 4,
       "material": "ore",
@@ -44,7 +43,6 @@
     "baseValue": 30,
     "rarity": "common",
     "stackable": true,
-    "maxStack": 100,
     "properties": {
       "weight": 5,
       "material": "ore",
@@ -76,7 +74,6 @@
     "baseValue": 60,
     "rarity": "common",
     "stackable": true,
-    "maxStack": 100,
     "properties": {
       "weight": 6,
       "material": "ore",
@@ -110,7 +107,6 @@
     "baseValue": 120,
     "rarity": "uncommon",
     "stackable": true,
-    "maxStack": 100,
     "properties": {
       "weight": 5.5,
       "material": "ore",

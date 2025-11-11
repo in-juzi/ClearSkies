@@ -49,8 +49,12 @@
                 <div class="item-info" (click)="selectBuyItem(stockItem)">
                   @if (stockItem.itemDefinition) {
                     <div class="item-icon">
-                      @if (stockItem.itemDefinition.iconPath) {
-                        <img [src]="stockItem.itemDefinition.iconPath" [alt]="stockItem.itemDefinition.name">
+                      @if (stockItem.itemDefinition.icon) {
+                        <app-icon
+                          [path]="stockItem.itemDefinition.icon.path"
+                          [material]="stockItem.itemDefinition.icon.material"
+                          [size]="48">
+                        </app-icon>
                       }
                     </div>
                     <div class="item-details">
@@ -106,8 +110,15 @@
                    (drop)="onDrop($event)">
                 <div class="item-info">
                   <div class="item-icon">
-                    <!-- Item icon placeholder -->
-                    <span class="item-tier">T{{ item.definition.properties.tier }}</span>
+                    @if (item.definition.icon) {
+                      <app-icon
+                        [path]="item.definition.icon.path"
+                        [material]="item.definition.icon.material"
+                        [size]="48">
+                      </app-icon>
+                    } @else {
+                      <span class="item-tier">T{{ item.definition.properties.tier }}</span>
+                    }
                   </div>
                   <div class="item-details">
                     <div class="item-header">

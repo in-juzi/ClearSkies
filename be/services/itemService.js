@@ -7,6 +7,7 @@ class ItemService {
     this.itemDefinitions = new Map();
     this.qualityDefinitions = new Map();
     this.traitDefinitions = new Map();
+    this.generationConfig = null;
     this.initialized = false;
   }
 
@@ -44,6 +45,26 @@ class ItemService {
       // Load item definitions from multiple files and directories
       const definitionsPath = path.join(dataPath, 'definitions');
       await this._loadDefinitionsRecursive(definitionsPath);
+
+      // Load generation config
+      const configPath = path.join(dataPath, 'generation-config.json');
+      try {
+        const configData = await fs.readFile(configPath, 'utf8');
+        this.generationConfig = JSON.parse(configData);
+        console.log('✓ Loaded generation config');
+      } catch (error) {
+        console.warn('⚠ Could not load generation-config.json, using default values:', error.message);
+        // Fallback to default config
+        this.generationConfig = {
+          qualityGeneration: {
+            countDistribution: { "0": 0.35, "1": 0.45, "2": 0.15, "3": 0.05 },
+            tierBasedLevels: true
+          },
+          traitGeneration: {
+            appearanceRates: { common: 0.02, uncommon: 0.08, rare: 0.15, epic: 0.30 }
+          }
+        };
+      }
 
       this.initialized = true;
       console.log(`✓ Loaded ${this.itemDefinitions.size} items, ${this.qualityDefinitions.size} qualities, ${this.traitDefinitions.size} traits`);
@@ -395,18 +416,27 @@ class ItemService {
       return {};
     }
 
+    const allowedCount = itemDef.allowedQualities.length;
+
+    // Determine how many qualities to generate based on config distribution
+    const qualityCount = this._rollQualityCount(allowedCount);
+
+    if (qualityCount === 0) {
+      return {}; // Plain item, no qualities
+    }
+
+    // Randomly select which qualities to include
+    const selectedQualities = this._selectRandomQualities(itemDef.allowedQualities, qualityCount);
+
+    // Generate level for each selected quality using tier-based distribution
     const qualities = {};
-    for (const qualityId of itemDef.allowedQualities) {
+    const tier = itemDef.properties.tier || 1;
+
+    for (const qualityId of selectedQualities) {
       const qualityDef = this.getQualityDefinition(qualityId);
       if (!qualityDef) continue;
 
-      // Generate quality level based on item tier
-      // Higher tier = better average quality levels
-      const tier = itemDef.properties.tier || 1;
       const maxLevel = qualityDef.maxLevel;
-
-      // Use weighted random distribution
-      // Tier 1: average level 2-3, Tier 2: average level 3-4, Tier 3: average level 4-5
       const weights = this._getQualityLevelWeights(tier, maxLevel);
       const level = this._weightedRandomLevel(weights);
 
@@ -461,19 +491,14 @@ class ItemService {
     }
 
     const traits = {};
-    const rarityChances = {
-      common: 0.05,
-      uncommon: 0.15,
-      rare: 0.30,
-      epic: 0.50
-    };
+    const rarityChances = this.generationConfig.traitGeneration.appearanceRates;
 
     for (const traitId of itemDef.allowedTraits) {
       const traitDef = this.getTraitDefinition(traitId);
       if (!traitDef) continue;
 
       // Inverted rarity: rarer traits have LOWER chance to appear
-      const chance = rarityChances[traitDef.rarity] || 0.05;
+      const chance = rarityChances[traitDef.rarity] || 0.02;
       if (Math.random() < chance) {
         // Trait appears! Now determine level (1-3)
         // Higher rarity traits have better chance of higher levels
@@ -510,6 +535,52 @@ class ItemService {
     }
 
     return this._weightedRandomLevel(weights);
+  }
+
+  /**
+   * Roll how many qualities an item should have based on config distribution
+   * @param {number} maxAllowed - Maximum allowed qualities for this item
+   * @returns {number} Number of qualities to generate (0 to maxAllowed)
+   */
+  _rollQualityCount(maxAllowed) {
+    const distribution = this.generationConfig.qualityGeneration.countDistribution;
+    const random = Math.random();
+    let cumulativeProbability = 0;
+
+    // Iterate through distribution (0, 1, 2, 3, etc.)
+    for (const [countStr, probability] of Object.entries(distribution)) {
+      const count = parseInt(countStr);
+      cumulativeProbability += probability;
+
+      if (random < cumulativeProbability) {
+        // Cap at maxAllowed
+        return Math.min(count, maxAllowed);
+      }
+    }
+
+    // Fallback: return minimum of 1 or maxAllowed
+    return Math.min(1, maxAllowed);
+  }
+
+  /**
+   * Randomly select N qualities from the allowed qualities array
+   * @param {Array<string>} allowedQualities - Array of quality IDs
+   * @param {number} count - How many to select
+   * @returns {Array<string>} Array of selected quality IDs
+   */
+  _selectRandomQualities(allowedQualities, count) {
+    if (count >= allowedQualities.length) {
+      return [...allowedQualities]; // Return all if count >= allowed
+    }
+
+    // Fisher-Yates shuffle and take first N elements
+    const shuffled = [...allowedQualities];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+
+    return shuffled.slice(0, count);
   }
 }
 

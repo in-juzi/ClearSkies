@@ -30,21 +30,21 @@
 
 // Location Header
 .location-header {
-  padding: var(--spacing-2xl);
+  padding: var(--spacing-l) var(--spacing-l);
   border-radius: var(--radius-card);
-  margin-bottom: var(--spacing-2xl);
+  margin-bottom: var(--spacing-l);
   position: relative;
   border: var(--border-width-medium) solid rgba(255, 255, 255, 0.2);
 
   h1 {
-    margin: 0 0 var(--spacing-s) 0;
+    margin: 0 0 var(--spacing-xs) 0;
     color: var(--color-secondary);
-    font-size: var(--font-size-5xl);
+    font-size: var(--font-size-3xl);
   }
 
   .location-description {
     color: var(--color-text-tertiary);
-    margin: var(--spacing-s) 0;
+    margin: 0 0 var(--spacing-xs) 0;
     line-height: var(--line-height-normal);
   }
 
@@ -150,8 +150,15 @@
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
 }
 
 // Activity Log
@@ -282,18 +289,24 @@
 }
 
 // Facilities view
-.facilities-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: var(--spacing-l);
-  margin-bottom: var(--spacing-4xl);
+.facilities-view {
+  h2 {
+    margin-bottom: var(--spacing-l);
+  }
+
+  .facilities-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--spacing-l);
+    margin-bottom: var(--spacing-4xl);
+  }
 }
 
 .facility-card {
   background-color: var(--color-bg-elevated);
   border: var(--border-default);
   border-radius: var(--radius-card);
-  padding: var(--spacing-xl);
+  padding: var(--spacing-l);
   cursor: pointer;
   transition: all var(--transition-normal) ease;
 
@@ -413,10 +426,6 @@
     border-color: var(--color-secondary);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(138, 43, 226, 0.3);
-  }
-
-  .vendor-icon {
-    font-size: var(--font-size-3xl);
   }
 
   .vendor-info {
@@ -589,7 +598,6 @@
   border-radius: var(--radius-s);
   cursor: pointer;
   font-size: var(--font-size-m);
-  margin-bottom: var(--spacing-l);
   transition: all var(--transition-fast) ease;
 
   &:hover {

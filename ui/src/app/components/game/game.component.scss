@@ -84,6 +84,60 @@
   gap: 0;
   height: 100%;
   overflow: hidden;
+  transition: grid-template-columns var(--transition-normal);
+
+  // Adjust grid when sidebars are collapsed
+  &:has(.left-sidebar.collapsed) {
+    grid-template-columns: 40px 1fr var(--sidebar-width-right);
+  }
+
+  &:has(.right-sidebar.collapsed) {
+    grid-template-columns: var(--sidebar-width-left) 1fr 40px;
+  }
+
+  &:has(.left-sidebar.collapsed):has(.right-sidebar.collapsed) {
+    grid-template-columns: 40px 1fr 40px;
+  }
+}
+
+// Collapse toggle button
+.collapse-toggle {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  width: var(--spacing-l);
+  height: 60px;
+  background: var(--color-bg-tertiary);
+  border: var(--border-width-thin) solid var(--color-surface-border);
+  color: var(--color-accent-purple);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-normal);
+  padding: 0;
+
+  &:hover {
+    background: var(--color-accent-purple-dark);
+    color: var(--color-text-primary);
+    box-shadow: var(--shadow-m);
+  }
+
+  &.left-toggle {
+    right: 0px;
+    border-radius: var(--radius-m) 0 0 var(--radius-m);
+  }
+
+  &.right-toggle {
+    left: 0px;
+    border-radius: 0 var(--radius-m) var(--radius-m) 0;
+  }
+
+  .toggle-icon {
+    font-size: var(--font-size-m);
+    line-height: 1;
+  }
 }
 
 // Common panel styles
@@ -116,6 +170,12 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  position: relative;
+  transition: all var(--transition-normal);
+
+  &.collapsed {
+    overflow: visible;
+  }
 
   // Ensure child components take full height
   app-inventory {
@@ -184,13 +244,20 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  padding: var(--spacing-m);
 
-  // Ensure the app-location component takes full height
+  // Ensure the app-location component takes available height
   app-location {
     display: flex;
     flex-direction: column;
     flex: 1;
     min-height: 0;
+    overflow-y: auto;
+  }
+
+  // Chat component at bottom
+  app-chat {
+    flex-shrink: 0;
   }
 
   .location-header {
@@ -257,6 +324,12 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  position: relative;
+  transition: all var(--transition-normal);
+
+  &.collapsed {
+    overflow: visible;
+  }
 
   // Ensure child components take full height
   app-skills,

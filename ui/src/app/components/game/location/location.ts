@@ -1,7 +1,9 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LocationService } from '../../../services/location.service';
 import { VendorService } from '../../../services/vendor.service';
+import { InventoryService } from '../../../services/inventory.service';
+import { ChatService } from '../../../services/chat.service';
 import { Location, Facility, Activity, ActivityRewards } from '../../../models/location.model';
 import { Vendor } from '../../../models/vendor.model';
 import { ConfirmDialogService } from '../../../services/confirm-dialog.service';
@@ -20,6 +22,8 @@ import { XpMiniComponent } from '../../shared/xp-mini/xp-mini.component';
 export class LocationComponent implements OnInit, OnDestroy {
   private confirmDialog = inject(ConfirmDialogService);
   private locationService = inject(LocationService);
+  private inventoryService = inject(InventoryService);
+  private chatService = inject(ChatService);
   vendorService = inject(VendorService);
 
   // Expose Object for template use
@@ -35,16 +39,45 @@ export class LocationComponent implements OnInit, OnDestroy {
   // Local state
   selectedActivity: Activity | null = null;
   lastRewards: ActivityRewards | null = null;
-  errorMessage: string | null = null;
-  successMessage: string | null = null;
   activityLog: Array<{ timestamp: Date; rewards: ActivityRewards; activityName: string }> = [];
   facilityVendors: Map<string, Vendor> = new Map(); // Cache vendor data by vendorId
+  private lastEquippedItems: string = '';
+  private refreshTimeout: any = null;
+
+  constructor() {
+    // Use effect to reactively update facility requirements when equipment changes
+    effect(() => {
+      const inventory = this.inventoryService.inventory();
+      const currentFacility = this.selectedFacility();
+
+      // Only track equipped items (not all inventory)
+      const equippedItems = inventory
+        .filter(item => item.equipped)
+        .map(item => item.instanceId)
+        .sort()
+        .join(',');
+
+      // Only refresh if facility is open AND equipped items changed
+      if (currentFacility && currentFacility.facilityId && equippedItems !== this.lastEquippedItems) {
+        this.lastEquippedItems = equippedItems;
+
+        // Debounce to avoid spam (wait 500ms after last change)
+        if (this.refreshTimeout) {
+          clearTimeout(this.refreshTimeout);
+        }
+
+        this.refreshTimeout = setTimeout(() => {
+          this.refreshFacilityRequirements(currentFacility.facilityId);
+        }, 500);
+      }
+    });
+  }
 
   ngOnInit() {
     // Load current location on component init
     this.locationService.getCurrentLocation().subscribe({
       error: (err) => {
-        this.errorMessage = 'Failed to load location data';
+        this.logToChat('Failed to load location data', 'error');
         console.error('Error loading location:', err);
       }
     });
@@ -65,13 +98,17 @@ export class LocationComponent implements OnInit, OnDestroy {
 
     // Subscribe to activity error events
     this.locationService.activityError$.subscribe(error => {
-      this.errorMessage = error.error;
-      setTimeout(() => this.errorMessage = null, 5000);
+      this.logToChat(error.error, 'error');
     });
   }
 
   ngOnDestroy() {
     // Service handles cleanup of polling
+
+    // Clear refresh timeout
+    if (this.refreshTimeout) {
+      clearTimeout(this.refreshTimeout);
+    }
   }
 
   /**
@@ -92,12 +129,23 @@ export class LocationComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Refresh facility requirements (silently re-fetch to update activity availability)
+   */
+  private refreshFacilityRequirements(facilityId: string) {
+    this.locationService.getFacility(facilityId).subscribe({
+      error: (err) => {
+        // Silently fail - this is just a background refresh
+        console.error('Failed to refresh facility requirements:', err);
+      }
+    });
+  }
+
+  /**
    * Select a facility to view its activities and vendors
    */
   selectFacility(facility: Facility) {
     if (facility.stub) {
-      this.successMessage = facility.stubMessage || 'This facility is not yet available';
-      setTimeout(() => this.successMessage = null, 3000);
+      this.logToChat(facility.stubMessage || 'This facility is not yet available', 'info');
       return;
     }
 
@@ -112,7 +160,7 @@ export class LocationComponent implements OnInit, OnDestroy {
         this.loadFacilityVendors(facility);
       },
       error: (err) => {
-        this.errorMessage = 'Failed to load facility';
+        this.logToChat('Failed to load facility', 'error');
         console.error('Error loading facility:', err);
       }
     });
@@ -164,9 +212,8 @@ export class LocationComponent implements OnInit, OnDestroy {
         // Vendor is loaded and signal is set by the service
       },
       error: (err) => {
-        this.errorMessage = err.error?.message || 'Failed to load vendor';
+        this.logToChat(err.error?.message || 'Failed to load vendor', 'error');
         console.error('Error loading vendor:', err);
-        setTimeout(() => this.errorMessage = null, 3000);
       }
     });
   }
@@ -239,14 +286,12 @@ export class LocationComponent implements OnInit, OnDestroy {
     }
 
     if (this.selectedActivity.stub) {
-      this.successMessage = this.selectedActivity.stubMessage || 'This activity is not yet available';
-      setTimeout(() => this.successMessage = null, 3000);
+      this.logToChat(this.selectedActivity.stubMessage || 'This activity is not yet available', 'info');
       return;
     }
 
     if (!this.selectedActivity.available) {
-      this.errorMessage = 'Requirements not met for this activity';
-      setTimeout(() => this.errorMessage = null, 3000);
+      this.logToChat('Requirements not met for this activity', 'error');
       return;
     }
 
@@ -255,14 +300,12 @@ export class LocationComponent implements OnInit, OnDestroy {
       this.selectedFacility()!.facilityId
     ).subscribe({
       next: (response) => {
-        this.successMessage = response.message;
+        this.logToChat(response.message, 'success');
         this.selectedActivity = null;
         this.locationService.selectedFacility.set(null);
-        setTimeout(() => this.successMessage = null, 3000);
       },
       error: (err) => {
-        this.errorMessage = err.error?.message || 'Failed to start activity';
-        setTimeout(() => this.errorMessage = null, 3000);
+        this.logToChat(err.error?.message || 'Failed to start activity', 'error');
       }
     });
   }
@@ -273,16 +316,14 @@ export class LocationComponent implements OnInit, OnDestroy {
   completeActivity() {
     this.locationService.completeActivity().subscribe({
       next: (response) => {
-        this.successMessage = response.message;
+        this.logToChat(response.message, 'success');
         this.lastRewards = response.rewards || null;
         setTimeout(() => {
-          this.successMessage = null;
           this.lastRewards = null;
         }, 5000);
       },
       error: (err) => {
-        this.errorMessage = err.error?.message || 'Failed to complete activity';
-        setTimeout(() => this.errorMessage = null, 3000);
+        this.logToChat(err.error?.message || 'Failed to complete activity', 'error');
       }
     });
   }
@@ -304,12 +345,10 @@ export class LocationComponent implements OnInit, OnDestroy {
 
     this.locationService.cancelActivity().subscribe({
       next: (response) => {
-        this.successMessage = response.message;
-        setTimeout(() => this.successMessage = null, 3000);
+        this.logToChat(response.message, 'success');
       },
       error: (err) => {
-        this.errorMessage = err.error?.message || 'Failed to cancel activity';
-        setTimeout(() => this.errorMessage = null, 3000);
+        this.logToChat(err.error?.message || 'Failed to cancel activity', 'error');
       }
     });
   }
@@ -331,13 +370,11 @@ export class LocationComponent implements OnInit, OnDestroy {
 
     this.locationService.cancelTravel().subscribe({
       next: (response) => {
-        this.successMessage = response.message;
+        this.logToChat(response.message, 'success');
         this.locationService.getCurrentLocation().subscribe(); // Refresh location
-        setTimeout(() => this.successMessage = null, 3000);
       },
       error: (err) => {
-        this.errorMessage = err.error?.message || 'Failed to cancel travel';
-        setTimeout(() => this.errorMessage = null, 3000);
+        this.logToChat(err.error?.message || 'Failed to cancel travel', 'error');
       }
     });
   }
@@ -348,12 +385,10 @@ export class LocationComponent implements OnInit, OnDestroy {
   travel(targetLocationId: string) {
     this.locationService.startTravel(targetLocationId).subscribe({
       next: (response) => {
-        this.successMessage = response.message;
-        setTimeout(() => this.successMessage = null, 3000);
+        this.logToChat(response.message, 'success');
       },
       error: (err) => {
-        this.errorMessage = err.error?.message || 'Failed to start travel';
-        setTimeout(() => this.errorMessage = null, 3000);
+        this.logToChat(err.error?.message || 'Failed to start travel', 'error');
       }
     });
   }
@@ -364,12 +399,10 @@ export class LocationComponent implements OnInit, OnDestroy {
   skipTravel() {
     this.locationService.skipTravel().subscribe({
       next: (response) => {
-        this.successMessage = response.message || 'Travel skipped to near completion';
-        setTimeout(() => this.successMessage = null, 3000);
+        this.logToChat(response.message || 'Travel skipped to near completion', 'success');
       },
       error: (err) => {
-        this.errorMessage = err.error?.message || 'Failed to skip travel';
-        setTimeout(() => this.errorMessage = null, 3000);
+        this.logToChat(err.error?.message || 'Failed to skip travel', 'error');
       }
     });
   }
@@ -425,5 +458,18 @@ export class LocationComponent implements OnInit, OnDestroy {
     const elapsed = now - start;
 
     return Math.min(100, Math.max(0, (elapsed / total) * 100));
+  }
+
+  /**
+   * Log a message to chat instead of showing UI message
+   */
+  private logToChat(message: string, type: 'info' | 'error' | 'success' = 'info'): void {
+    const prefix = type === 'error' ? '❌ ' : type === 'success' ? '✅ ' : 'ℹ️ ';
+    this.chatService.addLocalMessage({
+      userId: 'system',
+      username: 'System',
+      message: `${prefix}${message}`,
+      createdAt: new Date()
+    });
   }
 }

@@ -5,11 +5,12 @@ import { InventoryService } from '../../../services/inventory.service';
 import { AuthService } from '../../../services/auth.service';
 import { VendorStockItem } from '../../../models/vendor.model';
 import { ItemModifiersComponent } from '../../shared/item-modifiers/item-modifiers.component';
+import { IconComponent } from '../../shared/icon/icon.component';
 
 @Component({
   selector: 'app-vendor',
   standalone: true,
-  imports: [CommonModule, ItemModifiersComponent],
+  imports: [CommonModule, ItemModifiersComponent, IconComponent],
   templateUrl: './vendor.component.html',
   styleUrl: './vendor.component.scss'
 })

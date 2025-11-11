@@ -35,7 +35,6 @@ export interface ManualItem {
   category: string;
   subcategories: string[];
   stackable: boolean;
-  maxStack: number;
   slot?: string;
   subtype?: string;
   stats?: any;

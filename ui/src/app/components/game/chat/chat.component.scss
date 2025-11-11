@@ -1,20 +1,16 @@
 @use '../../../../design-tokens.scss' as *;
 
 .chat-container {
-  position: fixed;
-  bottom: 0;
-  right: var(--spacing-l);
-  width: 400px;
-  max-width: 90vw;
+  position: relative;
+  width: 100%;
   background: var(--color-bg-secondary);
   border: var(--border-width-medium) solid var(--color-border-primary);
-  border-bottom: none;
-  border-radius: var(--radius-m) var(--radius-m) 0 0;
+  border-radius: var(--radius-m);
   box-shadow: var(--shadow-overlay);
-  z-index: 1000;
   display: flex;
   flex-direction: column;
   transition: all var(--transition-normal);
+  margin-top: var(--spacing-m);
 
   &.collapsed {
     height: 50px;

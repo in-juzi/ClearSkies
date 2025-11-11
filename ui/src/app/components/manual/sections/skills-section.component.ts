@@ -35,7 +35,7 @@ import { ManualService, ManualSkill, SkillsResponse } from '../../../services/ma
               <div class="skill-card">
                 <div class="skill-header">
                   <img
-                    [src]="'assets/icons/' + skill.icon"
+                    [src]="'assets/' + skill.icon"
                     [alt]="skill.name"
                     class="skill-icon"
                   />

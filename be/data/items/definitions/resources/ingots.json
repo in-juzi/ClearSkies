@@ -13,7 +13,6 @@
     "baseValue": 80,
     "rarity": "common",
     "stackable": true,
-    "maxStack": 100,
     "properties": {
       "weight": 8,
       "material": "metal",
@@ -43,7 +42,6 @@
     "baseValue": 120,
     "rarity": "common",
     "stackable": true,
-    "maxStack": 100,
     "properties": {
       "weight": 10,
       "material": "metal",

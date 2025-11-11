@@ -14,7 +14,6 @@
     "baseValue": 50,
     "rarity": "common",
     "stackable": false,
-    "maxStack": 1,
     "icon": {
       "path": "item-categories/item_cat_body.svg",
       "material": "oak"
@@ -53,7 +52,6 @@
     "baseValue": 150,
     "rarity": "common",
     "stackable": false,
-    "maxStack": 1,
     "icon": {
       "path": "item-categories/item_cat_body.svg",
       "material": "iron"
@@ -90,7 +88,6 @@
     "baseValue": 20,
     "rarity": "common",
     "stackable": false,
-    "maxStack": 1,
     "icon": {
       "path": "item-categories/item_cat_body.svg",
       "material": "hemp"
@@ -126,7 +123,6 @@
     "baseValue": 75,
     "rarity": "common",
     "stackable": false,
-    "maxStack": 1,
     "icon": {
       "path": "item-categories/item_cat_body.svg",
       "material": "leather"

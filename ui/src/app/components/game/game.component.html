@@ -21,68 +21,100 @@
     @if (currentPlayer()) {
       <div class="game-layout">
         <!-- Left Sidebar: Inventory -->
-        <aside class="left-sidebar">
-          <!-- Tab Navigation -->
-          <div class="sidebar-nav">
-            <button
-              class="nav-tab"
-              [class.active]="leftSidebarTab() === 'inventory'"
-              (click)="leftSidebarTab.set('inventory')">
-              Inventory
-            </button>
-          </div>
-
-          <!-- Tab Content -->
-          <div class="sidebar-content">
-            @if (leftSidebarTab() === 'inventory') {
-              <app-inventory></app-inventory>
+        <aside class="left-sidebar" [class.collapsed]="leftSidebarCollapsed()">
+          <!-- Collapse Toggle Button -->
+          <button
+            class="collapse-toggle left-toggle"
+            (click)="toggleLeftSidebar()"
+            [attr.aria-label]="leftSidebarCollapsed() ? 'Expand inventory' : 'Collapse inventory'">
+            @if (leftSidebarCollapsed()) {
+              <span class="toggle-icon">&#9654;</span>
+            } @else {
+              <span class="toggle-icon">&#9664;</span>
             }
-          </div>
+          </button>
+
+          @if (!leftSidebarCollapsed()) {
+            <!-- Tab Navigation -->
+            <div class="sidebar-nav">
+              <button
+                class="nav-tab"
+                [class.active]="leftSidebarTab() === 'inventory'"
+                (click)="leftSidebarTab.set('inventory')">
+                Inventory
+              </button>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="sidebar-content">
+              @if (leftSidebarTab() === 'inventory') {
+                <app-inventory></app-inventory>
+              }
+            </div>
+          }
         </aside>
 
         <!-- Center: Main Game Area -->
         <section class="center-content">
           <app-location></app-location>
+
+          <!-- Chat Component (Bottom of Center Content) -->
+          @if (currentPlayer()) {
+            <app-chat></app-chat>
+          }
         </section>
 
         <!-- Right Sidebar: Character/Skills/Attributes/Status -->
-        <aside class="right-sidebar">
-          <!-- Tab Navigation -->
-          <div class="sidebar-nav">
-            <button
-              class="nav-tab"
-              [class.active]="rightSidebarTab() === 'character'"
-              (click)="rightSidebarTab.set('character')">
-              Character
-            </button>
-            <button
-              class="nav-tab"
-              [class.active]="rightSidebarTab() === 'equipment'"
-              (click)="rightSidebarTab.set('equipment')">
-              Equipment
-            </button>
-            <button
-              class="nav-tab"
-              [class.active]="rightSidebarTab() === 'skills'"
-              (click)="rightSidebarTab.set('skills')">
-              Skills
-            </button>
-            <button
-              class="nav-tab"
-              [class.active]="rightSidebarTab() === 'attributes'"
-              (click)="rightSidebarTab.set('attributes')">
-              Attributes
-            </button>
-            <button
-              class="nav-tab"
-              [class.active]="rightSidebarTab() === 'status'"
-              (click)="rightSidebarTab.set('status')">
-              Status
-            </button>
-          </div>
+        <aside class="right-sidebar" [class.collapsed]="rightSidebarCollapsed()">
+          <!-- Collapse Toggle Button -->
+          <button
+            class="collapse-toggle right-toggle"
+            (click)="toggleRightSidebar()"
+            [attr.aria-label]="rightSidebarCollapsed() ? 'Expand character panel' : 'Collapse character panel'">
+            @if (rightSidebarCollapsed()) {
+              <span class="toggle-icon">&#9664;</span>
+            } @else {
+              <span class="toggle-icon">&#9654;</span>
+            }
+          </button>
 
-          <!-- Tab Content -->
-          <div class="sidebar-content">
+          @if (!rightSidebarCollapsed()) {
+            <!-- Tab Navigation -->
+            <div class="sidebar-nav">
+              <button
+                class="nav-tab"
+                [class.active]="rightSidebarTab() === 'character'"
+                (click)="rightSidebarTab.set('character')">
+                Character
+              </button>
+              <button
+                class="nav-tab"
+                [class.active]="rightSidebarTab() === 'equipment'"
+                (click)="rightSidebarTab.set('equipment')">
+                Equipment
+              </button>
+              <button
+                class="nav-tab"
+                [class.active]="rightSidebarTab() === 'skills'"
+                (click)="rightSidebarTab.set('skills')">
+                Skills
+              </button>
+              <button
+                class="nav-tab"
+                [class.active]="rightSidebarTab() === 'attributes'"
+                (click)="rightSidebarTab.set('attributes')">
+                Attributes
+              </button>
+              <button
+                class="nav-tab"
+                [class.active]="rightSidebarTab() === 'status'"
+                (click)="rightSidebarTab.set('status')">
+                Status
+              </button>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="sidebar-content">
             <!-- Character Tab -->
             @if (rightSidebarTab() === 'character') {
               <div class="panel">
@@ -123,16 +155,12 @@
             @if (rightSidebarTab() === 'status') {
               <app-character-status></app-character-status>
             }
-          </div>
+            </div>
+          }
         </aside>
       </div>
     } @else {
       <div class="loading">Loading player data...</div>
     }
   </main>
-
-  <!-- Chat Component (Fixed Position Overlay) -->
-  @if (currentPlayer()) {
-    <app-chat></app-chat>
-  }
 </div>

@@ -110,7 +110,7 @@ import { IconComponent } from '../../shared/icon/icon.component';
 
             <p>
               Qualities represent the inherent characteristics of items. Each quality type has 5 discrete levels,
-              from poor (L1) to perfect (L5), affecting vendor value and item properties.
+              with escalating effects on vendor value and item properties. Higher levels provide increasingly powerful bonuses.
             </p>
 
             <div class="qualities-grid">

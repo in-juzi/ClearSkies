@@ -14,7 +14,7 @@
 - ✅ Cooking/Crafting system (completed - quality inheritance, instance selection)
 - ✅ Multi-channel icon colorization (completed - path-level SVG colorization with 40+ materials)
 - ✅ Item system reorganization (completed - category subdirectories for scalability)
-- ✅ 3-tier quality/trait system (completed - simplified from 5-tier to 3-tier)
+- ✅ 5-level quality system with 3-level trait system (completed - quality expanded to 5 levels)
 - ✅ Smithing foundation (completed - ore smelting, ingot crafting, Village Forge)
 
 **Recent Changes** (Last 7 commits):
@@ -155,7 +155,7 @@ cd be && node utils/add-item.js
   "rarity": "common|uncommon|rare|epic|legendary",
   "tier": 1,
   "baseValue": 10,
-  "maxStack": 99,
+  "stackable": true,
   "allowedQualities": ["purity"],
   "allowedTraits": ["pristine", "blessed"]
 }
@@ -591,28 +591,33 @@ The inventory system uses a three-tier architecture for flexibility and easy bal
    - Equipment items include `subtype` field for activity requirement matching
 
 2. **Quality & Trait Definitions** (JSON files)
-   - **Qualities**: woodGrain, moisture, age, purity, freshness (integer levels 1-3, simplified from 1-5)
+   - **Qualities**: woodGrain, moisture, age, purity, sheen (integer levels 1-5)
      - Each level has explicit name, description, and effects
-     - Example: woodGrain L1 (Fine Grain) → L3 (Perfect Grain)
+     - Example: woodGrain L1 (Fine Grain, 1.1x) → L5 (Mythical Grain, 1.5x)
+     - Example: purity L1 (High Purity, 1.1x) → L5 (Transcendent, 1.5x)
+     - Escalating effects: 8-10% per level depending on quality type
    - **Traits**: fragrant, knotted, weathered, pristine, cursed, blessed, masterwork (integer levels 1-3)
      - Stored as Map<traitId, level> instead of array
      - Each level has escalating effects
    - Define effects on vendor pricing, crafting, alchemy, combat
-   - Simplified 3-tier system provides clearer progression and easier balancing
+   - 5-level quality system provides granular progression, 3-level traits for special modifiers
 
 3. **Item Instances** (Player inventory in MongoDB)
    - References to base items
-   - Quality levels (1-3 integers) and trait levels (1-3 integers)
+   - Quality levels (1-5 integers) and trait levels (1-3 integers)
    - Automatic stacking for items with identical levels
    - Calculated vendor prices based on level modifiers
 
 **Key Features:**
-- Items have discrete quality levels (1-3, simplified) with descriptive names
+- Items have discrete quality levels (1-5) with descriptive names and escalating bonuses
 - Traits stored as Map with levels (1-3) for escalating effects
 - Better stacking: items with identical levels stack together
 - Easy balancing by editing JSON level definitions (no code changes needed)
 - Hot-reload capability without server restart
-- Random generation based on item tier and rarity distributions
+- **Probabilistic generation**: Most items have 0-1 qualities (config: 35% plain, 45% one quality, 15% two, 5% three+)
+- **Selective traits**: Reduced appearance rates (common: 2%, uncommon: 8%, rare: 15%, epic: 30%)
+- Tier-independent quality count with tier-based level distribution
+- Configuration via `be/data/items/generation-config.json` for easy balancing
 - Category-based organization improves scalability for growing item catalog
 - Multi-channel icon colorization with 40+ material definitions
 - Full documentation in `project/docs/inventory-system.md` and `project/docs/level-based-quality-trait-system.md`
@@ -676,7 +681,7 @@ The equipment system allows players to equip items to specific body slots for st
    - Must include `slot` field indicating which slot they can be equipped to
    - Examples: iron_helm (head), leather_tunic (body), copper_sword (mainHand), wooden_shield (offHand)
    - Properties include defense, damage, durability, required level
-   - Equipment items are non-stackable (maxStack: 1)
+   - Equipment items are non-stackable (stackable: false)
 
 3. **Equipment UI** (3x4 grid with square slots)
    - Drag-and-drop from inventory to equipment slots

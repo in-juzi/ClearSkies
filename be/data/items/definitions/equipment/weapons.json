@@ -15,7 +15,6 @@
     "baseValue": 100,
     "rarity": "common",
     "stackable": false,
-    "maxStack": 1,
     "icon": {
       "path": "item-categories/item_cat_sword.svg",
       "material": "copper_sword"
@@ -53,7 +52,6 @@
     "baseValue": 250,
     "rarity": "common",
     "stackable": false,
-    "maxStack": 1,
     "icon": {
       "path": "item-categories/item_cat_sword.svg",
       "material": "iron"

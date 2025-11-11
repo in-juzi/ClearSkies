@@ -270,6 +270,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     return d.toLocaleTimeString('en-US', {
       hour: 'numeric',
       minute: '2-digit',
+      second: '2-digit',
       hour12: true
     });
   }

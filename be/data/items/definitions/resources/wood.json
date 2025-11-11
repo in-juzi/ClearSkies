@@ -12,7 +12,6 @@
     "baseValue": 25,
     "rarity": "common",
     "stackable": true,
-    "maxStack": 100,
     "properties": {
       "weight": 0.5,
       "material": "wood",
@@ -47,7 +46,6 @@
     "baseValue": 50,
     "rarity": "uncommon",
     "stackable": true,
-    "maxStack": 100,
     "properties": {
       "weight": 0.5,
       "material": "wood",
@@ -82,7 +80,6 @@
     "baseValue": 75,
     "rarity": "uncommon",
     "stackable": true,
-    "maxStack": 100,
     "properties": {
       "weight": 0.5,
       "material": "wood",

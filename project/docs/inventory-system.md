@@ -35,8 +35,9 @@ be/
 │   │   └── consumables.json    # Food, potions
 │   ├── qualities/
 │   │   └── qualities.json      # woodGrain, purity, freshness, etc.
-│   └── traits/
-│       └── traits.json         # fragrant, pristine, cursed, etc.
+│   ├── traits/
+│   │   └── traits.json         # fragrant, pristine, cursed, etc.
+│   └── generation-config.json  # Quality/trait generation probabilities
 ├── services/
 │   └── itemService.js          # Item management logic
 ├── controllers/
@@ -169,20 +170,67 @@ New methods:
 
 ### Random Generation
 
-- `generateRandomQualities(itemId)` - Tier-based quality generation
-- `generateRandomTraits(itemId)` - Rarity-based trait generation
+- `generateRandomQualities(itemId)` - Probabilistic count-based quality generation
+- `generateRandomTraits(itemId)` - Rarity-based trait generation with reduced appearance rates
 
-**Quality Generation Logic:**
+**Quality Generation System:**
+
+Items receive a variable number of qualities based on configured probabilities:
+
 ```javascript
-baseValue = 0.3 + (tier * 0.1)  // T1: 0.4, T2: 0.5, T3: 0.6
-value = baseValue ± 0.3 variance
+// Configuration: be/data/items/generation-config.json
+{
+  "qualityGeneration": {
+    "countDistribution": {
+      "0": 0.35,  // 35% plain items (no qualities)
+      "1": 0.45,  // 45% items with 1 quality
+      "2": 0.15,  // 15% items with 2 qualities
+      "3": 0.05   // 5% items with 3+ qualities
+    }
+  }
+}
 ```
 
-**Trait Generation Chances:**
-- Common: 5%
-- Uncommon: 15%
-- Rare: 30%
-- Epic: 50%
+**Quality Level Distribution** (tier-based, once quality is selected):
+- **Tier 1**: Levels 1-2 most common (avg 2-3)
+- **Tier 2**: Levels 2-3 most common (avg 3-4)
+- **Tier 3+**: Levels 3-4 most common (avg 4-5)
+
+**Trait Generation System:**
+
+Traits have appearance probability followed by level determination:
+
+```javascript
+// Configuration: be/data/items/generation-config.json
+{
+  "traitGeneration": {
+    "appearanceRates": {
+      "common": 0.02,    // 2% chance to appear
+      "uncommon": 0.08,  // 8% chance to appear
+      "rare": 0.15,      // 15% chance to appear
+      "epic": 0.30       // 30% chance to appear
+    }
+  }
+}
+```
+
+**Trait Level Distribution** (rarity-based, if trait appears):
+- **Common**: 70% L1, 25% L2, 5% L3
+- **Uncommon**: 50% L1, 40% L2, 10% L3
+- **Rare**: 30% L1, 50% L2, 20% L3
+- **Epic**: 15% L1, 40% L2, 45% L3
+
+**Expected Results:**
+- ~35% plain items (0 qualities, 0 traits)
+- ~40% basic items (1 quality, 0 traits)
+- ~15% good items (1-2 qualities, 0 traits)
+- ~8% valuable items (qualities + 1 trait)
+- ~2% jackpot items (multiple qualities + traits)
+
+**Configuration:**
+- Edit `be/data/items/generation-config.json` to adjust probabilities
+- No code changes required for balancing
+- Hot-reload supported via `/api/inventory/reload`
 
 ## Frontend Integration
 
@@ -233,7 +281,6 @@ Edit the appropriate JSON file in `be/data/items/definitions/`:
     "baseValue": 100,
     "rarity": "common|uncommon|rare|epic|legendary",
     "stackable": true,
-    "maxStack": 100,
     "properties": {
       "weight": 5,
       "material": "wood",

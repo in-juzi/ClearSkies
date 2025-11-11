@@ -48,11 +48,21 @@ class DropTableService {
 
   /**
    * Roll on a drop table using weighted random selection
+   * Supports nested drop tables (drop tables that reference other drop tables)
    * @param {string} dropTableId - The drop table to roll on
    * @param {object} options - Optional modifiers (luck, quality multipliers, etc.)
+   * @param {number} depth - Current nesting depth (used internally for recursion protection)
    * @returns {object|null} The selected drop or null if dropNothing was rolled
    */
-  rollDropTable(dropTableId, options = {}) {
+  rollDropTable(dropTableId, options = {}, depth = 0) {
+    const MAX_DEPTH = 5; // Maximum nesting depth to prevent infinite loops
+
+    // Check for excessive nesting depth
+    if (depth > MAX_DEPTH) {
+      console.warn(`⚠️ Max nesting depth (${MAX_DEPTH}) reached for drop table: ${dropTableId}`);
+      return null;
+    }
+
     const dropTable = this.dropTables.get(dropTableId);
     if (!dropTable) {
       console.warn(`Drop table not found: ${dropTableId}`);
@@ -74,6 +84,16 @@ class DropTableService {
           return null;
         }
 
+        // Check if this is a nested drop table
+        // Support explicit type: "dropTable" or implicit detection (has dropTableId but no itemId)
+        const isNestedTable = drop.type === 'dropTable' || (drop.dropTableId && !drop.itemId);
+
+        if (isNestedTable) {
+          // Recursively roll on the nested drop table
+          return this.rollDropTable(drop.dropTableId, options, depth + 1);
+        }
+
+        // Otherwise, this is a normal item drop
         // Calculate quantity
         const quantity = drop.quantity.min +
           Math.floor(Math.random() * (drop.quantity.max - drop.quantity.min + 1));

@@ -23,6 +23,11 @@ export interface VendorStockItem {
   itemDefinition?: ItemDefinition;
 }
 
+export interface ItemIcon {
+  path: string;
+  material: string;
+}
+
 export interface ItemDefinition {
   itemId: string;
   name: string;
@@ -31,10 +36,10 @@ export interface ItemDefinition {
   rarity: string;
   tier: number;
   baseValue: number;
-  iconPath?: string;
+  icon?: ItemIcon;
   slot?: string;
   subtype?: string;
-  maxStack: number;
+  stackable: boolean;
 }
 
 export interface BuyItemRequest {

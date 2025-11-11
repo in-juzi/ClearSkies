@@ -19,7 +19,7 @@ const getSkills = async (req, res) => {
         name: 'Woodcutting',
         description: 'The art of felling trees and harvesting timber. Essential for gathering wood resources.',
         mainAttribute: 'strength',
-        icon: 'skill_woodcutting.svg',
+        icon: 'icons/skills/skill_woodcutting.svg',
         xpPerLevel: 1000
       },
       {
@@ -27,7 +27,7 @@ const getSkills = async (req, res) => {
         name: 'Mining',
         description: 'Extract valuable ores and minerals from the earth. Strength and endurance are key.',
         mainAttribute: 'strength',
-        icon: 'skill_mining.svg',
+        icon: 'icons/ui/ui_dig_1.svg',
         xpPerLevel: 1000
       },
       {
@@ -35,7 +35,7 @@ const getSkills = async (req, res) => {
         name: 'Fishing',
         description: 'Catch fish from rivers, lakes, and seas. Patience and endurance yield the best catches.',
         mainAttribute: 'endurance',
-        icon: 'skill_fishing.svg',
+        icon: 'icons/ui/ui_fishing_new.svg',
         xpPerLevel: 1000
       },
       {
@@ -43,7 +43,7 @@ const getSkills = async (req, res) => {
         name: 'Smithing',
         description: 'Forge weapons, armor, and tools at the anvil. Transform raw materials into powerful equipment.',
         mainAttribute: 'endurance',
-        icon: 'skill_smithing.svg',
+        icon: 'icons/skills/skill_blacksmithing.svg',
         xpPerLevel: 1000
       },
       {
@@ -51,7 +51,7 @@ const getSkills = async (req, res) => {
         name: 'Cooking',
         description: 'Prepare food and potions. A well-fed adventurer is a successful one.',
         mainAttribute: 'will',
-        icon: 'skill_cooking.svg',
+        icon: 'icons/skills/skill_cooking.svg',
         xpPerLevel: 1000
       }
     ];
@@ -83,7 +83,7 @@ const getAttributes = async (req, res) => {
         attributeId: 'strength',
         name: 'Strength',
         description: 'Physical power and melee combat prowess. Increases damage with heavy weapons.',
-        icon: 'attribute_strength.svg',
+        icon: 'icons/attributes/attr_strength.svg',
         linkedSkills: ['woodcutting', 'mining'],
         xpPerLevel: 1000
       },
@@ -91,7 +91,7 @@ const getAttributes = async (req, res) => {
         attributeId: 'endurance',
         name: 'Endurance',
         description: 'Stamina and resilience. Affects health, carry capacity, and sustained activities.',
-        icon: 'attribute_endurance.svg',
+        icon: 'icons/attributes/attr_endurance.svg',
         linkedSkills: ['fishing', 'smithing'],
         xpPerLevel: 1000
       },
@@ -99,7 +99,7 @@ const getAttributes = async (req, res) => {
         attributeId: 'magic',
         name: 'Magic',
         description: 'Magical aptitude and spellcasting power. Increases spell effectiveness.',
-        icon: 'attribute_magic.svg',
+        icon: 'icons/attributes/attr_magic.svg',
         linkedSkills: [],
         xpPerLevel: 1000
       },
@@ -107,7 +107,7 @@ const getAttributes = async (req, res) => {
         attributeId: 'perception',
         name: 'Perception',
         description: 'Awareness and keen senses. Improves discovery chances and ranged accuracy.',
-        icon: 'attribute_perception.svg',
+        icon: 'icons/attributes/attr_perception.svg',
         linkedSkills: [],
         xpPerLevel: 1000
       },
@@ -115,7 +115,7 @@ const getAttributes = async (req, res) => {
         attributeId: 'dexterity',
         name: 'Dexterity',
         description: 'Agility and finesse. Enhances dodge chance and precision with light weapons.',
-        icon: 'attribute_dexterity.svg',
+        icon: 'icons/attributes/attr_dexterity.svg',
         linkedSkills: [],
         xpPerLevel: 1000
       },
@@ -123,7 +123,7 @@ const getAttributes = async (req, res) => {
         attributeId: 'will',
         name: 'Will',
         description: 'Mental fortitude and focus. Increases mana and resistance to mental effects.',
-        icon: 'attribute_will.svg',
+        icon: 'icons/attributes/attr_will.svg',
         linkedSkills: ['cooking'],
         xpPerLevel: 1000
       },
@@ -131,7 +131,7 @@ const getAttributes = async (req, res) => {
         attributeId: 'charisma',
         name: 'Charisma',
         description: 'Social influence and leadership. Improves prices with vendors and NPC interactions.',
-        icon: 'attribute_charisma.svg',
+        icon: 'icons/attributes/attr_charisma.svg',
         linkedSkills: [],
         xpPerLevel: 1000
       }
@@ -181,8 +181,7 @@ const getItems = async (req, res) => {
         icon: item.icon,
         category: item.category,
         subcategories: item.subcategories || [],
-        stackable: item.maxStack > 1,
-        maxStack: item.maxStack
+        stackable: item.stackable
       };
 
       // Add equipment-specific data
@@ -257,7 +256,7 @@ const getQualities = async (req, res) => {
       qualities,
       system: {
         levelRange: '1-5',
-        description: 'Qualities are discrete levels (1-5) that affect item properties and vendor value',
+        description: 'Qualities are discrete levels (1-5) with escalating effects on item properties and vendor value',
         stacking: 'Items with identical quality levels can stack together'
       }
     });

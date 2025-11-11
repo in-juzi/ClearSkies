@@ -209,10 +209,23 @@ exports.getTravelStatus = async (req, res) => {
 
       const newLocation = locationService.getLocationDetails(player.currentLocation);
 
+      // Check which navigation links are available to the player (same as getCurrentLocation)
+      const availableLinks = newLocation.navigationLinks.map(link => {
+        const reqCheck = locationService.meetsNavigationRequirements(link, player);
+        return {
+          ...link,
+          available: reqCheck.meets,
+          requirementFailures: reqCheck.failures || []
+        };
+      });
+
       return res.json({
         isTravel: false,
         completed: true,
-        newLocation,
+        newLocation: {
+          ...newLocation,
+          navigationLinks: availableLinks
+        },
         message: `Arrived at ${newLocation.name}`
       });
     }

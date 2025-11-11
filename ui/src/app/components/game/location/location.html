@@ -1,10 +1,4 @@
 <div class="location-container">
-  <!-- Messages -->
-  <div class="messages" *ngIf="errorMessage || successMessage">
-    <div class="error-message" *ngIf="errorMessage">{{ errorMessage }}</div>
-    <div class="success-message" *ngIf="successMessage">{{ successMessage }}</div>
-  </div>
-
   <!-- Traveling State -->
   <div class="traveling-view" *ngIf="travelState()?.isTravel">
     <h2>Traveling...</h2>
@@ -197,7 +191,6 @@
             *ngFor="let vendorId of getVendorIds(selectedFacility())"
             class="vendor-card"
             (click)="openVendor(vendorId)">
-            <span class="vendor-icon">🏪</span>
             <div class="vendor-info">
               <span class="vendor-name">
                 {{ getVendor(vendorId)?.name || 'Merchant' }}

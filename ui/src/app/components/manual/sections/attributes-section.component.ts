@@ -35,7 +35,7 @@ import { ManualService, ManualAttribute, AttributesResponse } from '../../../ser
               <div class="attribute-card">
                 <div class="attribute-header">
                   <img
-                    [src]="'assets/icons/' + attribute.icon"
+                    [src]="'assets/' + attribute.icon"
                     [alt]="attribute.name"
                     class="attribute-icon"
                   />
