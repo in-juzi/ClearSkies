@@ -616,6 +616,7 @@ The inventory system uses a three-tier architecture for flexibility and easy bal
 - Hot-reload capability without server restart
 - **Probabilistic generation**: Most items have 0-1 qualities (config: 35% plain, 45% one quality, 15% two, 5% three+)
 - **Selective traits**: Reduced appearance rates (common: 2%, uncommon: 8%, rare: 15%, epic: 30%)
+- **Level damping**: Quality levels biased toward L1-L2 (0.6 damping reduces avg by ~0.2 levels)
 - Tier-independent quality count with tier-based level distribution
 - Configuration via `be/data/items/generation-config.json` for easy balancing
 - Category-based organization improves scalability for growing item catalog

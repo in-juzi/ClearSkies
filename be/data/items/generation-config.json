@@ -7,7 +7,8 @@
       "3": 0.05
     },
     "tierBasedLevels": true,
-    "comment": "Quality count probabilities are tier-independent. Level distribution still uses tier-based weights."
+    "levelDamping": 0.6,
+    "comment": "Quality count probabilities are tier-independent. Level distribution still uses tier-based weights. levelDamping (0-1) shifts probabilities toward lower levels - 0.6 means moderate damping, making L1-L2 more common."
   },
   "traitGeneration": {
     "appearanceRates": {

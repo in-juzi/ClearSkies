@@ -41,7 +41,8 @@ Implemented **Option 5 (Combined Approach)** with:
       "2": 0.15,  // 15% items with 2 qualities
       "3": 0.05   // 5% items with 3+ qualities
     },
-    "tierBasedLevels": true
+    "tierBasedLevels": true,
+    "levelDamping": 0.6  // 0-1, shifts probability toward lower levels
   },
   "traitGeneration": {
     "appearanceRates": {
@@ -200,6 +201,77 @@ Note: Trait rarity is "inverted" - epic traits are MORE common than common trait
 - This is intentional design
 - Epic traits have stronger effects, so appearing more often balances gameplay
 - Common traits are weak but very rare, making them collectible
+
+## Level Damping System
+
+### Overview
+
+Level damping applies an exponential curve to shift quality level probabilities toward lower levels (L1-L2), making high-level qualities rarer.
+
+### How It Works
+
+**Configuration**: `levelDamping: 0.6` in generation-config.json (0-1 range)
+
+**Algorithm**:
+1. Start with tier-based weights (e.g., T1: [0.25, 0.40, 0.25, 0.08, 0.02])
+2. Apply exponential boost to lower levels based on position
+3. Normalize weights to sum to 1
+
+**Formula**:
+```javascript
+dampingFactor = (1 - levelPosition) ^ (damping * 2)
+dampedWeight = originalWeight * (1 + dampingFactor)
+```
+
+### Effect with 0.6 Damping
+
+**Tier 1 (Common)**:
+- L1: 25% → 30.2% (+5.2%)
+- L2: 40% → 41.2% (+1.2%)
+- L3: 25% → 21.7% (-3.3%)
+- L4: 8% → 5.7% (-2.3%)
+- L5: 2% → 1.2% (-0.8%)
+- **Average: 2.22 → 2.07** (-0.15 levels)
+
+**Tier 2 (Uncommon)**:
+- L1: 10% → 13.5% (+3.5%)
+- L2: 25% → 28.9% (+3.9%)
+- L3: 35% → 34.0% (-1.0%)
+- L4: 25% → 20.1% (-4.9%)
+- L5: 5% → 3.4% (-1.6%)
+- **Average: 2.90 → 2.71** (-0.19 levels)
+
+**Tier 3+ (Rare)**:
+- L1: 5% → 7.7% (+2.7%)
+- L2: 10% → 13.2% (+3.2%)
+- L3: 25% → 27.7% (+2.7%)
+- L4: 35% → 32.1% (-2.9%)
+- L5: 25% → 19.3% (-5.7%)
+- **Average: 3.65 → 3.42** (-0.23 levels)
+
+### Testing Damping
+
+Run the test script to see damping effects:
+```bash
+cd be
+node utils/test-level-damping.js
+```
+
+### Adjusting Damping
+
+**Increase damping** (e.g., 0.8):
+- Even more bias toward L1-L2
+- L5 becomes extremely rare
+- Average level drops by ~0.4-0.6
+
+**Decrease damping** (e.g., 0.4):
+- Less bias toward low levels
+- L4-L5 more common
+- Average level drops by ~0.1-0.2
+
+**Disable damping** (set to 0 or remove):
+- Uses original tier-based distributions
+- No level shift
 
 ## Crafting System (Unchanged)
 

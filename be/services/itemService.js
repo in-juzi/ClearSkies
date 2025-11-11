@@ -450,17 +450,46 @@ class ItemService {
    * Get weighted distribution for quality levels based on tier
    */
   _getQualityLevelWeights(tier, maxLevel) {
-    // Returns array of weights for each level [1, 2, 3, 4, 5]
+    // Base weights for each tier
+    let weights;
     if (tier === 1) {
       // Tier 1: Common quality (levels 1-3 most common)
-      return [0.25, 0.40, 0.25, 0.08, 0.02];
+      weights = [0.25, 0.40, 0.25, 0.08, 0.02];
     } else if (tier === 2) {
       // Tier 2: Better quality (levels 2-4 most common)
-      return [0.10, 0.25, 0.35, 0.25, 0.05];
+      weights = [0.10, 0.25, 0.35, 0.25, 0.05];
     } else {
       // Tier 3+: High quality (levels 3-5 most common)
-      return [0.05, 0.10, 0.25, 0.35, 0.25];
+      weights = [0.05, 0.10, 0.25, 0.35, 0.25];
     }
+
+    // Apply level damping if configured
+    const damping = this.generationConfig.qualityGeneration.levelDamping;
+    if (damping !== undefined && damping > 0 && damping < 1) {
+      weights = this._applyLevelDamping(weights, damping);
+    }
+
+    return weights;
+  }
+
+  /**
+   * Apply damping to shift probability distribution toward lower levels
+   * @param {Array<number>} weights - Original weight distribution
+   * @param {number} damping - Damping factor (0-1), higher = more damping toward low levels
+   * @returns {Array<number>} Damped weight distribution
+   */
+  _applyLevelDamping(weights, damping) {
+    // Apply exponential decay based on level position
+    // Lower levels get boosted, higher levels get reduced
+    const dampedWeights = weights.map((weight, index) => {
+      const levelPosition = index / (weights.length - 1); // 0 to 1
+      const dampingFactor = Math.pow(1 - levelPosition, damping * 2); // Exponential curve
+      return weight * (1 + dampingFactor);
+    });
+
+    // Normalize to sum to 1
+    const total = dampedWeights.reduce((sum, w) => sum + w, 0);
+    return dampedWeights.map(w => w / total);
   }
 
   /**
