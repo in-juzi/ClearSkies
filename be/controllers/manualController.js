@@ -235,11 +235,19 @@ const getQualities = async (req, res) => {
 
     const qualities = [];
     for (const [qualityId, quality] of itemService.qualityDefinitions.entries()) {
+      // Transform levels object to array for frontend
+      const levelsArray = Object.entries(quality.levels).map(([level, data]) => ({
+        level: parseInt(level),
+        name: data.name,
+        description: data.description,
+        vendorPriceModifier: data.effects?.vendorPrice?.modifier || 1.0
+      }));
+
       qualities.push({
         qualityId: quality.qualityId,
         name: quality.name,
         description: quality.description,
-        levels: quality.levels,
+        levels: levelsArray,
         applicableTo: quality.applicableTo
       });
     }
@@ -273,12 +281,20 @@ const getTraits = async (req, res) => {
 
     const traits = [];
     for (const [traitId, trait] of itemService.traitDefinitions.entries()) {
+      // Transform levels object to array for frontend
+      const levelsArray = Object.entries(trait.levels).map(([level, data]) => ({
+        level: parseInt(level),
+        name: data.name,
+        description: data.description,
+        vendorPriceModifier: data.effects?.vendorPrice?.modifier || 1.0
+      }));
+
       traits.push({
         traitId: trait.traitId,
         name: trait.name,
         description: trait.description,
         rarity: trait.rarity,
-        levels: trait.levels,
+        levels: levelsArray,
         applicableTo: trait.applicableTo
       });
     }

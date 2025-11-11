@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 require('dotenv').config();
 
-const connectDB = require('./config/database');
-const Player = require('./models/Player');
-const itemService = require('./services/itemService');
+const connectDB = require('../config/database');
+const Player = require('../models/Player');
+const itemService = require('../services/itemService');
 
 async function addItemToPlayer() {
   try {
@@ -23,15 +23,28 @@ async function addItemToPlayer() {
 
     console.log(`Found player: ${player.characterName}`);
 
-    // Create bronze woodcutting axe
-    const itemInstance = itemService.createItemInstance('bronze_woodcutting_axe', 1);
+    // Create all new flowers (8 total)
+    const flowers = [
+      'morning_glory', 'jasmine',           // Tier 1 Common
+      'honeysuckle', 'wisteria',            // Tier 2 Uncommon
+      'passionflower', 'trumpet_vine',      // Tier 3 Rare
+      'moonvine', 'phoenix_vine'            // Tier 4 Epic
+    ];
+
+    const instances = flowers.map(flowerId => ({
+      id: flowerId,
+      instance: itemService.createItemInstance(flowerId, 1)
+    }));
 
     // Add to inventory
-    player.addItem(itemInstance);
+    instances.forEach(({ instance }) => player.addItem(instance));
     await player.save();
 
-    console.log('✅ Added bronze_woodcutting_axe to Juzi\'s inventory');
-    console.log('Item details:', itemInstance);
+    console.log(`✅ Added ${instances.length} flowers to Juzi's inventory`);
+    instances.forEach(({ id, instance }) => {
+      const def = itemService.getItemDefinition(id);
+      console.log(`  - ${def.name} (${def.baseValue}g)`);
+    });
 
     process.exit(0);
   } catch (error) {

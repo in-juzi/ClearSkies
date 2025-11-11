@@ -120,9 +120,17 @@ function main() {
 
   const files = [
     path.join(definitionsDir, 'equipment.json'),
-    path.join(definitionsDir, 'resources.json'),
     path.join(definitionsDir, 'consumables.json')
   ];
+
+  // Process resources directory
+  const resourcesDir = path.join(definitionsDir, 'resources');
+  if (fs.existsSync(resourcesDir)) {
+    const resourceFiles = fs.readdirSync(resourcesDir)
+      .filter(file => file.endsWith('.json'))
+      .map(file => path.join(resourcesDir, file));
+    files.push(...resourceFiles);
+  }
 
   console.log('Adding icon fields to item definitions...\n');
 
