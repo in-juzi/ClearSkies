@@ -5,7 +5,7 @@
   "type": "attack",
   "targetType": "single",
   "powerMultiplier": 2.0,
-  "manaCost": 15,
+  "manaCost": 2,
   "cooldown": 3,
   "requirements": {
     "weaponTypes": ["oneHanded", "twoHanded"],
@@ -18,7 +18,7 @@
     }
   },
   "icon": {
-    "path": "abilities/heavy_strike.svg",
+    "path": "abilities/ability_slash_1.svg",
     "material": "default"
   }
 }
