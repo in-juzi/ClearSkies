@@ -13,24 +13,24 @@
 - ✅ Vendor/NPC trading system (completed - buy/sell at gathering locations)
 - ✅ Cooking/Crafting system (completed - quality inheritance, instance selection)
 - ✅ Multi-channel icon colorization (completed - path-level SVG colorization with 40+ materials)
+- ✅ Item system reorganization (completed - category subdirectories for scalability)
+- ✅ 3-tier quality/trait system (completed - simplified from 5-tier to 3-tier)
+- ✅ Smithing foundation (completed - ore smelting, ingot crafting, Village Forge)
 
-**Recent Changes** (Last 10 commits):
-- docs: document SVG path splitting system and utilities
-- fix: update icon paths to use non-SPLIT filenames
-- feat: integrate IconComponent into equipment slots
-- feat: add autoSize option to IconComponent
-- feat: split weapon icons into multi-channel paths
-- feat: add SVG path splitting utilities for multi-channel icons
-- docs: update CLAUDE.md with icon system documentation
-- refactor: UI cleanup and polish across game components
-- feat: enhance crafting UI with icon display and improved feedback
-- fix: improve crafting ingredient consumption and validation
+**Recent Changes** (Last 7 commits):
+- chore: add icon processing tooling and project metadata
+- docs: update system documentation for recent changes
+- fix: update backend utilities for new item structure
+- refactor: improve UI components with icon integration and polish
+- feat: expand icon system with material colors and new SVG assets
+- feat: add smithing system foundation with ore smelting
+- refactor: simplify quality and trait levels to 3-tier system
 
 **Known Issues**:
 - None currently identified
 
 **Next Priorities**:
-- Smithing system (equipment crafting with tier progression)
+- Smithing system completion (weapon/armor crafting with tier progression)
 - Alchemy system (potion brewing with quality-based effects)
 - Combat system implementation
 - Vendor enhancements (restocking, skill-based pricing)
@@ -562,9 +562,10 @@ The agent will autonomously:
 - ✅ Skills API endpoints (GET all skills, GET single skill, POST add XP)
 - ✅ Attributes API endpoints (GET all attributes, GET single attribute, POST add XP)
 - ✅ Inventory system with dynamic qualities and traits
-- ✅ JSON-based item definitions (36 items: 21 resources including 6 herbs, 12 equipment, 3 consumables)
-- ✅ Quality system (5 types: woodGrain, moisture, purity, freshness, age)
-- ✅ Trait system (7 types with rarity levels: common to epic)
+- ✅ JSON-based item definitions (40+ items organized in category subdirectories: consumables, equipment, resources)
+- ✅ Recursive directory loading for item definitions (supports nested category structure)
+- ✅ Quality system (3-tier simplified: woodGrain, moisture, purity, freshness, age)
+- ✅ Trait system (3-tier: fragrant, knotted, weathered, pristine, cursed, blessed, masterwork)
 - ✅ Item instance management with stacking logic
 - ✅ Inventory UI with category filtering and detailed item views
 - ✅ Draggable item details panel (repositionable via header drag)
@@ -596,9 +597,12 @@ The agent will autonomously:
 - ✅ SVG icon system (222+ scalable icons for abilities, items, skills, attributes, UI elements)
 - ✅ Improved UI layout with viewport overflow fixes (100vh height, proper overflow handling)
 - ✅ Nodemon for backend auto-restart during development
-- ✅ Level-based quality and trait system (discrete levels 1-5 for qualities, 1-3 for traits)
+- ✅ Level-based quality and trait system (simplified to discrete levels 1-3 for both qualities and traits)
 - ✅ Quality and trait display with descriptive names instead of percentages
 - ✅ Improved item stacking based on identical quality/trait levels
+- ✅ Multi-channel icon colorization (40+ materials with 6+ color channels per material)
+- ✅ IconComponent integration across all UI (inventory, crafting, manual, vendors)
+- ✅ Smithing foundation (copper/tin mining, ore smelting, Village Forge facility)
 - ✅ Confirm dialog component for destructive action confirmation
 - ✅ Character status component (placeholder for future features)
 - ✅ JSON safety utilities and response validator middleware
@@ -901,43 +905,44 @@ Backend requires `.env` file with:
 The inventory system uses a three-tier architecture for flexibility and easy balancing:
 
 1. **Item Definitions** (JSON files in `be/data/items/definitions/`)
-   - Canonical item templates
-   - 30 items total:
-     - 15 resources:
-       - Logs: oak_log, willow_log, maple_log
-       - Ore: copper_ore, iron_ore, silver_ore
-       - Fish: trout, salmon, pike, shrimp
-       - Herbs: chamomile, sage, nettle, mandrake_root, moonpetal, dragons_breath
-     - 12 equipment:
-       - Weapons: copper_sword, iron_sword
-       - Armor: wooden_shield, iron_helm, hemp_coif, leather_tunic
-       - Tools: bronze_woodcutting_axe, iron_woodcutting_axe, bronze_mining_pickaxe, iron_mining_pickaxe, rare_iron_mining_pickaxe_offhand, bamboo_fishing_rod, willow_fishing_rod
-     - 3 consumables: bread, health_potion, mana_potion
+   - **New Structure**: Organized into category subdirectories
+     - `consumables/` - food.json, potions.json
+     - `equipment/` - tools.json, weapons.json, armor.json
+     - `resources/` - wood.json, ore.json, fish.json, herbs.json, gemstones.json, ingots.json
+   - **Recursive Loading**: ItemService automatically loads from all subdirectories
+   - 40+ items total (expanded from 30):
+     - Resources: logs, ore (copper, tin, iron, silver), fish, herbs, gemstones, ingots (bronze, iron)
+     - Equipment: weapons (copper_sword, iron_sword), armor, tools (axes, pickaxes, fishing rods)
+     - Consumables: cooked food, potions
    - Define base properties, allowed qualities, traits, equipment slots, and subtypes
-   - Equipment items include `subtype` field for activity requirement matching (e.g., woodcutting-axe, mining-pickaxe, fishing-rod)
+   - All items include `icon` field with path and material for multi-channel colorization
+   - Equipment items include `subtype` field for activity requirement matching
 
 2. **Quality & Trait Definitions** (JSON files)
-   - **Qualities**: woodGrain, moisture, age, purity, freshness (integer levels 1-5)
+   - **Qualities**: woodGrain, moisture, age, purity, freshness (integer levels 1-3, simplified from 1-5)
      - Each level has explicit name, description, and effects
-     - Example: woodGrain L1 (Poor Grain) → L5 (Perfect Grain)
+     - Example: woodGrain L1 (Fine Grain) → L3 (Perfect Grain)
    - **Traits**: fragrant, knotted, weathered, pristine, cursed, blessed, masterwork (integer levels 1-3)
      - Stored as Map<traitId, level> instead of array
      - Each level has escalating effects
    - Define effects on vendor pricing, crafting, alchemy, combat
+   - Simplified 3-tier system provides clearer progression and easier balancing
 
 3. **Item Instances** (Player inventory in MongoDB)
    - References to base items
-   - Quality levels (1-5 integers) and trait levels (1-3 integers)
+   - Quality levels (1-3 integers) and trait levels (1-3 integers)
    - Automatic stacking for items with identical levels
    - Calculated vendor prices based on level modifiers
 
 **Key Features:**
-- Items have discrete quality levels (1-5) with descriptive names
+- Items have discrete quality levels (1-3, simplified) with descriptive names
 - Traits stored as Map with levels (1-3) for escalating effects
 - Better stacking: items with identical levels stack together
 - Easy balancing by editing JSON level definitions (no code changes needed)
 - Hot-reload capability without server restart
 - Random generation based on item tier and rarity distributions
+- Category-based organization improves scalability for growing item catalog
+- Multi-channel icon colorization with 40+ material definitions
 - Full documentation in `project/docs/inventory-system.md` and `project/docs/level-based-quality-trait-system.md`
 
 ## Location System
