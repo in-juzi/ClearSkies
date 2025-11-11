@@ -479,6 +479,12 @@ export const MATERIAL_COLORS: Record<string, ColorChannels> = {
     detail: '#FFB6B6',     // Pale red shimmer/highlight (top layer glow)
     body: '#FFF'           // White glass bottle (container)
   },
+  mana_potion_minor: {
+    primary: '#6B9BFF',    // Light blue liquid (base layer)
+    secondary: '#4580FF',  // Slightly darker blue (mid-layer depth)
+    detail: '#B6D4FF',     // Pale blue shimmer/highlight (top layer glow)
+    body: '#FFF'           // White glass bottle (container)
+  },
   potion_health: {
     primary: '#DC143C',   // Crimson
     secondary: '#8B0000', // Dark red
