@@ -80,7 +80,6 @@
 .activity-view,
 .traveling-view {
   text-align: center;
-  padding: var(--spacing-4xl);
 
   h2 {
     color: var(--color-secondary);
@@ -97,6 +96,89 @@
     font-weight: var(--font-weight-bold);
     font-size: var(--font-size-xl);
   }
+}
+
+// Skill Training Display
+.skill-training {
+  margin-top: var(--spacing-2xl);
+  padding: var(--spacing-l);
+  background: linear-gradient(135deg, rgba(138, 43, 226, 0.15) 0%, rgba(74, 78, 105, 0.15) 100%);
+  border: var(--border-width-medium) solid var(--color-accent-purple);
+  border-radius: var(--radius-card);
+}
+
+.skill-training-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-m);
+  margin-bottom: var(--spacing-l);
+
+  .skill-icon {
+    width: 48px;
+    height: 48px;
+    filter: drop-shadow(0 2px 8px rgba(138, 43, 226, 0.4));
+  }
+
+  .skill-title-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+
+    h3 {
+      color: var(--color-secondary);
+      margin: 0;
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-bold);
+    }
+
+    .training-label {
+      color: var(--color-text-label);
+      font-size: var(--font-size-s);
+      font-style: italic;
+      opacity: var(--opacity-muted);
+    }
+  }
+}
+
+.skill-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-m);
+}
+
+.skill-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-m);
+
+  .skill-level {
+    color: var(--color-secondary);
+    font-weight: var(--font-weight-bold);
+  }
+
+  .skill-xp {
+    color: var(--color-text-label);
+    font-family: var(--font-monospace);
+  }
+}
+
+.xp-bar {
+  width: 100%;
+  height: 24px;
+  background-color: var(--color-bg-primary);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  border: var(--border-default);
+  position: relative;
+}
+
+.xp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-accent-purple) 0%, var(--color-secondary) 100%);
+  transition: width var(--transition-normal) ease;
+  box-shadow: 0 0 10px rgba(138, 43, 226, 0.5);
 }
 
 .activity-actions,
@@ -206,6 +288,7 @@
   font-size: var(--font-size-xs);
   min-width: 60px;
   flex-shrink: 0;
+  align-content: center;
 }
 
 .log-content {
@@ -216,6 +299,7 @@
 }
 
 .log-activity {
+  width: fit-content;
   color: var(--color-text-tertiary);
   font-weight: var(--font-weight-medium);
 }

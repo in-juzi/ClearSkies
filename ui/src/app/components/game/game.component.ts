@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { AttributesService } from '../../services/attributes.service';
+import { CombatService } from '../../services/combat.service';
 import { ManualDialogService } from '../../services/manual-dialog.service';
 import { ManualComponent } from '../manual/manual.component';
 import { Skills } from './skills/skills';
@@ -24,6 +25,7 @@ import { ALL_SKILLS, ALL_ATTRIBUTES } from '../../constants/game-data.constants'
 export class GameComponent implements OnInit {
   private authService = inject(AuthService);
   private attributesService = inject(AttributesService);
+  private combatService = inject(CombatService);
   private router = inject(Router);
 
   manualDialogService = inject(ManualDialogService);
@@ -48,6 +50,13 @@ export class GameComponent implements OnInit {
 
     // Fetch attributes data
     this.attributesService.getAllAttributes().subscribe();
+
+    // Check combat status (restores combat state if player was in combat on page refresh)
+    this.combatService.getCombatStatus().subscribe({
+      error: (err) => {
+        console.error('Failed to check combat status:', err);
+      }
+    });
   }
 
   onLogout(): void {

@@ -1,0 +1,204 @@
+<!-- Combat Arena -->
+<div class="combat-container" *ngIf="activeCombat() as combat">
+  <!-- Combatants Display -->
+  <div class="combatants">
+    <!-- Player Side -->
+    <div class="combatant player-side">
+      <div class="combatant-info">
+        <div class="combatant-name">You</div>
+        <div class="combatant-level">Level {{ player()?.level || 1 }}</div>
+      </div>
+
+      <!-- Attack Timer -->
+      <div class="attack-timer">
+        <div class="timer-info">
+          <span class="timer-label">Next Attack:</span>
+          <span class="timer-value" [class.ready]="playerAttackTimer() <= 0">
+            {{ formatTimer(playerAttackTimer()) }}
+          </span>
+        </div>
+        <div class="timer-bar-bg">
+          <div class="timer-bar-fill" [ngStyle]="getTimerBarStyle(playerAttackTimerPercent())"></div>
+        </div>
+      </div>
+
+      <!-- Player HP Bar -->
+      <div class="hp-bar-container">
+        <div class="hp-bar-label">
+          <span>HP</span>
+          <span>{{ combat.playerHealth.current }} / {{ combat.playerHealth.max }}</span>
+        </div>
+        <div class="hp-bar-bg">
+          <div class="hp-bar-fill" [ngStyle]="getHpBarStyle(playerHpPercent(), playerHpColor())"></div>
+        </div>
+      </div>
+
+      <!-- Player Mana Bar -->
+      <div class="mana-bar-container">
+        <div class="mana-bar-label">
+          <span>Mana</span>
+          <span>{{ combat.playerMana.current }} / {{ combat.playerMana.max }}</span>
+        </div>
+        <div class="mana-bar-bg">
+          <div class="mana-bar-fill" [ngStyle]="getManaBarStyle(playerManaPercent())"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VS Indicator -->
+    <div class="vs-indicator">
+      <div class="vs-text">VS</div>
+    </div>
+
+    <!-- Monster Side -->
+    <div class="combatant monster-side">
+      <div class="combatant-info">
+        <div class="combatant-name">{{ combat.monsterName }}</div>
+        <div class="combatant-level">Level {{ combat.monsterLevel }}</div>
+      </div>
+
+      <!-- Attack Timer -->
+      <div class="attack-timer">
+        <div class="timer-info">
+          <span class="timer-label">Next Attack:</span>
+          <span class="timer-value" [class.ready]="monsterAttackTimer() <= 0">
+            {{ formatTimer(monsterAttackTimer()) }}
+          </span>
+        </div>
+        <div class="timer-bar-bg">
+          <div class="timer-bar-fill" [ngStyle]="getTimerBarStyle(monsterAttackTimerPercent())"></div>
+        </div>
+      </div>
+
+      <!-- Monster HP Bar -->
+      <div class="hp-bar-container">
+        <div class="hp-bar-label">
+          <span>HP</span>
+          <span>{{ combat.monsterHealth.current }} / {{ combat.monsterHealth.max }}</span>
+        </div>
+        <div class="hp-bar-bg">
+          <div class="hp-bar-fill" [ngStyle]="getHpBarStyle(monsterHpPercent(), monsterHpColor())"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Bar -->
+  <div class="action-bar">
+    <!-- Attack Button -->
+    <button
+      class="action-button attack-button"
+      [disabled]="isExecutingAction()"
+      (click)="attack()">
+      <span class="button-icon">⚔️</span>
+      <span class="button-text">Attack</span>
+    </button>
+
+    <!-- Ability Buttons -->
+    <button
+      *ngFor="let ability of combat.availableAbilities"
+      class="action-button ability-button"
+      [class.ability-disabled]="!canUseAbility(ability)"
+      [class.ability-cooldown]="getAbilityCooldown(ability) > 0"
+      [disabled]="isExecutingAction() || !canUseAbility(ability)"
+      (click)="useAbility(ability)"
+      [title]="ability.description + ' (Cost: ' + ability.manaCost + ' mana, Cooldown: ' + ability.cooldown + ' turns)'">
+      <span class="button-icon">✨</span>
+      <span class="button-text">{{ ability.name }}</span>
+      <span class="ability-cost">{{ ability.manaCost }}m</span>
+      <span class="ability-cooldown-counter" *ngIf="getAbilityCooldown(ability) > 0">
+        {{ getAbilityCooldown(ability) }}
+      </span>
+    </button>
+
+    <!-- Flee Button -->
+    <button
+      class="action-button flee-button"
+      [disabled]="isExecutingAction()"
+      (click)="flee()">
+      <span class="button-icon">🏃</span>
+      <span class="button-text">Flee</span>
+    </button>
+  </div>
+
+  <!-- Combat Log -->
+  <div class="combat-log">
+    <div class="combat-log-header">Combat Log</div>
+    <div class="combat-log-content">
+      <div
+        *ngFor="let entry of combat.combatLog"
+        class="log-entry"
+        [ngClass]="getLogEntryClass(entry)">
+        <span class="log-timestamp">[{{ formatTimestamp(entry.timestamp) }}]</span>
+        <span class="log-message">{{ entry.message }}</span>
+      </div>
+      <div *ngIf="combat.combatLog.length === 0" class="log-empty">
+        No combat events yet...
+      </div>
+    </div>
+  </div>
+
+  <!-- Turn Counter -->
+  <div class="turn-counter">
+    <span>Turn {{ combat.turnCount }}</span>
+  </div>
+</div>
+
+<!-- Rewards Modal -->
+<div class="rewards-modal" *ngIf="lastRewards() as rewards">
+  <div class="rewards-overlay" (click)="dismissRewards()"></div>
+  <div class="rewards-content">
+    <h2 class="rewards-title" [class.victory]="rewards.victory" [class.defeat]="!rewards.victory">
+      {{ rewards.victory ? '🎉 Victory!' : '💀 Defeated!' }}
+    </h2>
+
+    <div class="rewards-details" *ngIf="rewards.victory">
+      <!-- Gold -->
+      <div class="reward-item" *ngIf="rewards.gold">
+        <span class="reward-icon">💰</span>
+        <span class="reward-text">{{ rewards.gold }} gold</span>
+      </div>
+
+      <!-- Experience -->
+      <div class="reward-item" *ngIf="rewards.experience">
+        <span class="reward-icon">⭐</span>
+        <span class="reward-text">{{ rewards.experience }} XP</span>
+      </div>
+
+      <!-- Level Up -->
+      <div class="reward-item level-up" *ngIf="rewards.skillResult?.skill?.leveledUp">
+        <span class="reward-icon">🎊</span>
+        <span class="reward-text">Level Up! {{ rewards.skillResult.skill.skill }} → {{ rewards.skillResult.skill.newLevel }}</span>
+      </div>
+
+      <!-- Items -->
+      <div class="reward-items" *ngIf="rewards.items && rewards.items.length > 0">
+        <div class="reward-items-header">Items:</div>
+        <div class="reward-item" *ngFor="let item of rewards.items">
+          <span class="reward-icon">📦</span>
+          <span class="reward-text">{{ item.itemId }} x{{ item.quantity }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rewards-details" *ngIf="!rewards.victory">
+      <!-- Gold Lost -->
+      <div class="reward-item penalty">
+        <span class="reward-icon">💸</span>
+        <span class="reward-text">Lost {{ rewards.goldLost || 0 }} gold</span>
+      </div>
+      <div class="reward-message">
+        You have been defeated and returned to safety.
+      </div>
+    </div>
+
+    <button class="rewards-dismiss" (click)="dismissRewards()">
+      Continue
+    </button>
+  </div>
+</div>
+
+<!-- Not in Combat Message -->
+<div class="no-combat" *ngIf="!inCombat()">
+  <p>You are not currently in combat.</p>
+</div>

@@ -1,20 +1,25 @@
-import { Component, OnInit, OnDestroy, inject, effect } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, effect, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LocationService } from '../../../services/location.service';
 import { VendorService } from '../../../services/vendor.service';
 import { InventoryService } from '../../../services/inventory.service';
 import { ChatService } from '../../../services/chat.service';
+import { SkillsService } from '../../../services/skills.service';
 import { Location, Facility, Activity, ActivityRewards } from '../../../models/location.model';
 import { Vendor } from '../../../models/vendor.model';
+import { SkillWithProgress, SkillName } from '../../../models/user.model';
 import { ConfirmDialogService } from '../../../services/confirm-dialog.service';
 import { VendorComponent } from '../vendor/vendor.component';
 import { CraftingComponent } from '../crafting/crafting.component';
+import { CombatComponent } from '../combat/combat.component';
 import { ItemMiniComponent } from '../../shared/item-mini/item-mini.component';
 import { XpMiniComponent } from '../../shared/xp-mini/xp-mini.component';
+import { SKILL_ICONS, SKILL_DISPLAY_NAMES } from '../../../constants/game-data.constants';
+import { CombatService } from '../../../services/combat.service';
 
 @Component({
   selector: 'app-location',
-  imports: [CommonModule, VendorComponent, CraftingComponent, ItemMiniComponent, XpMiniComponent],
+  imports: [CommonModule, VendorComponent, CraftingComponent, CombatComponent, ItemMiniComponent, XpMiniComponent],
   templateUrl: './location.html',
   styleUrl: './location.scss',
   standalone: true
@@ -24,10 +29,16 @@ export class LocationComponent implements OnInit, OnDestroy {
   private locationService = inject(LocationService);
   private inventoryService = inject(InventoryService);
   private chatService = inject(ChatService);
+  private skillsService = inject(SkillsService);
+  combatService = inject(CombatService);
   vendorService = inject(VendorService);
 
   // Expose Object for template use
   Object = Object;
+
+  // Expose skill constants for template
+  skillIcons = SKILL_ICONS;
+  skillNames = SKILL_DISPLAY_NAMES;
 
   // Exposed signals from service
   currentLocation = this.locationService.currentLocation;
@@ -35,6 +46,63 @@ export class LocationComponent implements OnInit, OnDestroy {
   travelState = this.locationService.travelState;
   selectedFacility = this.locationService.selectedFacility;
   activityProgress = this.locationService.activityProgress;
+  skills = this.skillsService.skills;
+  activeCombat = this.combatService.activeCombat;
+  inCombat = this.combatService.inCombat;
+
+  // Computed signal to get the skill being trained by current activity
+  activeSkill = computed<{ name: string; skill: SkillWithProgress } | null>(() => {
+    const activity = this.activeActivity();
+    const location = this.currentLocation();
+    const allSkills = this.skills();
+
+    if (!activity?.activityId || !activity?.facilityId || !location || !allSkills) {
+      return null;
+    }
+
+    // Find the facility in the current location
+    const facility = location.facilities.find(f => f.facilityId === activity.facilityId);
+    if (!facility?.activities) {
+      return null;
+    }
+
+    // Find the full activity definition from the facility
+    const fullActivity = facility.activities.find(a => a.activityId === activity.activityId);
+    if (!fullActivity?.rewards?.experience) {
+      return null;
+    }
+
+    // Get the first skill being trained (activities typically train one primary skill)
+    const skillName = Object.keys(fullActivity.rewards.experience)[0];
+    if (!skillName || !(skillName in allSkills)) {
+      return null;
+    }
+
+    return {
+      name: skillName,
+      skill: allSkills[skillName as keyof typeof allSkills]
+    };
+  });
+
+  // Computed signal to get the current activity name
+  activeActivityName = computed<string | null>(() => {
+    const activity = this.activeActivity();
+    const location = this.currentLocation();
+
+    if (!activity?.activityId || !activity?.facilityId || !location) {
+      return null;
+    }
+
+    // Find the facility in the current location
+    const facility = location.facilities.find(f => f.facilityId === activity.facilityId);
+    if (!facility?.activities) {
+      return null;
+    }
+
+    // Find the full activity definition from the facility
+    const fullActivity = facility.activities.find(a => a.activityId === activity.activityId);
+    return fullActivity?.name || null;
+  });
 
   // Local state
   selectedActivity: Activity | null = null;
@@ -82,6 +150,13 @@ export class LocationComponent implements OnInit, OnDestroy {
       }
     });
 
+    // Load skills on component init
+    this.skillsService.getSkills().subscribe({
+      error: (err) => {
+        console.error('Error loading skills:', err);
+      }
+    });
+
     // Subscribe to activity completion events
     this.locationService.activityCompleted$.subscribe(completion => {
       this.activityLog.unshift({
@@ -94,6 +169,9 @@ export class LocationComponent implements OnInit, OnDestroy {
       if (this.activityLog.length > 10) {
         this.activityLog = this.activityLog.slice(0, 10);
       }
+
+      // Refresh skills after activity completion to update XP display
+      this.skillsService.getSkills().subscribe();
     });
 
     // Subscribe to activity error events
@@ -109,6 +187,27 @@ export class LocationComponent implements OnInit, OnDestroy {
     if (this.refreshTimeout) {
       clearTimeout(this.refreshTimeout);
     }
+  }
+
+  /**
+   * Get XP needed to reach next level
+   */
+  getExperienceToNext(experience: number): number {
+    return this.skillsService.getExperienceToNext(experience);
+  }
+
+  /**
+   * Get skill icon path
+   */
+  getSkillIcon(skillName: string): string {
+    return this.skillIcons[skillName as SkillName] || '';
+  }
+
+  /**
+   * Get skill display name
+   */
+  getSkillDisplayName(skillName: string): string {
+    return this.skillNames[skillName as SkillName] || skillName;
   }
 
   /**
@@ -295,6 +394,31 @@ export class LocationComponent implements OnInit, OnDestroy {
       return;
     }
 
+    // Check if this is a combat activity
+    if (this.selectedActivity.type === 'combat') {
+      // Get monster ID from activity's combatConfig
+      const monsterId = (this.selectedActivity as any).combatConfig?.monsterId;
+
+      if (!monsterId) {
+        this.logToChat('Combat activity configuration error', 'error');
+        return;
+      }
+
+      // Start combat instead of regular activity
+      this.combatService.startCombat(monsterId).subscribe({
+        next: (response) => {
+          this.logToChat(response.message || 'Combat started!', 'success');
+          this.selectedActivity = null;
+          this.locationService.selectedFacility.set(null);
+        },
+        error: (err) => {
+          this.logToChat(err.error?.message || 'Failed to start combat', 'error');
+        }
+      });
+      return;
+    }
+
+    // Regular activity
     this.locationService.startActivity(
       this.selectedActivity.activityId,
       this.selectedFacility()!.facilityId
@@ -458,6 +582,25 @@ export class LocationComponent implements OnInit, OnDestroy {
     const elapsed = now - start;
 
     return Math.min(100, Math.max(0, (elapsed / total) * 100));
+  }
+
+  /**
+   * Check if activity has any requirements to display
+   */
+  hasRequirements(activity: Activity | null): boolean {
+    if (!activity?.requirements) {
+      return false;
+    }
+
+    const req = activity.requirements;
+
+    // Check if any requirement type has entries
+    const hasSkills = req.skills && Object.keys(req.skills).length > 0;
+    const hasAttributes = req.attributes && Object.keys(req.attributes).length > 0;
+    const hasEquipped = req.equipped && req.equipped.length > 0;
+    const hasInventory = req.inventory && req.inventory.length > 0;
+
+    return !!(hasSkills || hasAttributes || hasEquipped || hasInventory);
   }
 
   /**
