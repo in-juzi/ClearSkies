@@ -10,7 +10,16 @@
   @if (craftingService.isCrafting() || isRestarting()) {
     <div class="active-crafting">
       <h3>Crafting in Progress</h3>
-      @if (activeRecipe()) {
+      @if (activeRecipe() && activeOutputIcon()) {
+        <div class="recipe-output-display">
+          <app-icon
+            [icon]="activeOutputIcon()!"
+            [size]="48"
+            class="output-icon">
+          </app-icon>
+          <div class="recipe-name-active">{{ activeRecipe()!.name }}</div>
+        </div>
+      } @else if (activeRecipe()) {
         <div class="recipe-name-active">{{ activeRecipe()!.name }}</div>
       }
       <div class="progress-bar-container">

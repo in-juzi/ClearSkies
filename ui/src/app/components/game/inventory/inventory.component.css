@@ -287,14 +287,35 @@
   min-height: 0;
 }
 
+.detail-icon-description-section {
+  display: flex;
+  gap: var(--spacing-l);
+  align-items: flex-start;
+  margin-bottom: var(--spacing-2xl);
+  padding: var(--spacing-l);
+  background: radial-gradient(circle at left, var(--color-bg-tertiary) 0%, transparent 70%);
+  border-radius: var(--radius-s);
+}
+
+.detail-icon-wrapper {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+}
+
 .detail-section {
   margin-bottom: var(--spacing-2xl);
 }
 
 .item-description {
+  flex: 1;
   color: var(--color-text-label);
   font-style: italic;
-  margin-bottom: var(--spacing-l);
+  margin: 0;
+  line-height: 1.6;
 }
 
 .detail-row {
@@ -515,11 +536,152 @@
   padding: var(--spacing-l);
   background: var(--color-bg-elevated);
   border-top: var(--border-light);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-m);
+}
+
+.drop-quantity-controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-s);
+  padding: var(--spacing-m);
+  background: var(--color-bg-secondary);
+  border: var(--border-light);
+  border-radius: var(--radius-s);
+}
+
+.quantity-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-m);
+}
+
+.quantity-label {
+  font-size: var(--font-size-s);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  white-space: nowrap;
+}
+
+.quantity-input-group {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-s);
+}
+
+.quantity-input {
+  width: 80px;
+  padding: var(--spacing-xs) var(--spacing-s);
+  background: var(--color-bg-tertiary);
+  border: var(--border-default);
+  border-radius: var(--radius-s);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-m);
+  text-align: center;
+}
+
+.quantity-input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+}
+
+.quantity-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.quantity-max {
+  font-size: var(--font-size-s);
+  color: var(--color-text-label);
+  white-space: nowrap;
+}
+
+.quantity-slider {
+  width: 100%;
+  height: 8px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--color-bg-tertiary);
+  border-radius: 4px;
+  outline: none;
+  border: var(--border-light);
+  cursor: pointer;
+}
+
+.quantity-slider:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Webkit browsers (Chrome, Safari, Edge) */
+.quantity-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  border: 3px solid #a78bfa;
+  border-radius: 50%;
+  cursor: grab;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(139, 92, 246, 0.3);
+  transition: all 0.2s ease;
+}
+
+.quantity-slider::-webkit-slider-thumb:hover {
+  background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
+  border-color: #c4b5fd;
+  transform: scale(1.15);
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.8), 0 2px 8px rgba(0, 0, 0, 0.6);
+  cursor: grab;
+}
+
+.quantity-slider::-webkit-slider-thumb:active {
+  transform: scale(1.05);
+  cursor: grabbing;
+  box-shadow: 0 0 16px rgba(139, 92, 246, 1), 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+/* Firefox */
+.quantity-slider::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  border: 3px solid #a78bfa;
+  border-radius: 50%;
+  cursor: grab;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(139, 92, 246, 0.3);
+  transition: all 0.2s ease;
+}
+
+.quantity-slider::-moz-range-thumb:hover {
+  background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
+  border-color: #c4b5fd;
+  transform: scale(1.15);
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.8), 0 2px 8px rgba(0, 0, 0, 0.6);
+  cursor: grab;
+}
+
+.quantity-slider::-moz-range-thumb:active {
+  transform: scale(1.05);
+  cursor: grabbing;
+  box-shadow: 0 0 16px rgba(139, 92, 246, 1), 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+/* Track styling for Firefox */
+.quantity-slider::-moz-range-track {
+  background: var(--color-bg-tertiary);
+  border: var(--border-light);
+  border-radius: 4px;
+  height: 8px;
 }
 
 .detail-actions {
   display: flex;
   gap: var(--spacing-s);
+  flex-wrap: wrap;
 }
 
 .btn-primary, .btn-secondary, .btn-danger {

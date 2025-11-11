@@ -8,6 +8,7 @@ import { AttributesSectionComponent } from './sections/attributes-section.compon
 import { ItemsSectionComponent } from './sections/items-section.component';
 import { LocationsSectionComponent } from './sections/locations-section.component';
 import { MechanicsSectionComponent } from './sections/mechanics-section.component';
+import { IconComponent } from '../shared/icon/icon.component';
 
 type Section = 'overview' | 'skills' | 'attributes' | 'items' | 'locations' | 'mechanics';
 
@@ -22,7 +23,8 @@ type Section = 'overview' | 'skills' | 'attributes' | 'items' | 'locations' | 'm
     AttributesSectionComponent,
     ItemsSectionComponent,
     LocationsSectionComponent,
-    MechanicsSectionComponent
+    MechanicsSectionComponent,
+    IconComponent
   ],
   templateUrl: './manual.component.html',
   styleUrl: './manual.component.scss'

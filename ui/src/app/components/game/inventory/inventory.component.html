@@ -77,9 +77,20 @@
     </div>
 
     <div class="details-content">
+      <!-- Item Icon and Description -->
+      <div class="detail-icon-description-section">
+        <div class="detail-icon-wrapper" *ngIf="selectedItem.definition.icon">
+          <app-icon
+            [icon]="selectedItem.definition.icon"
+            [size]="80"
+            [alt]="selectedItem.definition.name">
+          </app-icon>
+        </div>
+        <p class="item-description">{{ selectedItem.definition.description }}</p>
+      </div>
+
       <!-- Basic Info -->
       <div class="detail-section">
-        <p class="item-description">{{ selectedItem.definition.description }}</p>
         <div class="detail-row">
           <span class="label">Category:</span>
           <span>{{ selectedItem.definition.category }}</span>
@@ -184,6 +195,34 @@
 
     <!-- Actions Footer (always visible) -->
     <div class="details-footer">
+      <!-- Quantity Controls (only show if quantity > 1) -->
+      <div class="drop-quantity-controls" *ngIf="selectedItem.quantity > 1">
+        <div class="quantity-header">
+          <label class="quantity-label">Drop Quantity:</label>
+          <div class="quantity-input-group">
+            <input
+              type="number"
+              class="quantity-input"
+              [(ngModel)]="dropQuantity"
+              (ngModelChange)="updateDropQuantity($event)"
+              [min]="1"
+              [max]="getMaxDropQuantity()"
+              [disabled]="!!selectedItem.equipped"
+            />
+            <span class="quantity-max">/ {{ selectedItem.quantity }}</span>
+          </div>
+        </div>
+        <input
+          type="range"
+          class="quantity-slider"
+          [(ngModel)]="dropQuantity"
+          (ngModelChange)="updateDropQuantity($event)"
+          [min]="1"
+          [max]="getMaxDropQuantity()"
+          [disabled]="!!selectedItem.equipped"
+        />
+      </div>
+
       <div class="detail-actions">
         <button class="btn-primary" *ngIf="selectedItem.definition.category === 'consumable'">
           Use
@@ -194,8 +233,18 @@
         <button class="btn-secondary" *ngIf="selectedItem.definition.category === 'equipment' && selectedItem.equipped">
           Unequip
         </button>
-        <button class="btn-danger" (click)="removeItem(selectedItem.instanceId)">
-          Drop
+        <button
+          class="btn-danger"
+          *ngIf="selectedItem.quantity > 1"
+          (click)="removeItem(selectedItem.instanceId)"
+          [disabled]="!!selectedItem.equipped">
+          Drop ({{ dropQuantity }})
+        </button>
+        <button
+          class="btn-danger"
+          (click)="removeAllItems(selectedItem.instanceId)"
+          [disabled]="!!selectedItem.equipped">
+          Drop All
         </button>
       </div>
     </div>

@@ -47,7 +47,12 @@ export class IconService {
    */
   fetchColorizedSvg(iconPath: string, colorChannels: ColorChannels): Observable<SafeHtml> {
     const fullPath = `assets/icons/${iconPath}`;
-    const cacheKey = `${fullPath}:${JSON.stringify(colorChannels)}`;
+    // Create deterministic cache key by sorting color channel keys
+    const sortedChannels = Object.keys(colorChannels).sort().reduce((acc, key) => {
+      acc[key] = (colorChannels as any)[key];
+      return acc;
+    }, {} as any);
+    const cacheKey = `${fullPath}:${JSON.stringify(sortedChannels)}`;
 
     // Check cache first
     if (this.svgCache.has(cacheKey)) {
@@ -73,8 +78,8 @@ export class IconService {
    * Strategy:
    * 1. Skip first path (background)
    * 2. Read data-channel attribute from each path (e.g., data-channel="handle")
-   * 3. Apply color based on channel name
-   * 4. Inject <style> block with CSS rules
+   * 3. Apply color directly as inline style (scoped to this SVG instance)
+   * 4. No global CSS classes needed - each SVG is self-contained
    */
   private applyCssClassesToSvg(svgContent: string, channels: ColorChannels): string {
     const parser = new DOMParser();
@@ -86,7 +91,6 @@ export class IconService {
     }
 
     const paths = svgElement.querySelectorAll('path');
-    const channelClasses = new Set<string>();
 
     // Skip first path (background), process remaining paths
     paths.forEach((path, index) => {
@@ -97,48 +101,20 @@ export class IconService {
       // Read data-channel attribute (e.g., "handle", "blade", "edge")
       const channelName = path.getAttribute('data-channel') || 'primary';
 
-      // Remove inline fill attribute
-      path.removeAttribute('fill');
+      // Special handling for "empty" channel - use inherit
+      if (channelName === 'empty') {
+        path.setAttribute('fill', 'inherit');
+        return;
+      }
 
-      // Add class based on channel name
-      const className = `icon-channel-${channelName}`;
-      path.classList.add(className);
-      channelClasses.add(channelName);
-    });
-
-    // Create style block with CSS rules for each channel
-    const styleElement = doc.createElementNS('http://www.w3.org/2000/svg', 'style');
-    styleElement.textContent = this.generateCssForChannels(channels, channelClasses);
-
-    // Insert style as first child of SVG
-    svgElement.insertBefore(styleElement, svgElement.firstChild);
-
-    return new XMLSerializer().serializeToString(svgElement);
-  }
-
-  /**
-   * Generate CSS rules for color channels
-   *
-   * Creates CSS rules based on data-channel attributes found in SVG paths.
-   * Each channel gets its color from the ColorChannels object with fallback to primary.
-   *
-   * @param channels - Color definitions for this material
-   * @param channelNames - Set of channel names found in SVG (e.g., "handle", "blade", "edge")
-   */
-  private generateCssForChannels(channels: ColorChannels, channelNames: Set<string>): string {
-    let css = '';
-
-    // Generate CSS rule for each channel found in the SVG
-    channelNames.forEach(channelName => {
       // Get color from channels object, fallback to primary
       const color = (channels as any)[channelName] || channels.primary;
 
-      css += `.icon-channel-${channelName} {\n`;
-      css += `  fill: ${color};\n`;
-      css += '}\n';
+      // Apply color directly as inline style (scoped to this path)
+      path.setAttribute('fill', color);
     });
 
-    return css;
+    return new XMLSerializer().serializeToString(svgElement);
   }
 
   /**

@@ -1,5 +1,6 @@
 import { Component, OnInit, inject, Renderer2, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { InventoryService } from '../../../services/inventory.service';
 import { ConfirmDialogService } from '../../../services/confirm-dialog.service';
 import { ItemDetails } from '../../../models/inventory.model';
@@ -9,7 +10,7 @@ import { IconComponent } from '../../shared/icon/icon.component';
 @Component({
   selector: 'app-inventory',
   standalone: true,
-  imports: [CommonModule, ItemModifiersComponent, IconComponent],
+  imports: [CommonModule, FormsModule, ItemModifiersComponent, IconComponent],
   templateUrl: './inventory.component.html',
   styleUrl: './inventory.component.css'
 })
@@ -18,6 +19,7 @@ export class InventoryComponent implements OnInit {
   
   selectedItem: ItemDetails | null = null;
   selectedCategory: string = 'all';
+  dropQuantity: number = 1; // Quantity to drop
 
   // Drag state
   private isDragging = false;
@@ -70,6 +72,8 @@ export class InventoryComponent implements OnInit {
 
   selectItem(item: ItemDetails): void {
     this.selectedItem = item;
+    // Reset drop quantity to 1 when selecting a new item
+    this.dropQuantity = 1;
   }
 
   closeItemDetails(): void {
@@ -106,10 +110,13 @@ export class InventoryComponent implements OnInit {
   }
 
   async removeItem(instanceId: string, quantity?: number): Promise<void> {
+    const quantityToRemove = quantity || this.dropQuantity;
+    const itemName = this.selectedItem?.definition.name || 'this item';
+
     const confirmed = await this.confirmDialog.confirm({
-      title: 'Remove Item',
-      message: 'Are you sure you want to remove this item?',
-      confirmLabel: 'Remove',
+      title: 'Drop Item',
+      message: `Are you sure you want to drop ${quantityToRemove}x ${itemName}?`,
+      confirmLabel: 'Drop',
       cancelLabel: 'Keep'
     });
 
@@ -117,15 +124,57 @@ export class InventoryComponent implements OnInit {
       return;
     }
 
-    this.inventoryService.removeItem({ instanceId, quantity }).subscribe({
+    this.inventoryService.removeItem({ instanceId, quantity: quantityToRemove }).subscribe({
       next: () => {
         console.log('Item removed');
+        // Close panel if all items were dropped, otherwise reset quantity to 1
+        if (this.selectedItem && quantityToRemove >= this.selectedItem.quantity) {
+          this.selectedItem = null;
+        } else {
+          this.dropQuantity = 1;
+        }
+      },
+      error: (error) => {
+        console.error('Error removing item:', error);
+      }
+    });
+  }
+
+  async removeAllItems(instanceId: string): Promise<void> {
+    const itemName = this.selectedItem?.definition.name || 'this item';
+    const quantity = this.selectedItem?.quantity || 0;
+
+    const confirmed = await this.confirmDialog.confirm({
+      title: 'Drop All',
+      message: `Are you sure you want to drop all ${quantity}x ${itemName}?`,
+      confirmLabel: 'Drop All',
+      cancelLabel: 'Keep'
+    });
+
+    if (!confirmed) {
+      return;
+    }
+
+    this.inventoryService.removeItem({ instanceId }).subscribe({
+      next: () => {
+        console.log('All items removed');
         this.selectedItem = null;
       },
       error: (error) => {
         console.error('Error removing item:', error);
       }
     });
+  }
+
+  updateDropQuantity(value: number): void {
+    if (!this.selectedItem) return;
+
+    // Clamp value between 1 and item quantity
+    this.dropQuantity = Math.max(1, Math.min(value, this.selectedItem.quantity));
+  }
+
+  getMaxDropQuantity(): number {
+    return this.selectedItem?.quantity || 1;
   }
 
   getQualityKeys(qualities: any): string[] {

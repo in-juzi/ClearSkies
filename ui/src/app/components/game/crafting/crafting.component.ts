@@ -8,11 +8,12 @@ import { Recipe } from '../../../models/recipe.model';
 import { ItemModifiersComponent } from '../../shared/item-modifiers/item-modifiers.component';
 import { ItemMiniComponent } from '../../shared/item-mini/item-mini.component';
 import { XpMiniComponent } from '../../shared/xp-mini/xp-mini.component';
+import { IconComponent } from '../../shared/icon/icon.component';
 
 @Component({
   selector: 'app-crafting',
   standalone: true,
-  imports: [CommonModule, ItemModifiersComponent, ItemMiniComponent, XpMiniComponent],
+  imports: [CommonModule, ItemModifiersComponent, ItemMiniComponent, XpMiniComponent, IconComponent],
   templateUrl: './crafting.component.html',
   styleUrls: ['./crafting.component.scss']
 })
@@ -30,6 +31,7 @@ export class CraftingComponent implements OnInit {
   autoRestartEnabled = signal<boolean>(false); // Auto-restart crafting flag
   lastCraftedRecipeId = signal<string | null>(null); // Track last crafted recipe for auto-restart
   isRestarting = signal<boolean>(false); // Prevent multiple simultaneous restart attempts
+  activeOutputIcon = signal<any>(null); // Icon for the active crafting output
   craftingLog: Array<{
     timestamp: Date;
     recipeName: string;
@@ -46,7 +48,9 @@ export class CraftingComponent implements OnInit {
 
   // Computed values
   filteredRecipes = computed(() => {
-    return this.recipeService.recipes().filter(r => r.skill === this.skill);
+    return this.recipeService.recipes()
+      .filter(r => r.skill === this.skill)
+      .sort((a, b) => a.requiredLevel - b.requiredLevel);
   });
 
   playerSkills = computed(() => this.authService.currentPlayer()?.skills);
@@ -68,6 +72,7 @@ export class CraftingComponent implements OnInit {
     const elapsed = recipe.duration - remaining;
     return (elapsed / recipe.duration) * 100;
   });
+
 
   // Get selected ingredient items for display
   activeIngredientItems = computed(() => {
@@ -205,6 +210,8 @@ export class CraftingComponent implements OnInit {
       selectedIngredients[itemId] = instanceIds;
     });
 
+    // Icon is already loaded from the previous craft, no need to fetch again
+
     // Clear the last result to avoid triggering the watcher again
     this.craftingService.clearResult();
 
@@ -284,6 +291,21 @@ export class CraftingComponent implements OnInit {
     this.selectedIngredients().forEach((instanceIds, itemId) => {
       selectedIngredients[itemId] = instanceIds;
     });
+
+    // Fetch the output item icon before starting
+    const outputs = this.getRecipeOutputs(recipe);
+    if (outputs.length > 0) {
+      const outputItemId = outputs[0].itemId;
+      this.inventoryService.getItemDefinition(outputItemId).subscribe({
+        next: (itemDef) => {
+          this.activeOutputIcon.set(itemDef.icon);
+        },
+        error: (error) => {
+          console.warn('Could not load output icon:', error);
+          this.activeOutputIcon.set(null);
+        }
+      });
+    }
 
     this.craftingService.startCrafting(recipe.recipeId, selectedIngredients).subscribe({
       next: (response) => {

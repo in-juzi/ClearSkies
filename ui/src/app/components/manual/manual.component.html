@@ -22,9 +22,10 @@
             [class.active]="activeSection() === section.id"
             (click)="selectSection(section.id)"
           >
-            <img
-              [src]="'assets/icons/' + section.icon + '.svg'"
-              [alt]="section.label"
+            <app-icon
+              [path]="section.icon + '.svg'"
+              [size]="24"
+              [disableColor]="true"
               class="nav-icon"
             />
             <span>{{ section.label }}</span>

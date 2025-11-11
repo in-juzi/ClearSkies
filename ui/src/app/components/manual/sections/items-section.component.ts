@@ -1,11 +1,13 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { firstValueFrom } from 'rxjs';
 import { ManualService, ItemsResponse, QualitiesResponse, TraitsResponse } from '../../../services/manual.service';
+import { IconComponent } from '../../shared/icon/icon.component';
 
 @Component({
   selector: 'app-items-section',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, IconComponent],
   template: `
     <div class="section-content">
       <h2>Items & Inventory</h2>
@@ -31,9 +33,9 @@ import { ManualService, ItemsResponse, QualitiesResponse, TraitsResponse } from 
               <div class="items-grid">
                 @for (item of itemsData()!.categories.resources; track item.itemId) {
                   <div class="item-card">
-                    <img [src]="'assets/icons/' + item.icon" [alt]="item.name" class="item-icon" />
+                    <app-icon [icon]="item.icon" [size]="48" class="item-icon" />
                     <div class="item-info">
-                      <h5>{{ item.name }}</h5>
+                      <h5 [class]="'rarity-' + item.rarity">{{ item.name }}</h5>
                       <p>{{ item.description }}</p>
                       @if (item.subcategories && item.subcategories.length > 0) {
                         <div class="subcategories">
@@ -42,10 +44,6 @@ import { ManualService, ItemsResponse, QualitiesResponse, TraitsResponse } from 
                           }
                         </div>
                       }
-                      <div class="item-meta">
-                        <span class="tier">Tier: {{ item.tier }}</span>
-                        <span class="rarity">{{ item.rarity }}</span>
-                      </div>
                     </div>
                   </div>
                 }
@@ -58,9 +56,9 @@ import { ManualService, ItemsResponse, QualitiesResponse, TraitsResponse } from 
               <div class="items-grid">
                 @for (item of itemsData()!.categories.equipment; track item.itemId) {
                   <div class="item-card">
-                    <img [src]="'assets/icons/' + item.icon" [alt]="item.name" class="item-icon" />
+                    <app-icon [icon]="item.icon" [size]="48" class="item-icon" />
                     <div class="item-info">
-                      <h5>{{ item.name }}</h5>
+                      <h5 [class]="'rarity-' + item.rarity">{{ item.name }}</h5>
                       <p>{{ item.description }}</p>
                       @if (item.subcategories && item.subcategories.length > 0) {
                         <div class="subcategories">
@@ -69,12 +67,6 @@ import { ManualService, ItemsResponse, QualitiesResponse, TraitsResponse } from 
                           }
                         </div>
                       }
-                      <div class="item-meta">
-                        <span class="tier">{{ item.slot }} | {{ item.tier }}</span>
-                        @if (item.subtype) {
-                          <span class="subtype">{{ item.subtype }}</span>
-                        }
-                      </div>
                     </div>
                   </div>
                 }
@@ -87,9 +79,9 @@ import { ManualService, ItemsResponse, QualitiesResponse, TraitsResponse } from 
               <div class="items-grid">
                 @for (item of itemsData()!.categories.consumables; track item.itemId) {
                   <div class="item-card">
-                    <img [src]="'assets/icons/' + item.icon" [alt]="item.name" class="item-icon" />
+                    <app-icon [icon]="item.icon" [size]="48" class="item-icon" />
                     <div class="item-info">
-                      <h5>{{ item.name }}</h5>
+                      <h5 [class]="'rarity-' + item.rarity">{{ item.name }}</h5>
                       <p>{{ item.description }}</p>
                       @if (item.subcategories && item.subcategories.length > 0) {
                         <div class="subcategories">
@@ -98,10 +90,6 @@ import { ManualService, ItemsResponse, QualitiesResponse, TraitsResponse } from 
                           }
                         </div>
                       }
-                      <div class="item-meta">
-                        <span class="tier">Tier: {{ item.tier }}</span>
-                        <span class="rarity">{{ item.rarity }}</span>
-                      </div>
                     </div>
                   </div>
                 }
@@ -223,6 +211,12 @@ import { ManualService, ItemsResponse, QualitiesResponse, TraitsResponse } from 
         font-size: var(--font-size-l);
         color: var(--color-text-primary);
         margin: 0 0 var(--spacing-xs) 0;
+
+        &.rarity-common { color: #9e9e9e; }
+        &.rarity-uncommon { color: #4caf50; }
+        &.rarity-rare { color: #2196f3; }
+        &.rarity-epic { color: #9c27b0; }
+        &.rarity-legendary { color: #ff9800; }
       }
 
       .lead {
@@ -294,8 +288,6 @@ import { ManualService, ItemsResponse, QualitiesResponse, TraitsResponse } from 
         text-align: center;
 
         .item-icon {
-          width: 48px;
-          height: 48px;
           margin-bottom: var(--spacing-s);
         }
 
@@ -322,18 +314,6 @@ import { ManualService, ItemsResponse, QualitiesResponse, TraitsResponse } from 
             border-radius: var(--radius-s);
             text-transform: lowercase;
             border: var(--border-width-thin) solid var(--color-accent-purple);
-          }
-        }
-
-        .item-meta {
-          display: flex;
-          flex-direction: column;
-          gap: var(--spacing-xs);
-          font-size: var(--font-size-xs);
-          color: var(--color-text-disabled);
-
-          .tier, .subtype, .rarity {
-            text-transform: capitalize;
           }
         }
       }
@@ -475,21 +455,23 @@ export class ItemsSectionComponent implements OnInit {
     this.loadData();
   }
 
-  private loadData(): void {
-    Promise.all([
-      this.manualService.getItems().toPromise(),
-      this.manualService.getQualities().toPromise(),
-      this.manualService.getTraits().toPromise()
-    ]).then(([items, qualities, traits]) => {
+  private async loadData(): Promise<void> {
+    try {
+      const [items, qualities, traits] = await Promise.all([
+        firstValueFrom(this.manualService.getItems()),
+        firstValueFrom(this.manualService.getQualities()),
+        firstValueFrom(this.manualService.getTraits())
+      ]);
+
       this.itemsData.set(items || null);
       this.qualitiesData.set(qualities || null);
       this.traitsData.set(traits || null);
       this.loading.set(false);
-    }).catch(err => {
+    } catch (err) {
       console.error('Failed to load items data:', err);
       this.error.set('Failed to load items data. Please try again later.');
       this.loading.set(false);
-    });
+    }
   }
 
   getRarityEntries(): Array<{ key: string; value: string }> {

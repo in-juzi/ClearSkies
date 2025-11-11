@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { ItemIcon } from '../models/inventory.model';
 
 /**
  * Interface definitions for manual API responses
@@ -30,7 +31,7 @@ export interface ManualItem {
   description: string;
   tier: string;
   rarity: string;
-  icon: string;
+  icon: ItemIcon;
   category: string;
   subcategories: string[];
   stackable: boolean;
