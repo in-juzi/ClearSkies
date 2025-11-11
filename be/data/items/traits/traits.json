@@ -34,41 +34,6 @@
       }
     }
   },
-  "knotted": {
-    "traitId": "knotted",
-    "name": "Knotted",
-    "shorthand": "KNT",
-    "description": "Contains knots, making it harder to work with",
-    "rarity": "common",
-    "applicableCategories": ["resource"],
-    "maxLevel": 3,
-    "levels": {
-      "1": {
-        "name": "Slightly Knotted",
-        "description": "A few small knots present",
-        "effects": {
-          "vendorPrice": { "modifier": 0.9 },
-          "smithing": { "difficultyIncrease": 5 }
-        }
-      },
-      "2": {
-        "name": "Knotted",
-        "description": "Moderate knots throughout",
-        "effects": {
-          "vendorPrice": { "modifier": 0.75 },
-          "smithing": { "difficultyIncrease": 10 }
-        }
-      },
-      "3": {
-        "name": "Heavily Knotted",
-        "description": "Numerous large knots, very difficult to work",
-        "effects": {
-          "vendorPrice": { "modifier": 0.6 },
-          "smithing": { "difficultyIncrease": 20 }
-        }
-      }
-    }
-  },
   "weathered": {
     "traitId": "weathered",
     "name": "Weathered",
@@ -146,33 +111,16 @@
     "traitId": "cursed",
     "name": "Cursed",
     "shorthand": "CRS",
-    "description": "Bears a mysterious curse",
+    "description": "Bears a mysterious curse with dangerous power",
     "rarity": "rare",
     "applicableCategories": ["equipment", "crafted"],
-    "maxLevel": 3,
+    "maxLevel": 1,
     "levels": {
       "1": {
-        "name": "Tainted",
-        "description": "A faint curse lingers",
-        "effects": {
-          "vendorPrice": { "modifier": 0.7 },
-          "combat": { "damageBonus": 0.15, "healthDrain": 2 }
-        }
-      },
-      "2": {
         "name": "Cursed",
-        "description": "Bears a noticeable curse",
+        "description": "Bears a mysterious curse - powerful but dangerous",
         "effects": {
-          "vendorPrice": { "modifier": 0.5 },
           "combat": { "damageBonus": 0.3, "healthDrain": 5 }
-        }
-      },
-      "3": {
-        "name": "Heavily Cursed",
-        "description": "Consumed by a powerful curse",
-        "effects": {
-          "vendorPrice": { "modifier": 0.3 },
-          "combat": { "damageBonus": 0.5, "healthDrain": 10 }
         }
       }
     }
