@@ -1,0 +1,82 @@
+<button
+  [class]="buttonClasses()"
+  [disabled]="!canUse()"
+  (click)="handleClick($event)"
+  (mouseenter)="handleHover()"
+  type="button">
+
+  <!-- Ability Icon -->
+  <div class="ability-icon-container">
+    @if (ability().icon) {
+      <app-icon
+        [path]="ability().icon!.path"
+        [material]="ability().icon!.material"
+        [autoSize]="true"
+        class="ability-icon">
+      </app-icon>
+    } @else {
+      <div class="ability-icon-placeholder">
+        <span class="ability-icon-text">{{ ability().name.charAt(0) }}</span>
+      </div>
+    }
+
+    <!-- Cooldown Overlay -->
+    @if (isOnCooldown() && showCooldown()) {
+      <div class="cooldown-overlay" [style.height.%]="cooldownPercent()">
+        <div class="cooldown-counter">{{ cooldownRemaining() }}</div>
+      </div>
+    }
+  </div>
+
+  <!-- Ability Name (for larger sizes) -->
+  @if (size() === 'large') {
+    <div class="ability-name">{{ ability().name }}</div>
+  }
+
+  <!-- Resource Cost Badge -->
+  @if (showCost() && (ability().manaCost ?? 0) > 0) {
+    <div class="ability-cost"
+         [class.cost-insufficient]="insufficientResource()">
+      {{ ability().manaCost }}
+    </div>
+  }
+
+  <!-- Tooltip -->
+  @if (showTooltip()) {
+    <div class="ability-tooltip">
+      <div class="tooltip-header">
+        <div class="tooltip-name">{{ ability().name }}</div>
+        @if (ability().type) {
+          <div class="tooltip-type">{{ ability().type }}</div>
+        }
+      </div>
+
+      <div class="tooltip-description">
+        {{ ability().description }}
+      </div>
+
+      <div class="tooltip-stats">
+        @if ((ability().manaCost ?? 0) > 0) {
+          <div class="tooltip-stat">
+            <span class="stat-label">Cost:</span>
+            <span class="stat-value">{{ ability().manaCost }} {{ resourceLabel() }}</span>
+          </div>
+        }
+
+        @if ((ability().cooldown ?? 0) > 0) {
+          <div class="tooltip-stat">
+            <span class="stat-label">Cooldown:</span>
+            <span class="stat-value">{{ ability().cooldown }} turns</span>
+          </div>
+        }
+      </div>
+
+      <!-- Disabled reason -->
+      @if (!canUse() && disabledReasonText()) {
+        <div class="tooltip-disabled-reason">
+          {{ disabledReasonText() }}
+        </div>
+      }
+    </div>
+  }
+</button>
