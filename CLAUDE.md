@@ -6,26 +6,31 @@
 - ✅ Herbalism system (completed - 6 herbs, 4 gathering locations)
 - ✅ Combat skills framework (completed - 6 combat skills added)
 - ✅ Turn-based combat system (completed - monsters, abilities, combat activities)
+- ✅ Combat UI components (completed - ability/item buttons, auto-scroll log, restart encounters)
+- ✅ Consumable items system (completed - health/mana potions usable in/out of combat)
 - ✅ Manual/help system (completed - full game guide with 6 sections)
 - ✅ Quality/trait effect display (completed - enhanced inventory UI)
 - ✅ XP scaling display (completed - shows raw vs scaled XP)
 - ✅ Real-time chat system (completed - Socket.io with commands and autocomplete)
-- ✅ Icon organization (completed - 220+ icons organized into 6 categories)
+- ✅ Icon organization (completed - 235+ icons organized into 6 categories)
 - ✅ Vendor/NPC trading system (completed - buy/sell at gathering locations)
 - ✅ Cooking/Crafting system (completed - quality inheritance, instance selection)
-- ✅ Multi-channel icon colorization (completed - path-level SVG colorization with 40+ materials)
+- ✅ Multi-channel icon colorization (completed - path-level SVG colorization with 42+ materials)
 - ✅ Item system reorganization (completed - category subdirectories for scalability)
 - ✅ 5-level quality system with 3-level trait system (completed - quality expanded to 5 levels)
 - ✅ Smithing foundation (completed - ore smelting, ingot crafting, Village Forge)
 
-**Recent Changes** (Last 7 commits):
-- feat: expand material color system for combat items
-- refactor: enhance inventory and UI components
-- feat: add combat content and activities
-- feat: add combat UI implementation
-- feat: add combat system foundation
-- feat: add quality level damping system
-- feat: implement probabilistic item generation system
+**Recent Changes** (Last 10 commits):
+- chore: update IDE settings
+- feat: add item consumption during combat backend support
+- feat: add health/mana display and UI improvements
+- feat: update item and ability definitions with icons and properties
+- feat: add combat item icons and materials
+- feat: add flee/return button to location component
+- feat: enhance combat UI with consumables, improved controls, and auto-scroll
+- feat: add combat restart functionality and activity tracking
+- feat: add shared item-button component for consumables
+- feat: add shared ability-button component for combat
 
 **Known Issues**:
 - None currently identified
@@ -80,7 +85,7 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 - Crafting: [ui/src/app/components/game/crafting/crafting.component.ts](ui/src/app/components/game/crafting/crafting.component.ts), [ui/src/app/components/game/crafting/crafting.component.html](ui/src/app/components/game/crafting/crafting.component.html)
 - Combat: [ui/src/app/components/game/combat/combat.component.ts](ui/src/app/components/game/combat/combat.component.ts), [ui/src/app/components/game/combat/combat.component.html](ui/src/app/components/game/combat/combat.component.html)
 - Manual: [ui/src/app/components/manual/manual.component.ts](ui/src/app/components/manual/manual.component.ts), [ui/src/app/components/manual/sections/](ui/src/app/components/manual/sections/)
-- Shared Components: [ui/src/app/components/shared/item-mini/item-mini.component.ts](ui/src/app/components/shared/item-mini/item-mini.component.ts), [ui/src/app/components/shared/item-modifiers/item-modifiers.component.ts](ui/src/app/components/shared/item-modifiers/item-modifiers.component.ts), [ui/src/app/components/shared/icon/icon.component.ts](ui/src/app/components/shared/icon/icon.component.ts), [ui/src/app/components/shared/xp-mini/xp-mini.component.ts](ui/src/app/components/shared/xp-mini/xp-mini.component.ts)
+- Shared Components: [ui/src/app/components/shared/item-mini/item-mini.component.ts](ui/src/app/components/shared/item-mini/item-mini.component.ts), [ui/src/app/components/shared/item-modifiers/item-modifiers.component.ts](ui/src/app/components/shared/item-modifiers/item-modifiers.component.ts), [ui/src/app/components/shared/icon/icon.component.ts](ui/src/app/components/shared/icon/icon.component.ts), [ui/src/app/components/shared/xp-mini/xp-mini.component.ts](ui/src/app/components/shared/xp-mini/xp-mini.component.ts), [ui/src/app/components/shared/ability-button/ability-button.component.ts](ui/src/app/components/shared/ability-button/ability-button.component.ts), [ui/src/app/components/shared/item-button/item-button.component.ts](ui/src/app/components/shared/item-button/item-button.component.ts)
 - Services: [ui/src/app/services/inventory.service.ts](ui/src/app/services/inventory.service.ts), [ui/src/app/services/location.service.ts](ui/src/app/services/location.service.ts), [ui/src/app/services/skills.service.ts](ui/src/app/services/skills.service.ts), [ui/src/app/services/auth.service.ts](ui/src/app/services/auth.service.ts), [ui/src/app/services/manual.service.ts](ui/src/app/services/manual.service.ts), [ui/src/app/services/chat.service.ts](ui/src/app/services/chat.service.ts), [ui/src/app/services/vendor.service.ts](ui/src/app/services/vendor.service.ts), [ui/src/app/services/recipe.service.ts](ui/src/app/services/recipe.service.ts), [ui/src/app/services/crafting.service.ts](ui/src/app/services/crafting.service.ts), [ui/src/app/services/combat.service.ts](ui/src/app/services/combat.service.ts), [ui/src/app/services/icon.service.ts](ui/src/app/services/icon.service.ts)
 - Constants: [ui/src/app/constants/material-colors.constants.ts](ui/src/app/constants/material-colors.constants.ts)
 
@@ -406,11 +411,11 @@ See [project/docs/content-generator-agent.md](project/docs/content-generator-age
 
 **Core Systems**: Auth/JWT, Player/User models, MongoDB with migrations
 **Game Mechanics**: Skills (12), Attributes (7), XP scaling with 50% skill→attribute passthrough
-**Inventory**: Items (50+), Quality/Trait (5-tier/3-tier), Stacking, Equipment slots (10)
+**Inventory**: Items (50+), Quality/Trait (5-tier/3-tier), Stacking, Equipment slots (10), Consumables (potions)
 **World**: Locations, Activities, Drop tables, Travel, Time-based completion
-**Combat**: Turn-based combat, Monsters (3), Abilities (6), Combat stats tracking
+**Combat**: Turn-based combat, Monsters (3), Abilities (6), Combat stats tracking, Restart encounters
 **Crafting**: Cooking/Smithing, Recipe system, Quality inheritance, Instance selection
-**UI**: IconComponent (multi-channel colorization), ItemMiniComponent, Manual/help system
+**UI**: IconComponent (multi-channel colorization), ItemMiniComponent, AbilityButtonComponent, ItemButtonComponent, Manual/help system
 **Social**: Real-time chat (Socket.io), Vendor trading, Gold system
 
 See [project/docs/completed-features.md](project/docs/completed-features.md) for full list.
@@ -428,8 +433,8 @@ See [project/docs/completed-features.md](project/docs/completed-features.md) for
 - Inventory: items with qualities (Map), traits (Map), quantities, equipped flag
 - Equipment slots (Map): 10 default slots (head, body, mainHand, offHand, belt, gloves, boots, necklace, ringRight, ringLeft)
 - Location state: currentLocation, discoveredLocations, activeActivity, travelState
-- Combat state: activeCombat (monster instance, turn tracking, cooldowns, combat log), combatStats (defeats, damage, deaths, crits, dodges)
-- Gold, questProgress, achievements
+- Combat state: activeCombat (monster instance, turn tracking, cooldowns, combat log, activityId), combatStats (defeats, damage, deaths, crits, dodges), lastCombatActivityId
+- Character: characterName (optional display name), gold, questProgress, achievements
 
 **Key Methods:** See [be/models/Player.js](be/models/Player.js) for full list
 - Skills/Inventory: `addSkillExperience()` ~L145, `addItem()` ~L200, `equipItem()` ~L280
@@ -1096,11 +1101,14 @@ Turn-based combat system with monsters, abilities, and stat tracking.
 **Key Features:**
 - **Turn-based combat**: Player and monster alternate attacks based on weapon speed
 - **Combat abilities**: Weapon-specific special attacks (6 abilities for different weapon types)
+- **Consumable items**: Use health/mana potions during combat via item-button component
+- **Combat restart**: "Start New Encounter" button to repeat same activity without navigation
 - **Damage calculation**: Base damage + skill level + equipment bonuses, with crit/dodge mechanics
 - **Monster AI**: Basic attack patterns with ability usage
 - **Combat stats**: Track defeats, damage dealt/taken, deaths, critical hits, dodges
-- **Combat log**: Color-coded event history with timestamps
+- **Combat log**: Color-coded event history with timestamps and auto-scroll
 - **Loot drops**: Monsters drop items via drop tables on defeat
+- **UI components**: Reusable ability-button and item-button components with cooldowns, tooltips
 
 **Current Content:**
 - Monsters: Bandit Thug (L3, one-handed), Forest Wolf (L2, ranged), Goblin Warrior (L4, two-handed)
@@ -1111,9 +1119,10 @@ Turn-based combat system with monsters, abilities, and stat tracking.
 **Combat Flow:**
 1. Player starts combat via activity (requires appropriate weapon equipped)
 2. Turn-based attacks with weapon speed determining attack intervals
-3. Use abilities (cooldown-based) or basic attacks
-4. Monster defeated → rewards (XP, loot, gold) → combat ends
+3. Use abilities (cooldown-based), consumables, or basic attacks
+4. Monster defeated → rewards (XP, loot, gold) → option to restart or return
 5. Player defeated → respawn at location with no penalty
+6. Flee during combat (confirmation) or return after combat ends (instant)
 
 **Configuration:**
 - Monster JSON: `be/data/monsters/definitions/{monster-id}.json` with stats, abilities, resistances
