@@ -105,6 +105,31 @@ const playerSchema = new mongoose.Schema({
     endTime: { type: Date },
     selectedIngredients: { type: Map, of: [String] }
   },
+  // Combat system
+  activeCombat: {
+    monsterId: { type: String },
+    monsterInstance: { type: Map, of: mongoose.Schema.Types.Mixed }, // Full monster state
+    playerLastAttackTime: { type: Date },
+    monsterLastAttackTime: { type: Date },
+    playerNextAttackTime: { type: Date },
+    monsterNextAttackTime: { type: Date },
+    turnCount: { type: Number, default: 0 }, // Track player attack count for ability cooldowns
+    abilityCooldowns: { type: Map, of: Number }, // abilityId -> turn when available
+    combatLog: [{
+      timestamp: { type: Date, default: Date.now },
+      message: { type: String },
+      type: { type: String, enum: ['damage', 'heal', 'dodge', 'miss', 'crit', 'ability', 'system'] }
+    }],
+    startTime: { type: Date }
+  },
+  combatStats: {
+    monstersDefeated: { type: Number, default: 0 },
+    totalDamageDealt: { type: Number, default: 0 },
+    totalDamageTaken: { type: Number, default: 0 },
+    deaths: { type: Number, default: 0 },
+    criticalHits: { type: Number, default: 0 },
+    dodges: { type: Number, default: 0 }
+  },
   questProgress: [{
     questId: { type: mongoose.Schema.Types.ObjectId, ref: 'Quest' },
     status: {
@@ -580,6 +605,131 @@ playerSchema.methods.hasInventoryItem = function(itemId, minQuantity = 1) {
 playerSchema.methods.getInventoryItemQuantity = function(itemId) {
   const items = this.inventory.filter(item => item.itemId === itemId);
   return items.reduce((sum, item) => sum + (item.quantity || 1), 0);
+};
+
+// Combat Management Methods
+
+// Take damage and return true if defeated
+playerSchema.methods.takeDamage = function(amount) {
+  if (amount < 0) {
+    throw new Error('Damage amount must be positive');
+  }
+
+  this.stats.health.current = Math.max(0, this.stats.health.current - amount);
+  this.combatStats.totalDamageTaken += amount;
+
+  return this.stats.health.current === 0; // Returns true if defeated
+};
+
+// Heal health
+playerSchema.methods.heal = function(amount) {
+  if (amount < 0) {
+    throw new Error('Heal amount must be positive');
+  }
+
+  this.stats.health.current = Math.min(this.stats.health.max, this.stats.health.current + amount);
+};
+
+// Use mana for abilities
+playerSchema.methods.useMana = function(amount) {
+  if (amount < 0) {
+    throw new Error('Mana amount must be positive');
+  }
+
+  if (this.stats.mana.current < amount) {
+    throw new Error('Insufficient mana');
+  }
+
+  this.stats.mana.current -= amount;
+};
+
+// Restore mana
+playerSchema.methods.restoreMana = function(amount) {
+  if (amount < 0) {
+    throw new Error('Mana amount must be positive');
+  }
+
+  this.stats.mana.current = Math.min(this.stats.mana.max, this.stats.mana.current + amount);
+};
+
+// Check if player is in combat
+playerSchema.methods.isInCombat = function() {
+  return this.activeCombat && this.activeCombat.monsterId;
+};
+
+// Add combat log entry
+playerSchema.methods.addCombatLog = function(message, type = 'system') {
+  if (!this.activeCombat) {
+    throw new Error('Player is not in combat');
+  }
+
+  const logEntry = {
+    timestamp: new Date(),
+    message,
+    type
+  };
+
+  // Keep only last 50 entries to prevent bloat
+  if (this.activeCombat.combatLog.length >= 50) {
+    this.activeCombat.combatLog.shift();
+  }
+
+  this.activeCombat.combatLog.push(logEntry);
+};
+
+// Clear active combat (used when combat ends)
+playerSchema.methods.clearCombat = function() {
+  this.activeCombat = {
+    monsterId: null,
+    monsterInstance: new Map(),
+    playerLastAttackTime: null,
+    monsterLastAttackTime: null,
+    playerNextAttackTime: null,
+    monsterNextAttackTime: null,
+    turnCount: 0,
+    abilityCooldowns: new Map(),
+    combatLog: [],
+    startTime: null
+  };
+};
+
+// Check if ability is on cooldown
+playerSchema.methods.isAbilityOnCooldown = function(abilityId) {
+  if (!this.activeCombat || !this.activeCombat.abilityCooldowns) {
+    return false;
+  }
+
+  const availableTurn = this.activeCombat.abilityCooldowns.get(abilityId);
+  if (!availableTurn) {
+    return false;
+  }
+
+  return this.activeCombat.turnCount < availableTurn;
+};
+
+// Set ability cooldown
+playerSchema.methods.setAbilityCooldown = function(abilityId, cooldownTurns) {
+  if (!this.activeCombat) {
+    throw new Error('Player is not in combat');
+  }
+
+  const availableTurn = this.activeCombat.turnCount + cooldownTurns;
+  this.activeCombat.abilityCooldowns.set(abilityId, availableTurn);
+};
+
+// Get ability cooldown remaining turns
+playerSchema.methods.getAbilityCooldownRemaining = function(abilityId) {
+  if (!this.activeCombat || !this.activeCombat.abilityCooldowns) {
+    return 0;
+  }
+
+  const availableTurn = this.activeCombat.abilityCooldowns.get(abilityId);
+  if (!availableTurn) {
+    return 0;
+  }
+
+  const remaining = availableTurn - this.activeCombat.turnCount;
+  return Math.max(0, remaining);
 };
 
 module.exports = mongoose.model('Player', playerSchema);

@@ -1,0 +1,24 @@
+{
+  "abilityId": "fire_bolt",
+  "name": "Fire Bolt",
+  "description": "Hurl a bolt of searing flame at your enemy. The arcane fires burn hot and true.",
+  "type": "attack",
+  "targetType": "single",
+  "powerMultiplier": 2.2,
+  "manaCost": 20,
+  "cooldown": 3,
+  "requirements": {
+    "weaponTypes": ["casting"],
+    "minSkillLevel": 1
+  },
+  "effects": {
+    "damage": {
+      "type": "magical",
+      "multiplier": 2.2
+    }
+  },
+  "icon": {
+    "path": "abilities/fire_bolt.svg",
+    "material": "default"
+  }
+}

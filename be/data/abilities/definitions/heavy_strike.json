@@ -1,0 +1,24 @@
+{
+  "abilityId": "heavy_strike",
+  "name": "Heavy Strike",
+  "description": "A powerful overhead blow that deals increased damage. The weight of your weapon comes crashing down on your foe.",
+  "type": "attack",
+  "targetType": "single",
+  "powerMultiplier": 2.0,
+  "manaCost": 15,
+  "cooldown": 3,
+  "requirements": {
+    "weaponTypes": ["oneHanded", "twoHanded"],
+    "minSkillLevel": 1
+  },
+  "effects": {
+    "damage": {
+      "type": "physical",
+      "multiplier": 2.0
+    }
+  },
+  "icon": {
+    "path": "abilities/heavy_strike.svg",
+    "material": "default"
+  }
+}

@@ -7,6 +7,7 @@ const itemService = require('./services/itemService');
 const locationService = require('./services/locationService');
 const vendorService = require('./services/vendorService');
 const recipeService = require('./services/recipeService');
+const combatService = require('./services/combatService');
 
 const app = express();
 const server = http.createServer(app);
@@ -63,6 +64,7 @@ const locationRoutes = require('./routes/locations');
 const manualRoutes = require('./routes/manual');
 const vendorRoutes = require('./routes/vendors');
 const craftingRoutes = require('./routes/crafting');
+const combatRoutes = require('./routes/combat');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/skills', skillsRoutes);
@@ -72,6 +74,7 @@ app.use('/api/locations', locationRoutes);
 app.use('/api/manual', manualRoutes); // Public routes (no auth required)
 app.use('/api/vendors', vendorRoutes);
 app.use('/api/crafting', craftingRoutes);
+app.use('/api/combat', combatRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
