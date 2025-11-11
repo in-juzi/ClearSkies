@@ -5,6 +5,7 @@
 **Active Features**:
 - ✅ Herbalism system (completed - 6 herbs, 4 gathering locations)
 - ✅ Combat skills framework (completed - 6 combat skills added)
+- ✅ Turn-based combat system (completed - monsters, abilities, combat activities)
 - ✅ Manual/help system (completed - full game guide with 6 sections)
 - ✅ Quality/trait effect display (completed - enhanced inventory UI)
 - ✅ XP scaling display (completed - shows raw vs scaled XP)
@@ -18,21 +19,21 @@
 - ✅ Smithing foundation (completed - ore smelting, ingot crafting, Village Forge)
 
 **Recent Changes** (Last 7 commits):
-- chore: add icon processing tooling and project metadata
-- docs: update system documentation for recent changes
-- fix: update backend utilities for new item structure
-- refactor: improve UI components with icon integration and polish
-- feat: expand icon system with material colors and new SVG assets
-- feat: add smithing system foundation with ore smelting
-- refactor: simplify quality and trait levels to 3-tier system
+- feat: expand material color system for combat items
+- refactor: enhance inventory and UI components
+- feat: add combat content and activities
+- feat: add combat UI implementation
+- feat: add combat system foundation
+- feat: add quality level damping system
+- feat: implement probabilistic item generation system
 
 **Known Issues**:
 - None currently identified
 
 **Next Priorities**:
+- Combat system enhancements (more monsters, abilities, boss fights)
 - Smithing system completion (weapon/armor crafting with tier progression)
 - Alchemy system (potion brewing with quality-based effects)
-- Combat system implementation
 - Vendor enhancements (restocking, skill-based pricing)
 - Player housing
 - Guild/party system
@@ -62,10 +63,10 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 ### Frequently Modified Files
 
 **Backend Core:**
-- Controllers: [be/controllers/inventoryController.js](be/controllers/inventoryController.js), [be/controllers/locationController.js](be/controllers/locationController.js), [be/controllers/skillsController.js](be/controllers/skillsController.js), [be/controllers/attributesController.js](be/controllers/attributesController.js), [be/controllers/authController.js](be/controllers/authController.js), [be/controllers/manualController.js](be/controllers/manualController.js), [be/controllers/vendorController.js](be/controllers/vendorController.js), [be/controllers/craftingController.js](be/controllers/craftingController.js)
+- Controllers: [be/controllers/inventoryController.js](be/controllers/inventoryController.js), [be/controllers/locationController.js](be/controllers/locationController.js), [be/controllers/skillsController.js](be/controllers/skillsController.js), [be/controllers/attributesController.js](be/controllers/attributesController.js), [be/controllers/authController.js](be/controllers/authController.js), [be/controllers/manualController.js](be/controllers/manualController.js), [be/controllers/vendorController.js](be/controllers/vendorController.js), [be/controllers/craftingController.js](be/controllers/craftingController.js), [be/controllers/combatController.js](be/controllers/combatController.js)
 - Models: [be/models/Player.js](be/models/Player.js), [be/models/User.js](be/models/User.js), [be/models/ChatMessage.js](be/models/ChatMessage.js)
-- Services: [be/services/itemService.js](be/services/itemService.js), [be/services/locationService.js](be/services/locationService.js), [be/services/dropTableService.js](be/services/dropTableService.js), [be/services/vendorService.js](be/services/vendorService.js), [be/services/recipeService.js](be/services/recipeService.js)
-- Routes: [be/routes/inventory.js](be/routes/inventory.js), [be/routes/locations.js](be/routes/locations.js), [be/routes/skills.js](be/routes/skills.js), [be/routes/attributes.js](be/routes/attributes.js), [be/routes/auth.js](be/routes/auth.js), [be/routes/manual.js](be/routes/manual.js), [be/routes/vendors.js](be/routes/vendors.js), [be/routes/crafting.js](be/routes/crafting.js)
+- Services: [be/services/itemService.js](be/services/itemService.js), [be/services/locationService.js](be/services/locationService.js), [be/services/dropTableService.js](be/services/dropTableService.js), [be/services/vendorService.js](be/services/vendorService.js), [be/services/recipeService.js](be/services/recipeService.js), [be/services/combatService.js](be/services/combatService.js)
+- Routes: [be/routes/inventory.js](be/routes/inventory.js), [be/routes/locations.js](be/routes/locations.js), [be/routes/skills.js](be/routes/skills.js), [be/routes/attributes.js](be/routes/attributes.js), [be/routes/auth.js](be/routes/auth.js), [be/routes/manual.js](be/routes/manual.js), [be/routes/vendors.js](be/routes/vendors.js), [be/routes/crafting.js](be/routes/crafting.js), [be/routes/combat.js](be/routes/combat.js)
 - Sockets: [be/sockets/chatHandler.js](be/sockets/chatHandler.js)
 
 **Frontend Core:**
@@ -77,9 +78,10 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 - Chat: [ui/src/app/components/game/chat/chat.component.ts](ui/src/app/components/game/chat/chat.component.ts)
 - Vendor: [ui/src/app/components/game/vendor/vendor.component.ts](ui/src/app/components/game/vendor/vendor.component.ts), [ui/src/app/components/game/vendor/vendor.component.html](ui/src/app/components/game/vendor/vendor.component.html)
 - Crafting: [ui/src/app/components/game/crafting/crafting.component.ts](ui/src/app/components/game/crafting/crafting.component.ts), [ui/src/app/components/game/crafting/crafting.component.html](ui/src/app/components/game/crafting/crafting.component.html)
+- Combat: [ui/src/app/components/game/combat/combat.component.ts](ui/src/app/components/game/combat/combat.component.ts), [ui/src/app/components/game/combat/combat.component.html](ui/src/app/components/game/combat/combat.component.html)
 - Manual: [ui/src/app/components/manual/manual.component.ts](ui/src/app/components/manual/manual.component.ts), [ui/src/app/components/manual/sections/](ui/src/app/components/manual/sections/)
 - Shared Components: [ui/src/app/components/shared/item-mini/item-mini.component.ts](ui/src/app/components/shared/item-mini/item-mini.component.ts), [ui/src/app/components/shared/item-modifiers/item-modifiers.component.ts](ui/src/app/components/shared/item-modifiers/item-modifiers.component.ts), [ui/src/app/components/shared/icon/icon.component.ts](ui/src/app/components/shared/icon/icon.component.ts), [ui/src/app/components/shared/xp-mini/xp-mini.component.ts](ui/src/app/components/shared/xp-mini/xp-mini.component.ts)
-- Services: [ui/src/app/services/inventory.service.ts](ui/src/app/services/inventory.service.ts), [ui/src/app/services/location.service.ts](ui/src/app/services/location.service.ts), [ui/src/app/services/skills.service.ts](ui/src/app/services/skills.service.ts), [ui/src/app/services/auth.service.ts](ui/src/app/services/auth.service.ts), [ui/src/app/services/manual.service.ts](ui/src/app/services/manual.service.ts), [ui/src/app/services/chat.service.ts](ui/src/app/services/chat.service.ts), [ui/src/app/services/vendor.service.ts](ui/src/app/services/vendor.service.ts), [ui/src/app/services/recipe.service.ts](ui/src/app/services/recipe.service.ts), [ui/src/app/services/crafting.service.ts](ui/src/app/services/crafting.service.ts), [ui/src/app/services/icon.service.ts](ui/src/app/services/icon.service.ts)
+- Services: [ui/src/app/services/inventory.service.ts](ui/src/app/services/inventory.service.ts), [ui/src/app/services/location.service.ts](ui/src/app/services/location.service.ts), [ui/src/app/services/skills.service.ts](ui/src/app/services/skills.service.ts), [ui/src/app/services/auth.service.ts](ui/src/app/services/auth.service.ts), [ui/src/app/services/manual.service.ts](ui/src/app/services/manual.service.ts), [ui/src/app/services/chat.service.ts](ui/src/app/services/chat.service.ts), [ui/src/app/services/vendor.service.ts](ui/src/app/services/vendor.service.ts), [ui/src/app/services/recipe.service.ts](ui/src/app/services/recipe.service.ts), [ui/src/app/services/crafting.service.ts](ui/src/app/services/crafting.service.ts), [ui/src/app/services/combat.service.ts](ui/src/app/services/combat.service.ts), [ui/src/app/services/icon.service.ts](ui/src/app/services/icon.service.ts)
 - Constants: [ui/src/app/constants/material-colors.constants.ts](ui/src/app/constants/material-colors.constants.ts)
 
 **Game Data:**
@@ -90,6 +92,8 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 - Facilities: [be/data/locations/facilities/](be/data/locations/facilities/)
 - Vendors: [be/data/vendors/](be/data/vendors/)
 - Recipes: [be/data/recipes/](be/data/recipes/)
+- Monsters: [be/data/monsters/definitions/](be/data/monsters/definitions/)
+- Abilities: [be/data/abilities/definitions/](be/data/abilities/definitions/)
 
 **Utilities:**
 - [be/utils/add-item.js](be/utils/add-item.js) - Add items to player inventory
@@ -402,8 +406,9 @@ See [project/docs/content-generator-agent.md](project/docs/content-generator-age
 
 **Core Systems**: Auth/JWT, Player/User models, MongoDB with migrations
 **Game Mechanics**: Skills (12), Attributes (7), XP scaling with 50% skill→attribute passthrough
-**Inventory**: Items (40+), Quality/Trait (3-tier), Stacking, Equipment slots (10)
+**Inventory**: Items (50+), Quality/Trait (5-tier/3-tier), Stacking, Equipment slots (10)
 **World**: Locations, Activities, Drop tables, Travel, Time-based completion
+**Combat**: Turn-based combat, Monsters (3), Abilities (6), Combat stats tracking
 **Crafting**: Cooking/Smithing, Recipe system, Quality inheritance, Instance selection
 **UI**: IconComponent (multi-channel colorization), ItemMiniComponent, Manual/help system
 **Social**: Real-time chat (Socket.io), Vendor trading, Gold system
@@ -416,16 +421,19 @@ See [project/docs/completed-features.md](project/docs/completed-features.md) for
 
 **ChatMessage** ([be/models/ChatMessage.js](be/models/ChatMessage.js) ~L10-20): Chat history (userId, username, message, channel)
 
-**Player** ([be/models/Player.js](be/models/Player.js) ~L15-120): Game data
+**Player** ([be/models/Player.js](be/models/Player.js) ~L15-135): Game data
 - Skills (12): woodcutting, mining, fishing, herbalism, smithing, cooking, oneHanded, dualWield, twoHanded, ranged, casting, gun
 - Attributes (7): strength, endurance, magic, perception, dexterity, will, charisma
 - Skill-Attribute links: woodcutting/mining→strength, fishing/smithing→endurance, herbalism/cooking→will, oneHanded/twoHanded→strength, dualWield/ranged→dexterity, casting→magic, gun→perception
 - Inventory: items with qualities (Map), traits (Map), quantities, equipped flag
 - Equipment slots (Map): 10 default slots (head, body, mainHand, offHand, belt, gloves, boots, necklace, ringRight, ringLeft)
 - Location state: currentLocation, discoveredLocations, activeActivity, travelState
+- Combat state: activeCombat (monster instance, turn tracking, cooldowns, combat log), combatStats (defeats, damage, deaths, crits, dodges)
 - Gold, questProgress, achievements
 
-**Key Methods:** See [be/models/Player.js](be/models/Player.js) for full list - `addSkillExperience()` ~L145, `addItem()` ~L200, `equipItem()` ~L280, etc.
+**Key Methods:** See [be/models/Player.js](be/models/Player.js) for full list
+- Skills/Inventory: `addSkillExperience()` ~L145, `addItem()` ~L200, `equipItem()` ~L280
+- Combat: `takeDamage()` ~L610, `heal()` ~L620, `useMana()` ~L628, `isInCombat()` ~L650, `addCombatLog()` ~L655
 
 ### API Routes Reference
 
@@ -440,6 +448,7 @@ All endpoints require JWT authentication except `/api/auth/register` and `/api/a
 - Locations: `/api/locations` → [be/routes/locations.js](be/routes/locations.js)
 - Vendors: `/api/vendors` → [be/routes/vendors.js](be/routes/vendors.js)
 - Crafting: `/api/crafting` → [be/routes/crafting.js](be/routes/crafting.js)
+- Combat: `/api/combat` → [be/routes/combat.js](be/routes/combat.js)
 - Manual: `/api/manual` → [be/routes/manual.js](be/routes/manual.js)
 
 ## Development Quick Rules
@@ -528,6 +537,7 @@ npm run migrate:down     # Rollback last migration
 4. `004-add-equipment-slots.js` - Adds equipment slot system to all players with 10 default slots
 5. `005-convert-quality-trait-to-levels.js` - Converts quality/trait system from decimal values to integer levels
 6. `006-add-herbalism-skill.js` - Adds herbalism gathering skill to all players (linked to Will attribute)
+7. `007-add-combat-system.js` - Adds combat fields (activeCombat state, combatStats tracking) to all players
 
 **Creating a New Migration:**
 1. Create a file in `be/migrations/` with format: `NNN-description.js`
@@ -1071,6 +1081,45 @@ Create items from ingredients with quality inheritance and instance selection.
 **Configuration:**
 - Recipe JSON: `be/data/recipes/{skill}/{recipe-id}.json` with ingredients, output, qualityModifier
 - Facility: Set `type: "crafting"` and `craftingSkills: ["cooking"]` in facility JSON
+
+## Combat System
+
+Turn-based combat system with monsters, abilities, and stat tracking.
+
+**Key Files:**
+- CombatService: [be/services/combatService.js](be/services/combatService.js) - Combat logic, damage calculation, monster AI
+- CombatController: [be/controllers/combatController.js](be/controllers/combatController.js) - Start/attack/ability/flee endpoints
+- Combat Component: [ui/src/app/components/game/combat/](ui/src/app/components/game/combat/) - Combat UI, health bars, combat log
+- Monster definitions: [be/data/monsters/definitions/](be/data/monsters/definitions/)
+- Ability definitions: [be/data/abilities/definitions/](be/data/abilities/definitions/)
+
+**Key Features:**
+- **Turn-based combat**: Player and monster alternate attacks based on weapon speed
+- **Combat abilities**: Weapon-specific special attacks (6 abilities for different weapon types)
+- **Damage calculation**: Base damage + skill level + equipment bonuses, with crit/dodge mechanics
+- **Monster AI**: Basic attack patterns with ability usage
+- **Combat stats**: Track defeats, damage dealt/taken, deaths, critical hits, dodges
+- **Combat log**: Color-coded event history with timestamps
+- **Loot drops**: Monsters drop items via drop tables on defeat
+
+**Current Content:**
+- Monsters: Bandit Thug (L3, one-handed), Forest Wolf (L2, ranged), Goblin Warrior (L4, two-handed)
+- Abilities: Heavy Strike, Quick Slash (one-handed), Aimed Shot, Rapid Fire (ranged), Fire Bolt, Ice Shard (casting)
+- Combat activities: 3 combat encounters at different locations requiring appropriate weapon skills
+- Combat drops: Raw meat, fangs, animal hide, saber tooth + gold and basic equipment
+
+**Combat Flow:**
+1. Player starts combat via activity (requires appropriate weapon equipped)
+2. Turn-based attacks with weapon speed determining attack intervals
+3. Use abilities (cooldown-based) or basic attacks
+4. Monster defeated → rewards (XP, loot, gold) → combat ends
+5. Player defeated → respawn at location with no penalty
+
+**Configuration:**
+- Monster JSON: `be/data/monsters/definitions/{monster-id}.json` with stats, abilities, resistances
+- Ability JSON: `be/data/abilities/definitions/{ability-id}.json` with damage, cooldown, mana cost
+- Combat activity: Set activity type with combat flag, link to monster via drop table
+- Full documentation: [project/docs/combat-system.md](project/docs/combat-system.md)
 
 ## Next Steps / Ideas
 
