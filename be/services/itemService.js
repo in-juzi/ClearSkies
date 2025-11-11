@@ -22,6 +22,10 @@ class ItemService {
       const qualitiesData = await fs.readFile(qualitiesPath, 'utf8');
       const qualities = JSON.parse(qualitiesData);
       Object.values(qualities).forEach(quality => {
+        // Transform applicableCategories to applicableTo for consistency
+        if (quality.applicableCategories && !quality.applicableTo) {
+          quality.applicableTo = quality.applicableCategories;
+        }
         this.qualityDefinitions.set(quality.qualityId, quality);
       });
 
@@ -30,23 +34,16 @@ class ItemService {
       const traitsData = await fs.readFile(traitsPath, 'utf8');
       const traits = JSON.parse(traitsData);
       Object.values(traits).forEach(trait => {
+        // Transform applicableCategories to applicableTo for consistency
+        if (trait.applicableCategories && !trait.applicableTo) {
+          trait.applicableTo = trait.applicableCategories;
+        }
         this.traitDefinitions.set(trait.traitId, trait);
       });
 
-      // Load item definitions from multiple files
+      // Load item definitions from multiple files and directories
       const definitionsPath = path.join(dataPath, 'definitions');
-      const files = await fs.readdir(definitionsPath);
-
-      for (const file of files) {
-        if (file.endsWith('.json')) {
-          const filePath = path.join(definitionsPath, file);
-          const fileData = await fs.readFile(filePath, 'utf8');
-          const items = JSON.parse(fileData);
-          Object.values(items).forEach(item => {
-            this.itemDefinitions.set(item.itemId, item);
-          });
-        }
-      }
+      await this._loadDefinitionsRecursive(definitionsPath);
 
       this.initialized = true;
       console.log(`✓ Loaded ${this.itemDefinitions.size} items, ${this.qualityDefinitions.size} qualities, ${this.traitDefinitions.size} traits`);
@@ -59,6 +56,30 @@ class ItemService {
     } catch (error) {
       console.error('Error loading item definitions:', error);
       throw error;
+    }
+  }
+
+  /**
+   * Recursively load item definitions from a directory
+   * Supports both JSON files and subdirectories with JSON files
+   */
+  async _loadDefinitionsRecursive(dirPath) {
+    const entries = await fs.readdir(dirPath, { withFileTypes: true });
+
+    for (const entry of entries) {
+      const fullPath = path.join(dirPath, entry.name);
+
+      if (entry.isDirectory()) {
+        // Recursively load from subdirectory
+        await this._loadDefinitionsRecursive(fullPath);
+      } else if (entry.isFile() && entry.name.endsWith('.json')) {
+        // Load JSON file
+        const fileData = await fs.readFile(fullPath, 'utf8');
+        const items = JSON.parse(fileData);
+        Object.values(items).forEach(item => {
+          this.itemDefinitions.set(item.itemId, item);
+        });
+      }
     }
   }
 

@@ -1,0 +1,107 @@
+{
+  "oak_log": {
+    "itemId": "oak_log",
+    "name": "Oak Log",
+    "description": "A sturdy oak log, useful for construction and crafting",
+    "category": "resource",
+    "subcategories": [
+      "wood",
+      "timber",
+      "building-material"
+    ],
+    "baseValue": 25,
+    "rarity": "common",
+    "stackable": true,
+    "maxStack": 100,
+    "properties": {
+      "weight": 0.5,
+      "material": "wood",
+      "tier": 1,
+      "skillSource": "woodcutting"
+    },
+    "allowedQualities": [
+      "woodGrain",
+      "moisture",
+      "age"
+    ],
+    "allowedTraits": [
+      "fragrant",
+      "weathered",
+      "pristine"
+    ],
+    "icon": {
+      "path": "item-categories/item_cat_log.svg",
+      "material": "oak_log"
+    }
+  },
+  "willow_log": {
+    "itemId": "willow_log",
+    "name": "Willow Log",
+    "description": "A flexible willow log, prized for its magical properties",
+    "category": "resource",
+    "subcategories": [
+      "wood",
+      "timber",
+      "magical"
+    ],
+    "baseValue": 50,
+    "rarity": "uncommon",
+    "stackable": true,
+    "maxStack": 100,
+    "properties": {
+      "weight": 0.5,
+      "material": "wood",
+      "tier": 2,
+      "skillSource": "woodcutting"
+    },
+    "allowedQualities": [
+      "woodGrain",
+      "moisture",
+      "age"
+    ],
+    "allowedTraits": [
+      "fragrant",
+      "weathered",
+      "pristine"
+    ],
+    "icon": {
+      "path": "item-categories/item_cat_log.svg",
+      "material": "willow_log"
+    }
+  },
+  "maple_log": {
+    "itemId": "maple_log",
+    "name": "Maple Log",
+    "description": "A fine maple log with beautiful grain patterns",
+    "category": "resource",
+    "subcategories": [
+      "wood",
+      "timber",
+      "crafting-material"
+    ],
+    "baseValue": 75,
+    "rarity": "uncommon",
+    "stackable": true,
+    "maxStack": 100,
+    "properties": {
+      "weight": 0.5,
+      "material": "wood",
+      "tier": 3,
+      "skillSource": "woodcutting"
+    },
+    "allowedQualities": [
+      "woodGrain",
+      "moisture",
+      "age"
+    ],
+    "allowedTraits": [
+      "fragrant",
+      "weathered",
+      "pristine"
+    ],
+    "icon": {
+      "path": "item-categories/item_cat_log.svg",
+      "material": "maple_log"
+    }
+  }
+}

@@ -1,0 +1,370 @@
+{
+  "quartz": {
+    "itemId": "quartz",
+    "name": "Quartz",
+    "description": "A clear crystalline stone, common but valued for its clarity and magical resonance",
+    "category": "resource",
+    "subcategories": [
+      "gemstone",
+      "crystal",
+      "jewelry",
+      "enchanting"
+    ],
+    "baseValue": 15,
+    "rarity": "common",
+    "stackable": true,
+    "maxStack": 100,
+    "properties": {
+      "weight": 0.2,
+      "material": "gemstone",
+      "tier": 1,
+      "skillSource": "mining"
+    },
+    "allowedQualities": [
+      "sheen"
+    ],
+    "allowedTraits": [
+      "pristine"
+    ],
+    "icon": {
+      "path": "item-categories/item_cat_jewel.svg",
+      "material": "quartz"
+    }
+  },
+  "citrine": {
+    "itemId": "citrine",
+    "name": "Citrine",
+    "description": "A golden-yellow quartz variety that gleams like captured sunlight, warm to the touch",
+    "category": "resource",
+    "subcategories": [
+      "gemstone",
+      "crystal",
+      "jewelry",
+      "enchanting"
+    ],
+    "baseValue": 25,
+    "rarity": "common",
+    "stackable": true,
+    "maxStack": 100,
+    "properties": {
+      "weight": 0.2,
+      "material": "gemstone",
+      "tier": 1,
+      "skillSource": "mining"
+    },
+    "allowedQualities": [
+      "sheen"
+    ],
+    "allowedTraits": [
+      "pristine",
+      "blessed"
+    ],
+    "icon": {
+      "path": "item-categories/item_cat_jewel.svg",
+      "material": "citrine"
+    }
+  },
+  "amethyst": {
+    "itemId": "amethyst",
+    "name": "Amethyst",
+    "description": "A stunning purple quartz prized for its royal color and calming properties",
+    "category": "resource",
+    "subcategories": [
+      "gemstone",
+      "crystal",
+      "jewelry",
+      "enchanting"
+    ],
+    "baseValue": 35,
+    "rarity": "common",
+    "stackable": true,
+    "maxStack": 100,
+    "properties": {
+      "weight": 0.2,
+      "material": "gemstone",
+      "tier": 1,
+      "skillSource": "mining"
+    },
+    "allowedQualities": [
+      "sheen"
+    ],
+    "allowedTraits": [
+      "pristine",
+      "blessed"
+    ],
+    "icon": {
+      "path": "item-categories/item_cat_jewel.svg",
+      "material": "amethyst"
+    }
+  },
+  "garnet": {
+    "itemId": "garnet",
+    "name": "Garnet",
+    "description": "A deep burgundy gemstone with a rich, wine-dark luster favored for protective amulets",
+    "category": "resource",
+    "subcategories": [
+      "gemstone",
+      "semi-precious",
+      "jewelry",
+      "enchanting"
+    ],
+    "baseValue": 50,
+    "rarity": "uncommon",
+    "stackable": true,
+    "maxStack": 100,
+    "properties": {
+      "weight": 0.2,
+      "material": "gemstone",
+      "tier": 2,
+      "skillSource": "mining"
+    },
+    "allowedQualities": [
+      "sheen"
+    ],
+    "allowedTraits": [
+      "pristine",
+      "blessed"
+    ],
+    "icon": {
+      "path": "item-categories/item_cat_jewel.svg",
+      "material": "garnet"
+    }
+  },
+  "turquoise": {
+    "itemId": "turquoise",
+    "name": "Turquoise",
+    "description": "An opaque blue-green stone with distinctive veining, sacred to many ancient cultures",
+    "category": "resource",
+    "subcategories": [
+      "gemstone",
+      "semi-precious",
+      "jewelry",
+      "enchanting"
+    ],
+    "baseValue": 60,
+    "rarity": "uncommon",
+    "stackable": true,
+    "maxStack": 100,
+    "properties": {
+      "weight": 0.2,
+      "material": "gemstone",
+      "tier": 2,
+      "skillSource": "mining"
+    },
+    "allowedQualities": [
+      "sheen"
+    ],
+    "allowedTraits": [
+      "pristine",
+      "blessed"
+    ],
+    "icon": {
+      "path": "item-categories/item_cat_jewel.svg",
+      "material": "turquoise"
+    }
+  },
+  "topaz": {
+    "itemId": "topaz",
+    "name": "Topaz",
+    "description": "A brilliant golden gemstone that catches firelight beautifully, highly sought after by jewelers",
+    "category": "resource",
+    "subcategories": [
+      "gemstone",
+      "semi-precious",
+      "jewelry",
+      "enchanting"
+    ],
+    "baseValue": 100,
+    "rarity": "uncommon",
+    "stackable": true,
+    "maxStack": 100,
+    "properties": {
+      "weight": 0.2,
+      "material": "gemstone",
+      "tier": 2,
+      "skillSource": "mining"
+    },
+    "allowedQualities": [
+      "sheen"
+    ],
+    "allowedTraits": [
+      "pristine",
+      "blessed",
+      "masterwork"
+    ],
+    "icon": {
+      "path": "item-categories/item_cat_jewel.svg",
+      "material": "topaz"
+    }
+  },
+  "aquamarine": {
+    "itemId": "aquamarine",
+    "name": "Aquamarine",
+    "description": "A pale cyan gemstone reminiscent of clear ocean waters, said to protect sailors at sea",
+    "category": "resource",
+    "subcategories": [
+      "gemstone",
+      "semi-precious",
+      "jewelry",
+      "enchanting"
+    ],
+    "baseValue": 120,
+    "rarity": "uncommon",
+    "stackable": true,
+    "maxStack": 100,
+    "properties": {
+      "weight": 0.2,
+      "material": "gemstone",
+      "tier": 3,
+      "skillSource": "mining"
+    },
+    "allowedQualities": [
+      "sheen"
+    ],
+    "allowedTraits": [
+      "pristine",
+      "blessed",
+      "masterwork"
+    ],
+    "icon": {
+      "path": "item-categories/item_cat_jewel.svg",
+      "material": "aquamarine"
+    }
+  },
+  "jade": {
+    "itemId": "jade",
+    "name": "Jade",
+    "description": "A smooth green stone prized for its toughness and spiritual significance across many cultures",
+    "category": "resource",
+    "subcategories": [
+      "gemstone",
+      "semi-precious",
+      "jewelry",
+      "enchanting"
+    ],
+    "baseValue": 140,
+    "rarity": "uncommon",
+    "stackable": true,
+    "maxStack": 100,
+    "properties": {
+      "weight": 0.2,
+      "material": "gemstone",
+      "tier": 3,
+      "skillSource": "mining"
+    },
+    "allowedQualities": [
+      "sheen"
+    ],
+    "allowedTraits": [
+      "pristine",
+      "blessed",
+      "masterwork"
+    ],
+    "icon": {
+      "path": "item-categories/item_cat_jewel.svg",
+      "material": "jade"
+    }
+  },
+  "ruby": {
+    "itemId": "ruby",
+    "name": "Ruby",
+    "description": "A brilliant crimson gemstone that seems to hold an inner fire, prized by jewelers and enchanters alike",
+    "category": "resource",
+    "subcategories": [
+      "gemstone",
+      "precious",
+      "jewelry",
+      "enchanting"
+    ],
+    "baseValue": 250,
+    "rarity": "rare",
+    "stackable": true,
+    "maxStack": 100,
+    "properties": {
+      "weight": 0.2,
+      "material": "gemstone",
+      "tier": 3,
+      "skillSource": "mining"
+    },
+    "allowedQualities": [
+      "sheen"
+    ],
+    "allowedTraits": [
+      "pristine",
+      "blessed",
+      "masterwork"
+    ],
+    "icon": {
+      "path": "item-categories/item_cat_jewel.svg",
+      "material": "ruby"
+    }
+  },
+  "sapphire": {
+    "itemId": "sapphire",
+    "name": "Sapphire",
+    "description": "A deep blue gemstone of royal quality, its crystalline structure catches the light in mesmerizing ways",
+    "category": "resource",
+    "subcategories": [
+      "gemstone",
+      "precious",
+      "jewelry",
+      "enchanting"
+    ],
+    "baseValue": 280,
+    "rarity": "rare",
+    "stackable": true,
+    "maxStack": 100,
+    "properties": {
+      "weight": 0.2,
+      "material": "gemstone",
+      "tier": 3,
+      "skillSource": "mining"
+    },
+    "allowedQualities": [
+      "sheen"
+    ],
+    "allowedTraits": [
+      "pristine",
+      "blessed",
+      "masterwork"
+    ],
+    "icon": {
+      "path": "item-categories/item_cat_jewel.svg",
+      "material": "sapphire"
+    }
+  },
+  "emerald": {
+    "itemId": "emerald",
+    "name": "Emerald",
+    "description": "A lustrous green gemstone of exceptional clarity, said to enhance magical abilities and bring good fortune",
+    "category": "resource",
+    "subcategories": [
+      "gemstone",
+      "precious",
+      "jewelry",
+      "enchanting"
+    ],
+    "baseValue": 300,
+    "rarity": "rare",
+    "stackable": true,
+    "maxStack": 100,
+    "properties": {
+      "weight": 0.2,
+      "material": "gemstone",
+      "tier": 4,
+      "skillSource": "mining"
+    },
+    "allowedQualities": [
+      "sheen"
+    ],
+    "allowedTraits": [
+      "pristine",
+      "blessed",
+      "masterwork"
+    ],
+    "icon": {
+      "path": "item-categories/item_cat_jewel.svg",
+      "material": "emerald"
+    }
+  }
+}

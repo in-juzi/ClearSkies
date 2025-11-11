@@ -1,0 +1,133 @@
+{
+  "tin_ore": {
+    "itemId": "tin_ore",
+    "name": "Tin Ore",
+    "description": "Raw tin ore, lightweight and essential for bronze alloys",
+    "category": "resource",
+    "subcategories": [
+      "ore",
+      "mineral",
+      "metal"
+    ],
+    "baseValue": 25,
+    "rarity": "common",
+    "stackable": true,
+    "maxStack": 100,
+    "properties": {
+      "weight": 4,
+      "material": "ore",
+      "tier": 1,
+      "skillSource": "mining"
+    },
+    "allowedQualities": [
+      "purity",
+      "sheen"
+    ],
+    "allowedTraits": [
+      "pristine"
+    ],
+    "icon": {
+      "path": "item-categories/item_cat_ore.svg",
+      "material": "tin_ore"
+    }
+  },
+  "copper_ore": {
+    "itemId": "copper_ore",
+    "name": "Copper Ore",
+    "description": "Raw copper ore, ready to be smelted",
+    "category": "resource",
+    "subcategories": [
+      "ore",
+      "mineral",
+      "metal"
+    ],
+    "baseValue": 30,
+    "rarity": "common",
+    "stackable": true,
+    "maxStack": 100,
+    "properties": {
+      "weight": 5,
+      "material": "ore",
+      "tier": 1,
+      "skillSource": "mining"
+    },
+    "allowedQualities": [
+      "purity",
+      "sheen"
+    ],
+    "allowedTraits": [
+      "pristine"
+    ],
+    "icon": {
+      "path": "item-categories/item_cat_ore.svg",
+      "material": "copper_ore"
+    }
+  },
+  "iron_ore": {
+    "itemId": "iron_ore",
+    "name": "Iron Ore",
+    "description": "Raw iron ore, the backbone of any smithy",
+    "category": "resource",
+    "subcategories": [
+      "ore",
+      "mineral",
+      "metal"
+    ],
+    "baseValue": 60,
+    "rarity": "common",
+    "stackable": true,
+    "maxStack": 100,
+    "properties": {
+      "weight": 6,
+      "material": "ore",
+      "tier": 2,
+      "skillSource": "mining"
+    },
+    "allowedQualities": [
+      "purity",
+      "sheen"
+    ],
+    "allowedTraits": [
+      "pristine",
+      "cursed"
+    ],
+    "icon": {
+      "path": "item-categories/item_cat_ore.svg",
+      "material": "iron_ore"
+    }
+  },
+  "silver_ore": {
+    "itemId": "silver_ore",
+    "name": "Silver Ore",
+    "description": "Precious silver ore with a lustrous shine",
+    "category": "resource",
+    "subcategories": [
+      "ore",
+      "mineral",
+      "metal",
+      "precious"
+    ],
+    "baseValue": 120,
+    "rarity": "uncommon",
+    "stackable": true,
+    "maxStack": 100,
+    "properties": {
+      "weight": 5.5,
+      "material": "ore",
+      "tier": 3,
+      "skillSource": "mining"
+    },
+    "allowedQualities": [
+      "purity",
+      "sheen"
+    ],
+    "allowedTraits": [
+      "pristine",
+      "blessed"
+    ],
+    "icon": {
+      "path": "item-categories/item_cat_ore.svg",
+      "material": "silver_ore"
+    }
+  }
+}

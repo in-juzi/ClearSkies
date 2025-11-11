@@ -1,233 +1,4 @@
 {
-  "copper_sword": {
-    "itemId": "copper_sword",
-    "name": "Copper Sword",
-    "description": "A basic sword made of copper",
-    "category": "equipment",
-    "subcategories": [
-      "weapon",
-      "sword",
-      "melee",
-      "one-handed"
-    ],
-    "subtype": "sword",
-    "slot": "mainHand",
-    "baseValue": 100,
-    "rarity": "common",
-    "stackable": false,
-    "maxStack": 1,
-    "icon": {
-      "path": "item-categories/item_cat_sword.svg",
-      "material": "copper"
-    },
-    "properties": {
-      "weight": 4,
-      "material": "copper",
-      "tier": 1,
-      "damage": 5,
-      "durability": 100,
-      "requiredLevel": 1
-    },
-    "allowedQualities": [
-      "purity"
-    ],
-    "allowedTraits": [
-      "knotted",
-      "pristine",
-      "cursed",
-      "blessed",
-      "masterwork"
-    ]
-  },
-  "iron_sword": {
-    "itemId": "iron_sword",
-    "name": "Iron Sword",
-    "description": "A reliable iron sword",
-    "category": "equipment",
-    "subcategories": [
-      "weapon",
-      "sword",
-      "melee",
-      "one-handed"
-    ],
-    "subtype": "sword",
-    "slot": "mainHand",
-    "baseValue": 250,
-    "rarity": "common",
-    "stackable": false,
-    "maxStack": 1,
-    "icon": {
-      "path": "item-categories/item_cat_sword.svg",
-      "material": "iron"
-    },
-    "properties": {
-      "weight": 5,
-      "material": "iron",
-      "tier": 2,
-      "damage": 10,
-      "durability": 150,
-      "requiredLevel": 5
-    },
-    "allowedQualities": [
-      "purity"
-    ],
-    "allowedTraits": [
-      "pristine",
-      "cursed",
-      "blessed",
-      "masterwork"
-    ]
-  },
-  "wooden_shield": {
-    "itemId": "wooden_shield",
-    "name": "Wooden Shield",
-    "description": "A simple wooden shield for basic protection",
-    "category": "equipment",
-    "subcategories": [
-      "armor",
-      "shield",
-      "defensive"
-    ],
-    "subtype": "shield",
-    "slot": "offHand",
-    "baseValue": 50,
-    "rarity": "common",
-    "stackable": false,
-    "maxStack": 1,
-    "icon": {
-      "path": "item-categories/item_cat_body.svg",
-      "material": "oak"
-    },
-    "properties": {
-      "weight": 3,
-      "material": "wood",
-      "tier": 1,
-      "defense": 3,
-      "durability": 80,
-      "requiredLevel": 1
-    },
-    "allowedQualities": [
-      "woodGrain"
-    ],
-    "allowedTraits": [
-      "weathered",
-      "pristine",
-      "blessed",
-      "masterwork"
-    ]
-  },
-  "iron_helm": {
-    "itemId": "iron_helm",
-    "name": "Iron Helm",
-    "description": "A sturdy iron helmet",
-    "category": "equipment",
-    "subcategories": [
-      "armor",
-      "headgear",
-      "heavy-armor",
-      "metal"
-    ],
-    "subtype": "helm",
-    "slot": "head",
-    "baseValue": 150,
-    "rarity": "common",
-    "stackable": false,
-    "maxStack": 1,
-    "icon": {
-      "path": "item-categories/item_cat_body.svg",
-      "material": "iron"
-    },
-    "properties": {
-      "weight": 6,
-      "material": "iron",
-      "tier": 2,
-      "defense": 5,
-      "durability": 120,
-      "requiredLevel": 3
-    },
-    "allowedQualities": [
-      "purity"
-    ],
-    "allowedTraits": [
-      "pristine",
-      "cursed",
-      "blessed",
-      "masterwork"
-    ]
-  },
-  "hemp_coif": {
-    "itemId": "hemp_coif",
-    "name": "Hemp Coif",
-    "description": "A simple cloth head covering made from hemp",
-    "category": "equipment",
-    "subcategories": [
-      "armor",
-      "headgear",
-      "light-armor",
-      "cloth"
-    ],
-    "subtype": "coif",
-    "slot": "head",
-    "baseValue": 20,
-    "rarity": "common",
-    "stackable": false,
-    "maxStack": 1,
-    "icon": {
-      "path": "item-categories/item_cat_body.svg",
-      "material": "hemp"
-    },
-    "properties": {
-      "weight": 1,
-      "material": "cloth",
-      "tier": 1,
-      "defense": 1,
-      "durability": 50,
-      "requiredLevel": 1
-    },
-    "allowedQualities": [],
-    "allowedTraits": [
-      "weathered",
-      "pristine",
-      "blessed"
-    ]
-  },
-  "leather_tunic": {
-    "itemId": "leather_tunic",
-    "name": "Leather Tunic",
-    "description": "A basic leather chest piece",
-    "category": "equipment",
-    "subcategories": [
-      "armor",
-      "body-armor",
-      "medium-armor",
-      "leather"
-    ],
-    "subtype": "tunic",
-    "slot": "body",
-    "baseValue": 75,
-    "rarity": "common",
-    "stackable": false,
-    "maxStack": 1,
-    "icon": {
-      "path": "item-categories/item_cat_body.svg",
-      "material": "leather"
-    },
-    "properties": {
-      "weight": 5,
-      "material": "leather",
-      "tier": 1,
-      "defense": 3,
-      "durability": 90,
-      "requiredLevel": 1
-    },
-    "allowedQualities": [],
-    "allowedTraits": [
-      "weathered",
-      "pristine",
-      "blessed",
-      "masterwork"
-    ]
-  },
   "bronze_woodcutting_axe": {
     "itemId": "bronze_woodcutting_axe",
     "name": "Bronze Woodcutting Axe",
@@ -247,7 +18,7 @@
     "maxStack": 1,
     "icon": {
       "path": "item-categories/item_cat_axe.svg",
-      "material": "bronze"
+      "material": "bronze_woodcutting_axe"
     },
     "properties": {
       "weight": 4,
@@ -258,9 +29,7 @@
       "durability": 100,
       "requiredLevel": 1
     },
-    "allowedQualities": [
-      "purity"
-    ],
+    "allowedQualities": [],
     "allowedTraits": [
       "pristine",
       "blessed",
@@ -286,7 +55,7 @@
     "maxStack": 1,
     "icon": {
       "path": "item-categories/item_cat_axe.svg",
-      "material": "iron"
+      "material": "iron_woodcutting_axe"
     },
     "properties": {
       "weight": 5,
@@ -297,9 +66,7 @@
       "durability": 150,
       "requiredLevel": 5
     },
-    "allowedQualities": [
-      "purity"
-    ],
+    "allowedQualities": [],
     "allowedTraits": [
       "pristine",
       "blessed",
@@ -324,8 +91,8 @@
     "stackable": false,
     "maxStack": 1,
     "icon": {
-      "path": "item-categories/item_cat_tool.svg",
-      "material": "bronze"
+      "path": "items/pickaxe.svg",
+      "material": "bronze_mining_pickaxe"
     },
     "properties": {
       "weight": 5,
@@ -336,9 +103,7 @@
       "durability": 100,
       "requiredLevel": 1
     },
-    "allowedQualities": [
-      "purity"
-    ],
+    "allowedQualities": [],
     "allowedTraits": [
       "pristine",
       "blessed",
@@ -363,8 +128,8 @@
     "stackable": false,
     "maxStack": 1,
     "icon": {
-      "path": "item-categories/item_cat_tool.svg",
-      "material": "iron"
+      "path": "items/pickaxe.svg",
+      "material": "iron_mining_pickaxe"
     },
     "properties": {
       "weight": 6,
@@ -375,9 +140,7 @@
       "durability": 150,
       "requiredLevel": 5
     },
-    "allowedQualities": [
-      "purity"
-    ],
+    "allowedQualities": [],
     "allowedTraits": [
       "pristine",
       "blessed",
@@ -414,9 +177,7 @@
       "durability": 120,
       "requiredLevel": 8
     },
-    "allowedQualities": [
-      "purity"
-    ],
+    "allowedQualities": [],
     "allowedTraits": [
       "pristine",
       "blessed",
@@ -441,8 +202,8 @@
     "stackable": false,
     "maxStack": 1,
     "icon": {
-      "path": "item-categories/item_cat_tool.svg",
-      "material": "bamboo"
+      "path": "items/fishing-pole.svg",
+      "material": "bamboo_fishing_rod"
     },
     "properties": {
       "weight": 2,
@@ -479,8 +240,8 @@
     "stackable": false,
     "maxStack": 1,
     "icon": {
-      "path": "item-categories/item_cat_tool.svg",
-      "material": "willow"
+      "path": "items/fishing-pole.svg",
+      "material": "willow_fishing_rod"
     },
     "properties": {
       "weight": 2,
