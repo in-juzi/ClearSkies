@@ -33,9 +33,6 @@
             }
             <div class="item-info">
               <div class="item-name">{{ item.definition.name }}</div>
-              @if (item.definition.properties['damage']) {
-                <div class="item-stat">⚔️ {{ item.definition.properties['damage'] }}</div>
-              }
               @if (item.definition.properties['defense']) {
                 <div class="item-stat">🛡️ {{ item.definition.properties['defense'] }}</div>
               }

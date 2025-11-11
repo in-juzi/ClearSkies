@@ -115,6 +115,37 @@
         </div>
       </div>
 
+      <!-- Weapon Stats -->
+      <div class="detail-section" *ngIf="selectedItem.definition.category === 'equipment' && selectedItem.definition.subcategories?.includes('weapon')">
+        <h4 class="section-title">Weapon Stats</h4>
+        <div class="weapon-stats-grid">
+          <div class="detail-row" *ngIf="selectedItem.definition.properties['damageRoll']">
+            <span class="label">Damage Roll:</span>
+            <span class="text-red-400">{{ selectedItem.definition.properties['damageRoll'] }}</span>
+          </div>
+          <div class="detail-row" *ngIf="selectedItem.definition.properties['attackSpeed']">
+            <span class="label">Attack Speed:</span>
+            <span>{{ selectedItem.definition.properties['attackSpeed'].toFixed(1) }}s</span>
+          </div>
+          <div class="detail-row" *ngIf="selectedItem.definition.properties['critChance'] !== undefined">
+            <span class="label">Crit Chance:</span>
+            <span class="text-gold-400">{{ (selectedItem.definition.properties['critChance'] * 100).toFixed(1) }}%</span>
+          </div>
+          <div class="detail-row" *ngIf="selectedItem.definition.properties['skillScalar']">
+            <span class="label">Skill:</span>
+            <span class="text-purple-400">{{ selectedItem.definition.properties['skillScalar'] }}</span>
+          </div>
+          <div class="detail-row" *ngIf="selectedItem.definition.properties['durability'] !== undefined">
+            <span class="label">Durability:</span>
+            <span>{{ selectedItem.definition.properties['durability'] }}</span>
+          </div>
+          <div class="detail-row" *ngIf="selectedItem.definition.properties['requiredLevel'] !== undefined">
+            <span class="label">Required Level:</span>
+            <span class="text-blue-400">{{ selectedItem.definition.properties['requiredLevel'] }}</span>
+          </div>
+        </div>
+      </div>
+
       <!-- Subcategories -->
       <div class="detail-section" *ngIf="selectedItem.definition.subcategories && selectedItem.definition.subcategories.length > 0">
         <h4 class="section-title">Categories</h4>
@@ -224,8 +255,12 @@
       </div>
 
       <div class="detail-actions">
-        <button class="btn-primary" *ngIf="selectedItem.definition.category === 'consumable'">
-          Use
+        <button
+          class="btn-primary"
+          *ngIf="selectedItem.definition.category === 'consumable'"
+          (click)="useItem(selectedItem.instanceId)"
+          [disabled]="isUsingItem">
+          {{ isUsingItem ? 'Using...' : 'Use' }}
         </button>
         <button
           class="btn-primary"

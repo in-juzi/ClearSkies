@@ -8,6 +8,7 @@ export interface User {
 
 export interface Player {
   id: string;
+  characterName?: string;
   level: number;
   experience: number;
   stats: PlayerStats;

@@ -274,4 +274,18 @@ export class InventoryService {
       tap(() => this.getInventory().subscribe())
     );
   }
+
+  /**
+   * Use a consumable item
+   */
+  useItem(instanceId: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/use`, { instanceId }).pipe(
+      tap((response) => {
+        // Refresh inventory to show updated quantities
+        this.getInventory().subscribe();
+        // Refresh player data to update health/mana
+        this.authService.getProfile().subscribe();
+      })
+    );
+  }
 }

@@ -20,6 +20,7 @@ export class InventoryComponent implements OnInit {
   selectedItem: ItemDetails | null = null;
   selectedCategory: string = 'all';
   dropQuantity: number = 1; // Quantity to drop
+  isUsingItem: boolean = false; // Track if item is being used
 
   // Drag state
   private isDragging = false;
@@ -220,6 +221,40 @@ export class InventoryComponent implements OnInit {
       },
       error: (error: any) => {
         console.error('Error unequipping item:', error);
+      }
+    });
+  }
+
+  /**
+   * Use a consumable item
+   */
+  useItem(instanceId: string): void {
+    if (!this.selectedItem || this.isUsingItem) return;
+
+    this.isUsingItem = true;
+
+    this.inventoryService.useItem(instanceId).subscribe({
+      next: (response: any) => {
+        console.log('Item used successfully:', response);
+        this.isUsingItem = false;
+
+        // Close the details panel if item quantity is now 0
+        setTimeout(() => {
+          const updatedItem = this.inventoryService.inventory().find(i => i.instanceId === instanceId);
+          if (!updatedItem) {
+            // Item was completely consumed
+            this.closeItemDetails();
+          } else {
+            // Update selected item with new quantity
+            this.selectedItem = updatedItem;
+          }
+        }, 100);
+      },
+      error: (error: any) => {
+        console.error('Error using item:', error);
+        this.isUsingItem = false;
+        // Optionally show error message to user
+        alert(error.error?.message || 'Failed to use item');
       }
     });
   }
