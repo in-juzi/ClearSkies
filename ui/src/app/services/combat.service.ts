@@ -6,6 +6,7 @@ import { AuthService } from './auth.service';
 import { InventoryService } from './inventory.service';
 
 export interface Combat {
+  activityId?: string | null;
   monsterId: string;
   monsterName: string;
   monsterLevel: number;
@@ -70,6 +71,7 @@ export class CombatService {
   // Signals for reactive state
   activeCombat = signal<Combat | null>(null);
   inCombat = signal<boolean>(false);
+  combatEnded = signal<boolean>(false); // Track if combat just ended (for review)
   lastRewards = signal<CombatRewards | null>(null);
   combatError = signal<string | null>(null);
 
@@ -88,9 +90,9 @@ export class CombatService {
   /**
    * Start combat with a monster
    */
-  startCombat(monsterId: string): Observable<any> {
-    console.log('[CombatService] Starting combat with monster:', monsterId);
-    return this.http.post<any>(`${this.apiUrl}/start`, { monsterId }).pipe(
+  startCombat(monsterId: string, activityId?: string): Observable<any> {
+    console.log('[CombatService] Starting combat with monster:', monsterId, 'activityId:', activityId);
+    return this.http.post<any>(`${this.apiUrl}/start`, { monsterId, activityId }).pipe(
       tap(response => {
         console.log('[CombatService] Combat start response:', response);
         if (response.combat) {
@@ -154,7 +156,7 @@ export class CombatService {
             this.handleCombatEnd(response.rewards);
           } else {
             console.log('[CombatService] No active combat');
-            this.clearCombat();
+            this.stopStatusChecks();
           }
         }
       })
@@ -170,10 +172,13 @@ export class CombatService {
       return false;
     }
 
-    // Check cooldown
-    const cooldownRemaining = combat.abilityCooldowns[ability.abilityId] || 0;
-    if (cooldownRemaining > 0) {
-      return false;
+    // Check cooldown - abilityCooldowns stores the turn when ability becomes available
+    const availableTurn = combat.abilityCooldowns[ability.abilityId];
+    if (availableTurn) {
+      const cooldownRemaining = availableTurn - combat.turnCount;
+      if (cooldownRemaining > 0) {
+        return false;
+      }
     }
 
     return true;
@@ -237,12 +242,105 @@ export class CombatService {
    * Handle combat end and rewards
    */
   private handleCombatEnd(rewards: CombatRewards): void {
-    this.lastRewards.set(rewards);
-    this.clearCombat();
+    console.log('[CombatService] Handling combat end with rewards:', rewards);
+    // Stop status checks immediately to prevent clearing combat state
+    this.stopStatusChecks();
+
+    // Add rewards to combat log instead of showing modal
+    const combat = this.activeCombat();
+    if (combat) {
+      // Set monster health to 0 to visually show defeat
+      if (rewards.victory) {
+        combat.monsterHealth.current = 0;
+      }
+
+      const rewardMessages = this.formatRewardsForLog(rewards);
+      rewardMessages.forEach(msg => {
+        combat.combatLog.push({
+          timestamp: new Date(),
+          message: msg.message,
+          type: msg.type as any
+        });
+      });
+      // Update combat state with new log entries
+      this.activeCombat.set({ ...combat });
+    }
+
+    this.inCombat.set(false);
+    this.combatEnded.set(true); // Mark combat as ended but keep state for review
 
     // Refresh player data to show new items/gold/XP
     this.authService.getProfile().subscribe();
     this.inventoryService.getInventory().subscribe();
+  }
+
+  /**
+   * Format rewards into combat log messages
+   */
+  private formatRewardsForLog(rewards: CombatRewards): Array<{ message: string; type: string }> {
+    const messages: Array<{ message: string; type: string }> = [];
+
+    if (rewards.victory) {
+      messages.push({ message: '🎉 Victory! You defeated the monster!', type: 'system' });
+
+      if (rewards.gold) {
+        messages.push({ message: `💰 Received ${rewards.gold} gold`, type: 'system' });
+      }
+
+      if (rewards.experience) {
+        messages.push({ message: `⭐ Gained ${rewards.experience} XP`, type: 'system' });
+      }
+
+      if (rewards.skillResult?.skill?.leveledUp) {
+        messages.push({
+          message: `🎊 Level Up! ${rewards.skillResult.skill.skill} → Level ${rewards.skillResult.skill.newLevel}`,
+          type: 'system'
+        });
+      }
+
+      if (rewards.items && rewards.items.length > 0) {
+        rewards.items.forEach(item => {
+          messages.push({
+            message: `📦 Looted: ${item.itemId} x${item.quantity}`,
+            type: 'system'
+          });
+        });
+      }
+    } else {
+      messages.push({ message: '💀 You have been defeated!', type: 'system' });
+      if (rewards.goldLost) {
+        messages.push({ message: `💸 Lost ${rewards.goldLost} gold`, type: 'system' });
+      }
+    }
+
+    return messages;
+  }
+
+  /**
+   * Dismiss combat review and clear all combat state
+   */
+  dismissCombat(): void {
+    this.clearCombat();
+    this.combatEnded.set(false);
+    this.lastRewards.set(null);
+  }
+
+  /**
+   * Restart combat with the same activity
+   */
+  restartCombat(): Observable<any> {
+    console.log('[CombatService] Restarting combat');
+    return this.http.post<any>(`${this.apiUrl}/restart`, {}).pipe(
+      tap(response => {
+        console.log('[CombatService] Combat restart response:', response);
+        if (response.combat) {
+          this.setCombatState(response.combat);
+          this.combatEnded.set(false);
+          this.lastRewards.set(null);
+          this.combatError.set(null);
+        }
+      })
+    );
   }
 
   /**
@@ -270,6 +368,7 @@ export class CombatService {
    * Stop periodic status checks
    */
   private stopStatusChecks(): void {
+    console.log('[CombatService] Stopping status checks');
     if (this.statusCheckInterval) {
       clearInterval(this.statusCheckInterval);
       this.statusCheckInterval = null;

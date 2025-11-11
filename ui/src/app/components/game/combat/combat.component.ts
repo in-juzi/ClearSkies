@@ -1,25 +1,31 @@
-import { Component, OnInit, OnDestroy, computed, signal, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewChecked, computed, signal, inject, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CombatService, Combat, Ability, CombatLogEntry } from '../../../services/combat.service';
 import { AuthService } from '../../../services/auth.service';
 import { ConfirmDialogService } from '../../../services/confirm-dialog.service';
+import { InventoryService } from '../../../services/inventory.service';
+import { AbilityButtonComponent } from '../../shared/ability-button/ability-button.component';
+import { ItemButtonComponent } from '../../shared/item-button/item-button.component';
 
 @Component({
   selector: 'app-combat',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, AbilityButtonComponent, ItemButtonComponent],
   templateUrl: './combat.component.html',
   styleUrls: ['./combat.component.scss']
 })
-export class CombatComponent implements OnInit, OnDestroy {
+export class CombatComponent implements OnInit, OnDestroy, AfterViewChecked {
   private combatService = inject(CombatService);
   private authService = inject(AuthService);
   private confirmDialog = inject(ConfirmDialogService);
+  inventoryService = inject(InventoryService);
+
+  @ViewChild('combatLogContent') private combatLogContent?: ElementRef;
 
   // Combat state
   activeCombat = this.combatService.activeCombat;
   inCombat = this.combatService.inCombat;
-  lastRewards = this.combatService.lastRewards;
+  combatEnded = this.combatService.combatEnded;
 
   // Player state
   player = this.authService.currentPlayer;
@@ -27,6 +33,19 @@ export class CombatComponent implements OnInit, OnDestroy {
   // UI state
   isExecutingAction = signal<boolean>(false);
   selectedAbility = signal<Ability | null>(null);
+  isUsingItem = signal<boolean>(false);
+
+  // Track combat log length to detect new entries
+  private previousLogLength = 0;
+  private shouldAutoScroll = true;
+
+  // Filtered consumables for combat
+  consumables = computed(() => {
+    return this.inventoryService.inventory().filter(item =>
+      item.definition.category === 'consumable' &&
+      (item.definition.properties?.['healthRestore'] > 0 || item.definition.properties?.['manaRestore'] > 0)
+    );
+  });
 
   // Computed values
   playerHpPercent = computed(() => {
@@ -87,12 +106,61 @@ export class CombatComponent implements OnInit, OnDestroy {
     this.startTimerUpdates();
     // Check combat status on component init
     this.combatService.getCombatStatus().subscribe();
+    // Load inventory for consumables
+    this.inventoryService.getInventory().subscribe();
   }
 
   ngOnDestroy(): void {
     // Stop timer updates
     if (this.timerInterval) {
       clearInterval(this.timerInterval);
+    }
+  }
+
+  ngAfterViewChecked(): void {
+    // Check if new log entries were added
+    const combat = this.activeCombat();
+    const currentLogLength = combat?.combatLog?.length || 0;
+
+    if (currentLogLength > this.previousLogLength) {
+      // New entry added - scroll to bottom only if user is near bottom
+      if (this.shouldAutoScroll) {
+        this.scrollToBottom();
+      }
+      this.previousLogLength = currentLogLength;
+    }
+
+    // Detect if user has scrolled up manually
+    this.detectUserScroll();
+  }
+
+  /**
+   * Scroll combat log to bottom
+   */
+  private scrollToBottom(): void {
+    try {
+      if (this.combatLogContent) {
+        const element = this.combatLogContent.nativeElement;
+        element.scrollTop = element.scrollHeight;
+      }
+    } catch (err) {
+      // Ignore errors during scroll
+    }
+  }
+
+  /**
+   * Detect if user has manually scrolled up
+   */
+  private detectUserScroll(): void {
+    try {
+      if (this.combatLogContent) {
+        const element = this.combatLogContent.nativeElement;
+        const threshold = 50; // pixels from bottom
+        const isNearBottom = element.scrollHeight - element.scrollTop - element.clientHeight < threshold;
+        this.shouldAutoScroll = isNearBottom;
+      }
+    } catch (err) {
+      // Ignore errors during scroll detection
     }
   }
 
@@ -136,42 +204,34 @@ export class CombatComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Execute normal attack
-   */
-  attack(): void {
-    if (this.isExecutingAction()) return;
-
-    this.isExecutingAction.set(true);
-    this.combatService.executeAction('attack').subscribe({
-      next: () => {
-        this.isExecutingAction.set(false);
-      },
-      error: (err) => {
-        console.error('Attack failed:', err);
-        this.isExecutingAction.set(false);
-      }
-    });
-  }
-
-  /**
    * Use an ability
    */
-  useAbility(ability: Ability): void {
+  useAbility(ability: Ability | { abilityId: string; name: string }): void {
     if (this.isExecutingAction()) return;
 
     const combat = this.activeCombat();
     if (!combat) return;
 
+    // Find the full ability object if needed
+    const fullAbility = 'powerMultiplier' in ability
+      ? ability
+      : combat.availableAbilities.find(a => a.abilityId === ability.abilityId);
+
+    if (!fullAbility) {
+      console.warn('Ability not found:', ability.name);
+      return;
+    }
+
     // Check if ability can be used
-    if (!this.combatService.canUseAbility(ability, combat)) {
-      console.warn('Cannot use ability:', ability.name);
+    if (!this.combatService.canUseAbility(fullAbility, combat)) {
+      console.warn('Cannot use ability:', fullAbility.name);
       return;
     }
 
     this.isExecutingAction.set(true);
-    this.selectedAbility.set(ability);
+    this.selectedAbility.set(fullAbility);
 
-    this.combatService.executeAction('ability', ability.abilityId).subscribe({
+    this.combatService.executeAction('ability', fullAbility.abilityId).subscribe({
       next: () => {
         this.isExecutingAction.set(false);
         this.selectedAbility.set(null);
@@ -180,35 +240,6 @@ export class CombatComponent implements OnInit, OnDestroy {
         console.error('Ability failed:', err);
         this.isExecutingAction.set(false);
         this.selectedAbility.set(null);
-      }
-    });
-  }
-
-  /**
-   * Flee from combat
-   */
-  async flee(): Promise<void> {
-    if (this.isExecutingAction()) return;
-
-    const confirmed = await this.confirmDialog.confirm({
-      title: 'Flee from Combat',
-      message: 'Are you sure you want to flee? You will not receive any rewards.',
-      confirmLabel: 'Yes, Flee',
-      cancelLabel: 'No, Continue Fighting'
-    });
-
-    if (!confirmed) {
-      return;
-    }
-
-    this.isExecutingAction.set(true);
-    this.combatService.flee().subscribe({
-      next: () => {
-        this.isExecutingAction.set(false);
-      },
-      error: (err) => {
-        console.error('Flee failed:', err);
-        this.isExecutingAction.set(false);
       }
     });
   }
@@ -253,10 +284,48 @@ export class CombatComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Dismiss rewards modal
+   * Start a new encounter (restart with same activity)
    */
-  dismissRewards(): void {
-    this.lastRewards.set(null);
+  startNewEncounter(): void {
+    if (this.isExecutingAction()) return;
+
+    this.isExecutingAction.set(true);
+    this.combatService.restartCombat().subscribe({
+      next: () => {
+        this.isExecutingAction.set(false);
+      },
+      error: (err) => {
+        console.error('Restart combat failed:', err);
+        this.isExecutingAction.set(false);
+        // Fallback to dismissing combat if restart fails
+        this.combatService.dismissCombat();
+      }
+    });
+  }
+
+  /**
+   * Use a consumable item during combat
+   */
+  useConsumable(item: any): void {
+    if (this.isUsingItem() || this.isExecutingAction()) return;
+
+    this.isUsingItem.set(true);
+
+    this.inventoryService.useItem(item.instanceId).subscribe({
+      next: (response: any) => {
+        console.log('Item used in combat:', response);
+        this.isUsingItem.set(false);
+
+        // Update combat state if response includes it
+        if (response.combat) {
+          this.combatService.activeCombat.set(response.combat);
+        }
+      },
+      error: (error: any) => {
+        console.error('Error using item in combat:', error);
+        this.isUsingItem.set(false);
+      }
+    });
   }
 
   /**
