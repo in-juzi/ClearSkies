@@ -3,7 +3,7 @@
   "name": "Mine Iron Ore",
   "description": "Extract iron ore from the mountain veins",
   "type": "resource-gathering",
-  "duration": 50,
+  "duration": 10,
   "requirements": {
     "skills": {
       "mining": 5
