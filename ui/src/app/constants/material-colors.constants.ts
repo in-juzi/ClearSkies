@@ -46,6 +46,10 @@ export interface ColorChannels {
   facet?: string;       // Gemstone facet planes
   highlight?: string;   // Bright reflections
   shadow?: string;      // Darker shaded areas
+  // Specific parts for meat
+  chunk?: string;       // Separate meat chunks
+  marbling?: string;    // Fat marbling/veining
+  bone?: string;        // Bone sections
 }
 
 /**
@@ -327,6 +331,17 @@ export const MATERIAL_COLORS: Record<string, ColorChannels> = {
     blade: '#F0E8E0',     // Almost white body
     edge: '#F8F0E8',      // Pure white edge
     detail: '#E0D8D0'     // Off-white detail
+  },
+
+  // Meat - Raw (reddish-pink tones, fresh uncooked meat)
+  raw_meat: {
+    primary: '#C85A54',   // Deep reddish-pink (main meat body)
+    body: '#C85A54',      // Main meat color (muscle tissue)
+    chunk: '#B34A45',     // Slightly darker red (separate chunks)
+    marbling: '#F0E6E0',  // Creamy white (fat marbling)
+    edge: '#D66A64',      // Lighter red-pink (highlights/edges)
+    detail: '#A03E38',    // Dark red (shadows/blood)
+    bone: '#FFFFFF'       // White (bone sections)
   },
 
   // Fish - Cooked (opaque, warm browns/oranges)
