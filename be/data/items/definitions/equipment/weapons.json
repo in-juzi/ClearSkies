@@ -24,6 +24,10 @@
       "material": "copper",
       "tier": 1,
       "damage": 5,
+      "damageRoll": "1d3",
+      "attackSpeed": 2.4,
+      "critChance": 0.05,
+      "skillScalar": "oneHanded",
       "durability": 100,
       "requiredLevel": 1
     },
@@ -61,6 +65,10 @@
       "material": "iron",
       "tier": 2,
       "damage": 10,
+      "damageRoll": "1d5",
+      "attackSpeed": 2.6,
+      "critChance": 0.06,
+      "skillScalar": "oneHanded",
       "durability": 150,
       "requiredLevel": 5
     },

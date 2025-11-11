@@ -1,0 +1,10 @@
+{
+  "activityId": "activity-combat-bandit",
+  "type": "combat",
+  "name": "Fight Bandit Thug",
+  "description": "Challenge a dangerous bandit thug who preys on travelers along the road. These brigands show no mercy.",
+  "requirements": {},
+  "combatConfig": {
+    "monsterId": "bandit_thug"
+  }
+}

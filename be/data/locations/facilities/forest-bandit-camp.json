@@ -5,6 +5,7 @@
   "type": "combat",
   "icon": "combat",
   "activities": [
-    "activity-combat-bandits"
+    "activity-combat-forest-wolf",
+    "activity-combat-bandit"
   ]
 }
