@@ -19,18 +19,19 @@
 - ✅ Item system reorganization (completed - category subdirectories for scalability)
 - ✅ 5-level quality system with 3-level trait system (completed - quality expanded to 5 levels)
 - ✅ Smithing foundation (completed - ore smelting, ingot crafting, Village Forge)
+- ✅ TypeScript data layer migration (completed - all game data migrated from JSON to TypeScript registries)
 
 **Recent Changes** (Last 10 commits):
-- chore: update IDE settings
-- feat: add item consumption during combat backend support
-- feat: add health/mana display and UI improvements
-- feat: update item and ability definitions with icons and properties
-- feat: add combat item icons and materials
-- feat: add flee/return button to location component
-- feat: enhance combat UI with consumables, improved controls, and auto-scroll
-- feat: add combat restart functionality and activity tracking
-- feat: add shared item-button component for consumables
-- feat: add shared ability-button component for combat
+- docs: document TypeScript data layer migration
+- build: add TypeScript data layer compilation support
+- refactor: extend TypeScript type system for data layer
+- refactor: update services to use TypeScript registries
+- refactor: migrate recipe and vendor definitions to TypeScript
+- refactor: migrate monster and ability definitions to TypeScript
+- refactor: migrate activity and drop table definitions to TypeScript
+- refactor: migrate location, biome, and facility definitions to TypeScript
+- refactor: migrate quality and trait definitions to TypeScript
+- refactor: migrate item definitions from JSON to TypeScript
 
 **Known Issues**:
 - None currently identified
@@ -56,11 +57,11 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 
 **Add items to player:** `cd be && node utils/add-item.js` (edit itemId on line 28)
 **Create content:** Use Content Generator agent - describe what you want in natural language
-**Add recipe:** Template in Common Code Patterns → `be/data/recipes/{skill}/{recipe-id}.json`
+**Add recipe:** Create TypeScript module in `be/data/recipes/{skill}/{RecipeId}.ts` and register in RecipeRegistry
 **Fix backend bug:** Check Critical Code Locations section for file:line references
 **Restart servers:** Backend (:3000), Frontend (:4200) - check if already running first!
 **Make migration:** Template in Database Migrations section → `be/migrations/NNN-description.js`
-**Hot-reload items:** POST `/api/inventory/reload` (no restart needed)
+**Hot-reload data:** Restart backend server - data layer now uses TypeScript registries
 **API endpoints:** See route files in `be/routes/` - all require JWT except auth register/login
 
 > **IMPORTANT**: **NEVER start backend/frontend servers** - they are always running during development. Only rebuild with `npm run build` if code changes require it. If you need to restart servers, ask the user first.
@@ -72,7 +73,7 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 **Backend Core:**
 - Controllers: [be/controllers/inventoryController.js](be/controllers/inventoryController.js), [be/controllers/locationController.js](be/controllers/locationController.js), [be/controllers/skillsController.js](be/controllers/skillsController.js), [be/controllers/attributesController.js](be/controllers/attributesController.js), [be/controllers/authController.js](be/controllers/authController.js), [be/controllers/manualController.js](be/controllers/manualController.js), [be/controllers/vendorController.js](be/controllers/vendorController.js), [be/controllers/craftingController.js](be/controllers/craftingController.js), [be/controllers/combatController.js](be/controllers/combatController.js)
 - Models: [be/models/Player.js](be/models/Player.js), [be/models/User.js](be/models/User.js), [be/models/ChatMessage.js](be/models/ChatMessage.js)
-- Services: [be/services/itemService.js](be/services/itemService.js), [be/services/locationService.js](be/services/locationService.js), [be/services/dropTableService.js](be/services/dropTableService.js), [be/services/vendorService.js](be/services/vendorService.js), [be/services/recipeService.js](be/services/recipeService.js), [be/services/combatService.js](be/services/combatService.js)
+- Services (TypeScript): [be/services/itemService.ts](be/services/itemService.ts), [be/services/locationService.ts](be/services/locationService.ts), [be/services/dropTableService.ts](be/services/dropTableService.ts), [be/services/vendorService.ts](be/services/vendorService.ts), [be/services/recipeService.ts](be/services/recipeService.ts), [be/services/combatService.ts](be/services/combatService.ts)
 - Routes: [be/routes/inventory.js](be/routes/inventory.js), [be/routes/locations.js](be/routes/locations.js), [be/routes/skills.js](be/routes/skills.js), [be/routes/attributes.js](be/routes/attributes.js), [be/routes/auth.js](be/routes/auth.js), [be/routes/manual.js](be/routes/manual.js), [be/routes/vendors.js](be/routes/vendors.js), [be/routes/crafting.js](be/routes/crafting.js), [be/routes/combat.js](be/routes/combat.js)
 - Sockets: [be/sockets/chatHandler.js](be/sockets/chatHandler.js)
 
@@ -91,16 +92,18 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 - Services: [ui/src/app/services/inventory.service.ts](ui/src/app/services/inventory.service.ts), [ui/src/app/services/location.service.ts](ui/src/app/services/location.service.ts), [ui/src/app/services/skills.service.ts](ui/src/app/services/skills.service.ts), [ui/src/app/services/auth.service.ts](ui/src/app/services/auth.service.ts), [ui/src/app/services/manual.service.ts](ui/src/app/services/manual.service.ts), [ui/src/app/services/chat.service.ts](ui/src/app/services/chat.service.ts), [ui/src/app/services/vendor.service.ts](ui/src/app/services/vendor.service.ts), [ui/src/app/services/recipe.service.ts](ui/src/app/services/recipe.service.ts), [ui/src/app/services/crafting.service.ts](ui/src/app/services/crafting.service.ts), [ui/src/app/services/combat.service.ts](ui/src/app/services/combat.service.ts), [ui/src/app/services/icon.service.ts](ui/src/app/services/icon.service.ts)
 - Constants: [ui/src/app/constants/material-colors.constants.ts](ui/src/app/constants/material-colors.constants.ts)
 
-**Game Data:**
-- Item Definitions: [be/data/items/definitions/](be/data/items/definitions/)
-- Location Definitions: [be/data/locations/definitions/](be/data/locations/definitions/)
-- Activities: [be/data/locations/activities/](be/data/locations/activities/)
-- Drop Tables: [be/data/locations/drop-tables/](be/data/locations/drop-tables/)
-- Facilities: [be/data/locations/facilities/](be/data/locations/facilities/)
-- Vendors: [be/data/vendors/](be/data/vendors/)
-- Recipes: [be/data/recipes/](be/data/recipes/)
-- Monsters: [be/data/monsters/definitions/](be/data/monsters/definitions/)
-- Abilities: [be/data/abilities/definitions/](be/data/abilities/definitions/)
+**Game Data (TypeScript):**
+- Item Registry: [be/data/items/ItemRegistry.ts](be/data/items/ItemRegistry.ts) - All items in [definitions/](be/data/items/definitions/)
+- Location Registry: [be/data/locations/LocationRegistry.ts](be/data/locations/LocationRegistry.ts) - All locations in [definitions/](be/data/locations/definitions/)
+- Activity Registry: [be/data/locations/ActivityRegistry.ts](be/data/locations/ActivityRegistry.ts) - All activities in [activities/](be/data/locations/activities/)
+- Drop Table Registry: [be/data/locations/DropTableRegistry.ts](be/data/locations/DropTableRegistry.ts) - All drop tables in [drop-tables/](be/data/locations/drop-tables/)
+- Facility Registry: [be/data/locations/FacilityRegistry.ts](be/data/locations/FacilityRegistry.ts) - All facilities in [facilities/](be/data/locations/facilities/)
+- Vendor Registry: [be/data/vendors/VendorRegistry.ts](be/data/vendors/VendorRegistry.ts) - All vendors as TypeScript modules
+- Recipe Registry: [be/data/recipes/RecipeRegistry.ts](be/data/recipes/RecipeRegistry.ts) - All recipes by skill
+- Monster Registry: [be/data/monsters/MonsterRegistry.ts](be/data/monsters/MonsterRegistry.ts) - All monsters in [definitions/](be/data/monsters/definitions/)
+- Ability Registry: [be/data/abilities/AbilityRegistry.ts](be/data/abilities/AbilityRegistry.ts) - All abilities in [definitions/](be/data/abilities/definitions/)
+- Quality Registry: [be/data/items/qualities/QualityRegistry.ts](be/data/items/qualities/QualityRegistry.ts)
+- Trait Registry: [be/data/items/traits/TraitRegistry.ts](be/data/items/traits/TraitRegistry.ts)
 
 **Utilities:**
 - [be/utils/add-item.js](be/utils/add-item.js) - Add items to player inventory
@@ -155,65 +158,78 @@ cd be && node utils/add-item.js
 ## Common Code Patterns (Quick Reference)
 
 ### Adding New Item Definition
-**File**: `be/data/items/definitions/{category}/{itemId}.json`
+**File**: `be/data/items/definitions/{category}/{ItemId}.ts`
 **Template**:
-```json
-{
-  "itemId": "new_item",
-  "name": "New Item",
-  "description": "Medieval fantasy description...",
-  "category": "resource|equipment|consumable",
-  "rarity": "common|uncommon|rare|epic|legendary",
-  "tier": 1,
-  "baseValue": 10,
-  "stackable": true,
-  "allowedQualities": ["purity"],
-  "allowedTraits": ["pristine", "blessed"]
-}
+```typescript
+import { ResourceItem } from '../../../types';
+
+export const NewItem: ResourceItem = {
+  itemId: 'new_item',
+  name: 'New Item',
+  description: 'Medieval fantasy description...',
+  category: 'resource',
+  rarity: 'common',
+  tier: 1,
+  baseValue: 10,
+  stackable: true,
+  allowedQualities: ['purity'],
+  allowedTraits: ['pristine', 'blessed'],
+  icon: {
+    path: 'item-categories/icon.svg',
+    material: 'generic'
+  }
+};
 ```
+**Then register in**: `be/data/items/ItemRegistry.ts`
 
 ### Adding New Activity
-**File**: `be/data/locations/activities/{activity-id}.json`
+**File**: `be/data/locations/activities/{ActivityId}.ts`
 **Template**:
-```json
-{
-  "activityId": "new-activity",
-  "name": "Activity Name",
-  "description": "What players do here...",
-  "duration": 10,
-  "requirements": {
-    "skills": { "woodcutting": 5 },
-    "equipped": [{ "subtype": "woodcutting-axe" }]
+```typescript
+import { Activity } from '../../../types';
+
+export const NewActivity: Activity = {
+  activityId: 'new-activity',
+  name: 'Activity Name',
+  description: 'What players do here...',
+  duration: 10,
+  requirements: {
+    skills: { woodcutting: 5 },
+    equipped: [{ subtype: 'woodcutting-axe' }]
   },
-  "rewards": {
-    "experience": { "woodcutting": 25 },
-    "dropTables": ["drop-table-id"]
+  rewards: {
+    experience: { woodcutting: 25 },
+    dropTables: ['drop-table-id']
   }
-}
+};
 ```
+**Then register in**: `be/data/locations/ActivityRegistry.ts`
 
 ### Adding New Drop Table
-**File**: `be/data/locations/drop-tables/{table-id}.json`
+**File**: `be/data/locations/drop-tables/{TableId}.ts`
 **Template**:
-```json
-{
-  "dropTableId": "new-drop-table",
-  "name": "Drop Table Name",
-  "drops": [
+```typescript
+import { DropTable } from '../../../types';
+
+export const NewDropTable: DropTable = {
+  dropTableId: 'new-drop-table',
+  name: 'Drop Table Name',
+  drops: [
     {
-      "itemId": "oak_log",
-      "weight": 70,
-      "quantity": { "min": 1, "max": 3 }
+      itemId: 'oak_log',
+      weight: 70,
+      quantity: { min: 1, max: 3 }
     },
     {
-      "itemId": "rare_item",
-      "weight": 30,
-      "quantity": { "min": 1, "max": 1 },
-      "qualityBonus": 2
+      itemId: 'rare_item',
+      weight: 30,
+      quantity: { min: 1, max: 1 },
+      qualityBonus: 2
     }
   ]
-}
+};
 ```
+**Then register in**: `be/data/locations/DropTableRegistry.ts`
 
 ### Adding Skill XP (Backend Pattern)
 **Location**: Player model method
@@ -1148,7 +1164,39 @@ See `project/journal.md` for detailed development possibilities including:
 
 ## TypeScript Type System
 
-The backend uses an **interfaces-only TypeScript migration** for compile-time type safety without runtime changes.
+The backend uses a **comprehensive TypeScript migration** with both type safety and registry-based data loading.
+
+### TypeScript Data Layer Migration
+
+**IMPORTANT**: All game data (items, locations, activities, drop tables, recipes, monsters, abilities, vendors) has been migrated from JSON to TypeScript modules with centralized registries.
+
+**Benefits**:
+- ✅ Compile-time validation of all game data
+- ✅ IDE autocomplete for item properties, stats, abilities
+- ✅ Type safety prevents invalid references (e.g., misspelled itemIds)
+- ✅ Centralized registries for easy data management
+- ✅ Better refactoring support (rename symbols across all files)
+- ✅ Runtime TypeScript loading via ts-node/register
+
+**Registry Pattern**:
+Each game system has a central registry that exports all definitions:
+- `ItemRegistry.ts` - 60+ items (resources, equipment, consumables)
+- `LocationRegistry.ts` - All locations with biomes and facilities
+- `ActivityRegistry.ts` - 18+ gathering/combat/crafting activities
+- `DropTableRegistry.ts` - 16+ loot tables for activities
+- `RecipeRegistry.ts` - Cooking and smithing recipes
+- `MonsterRegistry.ts` - Combat monsters with stats
+- `AbilityRegistry.ts` - Combat abilities with damage formulas
+- `VendorRegistry.ts` - NPC merchants and their stock
+- `QualityRegistry.ts` - 7 quality types with 5 levels each
+- `TraitRegistry.ts` - 6 trait types with escalating effects
+
+**Creating New Content**:
+1. Create TypeScript module in appropriate directory (e.g., `be/data/items/definitions/resources/NewItem.ts`)
+2. Export const with strongly-typed object (e.g., `export const NewItem: ResourceItem = {...}`)
+3. Import and register in appropriate registry (e.g., add to `ItemRegistry.ts`)
+4. TypeScript compiler validates structure at build time
+5. Services automatically load from registries at runtime
 
 ### Architecture
 
