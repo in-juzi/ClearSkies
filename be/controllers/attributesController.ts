@@ -1,20 +1,35 @@
-const Player = require('../models/Player');
+import { Request, Response } from 'express';
+import Player from '../models/Player';
+import { AttributeName } from '../types';
+
+// ============================================================================
+// Type Definitions for Request Bodies
+// ============================================================================
+
+interface AddAttributeExperienceRequest {
+  amount: number;
+}
+
+// ============================================================================
+// Controller Functions
+// ============================================================================
 
 /**
  * Get all attributes for the logged-in player
  * @route GET /api/attributes
  */
-exports.getAllAttributes = async (req, res) => {
+export const getAllAttributes = async (req: Request, res: Response): Promise<void> => {
   try {
-    const player = await Player.findOne({ userId: req.user._id });
+    const player = await Player.findOne({ userId: req.user!._id });
 
     if (!player) {
-      return res.status(404).json({ message: 'Player profile not found' });
+      res.status(404).json({ message: 'Player profile not found' });
+      return;
     }
 
     // Build response with all attributes and their progress
-    const attributes = {};
-    const attributeNames = ['strength', 'endurance', 'magic', 'perception', 'dexterity', 'will', 'charisma'];
+    const attributes: Record<string, any> = {};
+    const attributeNames: AttributeName[] = ['strength', 'endurance', 'magic', 'perception', 'dexterity', 'will', 'charisma'];
 
     for (const name of attributeNames) {
       attributes[name] = {
@@ -28,7 +43,7 @@ exports.getAllAttributes = async (req, res) => {
     res.json(attributes);
   } catch (error) {
     console.error('Error fetching attributes:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: 'Server error', error: (error as Error).message });
   }
 };
 
@@ -36,19 +51,24 @@ exports.getAllAttributes = async (req, res) => {
  * Get a specific attribute for the logged-in player
  * @route GET /api/attributes/:attributeName
  */
-exports.getAttribute = async (req, res) => {
+export const getAttribute = async (
+  req: Request<{ attributeName: AttributeName }>,
+  res: Response
+): Promise<void> => {
   try {
     const { attributeName } = req.params;
-    const validAttributes = ['strength', 'endurance', 'magic', 'perception', 'dexterity', 'will', 'charisma'];
+    const validAttributes: AttributeName[] = ['strength', 'endurance', 'magic', 'perception', 'dexterity', 'will', 'charisma'];
 
     if (!validAttributes.includes(attributeName)) {
-      return res.status(400).json({ message: `Invalid attribute name: ${attributeName}` });
+      res.status(400).json({ message: `Invalid attribute name: ${attributeName}` });
+      return;
     }
 
-    const player = await Player.findOne({ userId: req.user._id });
+    const player = await Player.findOne({ userId: req.user!._id });
 
     if (!player) {
-      return res.status(404).json({ message: 'Player profile not found' });
+      res.status(404).json({ message: 'Player profile not found' });
+      return;
     }
 
     const attribute = player.attributes[attributeName];
@@ -62,7 +82,7 @@ exports.getAttribute = async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching attribute:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: 'Server error', error: (error as Error).message });
   }
 };
 
@@ -70,19 +90,24 @@ exports.getAttribute = async (req, res) => {
  * Add experience to a specific attribute
  * @route POST /api/attributes/:attributeName/experience
  */
-exports.addAttributeExperience = async (req, res) => {
+export const addAttributeExperience = async (
+  req: Request<{ attributeName: AttributeName }, {}, AddAttributeExperienceRequest>,
+  res: Response
+): Promise<void> => {
   try {
     const { attributeName } = req.params;
     const { amount } = req.body;
 
     if (!amount || amount <= 0) {
-      return res.status(400).json({ message: 'Experience amount must be a positive number' });
+      res.status(400).json({ message: 'Experience amount must be a positive number' });
+      return;
     }
 
-    const player = await Player.findOne({ userId: req.user._id });
+    const player = await Player.findOne({ userId: req.user!._id });
 
     if (!player) {
-      return res.status(404).json({ message: 'Player profile not found' });
+      res.status(404).json({ message: 'Player profile not found' });
+      return;
     }
 
     const result = await player.addAttributeExperience(attributeName, amount);
@@ -106,6 +131,6 @@ exports.addAttributeExperience = async (req, res) => {
     });
   } catch (error) {
     console.error('Error adding attribute experience:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: 'Server error', error: (error as Error).message });
   }
 };

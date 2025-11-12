@@ -1,73 +1,50 @@
-const Player = require('../models/Player');
+import { Request, Response } from 'express';
+import Player from '../models/Player';
+import { SkillName, AttributeName } from '../types';
+
+// ============================================================================
+// Type Definitions for Request Bodies
+// ============================================================================
+
+interface AddSkillExperienceRequest {
+  amount: number;
+}
+
+// ============================================================================
+// Controller Functions
+// ============================================================================
 
 /**
  * @desc    Get all skills for current player
  * @route   GET /api/skills
  * @access  Private
  */
-const getSkills = async (req, res) => {
+export const getSkills = async (req: Request, res: Response): Promise<void> => {
   try {
-    const player = await Player.findOne({ userId: req.user._id });
+    const player = await Player.findOne({ userId: req.user!._id });
 
     if (!player) {
-      return res.status(404).json({
+      res.status(404).json({
         success: false,
         message: 'Player not found'
       });
+      return;
     }
 
     // Calculate progress for each skill
-    const skillsWithProgress = {
-      woodcutting: {
-        ...player.skills.woodcutting.toObject(),
-        progress: player.getSkillProgress('woodcutting')
-      },
-      mining: {
-        ...player.skills.mining.toObject(),
-        progress: player.getSkillProgress('mining')
-      },
-      fishing: {
-        ...player.skills.fishing.toObject(),
-        progress: player.getSkillProgress('fishing')
-      },
-      smithing: {
-        ...player.skills.smithing.toObject(),
-        progress: player.getSkillProgress('smithing')
-      },
-      cooking: {
-        ...player.skills.cooking.toObject(),
-        progress: player.getSkillProgress('cooking')
-      },
-      herbalism: {
-        ...player.skills.herbalism.toObject(),
-        progress: player.getSkillProgress('herbalism')
-      },
-      // Combat skills
-      oneHanded: {
-        ...player.skills.oneHanded.toObject(),
-        progress: player.getSkillProgress('oneHanded')
-      },
-      dualWield: {
-        ...player.skills.dualWield.toObject(),
-        progress: player.getSkillProgress('dualWield')
-      },
-      twoHanded: {
-        ...player.skills.twoHanded.toObject(),
-        progress: player.getSkillProgress('twoHanded')
-      },
-      ranged: {
-        ...player.skills.ranged.toObject(),
-        progress: player.getSkillProgress('ranged')
-      },
-      casting: {
-        ...player.skills.casting.toObject(),
-        progress: player.getSkillProgress('casting')
-      },
-      gun: {
-        ...player.skills.gun.toObject(),
-        progress: player.getSkillProgress('gun')
-      }
-    };
+    const skillNames: SkillName[] = [
+      'woodcutting', 'mining', 'fishing', 'smithing', 'cooking', 'herbalism',
+      'oneHanded', 'dualWield', 'twoHanded', 'ranged', 'casting', 'gun'
+    ];
+
+    const skillsWithProgress: Record<string, any> = {};
+
+    for (const skillName of skillNames) {
+      skillsWithProgress[skillName] = {
+        ...player.skills[skillName],
+        progress: player.getSkillProgress(skillName)
+      };
+    }
 
     res.status(200).json({
       success: true,
@@ -81,7 +58,7 @@ const getSkills = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error fetching skills',
-      error: error.message
+      error: (error as Error).message
     });
   }
 };
@@ -91,25 +68,30 @@ const getSkills = async (req, res) => {
  * @route   POST /api/skills/:skillName/experience
  * @access  Private
  */
-const addSkillExperience = async (req, res) => {
+export const addSkillExperience = async (
+  req: Request<{ skillName: SkillName }, {}, AddSkillExperienceRequest>,
+  res: Response
+): Promise<void> => {
   try {
     const { skillName } = req.params;
     const { amount } = req.body;
 
     if (!amount || amount <= 0) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         message: 'Experience amount must be a positive number'
       });
+      return;
     }
 
-    const player = await Player.findOne({ userId: req.user._id });
+    const player = await Player.findOne({ userId: req.user!._id });
 
     if (!player) {
-      return res.status(404).json({
+      res.status(404).json({
         success: false,
         message: 'Player not found'
       });
+      return;
     }
 
     // Add experience and check for level up
@@ -155,7 +137,7 @@ const addSkillExperience = async (req, res) => {
     console.error('Add skill experience error:', error);
     res.status(400).json({
       success: false,
-      message: error.message
+      message: (error as Error).message
     });
   }
 };
@@ -165,25 +147,33 @@ const addSkillExperience = async (req, res) => {
  * @route   GET /api/skills/:skillName
  * @access  Private
  */
-const getSkill = async (req, res) => {
+export const getSkill = async (
+  req: Request<{ skillName: SkillName }>,
+  res: Response
+): Promise<void> => {
   try {
     const { skillName } = req.params;
-    const validSkills = ['woodcutting', 'mining', 'fishing', 'smithing', 'cooking', 'herbalism', 'oneHanded', 'dualWield', 'twoHanded', 'ranged', 'casting', 'gun'];
+    const validSkills: SkillName[] = [
+      'woodcutting', 'mining', 'fishing', 'smithing', 'cooking', 'herbalism',
+      'oneHanded', 'dualWield', 'twoHanded', 'ranged', 'casting', 'gun'
+    ];
 
     if (!validSkills.includes(skillName)) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         message: `Invalid skill name: ${skillName}`
       });
+      return;
     }
 
-    const player = await Player.findOne({ userId: req.user._id });
+    const player = await Player.findOne({ userId: req.user!._id });
 
     if (!player) {
-      return res.status(404).json({
+      res.status(404).json({
         success: false,
         message: 'Player not found'
       });
+      return;
     }
 
     const skill = player.skills[skillName];
@@ -205,13 +195,7 @@ const getSkill = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error fetching skill',
-      error: error.message
+      error: (error as Error).message
     });
   }
-};
-
-module.exports = {
-  getSkills,
-  addSkillExperience,
-  getSkill
 };

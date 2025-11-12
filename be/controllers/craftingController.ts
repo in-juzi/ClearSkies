@@ -1,12 +1,26 @@
-const Player = require('../models/Player');
-const recipeService = require('../services/recipeService');
-const itemService = require('../services/itemService');
+import { Request, Response } from 'express';
+import Player from '../models/Player';
+import recipeService from '../services/recipeService';
+import itemService from '../services/itemService';
+
+// ============================================================================
+// Type Definitions for Request Bodies
+// ============================================================================
+
+interface StartCraftingRequest {
+  recipeId: string;
+  selectedIngredients?: Record<string, string[]>;
+}
+
+// ============================================================================
+// Controller Functions
+// ============================================================================
 
 /**
  * GET /api/crafting/recipes
  * Get all available recipes
  */
-exports.getAllRecipes = async (req, res) => {
+export const getAllRecipes = async (req: Request, res: Response): Promise<void> => {
   try {
     const recipes = recipeService.getAllRecipes();
 
@@ -18,7 +32,7 @@ exports.getAllRecipes = async (req, res) => {
     console.error('Error getting recipes:', error);
     res.status(500).json({
       message: 'Error retrieving recipes',
-      error: error.message
+      error: (error as Error).message
     });
   }
 };
@@ -27,7 +41,10 @@ exports.getAllRecipes = async (req, res) => {
  * GET /api/crafting/recipes/:skill
  * Get recipes for specific skill
  */
-exports.getRecipesBySkill = async (req, res) => {
+export const getRecipesBySkill = async (
+  req: Request<{ skill: string }>,
+  res: Response
+): Promise<void> => {
   try {
     const { skill } = req.params;
     const recipes = recipeService.getRecipesBySkill(skill);
@@ -41,7 +58,7 @@ exports.getRecipesBySkill = async (req, res) => {
     console.error('Error getting recipes by skill:', error);
     res.status(500).json({
       message: 'Error retrieving recipes',
-      error: error.message
+      error: (error as Error).message
     });
   }
 };
@@ -51,59 +68,81 @@ exports.getRecipesBySkill = async (req, res) => {
  * Start crafting a recipe
  * Body: { recipeId, selectedIngredients?: { [itemId]: instanceId[] } }
  */
-exports.startCrafting = async (req, res) => {
+export const startCrafting = async (
+  req: Request<{}, {}, StartCraftingRequest>,
+  res: Response
+): Promise<void> => {
   try {
     const { recipeId, selectedIngredients } = req.body;
-    const userId = req.user._id;
+    const userId = req.user!._id;
 
     if (!recipeId) {
-      return res.status(400).json({ message: 'Recipe ID is required' });
+      res.status(400).json({ message: 'Recipe ID is required' });
+      return;
     }
 
     const player = await Player.findOne({ userId });
     if (!player) {
-      return res.status(404).json({ message: 'Player not found' });
+      res.status(404).json({ message: 'Player not found' });
+      return;
     }
 
     // Check if player already has active crafting
     if (player.activeCrafting && player.activeCrafting.recipeId) {
       const now = new Date();
-      if (now < new Date(player.activeCrafting.endTime)) {
-        return res.status(400).json({
+      const endTime = player.activeCrafting.endTime;
+      if (endTime && now < new Date(endTime)) {
+        res.status(400).json({
           message: 'Already crafting',
           activeCrafting: player.activeCrafting
         });
+        return;
       }
     }
 
     // Get recipe
     const recipe = recipeService.getRecipe(recipeId);
     if (!recipe) {
-      return res.status(404).json({ message: 'Recipe not found' });
+      res.status(404).json({ message: 'Recipe not found' });
+      return;
     }
 
     // Validate requirements
     const validation = recipeService.validateRecipeRequirements(player, recipe, selectedIngredients);
     if (!validation.valid) {
-      return res.status(400).json({ message: validation.message });
+      res.status(400).json({ message: validation.message });
+      return;
     }
 
     // Store selected ingredients in active crafting
     const now = new Date();
     const endTime = new Date(now.getTime() + recipe.duration * 1000);
 
+    // Convert selectedIngredients to Map for Mongoose
+    const ingredientsMap = new Map<string, string[]>();
+    if (selectedIngredients) {
+      for (const [key, value] of Object.entries(selectedIngredients)) {
+        ingredientsMap.set(key, value);
+      }
+    }
+
     player.activeCrafting = {
       recipeId: recipe.recipeId,
       startTime: now,
       endTime: endTime,
-      selectedIngredients: selectedIngredients || {}
+      selectedIngredients: ingredientsMap
     };
 
     await player.save();
 
     res.json({
       message: `Started crafting ${recipe.name}`,
-      activeCrafting: player.activeCrafting,
+      activeCrafting: {
+        recipeId: player.activeCrafting.recipeId,
+        startTime: player.activeCrafting.startTime,
+        endTime: player.activeCrafting.endTime,
+        selectedIngredients: selectedIngredients || {}
+      },
       recipe: {
         recipeId: recipe.recipeId,
         name: recipe.name,
@@ -115,7 +154,7 @@ exports.startCrafting = async (req, res) => {
     console.error('Error starting crafting:', error);
     res.status(500).json({
       message: 'Error starting crafting',
-      error: error.message
+      error: (error as Error).message
     });
   }
 };
@@ -124,45 +163,51 @@ exports.startCrafting = async (req, res) => {
  * POST /api/crafting/complete
  * Complete active crafting
  */
-exports.completeCrafting = async (req, res) => {
+export const completeCrafting = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId = req.user._id;
+    const userId = req.user!._id;
 
     const player = await Player.findOne({ userId });
     if (!player) {
-      return res.status(404).json({ message: 'Player not found' });
+      res.status(404).json({ message: 'Player not found' });
+      return;
     }
 
     // Check if player has active crafting
     if (!player.activeCrafting || !player.activeCrafting.recipeId) {
-      return res.status(400).json({ message: 'No active crafting' });
+      res.status(400).json({ message: 'No active crafting' });
+      return;
     }
 
     const now = new Date();
-    const endTime = new Date(player.activeCrafting.endTime);
+    const endTime = new Date(player.activeCrafting.endTime!);
 
     // Check if crafting is complete
     if (now < endTime) {
-      return res.status(400).json({
+      res.status(400).json({
         message: 'Crafting not yet complete',
-        remainingTime: Math.ceil((endTime - now) / 1000),
+        remainingTime: Math.ceil((endTime.getTime() - now.getTime()) / 1000),
         endTime: endTime
       });
+      return;
     }
 
     // Get recipe
     const recipe = recipeService.getRecipe(player.activeCrafting.recipeId);
     if (!recipe) {
-      return res.status(404).json({ message: 'Recipe not found' });
+      res.status(404).json({ message: 'Recipe not found' });
+      return;
     }
 
-    // Consume ingredients from inventory
-    const ingredientInstances = [];
-    const selectedIngredients = player.activeCrafting.selectedIngredients || {};
+    // Gather ingredient instances for quality calculation
+    const ingredientInstances: any[] = [];
+    const selectedIngredients = player.activeCrafting.selectedIngredients;
 
     for (const ingredient of recipe.ingredients) {
       // selectedIngredients is a Mongoose Map, so we need to use .get() method
-      const instanceIds = selectedIngredients.get ? selectedIngredients.get(ingredient.itemId) : selectedIngredients[ingredient.itemId];
+      const instanceIds = selectedIngredients.get
+        ? selectedIngredients.get(ingredient.itemId)
+        : (selectedIngredients as any)[ingredient.itemId];
 
       // Check if specific instances were selected
       if (instanceIds && instanceIds.length > 0) {
@@ -171,9 +216,10 @@ exports.completeCrafting = async (req, res) => {
           const item = player.getItem(instanceId);
 
           if (!item) {
-            return res.status(400).json({
+            res.status(400).json({
               message: `Selected ingredient instance not found: ${instanceId}`
             });
+            return;
           }
 
           // Store instance for quality calculation (before removal)
@@ -187,9 +233,10 @@ exports.completeCrafting = async (req, res) => {
         const items = player.getItemsByItemId(ingredient.itemId);
 
         if (items.length === 0) {
-          return res.status(400).json({
+          res.status(400).json({
             message: `Missing ingredient: ${ingredient.itemId}`
           });
+          return;
         }
 
         let remaining = ingredient.quantity;
@@ -210,9 +257,10 @@ exports.completeCrafting = async (req, res) => {
         }
 
         if (remaining > 0) {
-          return res.status(400).json({
+          res.status(400).json({
             message: `Not enough ${ingredient.itemId}`
           });
+          return;
         }
       }
     }
@@ -232,49 +280,32 @@ exports.completeCrafting = async (req, res) => {
     }
 
     // Award XP
-    const xpResult = await player.addSkillExperience(recipe.skill, recipe.experience);
+    await player.addSkillExperience(recipe.skill, recipe.experience);
 
     // Clear active crafting
     player.activeCrafting = {
-      recipeId: null,
-      startTime: null,
-      endTime: null
+      recipeId: undefined,
+      startTime: undefined,
+      endTime: undefined,
+      selectedIngredients: new Map()
     };
 
     await player.save();
 
-    // Convert output items to plain objects for JSON response
-    const plainOutputItems = outputItems.map(outputItem => {
-      const itemDef = itemService.getItemDefinition(outputItem.itemId);
-      return {
-        itemId: outputItem.itemId,
-        name: itemDef ? itemDef.name : outputItem.itemId,
-        instanceId: outputItem.instanceId,
-        quantity: outputItem.quantity,
-        qualities: outputItem.qualities instanceof Map ? Object.fromEntries(outputItem.qualities) : outputItem.qualities,
-        traits: outputItem.traits instanceof Map ? Object.fromEntries(outputItem.traits) : outputItem.traits
-      };
-    });
+    // Get enhanced item details for crafted items
+    const itemDetails = outputItems.map(item => itemService.getItemDetails(item));
 
     res.json({
-      message: `Crafted ${recipe.name}`,
-      outputs: plainOutputItems, // Changed from 'output' (singular) to 'outputs' (array)
-      experience: {
-        skill: recipe.skill,
-        xp: recipe.experience,
-        skillResult: xpResult.skill,
-        attributeResult: xpResult.attribute
-      },
-      recipe: {
-        recipeId: recipe.recipeId,
-        name: recipe.name
-      }
+      message: `Successfully crafted ${recipe.name}`,
+      items: itemDetails,
+      experience: recipe.experience,
+      skill: recipe.skill
     });
   } catch (error) {
     console.error('Error completing crafting:', error);
     res.status(500).json({
       message: 'Error completing crafting',
-      error: error.message
+      error: (error as Error).message
     });
   }
 };
@@ -283,25 +314,28 @@ exports.completeCrafting = async (req, res) => {
  * POST /api/crafting/cancel
  * Cancel active crafting
  */
-exports.cancelCrafting = async (req, res) => {
+export const cancelCrafting = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId = req.user._id;
+    const userId = req.user!._id;
 
     const player = await Player.findOne({ userId });
     if (!player) {
-      return res.status(404).json({ message: 'Player not found' });
+      res.status(404).json({ message: 'Player not found' });
+      return;
     }
 
     if (!player.activeCrafting || !player.activeCrafting.recipeId) {
-      return res.status(400).json({ message: 'No active crafting to cancel' });
+      res.status(400).json({ message: 'No active crafting to cancel' });
+      return;
     }
 
     const recipeName = player.activeCrafting.recipeId;
 
     player.activeCrafting = {
-      recipeId: null,
-      startTime: null,
-      endTime: null
+      recipeId: undefined,
+      startTime: undefined,
+      endTime: undefined,
+      selectedIngredients: new Map()
     };
 
     await player.save();
@@ -314,7 +348,7 @@ exports.cancelCrafting = async (req, res) => {
     console.error('Error cancelling crafting:', error);
     res.status(500).json({
       message: 'Error cancelling crafting',
-      error: error.message
+      error: (error as Error).message
     });
   }
 };

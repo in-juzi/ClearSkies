@@ -1,22 +1,43 @@
-const User = require('../models/User');
-const Player = require('../models/Player');
-const { generateUserToken } = require('../utils/jwt');
-const { validationResult } = require('express-validator');
+import { Request, Response } from 'express';
+import { validationResult, ValidationError, Result } from 'express-validator';
+import User, { IUser } from '../models/User';
+import Player from '../models/Player';
+import { generateUserToken } from '../utils/jwt';
+
+// ============================================================================
+// Type Definitions for Request Bodies
+// ============================================================================
+
+interface RegisterRequest {
+  username: string;
+  email: string;
+  password: string;
+}
+
+interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+// ============================================================================
+// Controller Functions
+// ============================================================================
 
 /**
  * @desc    Register new user
  * @route   POST /api/auth/register
  * @access  Public
  */
-const register = async (req, res) => {
+export const register = async (req: Request<{}, {}, RegisterRequest>, res: Response): Promise<void> => {
   try {
     // Check for validation errors
-    const errors = validationResult(req);
+    const errors: Result<ValidationError> = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         errors: errors.array()
       });
+      return;
     }
 
     const { username, email, password } = req.body;
@@ -27,10 +48,11 @@ const register = async (req, res) => {
     });
 
     if (existingUser) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         message: 'User with this email or username already exists'
       });
+      return;
     }
 
     // Create user
@@ -71,7 +93,7 @@ const register = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error registering user',
-      error: error.message
+      error: (error as Error).message
     });
   }
 };
@@ -81,14 +103,15 @@ const register = async (req, res) => {
  * @route   POST /api/auth/login
  * @access  Public
  */
-const login = async (req, res) => {
+export const login = async (req: Request<{}, {}, LoginRequest>, res: Response): Promise<void> => {
   try {
-    const errors = validationResult(req);
+    const errors: Result<ValidationError> = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         errors: errors.array()
       });
+      return;
     }
 
     const { email, password } = req.body;
@@ -97,28 +120,31 @@ const login = async (req, res) => {
     const user = await User.findOne({ email }).select('+password');
 
     if (!user) {
-      return res.status(401).json({
+      res.status(401).json({
         success: false,
         message: 'Invalid credentials'
       });
+      return;
     }
 
     // Check if account is active
     if (!user.isActive) {
-      return res.status(401).json({
+      res.status(401).json({
         success: false,
         message: 'Account is deactivated'
       });
+      return;
     }
 
     // Verify password
     const isPasswordValid = await user.comparePassword(password);
 
     if (!isPasswordValid) {
-      return res.status(401).json({
+      res.status(401).json({
         success: false,
         message: 'Invalid credentials'
       });
+      return;
     }
 
     // Update last login
@@ -148,7 +174,7 @@ const login = async (req, res) => {
           id: player._id,
           level: player.level,
           gold: player.gold,
-          location: player.location
+          location: player.currentLocation
         } : null,
         token
       }
@@ -159,7 +185,7 @@ const login = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error logging in',
-      error: error.message
+      error: (error as Error).message
     });
   }
 };
@@ -169,10 +195,10 @@ const login = async (req, res) => {
  * @route   GET /api/auth/me
  * @access  Private
  */
-const getMe = async (req, res) => {
+export const getMe = async (req: Request, res: Response): Promise<void> => {
   try {
     // User is already attached to req by auth middleware
-    const user = req.user;
+    const user = req.user as IUser;
 
     // Get player data
     const player = await Player.findOne({ userId: user._id });
@@ -194,7 +220,7 @@ const getMe = async (req, res) => {
           gold: player.gold,
           stats: player.stats,
           skills: player.skills,
-          location: player.location,
+          location: player.currentLocation,
           lastPlayed: player.lastPlayed
         } : null
       }
@@ -205,7 +231,7 @@ const getMe = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error fetching profile',
-      error: error.message
+      error: (error as Error).message
     });
   }
 };
@@ -215,7 +241,7 @@ const getMe = async (req, res) => {
  * @route   POST /api/auth/logout
  * @access  Private
  */
-const logout = async (req, res) => {
+export const logout = async (req: Request, res: Response): Promise<void> => {
   try {
     // In a JWT-based system, logout is primarily handled client-side
     // This endpoint can be used for logging or cleanup
@@ -229,14 +255,7 @@ const logout = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error logging out',
-      error: error.message
+      error: (error as Error).message
     });
   }
-};
-
-module.exports = {
-  register,
-  login,
-  getMe,
-  logout
 };

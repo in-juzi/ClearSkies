@@ -1,27 +1,79 @@
-const Player = require('../models/Player');
-const itemService = require('../services/itemService');
+import { Request, Response } from 'express';
+import Player from '../models/Player';
+import itemService from '../services/itemService';
+import { QualityMap, TraitMap, ItemCategory, ConsumableItem } from '../types';
+
+// ============================================================================
+// Type Definitions for Request Bodies
+// ============================================================================
+
+interface AddItemRequest {
+  itemId: string;
+  quantity?: number;
+  qualities?: QualityMap;
+  traits?: TraitMap;
+}
+
+interface AddRandomItemRequest {
+  itemId: string;
+  quantity?: number;
+}
+
+interface RemoveItemRequest {
+  instanceId: string;
+  quantity?: number;
+}
+
+interface EquipItemRequest {
+  instanceId: string;
+  slotName: string;
+}
+
+interface UnequipItemRequest {
+  slotName: string;
+}
+
+interface UseItemRequest {
+  instanceId: string;
+}
+
+// ============================================================================
+// Helper Functions
+// ============================================================================
+
+/**
+ * Convert Mongoose Maps to plain objects for JSON serialization
+ */
+function convertMapsToObjects(item: any): any {
+  const plainItem = item.toObject ? item.toObject() : item;
+  if (plainItem.qualities instanceof Map) {
+    plainItem.qualities = Object.fromEntries(plainItem.qualities);
+  }
+  if (plainItem.traits instanceof Map) {
+    plainItem.traits = Object.fromEntries(plainItem.traits);
+  }
+  return plainItem;
+}
+
+// ============================================================================
+// Controller Functions
+// ============================================================================
 
 /**
  * Get player's inventory with full item details
  */
-exports.getInventory = async (req, res) => {
+export const getInventory = async (req: Request, res: Response): Promise<void> => {
   try {
     const player = await Player.findOne({ userId: req.user._id });
 
     if (!player) {
-      return res.status(404).json({ message: 'Player not found' });
+      res.status(404).json({ message: 'Player not found' });
+      return;
     }
 
     // Enhance inventory with item details
     const enhancedInventory = player.inventory.map(item => {
-      const plainItem = item.toObject();
-      // Convert Mongoose Maps to plain objects for JSON serialization
-      if (plainItem.qualities instanceof Map) {
-        plainItem.qualities = Object.fromEntries(plainItem.qualities);
-      }
-      if (plainItem.traits instanceof Map) {
-        plainItem.traits = Object.fromEntries(plainItem.traits);
-      }
+      const plainItem = convertMapsToObjects(item);
       const details = itemService.getItemDetails(plainItem);
       return details;
     });
@@ -34,7 +86,7 @@ exports.getInventory = async (req, res) => {
     });
   } catch (error) {
     console.error('Get inventory error:', error);
-    res.status(500).json({ message: 'Error fetching inventory', error: error.message });
+    res.status(500).json({ message: 'Error fetching inventory', error: (error as Error).message });
   }
 };
 
@@ -42,17 +94,19 @@ exports.getInventory = async (req, res) => {
  * Add item to player's inventory
  * Body: { itemId, quantity, qualities, traits }
  */
-exports.addItem = async (req, res) => {
+export const addItem = async (req: Request<{}, {}, AddItemRequest>, res: Response): Promise<void> => {
   try {
-    const { itemId, quantity = 1, qualities = {}, traits = [] } = req.body;
+    const { itemId, quantity = 1, qualities = {}, traits = {} } = req.body;
 
     if (!itemId) {
-      return res.status(400).json({ message: 'itemId is required' });
+      res.status(400).json({ message: 'itemId is required' });
+      return;
     }
 
     const player = await Player.findOne({ userId: req.user._id });
     if (!player) {
-      return res.status(404).json({ message: 'Player not found' });
+      res.status(404).json({ message: 'Player not found' });
+      return;
     }
 
     // Create item instance
@@ -72,7 +126,7 @@ exports.addItem = async (req, res) => {
     });
   } catch (error) {
     console.error('Add item error:', error);
-    res.status(500).json({ message: 'Error adding item', error: error.message });
+    res.status(500).json({ message: 'Error adding item', error: (error as Error).message });
   }
 };
 
@@ -80,17 +134,19 @@ exports.addItem = async (req, res) => {
  * Add item with random qualities/traits
  * Body: { itemId, quantity }
  */
-exports.addRandomItem = async (req, res) => {
+export const addRandomItem = async (req: Request<{}, {}, AddRandomItemRequest>, res: Response): Promise<void> => {
   try {
     const { itemId, quantity = 1 } = req.body;
 
     if (!itemId) {
-      return res.status(400).json({ message: 'itemId is required' });
+      res.status(400).json({ message: 'itemId is required' });
+      return;
     }
 
     const player = await Player.findOne({ userId: req.user._id });
     if (!player) {
-      return res.status(404).json({ message: 'Player not found' });
+      res.status(404).json({ message: 'Player not found' });
+      return;
     }
 
     // Generate random qualities and traits
@@ -114,7 +170,7 @@ exports.addRandomItem = async (req, res) => {
     });
   } catch (error) {
     console.error('Add random item error:', error);
-    res.status(500).json({ message: 'Error adding item', error: error.message });
+    res.status(500).json({ message: 'Error adding item', error: (error as Error).message });
   }
 };
 
@@ -122,21 +178,23 @@ exports.addRandomItem = async (req, res) => {
  * Remove item from inventory
  * Body: { instanceId, quantity }
  */
-exports.removeItem = async (req, res) => {
+export const removeItem = async (req: Request<{}, {}, RemoveItemRequest>, res: Response): Promise<void> => {
   try {
     const { instanceId, quantity } = req.body;
 
     if (!instanceId) {
-      return res.status(400).json({ message: 'instanceId is required' });
+      res.status(400).json({ message: 'instanceId is required' });
+      return;
     }
 
     const player = await Player.findOne({ userId: req.user._id });
     if (!player) {
-      return res.status(404).json({ message: 'Player not found' });
+      res.status(404).json({ message: 'Player not found' });
+      return;
     }
 
     // Remove item
-    const removedItem = player.removeItem(instanceId, quantity);
+    const removedItem = player.removeItem(instanceId, quantity || null);
     await player.save();
 
     res.json({
@@ -146,40 +204,43 @@ exports.removeItem = async (req, res) => {
     });
   } catch (error) {
     console.error('Remove item error:', error);
-    res.status(500).json({ message: 'Error removing item', error: error.message });
+    res.status(500).json({ message: 'Error removing item', error: (error as Error).message });
   }
 };
 
 /**
  * Get single item details
  */
-exports.getItem = async (req, res) => {
+export const getItem = async (req: Request<{ instanceId: string }>, res: Response): Promise<void> => {
   try {
     const { instanceId } = req.params;
 
     const player = await Player.findOne({ userId: req.user._id });
     if (!player) {
-      return res.status(404).json({ message: 'Player not found' });
+      res.status(404).json({ message: 'Player not found' });
+      return;
     }
 
     const item = player.getItem(instanceId);
     if (!item) {
-      return res.status(404).json({ message: 'Item not found in inventory' });
+      res.status(404).json({ message: 'Item not found in inventory' });
+      return;
     }
 
-    const details = itemService.getItemDetails(item.toObject());
+    const plainItem = convertMapsToObjects(item);
+    const details = itemService.getItemDetails(plainItem);
 
     res.json(details);
   } catch (error) {
     console.error('Get item error:', error);
-    res.status(500).json({ message: 'Error fetching item', error: error.message });
+    res.status(500).json({ message: 'Error fetching item', error: (error as Error).message });
   }
 };
 
 /**
  * Get all available item definitions
  */
-exports.getItemDefinitions = async (req, res) => {
+export const getItemDefinitions = async (req: Request<{}, {}, {}, { category?: ItemCategory }>, res: Response): Promise<void> => {
   try {
     const { category } = req.query;
 
@@ -193,33 +254,34 @@ exports.getItemDefinitions = async (req, res) => {
     res.json({ items });
   } catch (error) {
     console.error('Get item definitions error:', error);
-    res.status(500).json({ message: 'Error fetching item definitions', error: error.message });
+    res.status(500).json({ message: 'Error fetching item definitions', error: (error as Error).message });
   }
 };
 
 /**
  * Get single item definition
  */
-exports.getItemDefinition = async (req, res) => {
+export const getItemDefinition = async (req: Request<{ itemId: string }>, res: Response): Promise<void> => {
   try {
     const { itemId } = req.params;
 
     const item = itemService.getItemDefinition(itemId);
     if (!item) {
-      return res.status(404).json({ message: 'Item definition not found' });
+      res.status(404).json({ message: 'Item definition not found' });
+      return;
     }
 
     res.json(item);
   } catch (error) {
     console.error('Get item definition error:', error);
-    res.status(500).json({ message: 'Error fetching item definition', error: error.message });
+    res.status(500).json({ message: 'Error fetching item definition', error: (error as Error).message });
   }
 };
 
 /**
  * Reload item definitions (admin function)
  */
-exports.reloadDefinitions = async (req, res) => {
+export const reloadDefinitions = async (req: Request, res: Response): Promise<void> => {
   try {
     const result = await itemService.reloadDefinitions();
 
@@ -229,7 +291,7 @@ exports.reloadDefinitions = async (req, res) => {
     });
   } catch (error) {
     console.error('Reload definitions error:', error);
-    res.status(500).json({ message: 'Error reloading definitions', error: error.message });
+    res.status(500).json({ message: 'Error reloading definitions', error: (error as Error).message });
   }
 };
 
@@ -237,24 +299,27 @@ exports.reloadDefinitions = async (req, res) => {
  * Equip an item to a slot
  * Body: { instanceId, slotName }
  */
-exports.equipItem = async (req, res) => {
+export const equipItem = async (req: Request<{}, {}, EquipItemRequest>, res: Response): Promise<void> => {
   try {
     const { instanceId, slotName } = req.body;
 
     if (!instanceId || !slotName) {
-      return res.status(400).json({ message: 'instanceId and slotName are required' });
+      res.status(400).json({ message: 'instanceId and slotName are required' });
+      return;
     }
 
     const player = await Player.findOne({ userId: req.user._id });
     if (!player) {
-      return res.status(404).json({ message: 'Player not found' });
+      res.status(404).json({ message: 'Player not found' });
+      return;
     }
 
     // Equip the item
     const result = await player.equipItem(instanceId, slotName);
 
     // Get enhanced item details
-    const itemDetails = itemService.getItemDetails(result.item.toObject());
+    const plainItem = convertMapsToObjects(result.item);
+    const itemDetails = itemService.getItemDetails(plainItem);
 
     res.json({
       message: 'Item equipped successfully',
@@ -264,7 +329,7 @@ exports.equipItem = async (req, res) => {
     });
   } catch (error) {
     console.error('Equip item error:', error);
-    res.status(400).json({ message: error.message });
+    res.status(400).json({ message: (error as Error).message });
   }
 };
 
@@ -272,24 +337,26 @@ exports.equipItem = async (req, res) => {
  * Unequip an item from a slot
  * Body: { slotName }
  */
-exports.unequipItem = async (req, res) => {
+export const unequipItem = async (req: Request<{}, {}, UnequipItemRequest>, res: Response): Promise<void> => {
   try {
     const { slotName } = req.body;
 
     if (!slotName) {
-      return res.status(400).json({ message: 'slotName is required' });
+      res.status(400).json({ message: 'slotName is required' });
+      return;
     }
 
     const player = await Player.findOne({ userId: req.user._id });
     if (!player) {
-      return res.status(404).json({ message: 'Player not found' });
+      res.status(404).json({ message: 'Player not found' });
+      return;
     }
 
     // Unequip the item
     const result = await player.unequipItem(slotName);
 
     // Get enhanced item details
-    const itemDetails = result.item ? itemService.getItemDetails(result.item.toObject()) : null;
+    const itemDetails = result.item ? itemService.getItemDetails(convertMapsToObjects(result.item)) : null;
 
     res.json({
       message: 'Item unequipped successfully',
@@ -299,30 +366,31 @@ exports.unequipItem = async (req, res) => {
     });
   } catch (error) {
     console.error('Unequip item error:', error);
-    res.status(400).json({ message: error.message });
+    res.status(400).json({ message: (error as Error).message });
   }
 };
 
 /**
  * Get all equipped items
  */
-exports.getEquippedItems = async (req, res) => {
+export const getEquippedItems = async (req: Request, res: Response): Promise<void> => {
   try {
     const player = await Player.findOne({ userId: req.user._id });
     if (!player) {
-      return res.status(404).json({ message: 'Player not found' });
+      res.status(404).json({ message: 'Player not found' });
+      return;
     }
 
     const equippedItems = player.getEquippedItems();
 
     // Enhance equipped items with details
-    const enhancedEquipped = {};
+    const enhancedEquipped: Record<string, any> = {};
     for (const [slot, item] of Object.entries(equippedItems)) {
-      enhancedEquipped[slot] = itemService.getItemDetails(item.toObject());
+      enhancedEquipped[slot] = itemService.getItemDetails(convertMapsToObjects(item));
     }
 
     // Get all available slots
-    const allSlots = {};
+    const allSlots: Record<string, string | null> = {};
     for (const [slot, instanceId] of player.equipmentSlots.entries()) {
       allSlots[slot] = instanceId;
     }
@@ -333,62 +401,71 @@ exports.getEquippedItems = async (req, res) => {
     });
   } catch (error) {
     console.error('Get equipped items error:', error);
-    res.status(500).json({ message: 'Error fetching equipped items', error: error.message });
+    res.status(500).json({ message: 'Error fetching equipped items', error: (error as Error).message });
   }
 };
 
 /**
  * Use a consumable item
  */
-exports.useItem = async (req, res) => {
+export const useItem = async (req: Request<{}, {}, UseItemRequest>, res: Response): Promise<void> => {
   try {
     const { instanceId } = req.body;
 
     if (!instanceId) {
-      return res.status(400).json({ message: 'Instance ID is required' });
+      res.status(400).json({ message: 'Instance ID is required' });
+      return;
     }
 
     const player = await Player.findOne({ userId: req.user._id });
 
     if (!player) {
-      return res.status(404).json({ message: 'Player not found' });
+      res.status(404).json({ message: 'Player not found' });
+      return;
     }
 
     // Find the item in inventory
     const itemInstance = player.inventory.find(item => item.instanceId === instanceId);
 
     if (!itemInstance) {
-      return res.status(404).json({ message: 'Item not found in inventory' });
+      res.status(404).json({ message: 'Item not found in inventory' });
+      return;
     }
 
     // Get item definition
     const itemDefinition = itemService.getItemDefinition(itemInstance.itemId);
 
     if (!itemDefinition) {
-      return res.status(404).json({ message: 'Item definition not found' });
+      res.status(404).json({ message: 'Item definition not found' });
+      return;
     }
 
     // Verify item is consumable
     if (itemDefinition.category !== 'consumable') {
-      return res.status(400).json({ message: 'Item is not consumable' });
+      res.status(400).json({ message: 'Item is not consumable' });
+      return;
     }
 
     // Check if player is at full health and mana (don't waste items)
     const isHealthFull = player.stats.health.current >= player.stats.health.max;
     const isManaFull = player.stats.mana.current >= player.stats.mana.max;
-    const restoresHealth = itemDefinition.properties?.healthRestore > 0;
-    const restoresMana = itemDefinition.properties?.manaRestore > 0;
+    const consumableItem = itemDefinition as ConsumableItem;
+    const restoresHealth = (consumableItem.properties?.healthRestore || 0) > 0;
+    const restoresMana = (consumableItem.properties?.manaRestore || 0) > 0;
 
     if (restoresHealth && !restoresMana && isHealthFull) {
-      return res.status(400).json({ message: 'Health is already full' });
+      res.status(400).json({ message: 'Health is already full' });
+      return;
     }
 
     if (restoresMana && !restoresHealth && isManaFull) {
-      return res.status(400).json({ message: 'Mana is already full' });
+      res.status(400).json({ message: 'Mana is already full' });
+      return;
     }
 
     if (restoresHealth && restoresMana && isHealthFull && isManaFull) {
-      return res.status(400).json({ message: 'Health and mana are already full' });
+      res.status(400).json({ message: 'Health and mana are already full' });
+      return;
     }
 
     // Use the item and apply effects
@@ -402,11 +479,12 @@ exports.useItem = async (req, res) => {
     // Get updated combat state if in combat
     let combat = null;
     if (player.isInCombat()) {
+      const activeCombat = player.activeCombat!;
       combat = {
-        ...player.activeCombat.toObject(),
+        ...convertMapsToObjects(activeCombat),
         playerHealth: player.stats.health,
         playerMana: player.stats.mana,
-        combatLog: player.activeCombat.combatLog.map(entry => entry.toObject())
+        combatLog: activeCombat.combatLog.map(entry => convertMapsToObjects(entry))
       };
     }
 
@@ -423,6 +501,6 @@ exports.useItem = async (req, res) => {
     });
   } catch (error) {
     console.error('Use item error:', error);
-    res.status(500).json({ message: 'Error using item', error: error.message });
+    res.status(500).json({ message: 'Error using item', error: (error as Error).message });
   }
 };
