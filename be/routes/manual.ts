@@ -1,6 +1,7 @@
-const express = require('express');
+import express from 'express';
+import * as manualController from '../controllers/manualController';
+
 const router = express.Router();
-const manualController = require('../controllers/manualController');
 
 /**
  * Manual Routes
@@ -29,4 +30,4 @@ router.get('/locations', manualController.getLocations);
 // GET /api/manual/biomes - Get biome definitions
 router.get('/biomes', manualController.getBiomes);
 
-module.exports = router;
+export default router;

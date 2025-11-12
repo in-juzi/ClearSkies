@@ -1,7 +1,8 @@
-const express = require('express');
+import express from 'express';
+import { protect } from '../middleware/auth';
+import * as combatController from '../controllers/combatController';
+
 const router = express.Router();
-const { protect } = require('../middleware/auth');
-const combatController = require('../controllers/combatController');
 
 // All routes require authentication
 router.use(protect);
@@ -21,4 +22,4 @@ router.post('/flee', combatController.flee);
 // POST /api/combat/restart - Restart combat with same activity
 router.post('/restart', combatController.restartCombat);
 
-module.exports = router;
+export default router;

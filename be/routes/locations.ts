@@ -1,7 +1,8 @@
-const express = require('express');
+import express from 'express';
+import * as locationController from '../controllers/locationController';
+import { protect } from '../middleware/auth';
+
 const router = express.Router();
-const locationController = require('../controllers/locationController');
-const { protect } = require('../middleware/auth');
 
 // All location routes require authentication
 router.use(protect);
@@ -30,4 +31,4 @@ router.post('/activities/cancel', locationController.cancelActivity);
 router.get('/definitions/all', locationController.getAllDefinitions);
 router.post('/definitions/reload', locationController.reloadDefinitions);
 
-module.exports = router;
+export default router;

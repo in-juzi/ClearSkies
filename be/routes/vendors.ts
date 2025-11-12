@@ -1,7 +1,8 @@
-const express = require('express');
+import express from 'express';
+import * as vendorController from '../controllers/vendorController';
+import { protect } from '../middleware/auth';
+
 const router = express.Router();
-const vendorController = require('../controllers/vendorController');
-const { protect } = require('../middleware/auth');
 
 // All vendor routes require authentication
 router.use(protect);
@@ -26,4 +27,4 @@ router.post('/:vendorId/buy', vendorController.buyItem);
  */
 router.post('/:vendorId/sell', vendorController.sellItem);
 
-module.exports = router;
+export default router;

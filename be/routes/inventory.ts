@@ -1,7 +1,8 @@
-const express = require('express');
+import express from 'express';
+import * as inventoryController from '../controllers/inventoryController';
+import { protect } from '../middleware/auth';
+
 const router = express.Router();
-const inventoryController = require('../controllers/inventoryController');
-const { protect } = require('../middleware/auth');
 
 // All routes are protected
 router.use(protect);
@@ -38,4 +39,4 @@ router.post('/equipment/unequip', inventoryController.unequipItem);
 // Consumable item routes
 router.post('/use', inventoryController.useItem);
 
-module.exports = router;
+export default router;

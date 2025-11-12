@@ -1,11 +1,8 @@
-const express = require('express');
+import express from 'express';
+import { protect } from '../middleware/auth';
+import { getSkills, addSkillExperience, getSkill } from '../controllers/skillsController';
+
 const router = express.Router();
-const { protect } = require('../middleware/auth');
-const {
-  getSkills,
-  addSkillExperience,
-  getSkill
-} = require('../controllers/skillsController');
 
 // All routes are protected (require authentication)
 router.use(protect);
@@ -19,4 +16,4 @@ router.get('/:skillName', getSkill);
 // Add experience to a skill
 router.post('/:skillName/experience', addSkillExperience);
 
-module.exports = router;
+export default router;

@@ -1,7 +1,8 @@
-const express = require('express');
+import express from 'express';
+import * as craftingController from '../controllers/craftingController';
+import { protect } from '../middleware/auth';
+
 const router = express.Router();
-const craftingController = require('../controllers/craftingController');
-const { protect } = require('../middleware/auth');
 
 // All routes require authentication
 router.use(protect);
@@ -21,4 +22,4 @@ router.post('/complete', craftingController.completeCrafting);
 // POST /api/crafting/cancel - Cancel crafting
 router.post('/cancel', craftingController.cancelCrafting);
 
-module.exports = router;
+export default router;

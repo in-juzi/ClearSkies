@@ -1,7 +1,8 @@
-const express = require('express');
+import express from 'express';
+import * as attributesController from '../controllers/attributesController';
+import { protect } from '../middleware/auth';
+
 const router = express.Router();
-const attributesController = require('../controllers/attributesController');
-const { protect } = require('../middleware/auth');
 
 // All attribute routes require authentication
 router.use(protect);
@@ -15,4 +16,4 @@ router.get('/:attributeName', attributesController.getAttribute);
 // Add experience to a specific attribute
 router.post('/:attributeName/experience', attributesController.addAttributeExperience);
 
-module.exports = router;
+export default router;
