@@ -40,6 +40,10 @@ export class CraftingService {
       body.selectedIngredients = selectedIngredients;
     }
 
+    // Set isCrafting immediately to prevent UI flicker during auto-restart
+    // This ensures the crafting panel stays visible during the HTTP request
+    this.isCrafting.set(true);
+
     return this.http.post<any>(`${this.apiUrl}/start`, body).pipe(
       tap(response => {
         if (response.activeCrafting) {
@@ -49,8 +53,11 @@ export class CraftingService {
             endTime: new Date(response.activeCrafting.endTime),
             selectedIngredients: response.activeCrafting.selectedIngredients
           });
-          this.isCrafting.set(true);
+          // isCrafting already set above
           this.updateRemainingTime();
+        } else {
+          // If no active crafting in response, reset state
+          this.isCrafting.set(false);
         }
       })
     );
@@ -62,11 +69,6 @@ export class CraftingService {
   completeCrafting(): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/complete`, {}).pipe(
       tap(response => {
-        // Clear crafting state first
-        this.activeCrafting.set(null);
-        this.isCrafting.set(false);
-        this.remainingTime.set(0);
-
         // Refresh inventory to show new items and removed ingredients
         // IMPORTANT: Do this BEFORE setting lastResult to ensure inventory updates
         // before any auto-restart logic runs

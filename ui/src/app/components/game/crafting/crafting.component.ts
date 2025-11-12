@@ -4,6 +4,7 @@ import { RecipeService } from '../../../services/recipe.service';
 import { CraftingService } from '../../../services/crafting.service';
 import { InventoryService } from '../../../services/inventory.service';
 import { AuthService } from '../../../services/auth.service';
+import { SkillsService } from '../../../services/skills.service';
 import { Recipe } from '../../../models/recipe.model';
 import { ItemModifiersComponent } from '../../shared/item-modifiers/item-modifiers.component';
 import { ItemMiniComponent } from '../../shared/item-mini/item-mini.component';
@@ -32,6 +33,11 @@ export class CraftingComponent implements OnInit {
   lastCraftedRecipeId = signal<string | null>(null); // Track last crafted recipe for auto-restart
   isRestarting = signal<boolean>(false); // Prevent multiple simultaneous restart attempts
   activeOutputIcon = signal<any>(null); // Icon for the active crafting output
+
+  // Filter state
+  searchQuery = signal<string>('');
+  showCraftableOnly = signal<boolean>(false);
+  sortBy = signal<'level' | 'name' | 'xp'>('level');
   craftingLog: Array<{
     timestamp: Date;
     recipeName: string;
@@ -48,9 +54,34 @@ export class CraftingComponent implements OnInit {
 
   // Computed values
   filteredRecipes = computed(() => {
-    return this.recipeService.recipes()
-      .filter(r => r.skill === this.skill)
-      .sort((a, b) => a.requiredLevel - b.requiredLevel);
+    let recipes = this.recipeService.recipes()
+      .filter(r => r.skill === this.skill);
+
+    // Apply search filter
+    const search = this.searchQuery().toLowerCase();
+    if (search) {
+      recipes = recipes.filter(r =>
+        r.name.toLowerCase().includes(search) ||
+        r.description.toLowerCase().includes(search)
+      );
+    }
+
+    // Apply craftable filter
+    if (this.showCraftableOnly()) {
+      recipes = recipes.filter(r => this.canCraft(r).canCraft);
+    }
+
+    // Apply sorting
+    const sortBy = this.sortBy();
+    if (sortBy === 'level') {
+      recipes = recipes.sort((a, b) => a.requiredLevel - b.requiredLevel);
+    } else if (sortBy === 'name') {
+      recipes = recipes.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (sortBy === 'xp') {
+      recipes = recipes.sort((a, b) => b.experience - a.experience);
+    }
+
+    return recipes;
   });
 
   playerSkills = computed(() => this.authService.currentPlayer()?.skills);
@@ -120,41 +151,49 @@ export class CraftingComponent implements OnInit {
     public recipeService: RecipeService,
     public craftingService: CraftingService,
     private inventoryService: InventoryService,
-    private authService: AuthService
+    private authService: AuthService,
+    private skillsService: SkillsService
   ) {
     // Setup auto-restart watcher in constructor (injection context)
     effect(() => {
       const lastResult = this.craftingService.lastResult();
       const autoRestart = this.autoRestartEnabled();
-      const isCrafting = this.craftingService.isCrafting();
       const isRestarting = this.isRestarting();
 
+      // CRITICAL: Inventory must be loaded for auto-restart to work
+      // This dependency ensures effect re-runs when inventory updates
+      const inventory = this.playerInventory();
+
       // If we just completed crafting and auto-restart is enabled, and we're not already restarting
-      if (lastResult && autoRestart && !isCrafting && !isRestarting) {
+      // Note: We don't check isCrafting here since completeCrafting() doesn't clear it to prevent flicker
+      if (lastResult && autoRestart && !isRestarting && inventory) {
+        // Set restarting flag IMMEDIATELY to prevent UI flicker
+        // This ensures the crafting panel stays visible during transition
+        this.isRestarting.set(true);
+
+        // Refresh skills to show updated XP from crafting
+        this.skillsService.getSkills().subscribe();
+
         // Get outputs (support both old and new schema)
         const outputs = lastResult.outputs || (lastResult.output ? [lastResult.output] : []);
 
         // Add to crafting log (one entry per output)
-        for (const output of outputs) {
-          this.craftingLog.unshift({
-            timestamp: new Date(),
-            recipeName: lastResult.recipe.name,
-            experience: lastResult.experience.xp,
-            skill: lastResult.experience.skill,
-            output: {
-              itemId: output.itemId,
-              name: output.name, // Include display name
-              quantity: output.quantity,
-              qualities: output.qualities,
-              traits: output.traits
-            }
-          });
-        }
+        const newEntries = outputs.map(output => ({
+          timestamp: new Date(),
+          recipeName: lastResult.recipe.name,
+          experience: lastResult.experience.xp,
+          skill: lastResult.experience.skill,
+          output: {
+            itemId: output.itemId,
+            name: output.name, // Include display name
+            quantity: output.quantity,
+            qualities: output.qualities,
+            traits: output.traits
+          }
+        }));
 
-        // Keep only the last 10 entries
-        if (this.craftingLog.length > 10) {
-          this.craftingLog = this.craftingLog.slice(0, 10);
-        }
+        // Create new array instead of mutating to ensure Angular change detection
+        this.craftingLog = [...newEntries, ...this.craftingLog].slice(0, 10);
 
         const recipeId = lastResult.recipe.recipeId;
         const recipe = this.recipeService.getRecipe(recipeId);
@@ -163,8 +202,7 @@ export class CraftingComponent implements OnInit {
           // Check if we can still craft this recipe
           const check = this.canCraft(recipe);
           if (check.canCraft) {
-            // Set restarting flag to prevent duplicate triggers
-            this.isRestarting.set(true);
+            // Already set restarting flag above to prevent flicker
 
             // Try to reuse the same ingredient instances if possible
             const reused = this.reuseIngredientSelection(recipe);
@@ -176,21 +214,26 @@ export class CraftingComponent implements OnInit {
 
             // Check if we have enough selected
             if (this.hasSelectedEnough(recipe)) {
-              // Small delay to let the UI update
-              setTimeout(() => {
-                this.restartCrafting(recipe);
-              }, 500);
+              // Restart immediately now that inventory is confirmed updated
+              this.restartCrafting(recipe);
             } else {
               // Not enough ingredients, disable auto-restart
               this.autoRestartEnabled.set(false);
               this.isRestarting.set(false);
+              this.craftingService.isCrafting.set(false); // Stop showing crafting UI
               this.showMessage('Auto-restart stopped: Not enough ingredients', 'info');
             }
           } else {
             // Can't craft anymore, disable auto-restart
             this.autoRestartEnabled.set(false);
+            this.isRestarting.set(false);
+            this.craftingService.isCrafting.set(false); // Stop showing crafting UI
             this.showMessage('Auto-restart stopped: ' + check.message, 'info');
           }
+        } else {
+          // No recipe found, stop auto-restart
+          this.isRestarting.set(false);
+          this.craftingService.isCrafting.set(false); // Stop showing crafting UI
         }
       }
     });
@@ -210,19 +253,16 @@ export class CraftingComponent implements OnInit {
       selectedIngredients[itemId] = instanceIds;
     });
 
-    // Icon is already loaded from the previous craft, no need to fetch again
-
-    // Clear the last result to avoid triggering the watcher again
-    this.craftingService.clearResult();
-
     this.craftingService.startCrafting(recipe.recipeId, selectedIngredients).subscribe({
       next: (response) => {
-        // Silent restart - no message or UI change
+        // Clear result AFTER craft starts to prevent effect from retriggering during transition
+        this.craftingService.clearResult();
         // Reset restarting flag now that craft has started
         this.isRestarting.set(false);
       },
       error: (error) => {
         console.error('Error restarting crafting:', error);
+        this.craftingService.clearResult();
         this.autoRestartEnabled.set(false);
         this.isRestarting.set(false);
         this.showMessage('Auto-restart failed: ' + (error.error?.message || 'Unknown error'), 'error');
@@ -622,5 +662,21 @@ export class CraftingComponent implements OnInit {
    */
   clearResult(): void {
     this.craftingService.clearResult();
+  }
+
+  /**
+   * Clear all filters
+   */
+  clearFilters(): void {
+    this.searchQuery.set('');
+    this.showCraftableOnly.set(false);
+    this.sortBy.set('level');
+  }
+
+  /**
+   * Check if any filters are active
+   */
+  hasActiveFilters(): boolean {
+    return this.searchQuery() !== '' || this.showCraftableOnly() || this.sortBy() !== 'level';
   }
 }
