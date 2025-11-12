@@ -58,6 +58,7 @@ export interface Activity {
   stubMessage?: string;
   available?: boolean;
   requirementFailures?: string[];
+  monsterLevel?: number; // Level of the monster for combat activities
 }
 
 export interface Facility {

@@ -135,6 +135,9 @@
         <div class="info-item">
           <strong>Type:</strong> {{ selectedActivity.type }}
         </div>
+        <div class="info-item" *ngIf="selectedActivity.type === 'combat' && selectedActivity.monsterLevel">
+          <strong>Monster Level:</strong> {{ selectedActivity.monsterLevel }}
+        </div>
       </div>
 
       <div class="requirements" *ngIf="hasRequirements(selectedActivity)">
@@ -238,6 +241,7 @@
           <p>{{ activity.description }}</p>
           <div class="activity-meta">
             <span *ngIf="activity.duration !== undefined && activity.duration > 0">⏱️ {{ activity.duration }}s</span>
+            <span *ngIf="activity.type === 'combat' && activity.monsterLevel">⚔️ Level {{ activity.monsterLevel }}</span>
             <span *ngIf="!activity.available" class="unavailable-badge">Requirements Not Met</span>
           </div>
         </div>
