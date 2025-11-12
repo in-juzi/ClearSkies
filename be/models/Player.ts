@@ -1,8 +1,196 @@
-const mongoose = require('mongoose');
+import mongoose, { Document, Schema, Model } from 'mongoose';
+import {
+  SkillName,
+  AttributeName,
+  Skill,
+  Attribute,
+  Stats,
+  QualityMap,
+  TraitMap,
+  EquipmentSlot,
+  CombatLogType
+} from '../types';
 
-const playerSchema = new mongoose.Schema({
+// ============================================================================
+// Type Definitions
+// ============================================================================
+
+export interface InventoryItem {
+  instanceId: string;
+  itemId: string;
+  quantity: number;
+  qualities: Map<string, number>;
+  traits: Map<string, number>;
+  equipped: boolean;
+  acquiredAt: Date;
+}
+
+export interface ActiveActivity {
+  activityId: string;
+  facilityId: string;
+  locationId: string;
+  startTime: Date;
+  endTime: Date;
+}
+
+export interface TravelState {
+  isTravel: boolean;
+  targetLocationId?: string;
+  startTime?: Date;
+  endTime?: Date;
+}
+
+export interface ActiveCrafting {
+  recipeId?: string;
+  startTime?: Date;
+  endTime?: Date;
+  selectedIngredients?: Map<string, string[]>;
+}
+
+export interface CombatLogEntry {
+  timestamp: Date;
+  message: string;
+  type: CombatLogType;
+}
+
+export interface ActiveCombat {
+  activityId?: string;
+  monsterId?: string;
+  monsterInstance?: Map<string, any>;
+  playerLastAttackTime?: Date;
+  monsterLastAttackTime?: Date;
+  playerNextAttackTime?: Date;
+  monsterNextAttackTime?: Date;
+  turnCount: number;
+  abilityCooldowns?: Map<string, number>;
+  combatLog: CombatLogEntry[];
+  startTime?: Date;
+}
+
+export interface CombatStats {
+  monstersDefeated: number;
+  totalDamageDealt: number;
+  totalDamageTaken: number;
+  deaths: number;
+  criticalHits: number;
+  dodges: number;
+}
+
+export interface QuestProgress {
+  questId: mongoose.Types.ObjectId;
+  status: 'not_started' | 'in_progress' | 'completed';
+  progress: Map<string, any>;
+}
+
+export interface Achievement {
+  achievementId: mongoose.Types.ObjectId;
+  unlockedAt: Date;
+}
+
+export interface PlayerStats {
+  health: Stats;
+  mana: Stats;
+  strength: number;
+  dexterity: number;
+  intelligence: number;
+  vitality: number;
+}
+
+// ============================================================================
+// Document Interface (represents a Player document from MongoDB)
+// ============================================================================
+
+export interface IPlayer extends Document {
+  userId: mongoose.Types.ObjectId;
+  level: number;
+  experience: number;
+  stats: PlayerStats;
+  gold: number;
+  inventory: InventoryItem[];
+  inventoryCapacity: number;
+  equipmentSlots: Map<string, string | null>;
+  currentLocation: string;
+  discoveredLocations: string[];
+  activeActivity?: ActiveActivity;
+  travelState?: TravelState;
+  activeCrafting?: ActiveCrafting;
+  activeCombat?: ActiveCombat;
+  lastCombatActivityId?: string;
+  combatStats: CombatStats;
+  questProgress: QuestProgress[];
+  achievements: Achievement[];
+  attributes: Record<AttributeName, Attribute>;
+  skills: Record<SkillName, Skill>;
+  createdAt: Date;
+  lastPlayed: Date;
+
+  // Methods
+  updateLastPlayed(): Promise<void>;
+  addExperience(amount: number): Promise<boolean>;
+  addGold(amount: number): void;
+  removeGold(amount: number): void;
+  addAttributeExperience(attributeName: AttributeName, amount: number): Promise<{
+    leveledUp: boolean;
+    oldLevel?: number;
+    newLevel?: number;
+    level?: number;
+    attribute: AttributeName;
+  }>;
+  getAttributeProgress(attributeName: AttributeName): number;
+  addSkillExperience(skillName: SkillName, amount: number): Promise<{
+    skill: {
+      skill: SkillName;
+      leveledUp: boolean;
+      level: number;
+      oldLevel: number;
+      newLevel: number;
+    };
+    attribute: {
+      leveledUp: boolean;
+      oldLevel?: number;
+      newLevel?: number;
+      level?: number;
+      attribute: AttributeName;
+    };
+  }>;
+  getSkillProgress(skillName: SkillName): number;
+  addItem(itemInstance: any): any;
+  removeItem(instanceId: string, quantity?: number | null): InventoryItem;
+  getItem(instanceId: string): InventoryItem | undefined;
+  getItemsByItemId(itemId: string): InventoryItem[];
+  getInventorySize(): number;
+  getInventoryValue(): number;
+  equipItem(instanceId: string, slotName: string): Promise<{ slot: string; item: InventoryItem }>;
+  unequipItem(slotName: string): Promise<{ slot: string; item: InventoryItem | undefined }>;
+  getEquippedItems(): Record<string, InventoryItem>;
+  isSlotAvailable(slotName: string): boolean;
+  addEquipmentSlot(slotName: string): Promise<string>;
+  hasEquippedSubtype(subtype: string, itemService: any): boolean;
+  hasInventoryItem(itemId: string, minQuantity?: number): boolean;
+  getInventoryItemQuantity(itemId: string): number;
+  takeDamage(amount: number): boolean;
+  heal(amount: number): void;
+  useMana(amount: number): void;
+  restoreMana(amount: number): void;
+  useConsumableItem(itemInstance: any, itemDefinition: any): {
+    healthRestored: number;
+    manaRestored: number;
+  };
+  isInCombat(): boolean;
+  addCombatLog(message: string, type?: CombatLogType): void;
+  clearCombat(): void;
+  isAbilityOnCooldown(abilityId: string): boolean;
+  setAbilityCooldown(abilityId: string, cooldownTurns: number): void;
+  getAbilityCooldownRemaining(abilityId: string): number;
+}
+
+// ============================================================================
+// Schema Definition
+// ============================================================================
+
+const playerSchema = new Schema<IPlayer>({
   userId: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'User',
     required: true,
     unique: true
@@ -39,16 +227,16 @@ const playerSchema = new mongoose.Schema({
   },
   inventory: [{
     instanceId: { type: String, required: true },
-    itemId: { type: String, required: true }, // Reference to item definition
+    itemId: { type: String, required: true },
     quantity: { type: Number, default: 1, min: 1 },
     qualities: {
       type: Map,
-      of: Number, // Stores quality levels as integers (1-5)
+      of: Number,
       default: {}
     },
     traits: {
       type: Map,
-      of: Number, // Stores trait levels as integers (1-3)
+      of: Number,
       default: {}
     },
     equipped: { type: Boolean, default: false },
@@ -59,8 +247,6 @@ const playerSchema = new mongoose.Schema({
     default: 100,
     min: 1
   },
-  // Equipment slots - extensible Map structure
-  // Key = slot name, Value = instanceId of equipped item (or null)
   equipmentSlots: {
     type: Map,
     of: String,
@@ -77,10 +263,9 @@ const playerSchema = new mongoose.Schema({
       ['ringLeft', null]
     ])
   },
-  // Location system
   currentLocation: {
     type: String,
-    default: 'kennik' // Starting location
+    default: 'kennik'
   },
   discoveredLocations: {
     type: [String],
@@ -105,17 +290,16 @@ const playerSchema = new mongoose.Schema({
     endTime: { type: Date },
     selectedIngredients: { type: Map, of: [String] }
   },
-  // Combat system
   activeCombat: {
-    activityId: { type: String }, // Activity that started this combat (for restart)
+    activityId: { type: String },
     monsterId: { type: String },
-    monsterInstance: { type: Map, of: mongoose.Schema.Types.Mixed }, // Full monster state
+    monsterInstance: { type: Map, of: Schema.Types.Mixed },
     playerLastAttackTime: { type: Date },
     monsterLastAttackTime: { type: Date },
     playerNextAttackTime: { type: Date },
     monsterNextAttackTime: { type: Date },
-    turnCount: { type: Number, default: 0 }, // Track player attack count for ability cooldowns
-    abilityCooldowns: { type: Map, of: Number }, // abilityId -> turn when available
+    turnCount: { type: Number, default: 0 },
+    abilityCooldowns: { type: Map, of: Number },
     combatLog: [{
       timestamp: { type: Date, default: Date.now },
       message: { type: String },
@@ -123,7 +307,7 @@ const playerSchema = new mongoose.Schema({
     }],
     startTime: { type: Date }
   },
-  lastCombatActivityId: { type: String }, // Last combat activity for restart (persists after combat ends)
+  lastCombatActivityId: { type: String },
   combatStats: {
     monstersDefeated: { type: Number, default: 0 },
     totalDamageDealt: { type: Number, default: 0 },
@@ -133,16 +317,16 @@ const playerSchema = new mongoose.Schema({
     dodges: { type: Number, default: 0 }
   },
   questProgress: [{
-    questId: { type: mongoose.Schema.Types.ObjectId, ref: 'Quest' },
+    questId: { type: Schema.Types.ObjectId, ref: 'Quest' },
     status: {
       type: String,
       enum: ['not_started', 'in_progress', 'completed'],
       default: 'not_started'
     },
-    progress: { type: Map, of: mongoose.Schema.Types.Mixed }
+    progress: { type: Map, of: Schema.Types.Mixed }
   }],
   achievements: [{
-    achievementId: { type: mongoose.Schema.Types.ObjectId, ref: 'Achievement' },
+    achievementId: { type: Schema.Types.ObjectId, ref: 'Achievement' },
     unlockedAt: { type: Date, default: Date.now }
   }],
   attributes: {
@@ -206,7 +390,6 @@ const playerSchema = new mongoose.Schema({
       experience: { type: Number, default: 0, min: 0 },
       mainAttribute: { type: String, default: 'will' }
     },
-    // Combat skills
     oneHanded: {
       level: { type: Number, default: 1, min: 1 },
       experience: { type: Number, default: 0, min: 0 },
@@ -250,14 +433,18 @@ const playerSchema = new mongoose.Schema({
   timestamps: true
 });
 
+// ============================================================================
+// Instance Methods
+// ============================================================================
+
 // Update last played time
-playerSchema.methods.updateLastPlayed = async function() {
+playerSchema.methods.updateLastPlayed = async function(this: IPlayer): Promise<void> {
   this.lastPlayed = new Date();
   await this.save();
 };
 
 // Add experience and handle leveling
-playerSchema.methods.addExperience = async function(amount) {
+playerSchema.methods.addExperience = async function(this: IPlayer, amount: number): Promise<boolean> {
   this.experience += amount;
 
   // Simple leveling formula: level = floor(sqrt(experience / 100))
@@ -281,12 +468,12 @@ playerSchema.methods.addExperience = async function(amount) {
 };
 
 // Add gold
-playerSchema.methods.addGold = function(amount) {
+playerSchema.methods.addGold = function(this: IPlayer, amount: number): void {
   this.gold += amount;
 };
 
 // Remove gold (with validation)
-playerSchema.methods.removeGold = function(amount) {
+playerSchema.methods.removeGold = function(this: IPlayer, amount: number): void {
   if (this.gold < amount) {
     throw new Error('Insufficient gold');
   }
@@ -294,8 +481,18 @@ playerSchema.methods.removeGold = function(amount) {
 };
 
 // Add attribute experience and handle attribute leveling
-playerSchema.methods.addAttributeExperience = async function(attributeName, amount) {
-  const validAttributes = ['strength', 'endurance', 'magic', 'perception', 'dexterity', 'will', 'charisma'];
+playerSchema.methods.addAttributeExperience = async function(
+  this: IPlayer,
+  attributeName: AttributeName,
+  amount: number
+): Promise<{
+  leveledUp: boolean;
+  oldLevel?: number;
+  newLevel?: number;
+  level?: number;
+  attribute: AttributeName;
+}> {
+  const validAttributes: AttributeName[] = ['strength', 'endurance', 'magic', 'perception', 'dexterity', 'will', 'charisma'];
 
   if (!validAttributes.includes(attributeName)) {
     throw new Error(`Invalid attribute name: ${attributeName}`);
@@ -319,8 +516,8 @@ playerSchema.methods.addAttributeExperience = async function(attributeName, amou
 };
 
 // Get progress to next attribute level (0-100%)
-playerSchema.methods.getAttributeProgress = function(attributeName) {
-  const validAttributes = ['strength', 'endurance', 'magic', 'perception', 'dexterity', 'will', 'charisma'];
+playerSchema.methods.getAttributeProgress = function(this: IPlayer, attributeName: AttributeName): number {
+  const validAttributes: AttributeName[] = ['strength', 'endurance', 'magic', 'perception', 'dexterity', 'will', 'charisma'];
 
   if (!validAttributes.includes(attributeName)) {
     throw new Error(`Invalid attribute name: ${attributeName}`);
@@ -333,8 +530,30 @@ playerSchema.methods.getAttributeProgress = function(attributeName) {
 
 // Add skill experience and handle skill leveling
 // Also awards XP to the skill's main attribute (50% of skill XP)
-playerSchema.methods.addSkillExperience = async function(skillName, amount) {
-  const validSkills = ['woodcutting', 'mining', 'fishing', 'smithing', 'cooking', 'herbalism', 'oneHanded', 'dualWield', 'twoHanded', 'ranged', 'casting', 'gun'];
+playerSchema.methods.addSkillExperience = async function(
+  this: IPlayer,
+  skillName: SkillName,
+  amount: number
+): Promise<{
+  skill: {
+    skill: SkillName;
+    leveledUp: boolean;
+    level: number;
+    oldLevel: number;
+    newLevel: number;
+  };
+  attribute: {
+    leveledUp: boolean;
+    oldLevel?: number;
+    newLevel?: number;
+    level?: number;
+    attribute: AttributeName;
+  };
+}> {
+  const validSkills: SkillName[] = [
+    'woodcutting', 'mining', 'fishing', 'smithing', 'cooking', 'herbalism',
+    'oneHanded', 'dualWield', 'twoHanded', 'ranged', 'casting', 'gun'
+  ];
 
   if (!validSkills.includes(skillName)) {
     throw new Error(`Invalid skill name: ${skillName}`);
@@ -362,7 +581,7 @@ playerSchema.methods.addSkillExperience = async function(skillName, amount) {
   }
 
   // Award attribute XP (50% of skill XP to main attribute)
-  const mainAttribute = skill.mainAttribute;
+  const mainAttribute = skill.mainAttribute as AttributeName;
   const attributeXP = Math.floor(amount * 0.5);
   const attributeResult = await this.addAttributeExperience(mainAttribute, attributeXP);
 
@@ -373,8 +592,11 @@ playerSchema.methods.addSkillExperience = async function(skillName, amount) {
 };
 
 // Get progress to next skill level (0-100%)
-playerSchema.methods.getSkillProgress = function(skillName) {
-  const validSkills = ['woodcutting', 'mining', 'fishing', 'smithing', 'cooking', 'herbalism', 'oneHanded', 'dualWield', 'twoHanded', 'ranged', 'casting', 'gun'];
+playerSchema.methods.getSkillProgress = function(this: IPlayer, skillName: SkillName): number {
+  const validSkills: SkillName[] = [
+    'woodcutting', 'mining', 'fishing', 'smithing', 'cooking', 'herbalism',
+    'oneHanded', 'dualWield', 'twoHanded', 'ranged', 'casting', 'gun'
+  ];
 
   if (!validSkills.includes(skillName)) {
     throw new Error(`Invalid skill name: ${skillName}`);
@@ -385,10 +607,12 @@ playerSchema.methods.getSkillProgress = function(skillName) {
   return (xpInCurrentLevel / 1000) * 100;
 };
 
+// ============================================================================
 // Inventory Management Methods
+// ============================================================================
 
 // Add item to inventory
-playerSchema.methods.addItem = function(itemInstance) {
+playerSchema.methods.addItem = function(this: IPlayer, itemInstance: any): any {
   // Check inventory capacity
   const currentSize = this.inventory.reduce((sum, item) => sum + item.quantity, 0);
   if (currentSize + itemInstance.quantity > this.inventoryCapacity) {
@@ -396,7 +620,7 @@ playerSchema.methods.addItem = function(itemInstance) {
   }
 
   // Try to stack with existing items
-  const itemService = require('../services/itemService');
+  const itemService = require('../services/itemService').default;
   const existingItem = this.inventory.find(inv =>
     itemService.canStack(inv, itemInstance)
   );
@@ -419,7 +643,11 @@ playerSchema.methods.addItem = function(itemInstance) {
 };
 
 // Remove item from inventory by instance ID
-playerSchema.methods.removeItem = function(instanceId, quantity = null) {
+playerSchema.methods.removeItem = function(
+  this: IPlayer,
+  instanceId: string,
+  quantity: number | null = null
+): InventoryItem {
   const itemIndex = this.inventory.findIndex(item => item.instanceId === instanceId);
 
   if (itemIndex === -1) {
@@ -443,34 +671,40 @@ playerSchema.methods.removeItem = function(instanceId, quantity = null) {
 };
 
 // Get item from inventory by instance ID
-playerSchema.methods.getItem = function(instanceId) {
+playerSchema.methods.getItem = function(this: IPlayer, instanceId: string): InventoryItem | undefined {
   return this.inventory.find(item => item.instanceId === instanceId);
 };
 
 // Get all items of a specific itemId
-playerSchema.methods.getItemsByItemId = function(itemId) {
+playerSchema.methods.getItemsByItemId = function(this: IPlayer, itemId: string): InventoryItem[] {
   return this.inventory.filter(item => item.itemId === itemId);
 };
 
 // Get inventory size
-playerSchema.methods.getInventorySize = function() {
+playerSchema.methods.getInventorySize = function(this: IPlayer): number {
   return this.inventory.reduce((sum, item) => sum + item.quantity, 0);
 };
 
 // Get inventory value (total vendor price)
-playerSchema.methods.getInventoryValue = function() {
-  const itemService = require('../services/itemService');
+playerSchema.methods.getInventoryValue = function(this: IPlayer): number {
+  const itemService = require('../services/itemService').default;
   return this.inventory.reduce((sum, item) => {
     const price = itemService.calculateVendorPrice(item);
     return sum + (price * item.quantity);
   }, 0);
 };
 
+// ============================================================================
 // Equipment Management Methods
+// ============================================================================
 
 // Equip an item to a slot
-playerSchema.methods.equipItem = async function(instanceId, slotName) {
-  const itemService = require('../services/itemService');
+playerSchema.methods.equipItem = async function(
+  this: IPlayer,
+  instanceId: string,
+  slotName: string
+): Promise<{ slot: string; item: InventoryItem }> {
+  const itemService = require('../services/itemService').default;
 
   // Find the item in inventory
   const item = this.getItem(instanceId);
@@ -515,7 +749,10 @@ playerSchema.methods.equipItem = async function(instanceId, slotName) {
 };
 
 // Unequip an item from a slot
-playerSchema.methods.unequipItem = async function(slotName) {
+playerSchema.methods.unequipItem = async function(
+  this: IPlayer,
+  slotName: string
+): Promise<{ slot: string; item: InventoryItem | undefined }> {
   // Validate the slot exists
   if (!this.equipmentSlots.has(slotName)) {
     throw new Error(`Invalid equipment slot: ${slotName}`);
@@ -540,8 +777,8 @@ playerSchema.methods.unequipItem = async function(slotName) {
 };
 
 // Get all currently equipped items
-playerSchema.methods.getEquippedItems = function() {
-  const equipped = {};
+playerSchema.methods.getEquippedItems = function(this: IPlayer): Record<string, InventoryItem> {
+  const equipped: Record<string, InventoryItem> = {};
   for (const [slot, instanceId] of this.equipmentSlots.entries()) {
     if (instanceId) {
       const item = this.getItem(instanceId);
@@ -554,7 +791,7 @@ playerSchema.methods.getEquippedItems = function() {
 };
 
 // Check if a slot is available
-playerSchema.methods.isSlotAvailable = function(slotName) {
+playerSchema.methods.isSlotAvailable = function(this: IPlayer, slotName: string): boolean {
   if (!this.equipmentSlots.has(slotName)) {
     return false;
   }
@@ -562,7 +799,7 @@ playerSchema.methods.isSlotAvailable = function(slotName) {
 };
 
 // Add a new equipment slot (for future extensibility)
-playerSchema.methods.addEquipmentSlot = async function(slotName) {
+playerSchema.methods.addEquipmentSlot = async function(this: IPlayer, slotName: string): Promise<string> {
   if (this.equipmentSlots.has(slotName)) {
     throw new Error(`Equipment slot ${slotName} already exists`);
   }
@@ -572,7 +809,7 @@ playerSchema.methods.addEquipmentSlot = async function(slotName) {
 };
 
 // Check if player has an item with a specific subtype equipped (in any slot)
-playerSchema.methods.hasEquippedSubtype = function(subtype, itemService) {
+playerSchema.methods.hasEquippedSubtype = function(this: IPlayer, subtype: string, itemService: any): boolean {
   if (!itemService) {
     throw new Error('itemService is required for hasEquippedSubtype');
   }
@@ -592,7 +829,7 @@ playerSchema.methods.hasEquippedSubtype = function(subtype, itemService) {
 };
 
 // Check if player has a specific item in inventory (equipped or not)
-playerSchema.methods.hasInventoryItem = function(itemId, minQuantity = 1) {
+playerSchema.methods.hasInventoryItem = function(this: IPlayer, itemId: string, minQuantity: number = 1): boolean {
   const items = this.inventory.filter(item => item.itemId === itemId);
 
   if (items.length === 0) {
@@ -604,15 +841,17 @@ playerSchema.methods.hasInventoryItem = function(itemId, minQuantity = 1) {
 };
 
 // Get total quantity of an item in inventory
-playerSchema.methods.getInventoryItemQuantity = function(itemId) {
+playerSchema.methods.getInventoryItemQuantity = function(this: IPlayer, itemId: string): number {
   const items = this.inventory.filter(item => item.itemId === itemId);
   return items.reduce((sum, item) => sum + (item.quantity || 1), 0);
 };
 
+// ============================================================================
 // Combat Management Methods
+// ============================================================================
 
 // Take damage and return true if defeated
-playerSchema.methods.takeDamage = function(amount) {
+playerSchema.methods.takeDamage = function(this: IPlayer, amount: number): boolean {
   if (amount < 0) {
     throw new Error('Damage amount must be positive');
   }
@@ -624,7 +863,7 @@ playerSchema.methods.takeDamage = function(amount) {
 };
 
 // Heal health
-playerSchema.methods.heal = function(amount) {
+playerSchema.methods.heal = function(this: IPlayer, amount: number): void {
   if (amount < 0) {
     throw new Error('Heal amount must be positive');
   }
@@ -633,7 +872,7 @@ playerSchema.methods.heal = function(amount) {
 };
 
 // Use mana for abilities
-playerSchema.methods.useMana = function(amount) {
+playerSchema.methods.useMana = function(this: IPlayer, amount: number): void {
   if (amount < 0) {
     throw new Error('Mana amount must be positive');
   }
@@ -646,7 +885,7 @@ playerSchema.methods.useMana = function(amount) {
 };
 
 // Restore mana
-playerSchema.methods.restoreMana = function(amount) {
+playerSchema.methods.restoreMana = function(this: IPlayer, amount: number): void {
   if (amount < 0) {
     throw new Error('Mana amount must be positive');
   }
@@ -655,7 +894,14 @@ playerSchema.methods.restoreMana = function(amount) {
 };
 
 // Use a consumable item and apply its effects
-playerSchema.methods.useConsumableItem = function(itemInstance, itemDefinition) {
+playerSchema.methods.useConsumableItem = function(
+  this: IPlayer,
+  itemInstance: any,
+  itemDefinition: any
+): {
+  healthRestored: number;
+  manaRestored: number;
+} {
   if (!itemInstance || !itemDefinition) {
     throw new Error('Item instance and definition are required');
   }
@@ -701,17 +947,17 @@ playerSchema.methods.useConsumableItem = function(itemInstance, itemDefinition) 
 };
 
 // Check if player is in combat
-playerSchema.methods.isInCombat = function() {
-  return this.activeCombat && this.activeCombat.monsterId;
+playerSchema.methods.isInCombat = function(this: IPlayer): boolean {
+  return !!(this.activeCombat && this.activeCombat.monsterId);
 };
 
 // Add combat log entry
-playerSchema.methods.addCombatLog = function(message, type = 'system') {
+playerSchema.methods.addCombatLog = function(this: IPlayer, message: string, type: CombatLogType = 'system'): void {
   if (!this.activeCombat) {
     throw new Error('Player is not in combat');
   }
 
-  const logEntry = {
+  const logEntry: CombatLogEntry = {
     timestamp: new Date(),
     message,
     type
@@ -726,23 +972,23 @@ playerSchema.methods.addCombatLog = function(message, type = 'system') {
 };
 
 // Clear active combat (used when combat ends)
-playerSchema.methods.clearCombat = function() {
+playerSchema.methods.clearCombat = function(this: IPlayer): void {
   this.activeCombat = {
-    monsterId: null,
+    monsterId: undefined,
     monsterInstance: new Map(),
-    playerLastAttackTime: null,
-    monsterLastAttackTime: null,
-    playerNextAttackTime: null,
-    monsterNextAttackTime: null,
+    playerLastAttackTime: undefined,
+    monsterLastAttackTime: undefined,
+    playerNextAttackTime: undefined,
+    monsterNextAttackTime: undefined,
     turnCount: 0,
     abilityCooldowns: new Map(),
     combatLog: [],
-    startTime: null
+    startTime: undefined
   };
 };
 
 // Check if ability is on cooldown
-playerSchema.methods.isAbilityOnCooldown = function(abilityId) {
+playerSchema.methods.isAbilityOnCooldown = function(this: IPlayer, abilityId: string): boolean {
   if (!this.activeCombat || !this.activeCombat.abilityCooldowns) {
     return false;
   }
@@ -756,17 +1002,17 @@ playerSchema.methods.isAbilityOnCooldown = function(abilityId) {
 };
 
 // Set ability cooldown
-playerSchema.methods.setAbilityCooldown = function(abilityId, cooldownTurns) {
+playerSchema.methods.setAbilityCooldown = function(this: IPlayer, abilityId: string, cooldownTurns: number): void {
   if (!this.activeCombat) {
     throw new Error('Player is not in combat');
   }
 
   const availableTurn = this.activeCombat.turnCount + cooldownTurns;
-  this.activeCombat.abilityCooldowns.set(abilityId, availableTurn);
+  this.activeCombat.abilityCooldowns!.set(abilityId, availableTurn);
 };
 
 // Get ability cooldown remaining turns
-playerSchema.methods.getAbilityCooldownRemaining = function(abilityId) {
+playerSchema.methods.getAbilityCooldownRemaining = function(this: IPlayer, abilityId: string): number {
   if (!this.activeCombat || !this.activeCombat.abilityCooldowns) {
     return 0;
   }
@@ -780,4 +1026,10 @@ playerSchema.methods.getAbilityCooldownRemaining = function(abilityId) {
   return Math.max(0, remaining);
 };
 
-module.exports = mongoose.model('Player', playerSchema);
+// ============================================================================
+// Model Export
+// ============================================================================
+
+const Player: Model<IPlayer> = mongoose.model<IPlayer>('Player', playerSchema);
+
+export default Player;
