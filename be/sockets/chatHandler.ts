@@ -1,17 +1,18 @@
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
-const Player = require('../models/Player');
-const ChatMessage = require('../models/ChatMessage');
+import jwt from 'jsonwebtoken';
+import { Server, Socket } from 'socket.io';
+import User from '../models/User';
+import Player from '../models/Player';
+import ChatMessage from '../models/ChatMessage';
 
 // Rate limiting: store message timestamps per user
-const rateLimiter = new Map(); // userId -> [timestamp, timestamp, ...]
+const rateLimiter = new Map<string, number[]>(); // userId -> [timestamp, timestamp, ...]
 const RATE_LIMIT_WINDOW = 10000; // 10 seconds
 const RATE_LIMIT_MAX = 5; // 5 messages per window
 
 /**
  * Check if user has exceeded rate limit
  */
-function isRateLimited(userId) {
+function isRateLimited(userId: string): boolean {
   const now = Date.now();
   const timestamps = rateLimiter.get(userId) || [];
 
@@ -32,34 +33,37 @@ function isRateLimited(userId) {
 /**
  * JWT Authentication Middleware for Socket.io
  */
-async function authMiddleware(socket, next) {
+async function authMiddleware(socket: Socket, next: (err?: Error) => void): Promise<void> {
   try {
     const token = socket.handshake.auth.token;
 
     if (!token) {
-      return next(new Error('Authentication token required'));
+      next(new Error('Authentication token required'));
+      return;
     }
 
     // Verify JWT token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { id: string };
 
     // Fetch user from database
     const user = await User.findById(decoded.id).select('-password');
     if (!user) {
-      return next(new Error('User not found'));
+      next(new Error('User not found'));
+      return;
     }
 
     // Fetch player data for username
     const player = await Player.findOne({ userId: user._id });
     if (!player) {
-      return next(new Error('Player not found'));
+      next(new Error('Player not found'));
+      return;
     }
 
     // Attach user and player data to socket (multiple places for compatibility)
-    socket.user = user;
-    socket.player = player;
-    socket.userId = user._id.toString();
-    socket.username = user.username; // Username comes from User model, not Player
+    (socket as any).user = user;
+    (socket as any).player = player;
+    (socket as any).userId = user._id.toString();
+    (socket as any).username = user.username; // Username comes from User model, not Player
 
     // Also set in socket.data for Socket.io v4+
     socket.data = socket.data || {};
@@ -70,7 +74,7 @@ async function authMiddleware(socket, next) {
 
     next();
   } catch (error) {
-    console.error('Socket auth error:', error.message);
+    console.error('Socket auth error:', (error as Error).message);
     next(new Error('Authentication failed'));
   }
 }
@@ -78,14 +82,14 @@ async function authMiddleware(socket, next) {
 /**
  * Chat Socket Handler
  */
-module.exports = function(io) {
+export default function (io: Server): void {
   // Apply authentication middleware
   io.use(authMiddleware);
 
-  io.on('connection', (socket) => {
+  io.on('connection', (socket: Socket) => {
     // Try both socket.data and socket properties for compatibility
-    const userId = socket.data?.userId || socket.userId;
-    const username = socket.data?.username || socket.username;
+    const userId = socket.data?.userId || (socket as any).userId;
+    const username = socket.data?.username || (socket as any).username;
 
     console.log(`✓ User connected to chat: ${username} (${userId})`);
 
@@ -96,7 +100,7 @@ module.exports = function(io) {
      * Event: chat:getOnlineCount
      * Client requests count of online users
      */
-    socket.on('chat:getOnlineCount', async (callback) => {
+    socket.on('chat:getOnlineCount', async (callback?: (response: any) => void) => {
       try {
         // Get all sockets in the 'global' room
         const sockets = await io.in('global').fetchSockets();
@@ -123,7 +127,7 @@ module.exports = function(io) {
      * Event: chat:getHistory
      * Client requests chat history
      */
-    socket.on('chat:getHistory', async (data, callback) => {
+    socket.on('chat:getHistory', async (data: { limit?: number }, callback?: (response: any) => void) => {
       try {
         const limit = Math.min(data?.limit || 50, 100); // Max 100 messages
         const messages = await ChatMessage.getRecentMessages('global', limit);
@@ -154,7 +158,7 @@ module.exports = function(io) {
      * Event: chat:sendMessage
      * Client sends a chat message
      */
-    socket.on('chat:sendMessage', async (data, callback) => {
+    socket.on('chat:sendMessage', async (data: { message: string }, callback?: (response: any) => void) => {
       try {
         const { message } = data;
 
@@ -192,8 +196,8 @@ module.exports = function(io) {
         }
 
         // Get userId and username from socket
-        const currentUserId = socket.data?.userId || socket.userId;
-        const currentUsername = socket.data?.username || socket.username;
+        const currentUserId = socket.data?.userId || (socket as any).userId;
+        const currentUsername = socket.data?.username || (socket as any).username;
 
         // Rate limiting check
         if (isRateLimited(currentUserId)) {
@@ -248,9 +252,9 @@ module.exports = function(io) {
      * Event: disconnect
      * User disconnects from chat
      */
-    socket.on('disconnect', (reason) => {
+    socket.on('disconnect', (reason: string) => {
       console.log(`✗ User disconnected from chat: ${username} (${reason})`);
       // Cleanup (Socket.io handles room cleanup automatically)
     });
   });
-};
+}

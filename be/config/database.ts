@@ -1,8 +1,8 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
-const connectDB = async () => {
+const connectDB = async (): Promise<void> => {
   try {
-    const conn = await mongoose.connect(process.env.MONGODB_URI, {
+    const conn = await mongoose.connect(process.env.MONGODB_URI!, {
       // These options are no longer needed in Mongoose 6+
       // but keeping them for compatibility
     });
@@ -24,11 +24,10 @@ const connectDB = async () => {
       console.log('MongoDB connection closed through app termination');
       process.exit(0);
     });
-
   } catch (error) {
-    console.error(`Error: ${error.message}`);
+    console.error(`Error: ${(error as Error).message}`);
     process.exit(1);
   }
 };
 
-module.exports = connectDB;
+export default connectDB;

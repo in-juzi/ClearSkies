@@ -1,13 +1,27 @@
-require('dotenv').config();
-const express = require('express');
-const http = require('http');
-const cors = require('cors');
-const connectDB = require('./config/database');
-const itemService = require('./services/itemService');
-const locationService = require('./services/locationService');
-const vendorService = require('./services/vendorService');
-const recipeService = require('./services/recipeService');
-const combatService = require('./services/combatService');
+import 'dotenv/config';
+import express from 'express';
+import http from 'http';
+import cors from 'cors';
+import mongoose from 'mongoose';
+import { Server } from 'socket.io';
+import connectDB from './config/database';
+import itemService from './services/itemService';
+import locationService from './services/locationService';
+import vendorService from './services/vendorService';
+import recipeService from './services/recipeService';
+import responseValidator from './middleware/responseValidator';
+import chatHandler from './sockets/chatHandler';
+
+// Import routes
+import authRoutes from './routes/auth';
+import skillsRoutes from './routes/skills';
+import attributesRoutes from './routes/attributes';
+import inventoryRoutes from './routes/inventory';
+import locationRoutes from './routes/locations';
+import manualRoutes from './routes/manual';
+import vendorRoutes from './routes/vendors';
+import craftingRoutes from './routes/crafting';
+import combatRoutes from './routes/combat';
 
 const app = express();
 const server = http.createServer(app);
@@ -17,12 +31,14 @@ const PORT = process.env.PORT || 3000;
 connectDB();
 
 // Load item definitions
-itemService.loadDefinitions()
+itemService
+  .loadDefinitions()
   .then(() => console.log('✓ Item definitions loaded'))
   .catch(err => console.error('Failed to load item definitions:', err));
 
 // Load location definitions
-locationService.loadAll()
+locationService
+  .loadAll()
   .then(() => console.log('✓ Location definitions loaded'))
   .catch(err => console.error('Failed to load location definitions:', err));
 
@@ -38,7 +54,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Response validation middleware (development only)
-const responseValidator = require('./middleware/responseValidator');
 app.use(responseValidator);
 
 // Basic route
@@ -51,21 +66,11 @@ app.get('/health', (req, res) => {
   res.json({
     status: 'OK',
     timestamp: new Date().toISOString(),
-    database: require('mongoose').connection.readyState === 1 ? 'connected' : 'disconnected'
+    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
   });
 });
 
 // API Routes
-const authRoutes = require('./routes/auth');
-const skillsRoutes = require('./routes/skills');
-const attributesRoutes = require('./routes/attributes');
-const inventoryRoutes = require('./routes/inventory');
-const locationRoutes = require('./routes/locations');
-const manualRoutes = require('./routes/manual');
-const vendorRoutes = require('./routes/vendors');
-const craftingRoutes = require('./routes/crafting');
-const combatRoutes = require('./routes/combat');
-
 app.use('/api/auth', authRoutes);
 app.use('/api/skills', skillsRoutes);
 app.use('/api/attributes', attributesRoutes);
@@ -77,7 +82,7 @@ app.use('/api/crafting', craftingRoutes);
 app.use('/api/combat', combatRoutes);
 
 // Error handling middleware
-app.use((err, req, res, next) => {
+app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error(err.stack);
   res.status(500).json({
     success: false,
@@ -87,7 +92,6 @@ app.use((err, req, res, next) => {
 });
 
 // Initialize Socket.io
-const { Server } = require('socket.io');
 const io = new Server(server, {
   cors: {
     origin: 'http://localhost:4200',
@@ -96,7 +100,6 @@ const io = new Server(server, {
 });
 
 // Socket.io chat handlers
-const chatHandler = require('./sockets/chatHandler');
 chatHandler(io);
 
 // Start server
