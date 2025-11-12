@@ -3,7 +3,10 @@
 ## Current Development Focus
 
 **Active Features**:
-- ✅ Herbalism system (completed - 6 herbs, 4 gathering locations)
+- ✅ Gathering system (completed - 14 herbs, 4 gathering locations, renamed from Herbalism)
+- ✅ Alchemy skill system (completed - 6 potion recipes with progressive unlocks)
+- ✅ Subcategory-based crafting (completed - recipes can use "any herb" instead of specific items)
+- ✅ Recipe unlock system (completed - progressive discovery via crafting achievements)
 - ✅ Combat skills framework (completed - 6 combat skills added)
 - ✅ Turn-based combat system (completed - 5 monsters, abilities, combat activities)
 - ✅ Combat UI components (completed - ability/item buttons, auto-scroll log, restart encounters)
@@ -12,9 +15,9 @@
 - ✅ Quality/trait effect display (completed - enhanced inventory UI)
 - ✅ XP scaling display (completed - shows raw vs scaled XP)
 - ✅ Real-time chat system (completed - Socket.io with commands and autocomplete)
-- ✅ Icon organization (completed - 235+ icons organized into 6 categories)
+- ✅ Icon organization (completed - 250+ icons organized into 6 categories)
 - ✅ Vendor/NPC trading system (completed - buy/sell at gathering locations)
-- ✅ Cooking/Crafting system (completed - quality inheritance, instance selection)
+- ✅ Cooking/Crafting system (completed - quality inheritance, instance selection, filters)
 - ✅ Multi-channel icon colorization (completed - path-level SVG colorization with 42+ materials)
 - ✅ Item system reorganization (completed - category subdirectories for scalability)
 - ✅ 5-level quality system with 3-level trait system (completed - quality expanded to 5 levels)
@@ -25,31 +28,32 @@
 - ✅ Goblin Village location (completed - 3 combat encounters with progressive difficulty)
 - ✅ Item details panel (completed - enhanced inventory UI with combat stats preview)
 - ✅ Bronze/Iron equipment crafting (completed - 8 armor pieces + 6 tools via smithing)
-- ✅ Crafting UI filters (completed - search, craftable-only filter, sorting by level/name/XP)
+- ✅ Equipment stats summary (completed - total armor/evasion/damage display in equipment panel)
 
 **Recent Changes** (Last 10 commits):
-- refactor: improve crafting backend and type safety
-- feat: add recipe search and filtering to crafting UI
-- chore: regenerate item and recipe registries
-- feat: add smithing recipes for bronze and iron equipment
-- feat: add bronze and iron armor equipment items
-- docs: update CLAUDE.md with new features and content
-- chore: update Claude settings configuration
-- style: minor styling and content adjustments
-- refactor: update location component with better navigation
-- refactor: enhance inventory and equipment UI components
+- chore: miscellaneous updates and documentation
+- style: add new material colors and split icon paths
+- feat: add chat command autocomplete with keyboard navigation
+- feat: add combat stats preview to equipment and inventory UI
+- feat: enhance crafting UI with subcategory selection and recipe unlocks
+- feat: implement subcategory-based crafting system
+- feat: add alchemy recipes and health/mana potions
+- feat: add alchemy skill and rename herbalism to gathering
+- refactor: rename herbalism to gathering across game data
+- docs: update CLAUDE.md with smithing equipment and crafting filter features
 
 **Known Issues**:
 - None currently identified
 
 **Next Priorities**:
-- Combat system enhancements (more monsters, abilities, boss fights)
+- Equipment stat application (apply armor/damage/evasion bonuses to combat calculations)
 - Steel tier equipment (requires steel ingots from iron + coal)
-- Alchemy system (potion brewing with quality-based effects)
-- Equipment stat application (apply armor/damage bonuses to combat)
-- Vendor enhancements (restocking, skill-based pricing)
-- Player housing
+- More alchemy recipes (buff potions, debuff potions, transmutation)
+- Combat system enhancements (more monsters, abilities, boss fights)
+- Vendor enhancements (restocking, skill-based pricing, buy orders)
+- Player housing system
 - Guild/party system
+- Enchanting/runecarving skill
 
 > **Maintenance Note**: Update this section regularly so AI has context without needing to explore
 
@@ -446,11 +450,11 @@ See [project/docs/content-generator-agent.md](project/docs/content-generator-age
 ### Completed Features
 
 **Core Systems**: Auth/JWT, Player/User models, MongoDB with migrations
-**Game Mechanics**: Skills (12), Attributes (7), XP scaling with 50% skill→attribute passthrough
+**Game Mechanics**: Skills (13), Attributes (7), XP scaling with 50% skill→attribute passthrough
 **Inventory**: Items (68+), Quality/Trait (5-tier/3-tier), Stacking, Equipment slots (10), Consumables (potions)
 **World**: Locations, Activities, Drop tables, Travel, Time-based completion
 **Combat**: Turn-based combat, Monsters (5), Abilities (6), Combat stats tracking, Restart encounters
-**Crafting**: Cooking (4 recipes) + Smithing (16 recipes), Quality inheritance, Instance selection, Recipe filtering
+**Crafting**: Cooking (4 recipes) + Smithing (16 recipes) + Alchemy (in progress), Quality inheritance, Instance selection, Recipe filtering, Subcategory ingredients, Recipe unlocks
 **UI**: IconComponent (multi-channel colorization), ItemMiniComponent, AbilityButtonComponent, ItemButtonComponent, Manual/help system
 **Social**: Real-time chat (Socket.io), Vendor trading, Gold system
 
@@ -463,9 +467,9 @@ See [project/docs/completed-features.md](project/docs/completed-features.md) for
 **ChatMessage** ([be/models/ChatMessage.js](be/models/ChatMessage.js) ~L10-20): Chat history (userId, username, message, channel)
 
 **Player** ([be/models/Player.js](be/models/Player.js) ~L15-135): Game data
-- Skills (12): woodcutting, mining, fishing, herbalism, smithing, cooking, oneHanded, dualWield, twoHanded, ranged, casting, gun
+- Skills (13): woodcutting, mining, fishing, gathering (renamed from herbalism), smithing, cooking, alchemy (new), oneHanded, dualWield, twoHanded, ranged, casting, gun
 - Attributes (7): strength, endurance, magic, perception, dexterity, will, charisma
-- Skill-Attribute links: woodcutting/mining→strength, fishing/smithing→endurance, herbalism/cooking→will, oneHanded/twoHanded→strength, dualWield/ranged→dexterity, casting→magic, gun→perception
+- Skill-Attribute links: woodcutting/mining→strength, fishing/smithing→endurance, gathering/cooking/alchemy→will, oneHanded/twoHanded→strength, dualWield/ranged→dexterity, casting→magic, gun→perception
 - Inventory: items with qualities (Map), traits (Map), quantities, equipped flag
 - Equipment slots (Map): 10 default slots (head, body, mainHand, offHand, belt, gloves, boots, necklace, ringRight, ringLeft)
 - Location state: currentLocation, discoveredLocations, activeActivity, travelState
@@ -579,6 +583,8 @@ npm run migrate:down     # Rollback last migration
 5. `005-convert-quality-trait-to-levels.js` - Converts quality/trait system from decimal values to integer levels
 6. `006-add-herbalism-skill.js` - Adds herbalism gathering skill to all players (linked to Will attribute)
 7. `007-add-combat-system.js` - Adds combat fields (activeCombat state, combatStats tracking) to all players
+8. `008-rename-herbalism-to-gathering.js` - Renames herbalism skill to gathering (more thematic for barehanded foraging)
+9. `009-add-alchemy-skill.js` - Adds alchemy skill to all players (level 1, linked to Will attribute)
 
 **Creating a New Migration:**
 1. Create a file in `be/migrations/` with format: `NNN-description.js`
@@ -743,7 +749,7 @@ The equipment system allows players to equip items to specific body slots for st
 2. **Equipment Items** (Item definitions with `slot` field)
    - Must include `slot` field indicating which slot they can be equipped to
    - Examples: iron_helm (head), leather_tunic (body), copper_sword (mainHand), wooden_shield (offHand)
-   - Properties include defense, damage, durability, required level
+   - Properties include armor, evasion, damage, durability, required level
    - Equipment items are non-stackable (stackable: false)
 
 3. **Equipment UI** (3x4 grid with square slots)
@@ -1130,11 +1136,29 @@ Create items from ingredients with quality inheritance and instance selection.
 **Current Skills:**
 - Cooking (4 recipes: shrimp/trout/salmon/cod at kennik-kitchen)
 - Smithing (16 recipes: ore smelting, bronze/iron equipment - weapons, armor, tools)
-- Alchemy (future: potions from herbs)
+- Alchemy (6 recipes: health/mana potions levels 1-15 at village-apothecary)
+
+**Advanced Features:**
+- **Subcategory ingredients**: Recipes can require "any herb" instead of specific itemIds
+  - Backend validates both `itemId` and `subcategory` ingredient types
+  - Frontend filters inventory by `item.definition.subcategories.includes(subcategory)`
+  - Enables flexible ingredient selection and quality optimization
+- **Recipe unlock system**: Progressive discovery via crafting achievements
+  - `unlockConditions: { craftedRecipes: ['basic_health_tincture'] }` for recipe chains
+  - `discoveredByDefault: true` for starter recipes
+  - Player.unlockedRecipes tracks discovered recipes
+  - Backend `checkRecipeUnlocks()` awards new recipes on craft completion
+- **Multi-instance selection**: Can select 2+ of same item instance as ingredients
+  - Cycling logic: 0 → 1 → 2 → max → 0
+  - Quality badge display for each instance
+  - Auto-select best quality feature
+- See [project/docs/alchemy-subcategory-implementation.md](project/docs/alchemy-subcategory-implementation.md) for full technical details
 
 **Configuration:**
 - Recipe TypeScript: Create module in `be/data/recipes/{skill}/{RecipeId}.ts` and register in RecipeRegistry
-- Facility: Set `type: "crafting"` and `craftingSkills: ["cooking"]` in facility TypeScript definition
+- Facility: Set `type: "crafting"` and `craftingSkills: ["alchemy"]` in facility TypeScript definition
+- Subcategory ingredients: Use `{ subcategory: 'herb', quantity: 2 }` instead of `{ itemId: 'sage', quantity: 2 }`
+- Item subcategories: Add `subcategories: ['herb']` to item definition
 
 ## Combat System
 
