@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject, effect, computed } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, effect, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LocationService } from '../../../services/location.service';
 import { VendorService } from '../../../services/vendor.service';
@@ -105,12 +105,24 @@ export class LocationComponent implements OnInit, OnDestroy {
   });
 
   // Local state
-  selectedActivity: Activity | null = null;
+  selectedActivityId = signal<string | null>(null); // Store activityId instead of full Activity object
   lastRewards: ActivityRewards | null = null;
   activityLog: Array<{ timestamp: Date; rewards: ActivityRewards; activityName: string }> = [];
   facilityVendors: Map<string, Vendor> = new Map(); // Cache vendor data by vendorId
   private lastEquippedItems: string = '';
   private refreshTimeout: any = null;
+
+  // Computed signal to get the selected activity from the facility (always fresh)
+  selectedActivity = computed<Activity | null>(() => {
+    const facility = this.selectedFacility();
+    const activityId = this.selectedActivityId(); // Read from signal
+
+    if (!facility || !activityId || !facility.activities) {
+      return null;
+    }
+
+    return facility.activities.find(a => a.activityId === activityId) || null;
+  });
 
   constructor() {
     // Use effect to reactively update facility requirements when equipment changes
@@ -251,7 +263,7 @@ export class LocationComponent implements OnInit, OnDestroy {
     // Always load facility activities (vendors are shown alongside, not instead of)
     this.locationService.getFacility(facility.facilityId).subscribe({
       next: () => {
-        this.selectedActivity = null;
+        this.selectedActivityId.set(null);
         // Close any open vendor when switching facilities
         this.vendorService.closeVendor();
 
@@ -358,7 +370,7 @@ export class LocationComponent implements OnInit, OnDestroy {
    */
   backToFacilities() {
     this.locationService.selectedFacility.set(null);
-    this.selectedActivity = null;
+    this.selectedActivityId.set(null);
     this.vendorService.closeVendor();
   }
 
@@ -366,38 +378,39 @@ export class LocationComponent implements OnInit, OnDestroy {
    * Select an activity
    */
   selectActivity(activity: Activity) {
-    this.selectedActivity = activity;
+    this.selectedActivityId.set(activity.activityId);
   }
 
   /**
    * Go back to activity list
    */
   backToActivities() {
-    this.selectedActivity = null;
+    this.selectedActivityId.set(null);
   }
 
   /**
    * Start the selected activity
    */
   startActivity() {
-    if (!this.selectedActivity || !this.selectedFacility()) {
+    const activity = this.selectedActivity();
+    if (!activity || !this.selectedFacility()) {
       return;
     }
 
-    if (this.selectedActivity.stub) {
-      this.logToChat(this.selectedActivity.stubMessage || 'This activity is not yet available', 'info');
+    if (activity.stub) {
+      this.logToChat(activity.stubMessage || 'This activity is not yet available', 'info');
       return;
     }
 
-    if (!this.selectedActivity.available) {
+    if (!activity.available) {
       this.logToChat('Requirements not met for this activity', 'error');
       return;
     }
 
     // Check if this is a combat activity
-    if (this.selectedActivity.type === 'combat') {
+    if (activity.type === 'combat') {
       // Get monster ID from activity's combatConfig
-      const monsterId = (this.selectedActivity as any).combatConfig?.monsterId;
+      const monsterId = (activity as any).combatConfig?.monsterId;
 
       if (!monsterId) {
         this.logToChat('Combat activity configuration error', 'error');
@@ -405,10 +418,10 @@ export class LocationComponent implements OnInit, OnDestroy {
       }
 
       // Start combat instead of regular activity
-      this.combatService.startCombat(monsterId, this.selectedActivity.activityId).subscribe({
+      this.combatService.startCombat(monsterId, activity.activityId).subscribe({
         next: (response) => {
           this.logToChat(response.message || 'Combat started!', 'success');
-          this.selectedActivity = null;
+          this.selectedActivityId.set(null);
           this.locationService.selectedFacility.set(null);
         },
         error: (err) => {
@@ -420,12 +433,12 @@ export class LocationComponent implements OnInit, OnDestroy {
 
     // Regular activity
     this.locationService.startActivity(
-      this.selectedActivity.activityId,
+      activity.activityId,
       this.selectedFacility()!.facilityId
     ).subscribe({
       next: (response) => {
         this.logToChat(response.message, 'success');
-        this.selectedActivity = null;
+        this.selectedActivityId.set(null);
         this.locationService.selectedFacility.set(null);
       },
       error: (err) => {

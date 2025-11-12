@@ -123,67 +123,67 @@
     @else {
 
     <!-- Activity Detail View -->
-    <div class="activity-detail" *ngIf="selectedActivity">
+    <div class="activity-detail" *ngIf="selectedActivity()">
       <button (click)="backToActivities()" class="btn-back">← Back to Activities</button>
-      <h2>{{ selectedActivity.name }}</h2>
-      <p>{{ selectedActivity.description }}</p>
+      <h2>{{ selectedActivity()!.name }}</h2>
+      <p>{{ selectedActivity()!.description }}</p>
 
       <div class="activity-info">
-        <div class="info-item" *ngIf="selectedActivity.duration !== undefined && selectedActivity.duration > 0">
-          <strong>Duration:</strong> {{ selectedActivity.duration }}s
+        <div class="info-item" *ngIf="selectedActivity()!.duration !== undefined && selectedActivity()!.duration > 0">
+          <strong>Duration:</strong> {{ selectedActivity()!.duration }}s
         </div>
         <div class="info-item">
-          <strong>Type:</strong> {{ selectedActivity.type }}
+          <strong>Type:</strong> {{ selectedActivity()!.type }}
         </div>
-        <div class="info-item" *ngIf="selectedActivity.type === 'combat' && selectedActivity.monsterLevel">
-          <strong>Monster Level:</strong> {{ selectedActivity.monsterLevel }}
+        <div class="info-item" *ngIf="selectedActivity()!.type === 'combat' && selectedActivity()!.monsterLevel">
+          <strong>Monster Level:</strong> {{ selectedActivity()!.monsterLevel }}
         </div>
       </div>
 
-      <div class="requirements" *ngIf="hasRequirements(selectedActivity)">
+      <div class="requirements" *ngIf="hasRequirements(selectedActivity())">
         <h3>Requirements</h3>
         <ul>
-          <li *ngFor="let skill of selectedActivity.requirements.skills | keyvalue">
+          <li *ngFor="let skill of selectedActivity()!.requirements.skills | keyvalue">
             {{ skill.key }} Level {{ skill.value }}
           </li>
-          <li *ngFor="let attr of selectedActivity.requirements.attributes | keyvalue">
+          <li *ngFor="let attr of selectedActivity()!.requirements.attributes | keyvalue">
             {{ attr.key }} Level {{ attr.value }}
           </li>
-          <li *ngFor="let equipped of selectedActivity.requirements.equipped">
+          <li *ngFor="let equipped of selectedActivity()!.requirements.equipped">
             {{ equipped.subtype }} equipped
           </li>
-          <li *ngFor="let inv of selectedActivity.requirements.inventory">
+          <li *ngFor="let inv of selectedActivity()!.requirements.inventory">
             {{ inv.quantity || 1 }}x {{ inv.itemId }} in inventory
           </li>
         </ul>
         <div class="requirement-failures"
-          *ngIf="selectedActivity.requirementFailures && selectedActivity.requirementFailures.length > 0">
+          *ngIf="selectedActivity()?.requirementFailures && (selectedActivity()?.requirementFailures?.length ?? 0) > 0">
           <p class="error">Not met:</p>
           <ul>
-            <li *ngFor="let failure of selectedActivity.requirementFailures">{{ failure }}</li>
+            <li *ngFor="let failure of selectedActivity()?.requirementFailures">{{ failure }}</li>
           </ul>
         </div>
       </div>
 
-      <div class="rewards" *ngIf="selectedActivity.rewards">
+      <div class="rewards" *ngIf="selectedActivity()!.rewards">
         <h3>Rewards</h3>
         <ul>
-          <li *ngFor="let exp of selectedActivity.rewards.experience | keyvalue">
+          <li *ngFor="let exp of selectedActivity()!.rewards.experience | keyvalue">
             {{ exp.key }}: +{{ exp.value }} XP
           </li>
-          <li *ngFor="let item of selectedActivity.rewards.items">
+          <li *ngFor="let item of selectedActivity()!.rewards.items">
             {{ item.itemId }} ({{ item.quantity.min }}-{{ item.quantity.max }}) - {{ (item.chance * 100).toFixed(0) }}%
             chance
           </li>
-          <li *ngIf="selectedActivity.rewards.gold">
-            Gold: {{ selectedActivity.rewards.gold.min }}-{{ selectedActivity.rewards.gold.max }}
+          <li *ngIf="selectedActivity()?.rewards?.gold">
+            Gold: {{ selectedActivity()?.rewards?.gold?.min }}-{{ selectedActivity()?.rewards?.gold?.max }}
           </li>
         </ul>
       </div>
 
-      <button (click)="startActivity()" [disabled]="!selectedActivity.available"
-        [class.btn-disabled]="!selectedActivity.available" class="btn-primary">
-        {{ selectedActivity.available ? 'Start Activity' : 'Requirements Not Met' }}
+      <button (click)="startActivity()" [disabled]="!selectedActivity()!.available"
+        [class.btn-disabled]="!selectedActivity()!.available" class="btn-primary">
+        {{ selectedActivity()!.available ? 'Start Activity' : 'Requirements Not Met' }}
       </button>
     </div>
 
@@ -201,7 +201,7 @@
     </div>
 
     <!-- Facility Detail View (shown when facility is selected but vendor is not open and not in combat) -->
-    <div class="facility-detail" *ngIf="selectedFacility() && !selectedActivity && !vendorService.isVendorOpen() && !inCombat() && !combatService.combatEnded()">
+    <div class="facility-detail" *ngIf="selectedFacility() && !selectedActivity() && !vendorService.isVendorOpen() && !inCombat() && !combatService.combatEnded()">
       <button (click)="backToFacilities()" class="btn-back">← Back to Facilities</button>
       <h2>{{ selectedFacility()?.name }}</h2>
       <p>{{ selectedFacility()?.description }}</p>
