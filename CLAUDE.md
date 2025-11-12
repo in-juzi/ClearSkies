@@ -280,8 +280,8 @@ if (plainItem.traits instanceof Map) {
 **Problem**: Fields defined as `{ type: Map, of: ... }` in schemas return `undefined` with bracket notation.
 
 **Examples in codebase**:
-- `player.activeCrafting.selectedIngredients` (Map<string, string[]>) - in Player schema
-- `player.equipmentSlots` (Map<string, string|null>) - in Player schema
+- `player.activeCrafting.selectedIngredients` (Map<string, string[]>) - in Player.js schema
+- `player.equipmentSlots` (Map<string, string|null>) - in Player.js schema
 - Item `qualities` and `traits` (Map<string, number>) - in inventory items
 
 **❌ WRONG - Returns undefined**:
@@ -334,7 +334,7 @@ See [project/docs/content-generator-agent.md](project/docs/content-generator-age
 ### Use Direct Tools (Grep/Glob/Read) For:
 - Finding specific function definitions - `Grep("functionName", type: "js")`
 - Locating item/activity by ID - `Grep("itemId", path: "be/data")`
-- Checking if file exists - `Glob("**/filename.js")`
+- Checking if file exists - `Glob("**/filename.{js,ts}")`
 - Reading specific code sections - `Read(file, offset, limit)`
 
 ### Use Task Agent Only For:
@@ -369,22 +369,22 @@ See [project/docs/content-generator-agent.md](project/docs/content-generator-age
 - `hasEquippedSubtype()`: ~L350-365
 - `hasInventoryItem()`: ~L367-380
 
-### Item Service (be/services/itemService.js)
-- Item definitions loading: ~L20-60
-- `getItemDefinition()`: ~L65-70
-- `createItemInstance()`: ~L85-120
-- `calculateVendorPrice()`: ~L145-180
-- `generateRandomQualities()`: ~L200-235
-- `generateRandomTraits()`: ~L240-275
-- `_sortedMapString()`: ~L310-320 (quality/trait comparison)
+### Item Service (be/services/itemService.ts)
+- Item registry loading: Loads from ItemRegistry.ts
+- `getItemDefinition()`: Returns typed Item objects
+- `createItemInstance()`: Creates typed item instances
+- `calculateVendorPrice()`: Price calculation with quality/trait modifiers
+- `generateRandomQualities()`: Probabilistic quality generation
+- `generateRandomTraits()`: Probabilistic trait generation
+- `_sortedMapString()`: Quality/trait comparison helper
 
-### Location Service (be/services/locationService.js)
-- Location loading: ~L25-70
-- `getLocation()`: ~L75-85
-- `validateActivityRequirements()`: ~L120-180
-- `calculateScaledXP()`: ~L185-205 (XP scaling formula)
-- `processActivityCompletion()`: ~L230-295
-- `getActivityRewards()`: ~L300-340
+### Location Service (be/services/locationService.ts)
+- Location/Activity/DropTable registry loading
+- `getLocation()`: Returns typed Location objects
+- `validateActivityRequirements()`: Validates skills, equipment, inventory
+- `calculateScaledXP()`: XP scaling formula with polynomial decay
+- `processActivityCompletion()`: Awards XP and loot from drop tables
+- `getActivityRewards()`: Processes drop table rewards
 
 ### Inventory Controller (be/controllers/inventoryController.js)
 - GET all inventory: ~L15-50
@@ -609,12 +609,12 @@ Backend requires `.env` file with:
 
 The inventory system uses a three-tier architecture for flexibility and easy balancing:
 
-1. **Item Definitions** (JSON files in `be/data/items/definitions/`)
-   - **New Structure**: Organized into category subdirectories
-     - `consumables/` - food.json, potions.json
-     - `equipment/` - tools.json, weapons.json, armor.json
-     - `resources/` - wood.json, ore.json, fish.json, herbs.json, gemstones.json, ingots.json
-   - **Recursive Loading**: ItemService automatically loads from all subdirectories
+1. **Item Definitions** (TypeScript modules in `be/data/items/definitions/`)
+   - **Registry-Based**: Organized into category subdirectories with centralized ItemRegistry
+     - `consumables/` - Individual .ts files for each food item and potion
+     - `equipment/` - Individual .ts files for each weapon, armor, and tool
+     - `resources/` - Individual .ts files for each resource (wood, ore, fish, herbs, gemstones, ingots)
+   - **Type-Safe Loading**: ItemService loads from ItemRegistry.ts with compile-time validation
    - 40+ items total (expanded from 30):
      - Resources: logs, ore (copper, tin, iron, silver), fish, herbs, gemstones, ingots (bronze, iron)
      - Equipment: weapons (copper_sword, iron_sword), armor, tools (axes, pickaxes, fishing rods)
@@ -623,13 +623,15 @@ The inventory system uses a three-tier architecture for flexibility and easy bal
    - All items include `icon` field with path and material for multi-channel colorization
    - Equipment items include `subtype` field for activity requirement matching
 
-2. **Quality & Trait Definitions** (JSON files)
+2. **Quality & Trait Definitions** (TypeScript modules)
    - **Qualities**: woodGrain, moisture, age, purity, sheen (integer levels 1-5)
+     - QualityRegistry.ts exports all quality definitions
      - Each level has explicit name, description, and effects
      - Example: woodGrain L1 (Fine Grain, 1.1x) → L5 (Mythical Grain, 1.5x)
      - Example: purity L1 (High Purity, 1.1x) → L5 (Transcendent, 1.5x)
      - Escalating effects: 8-10% per level depending on quality type
    - **Traits**: fragrant, knotted, weathered, pristine, cursed, blessed, masterwork (integer levels 1-3)
+     - TraitRegistry.ts exports all trait definitions
      - Stored as Map<traitId, level> instead of array
      - Each level has escalating effects
    - Define effects on vendor pricing, crafting, alchemy, combat
@@ -645,8 +647,8 @@ The inventory system uses a three-tier architecture for flexibility and easy bal
 - Items have discrete quality levels (1-5) with descriptive names and escalating bonuses
 - Traits stored as Map with levels (1-3) for escalating effects
 - Better stacking: items with identical levels stack together
-- Easy balancing by editing JSON level definitions (no code changes needed)
-- Hot-reload capability without server restart
+- Easy balancing by editing TypeScript definitions with compile-time validation
+- TypeScript registries provide centralized data management
 - **Probabilistic generation**: Most items have 0-1 qualities (config: 35% plain, 45% one quality, 15% two, 5% three+)
 - **Selective traits**: Reduced appearance rates (common: 2%, uncommon: 8%, rare: 15%, epic: 30%)
 - **Level damping**: Quality levels biased toward L1-L2 (0.6 damping reduces avg by ~0.2 levels)
@@ -660,30 +662,35 @@ The inventory system uses a three-tier architecture for flexibility and easy bal
 
 The location system provides a rich world exploration and activity framework:
 
-1. **Location Definitions** (JSON files in `be/data/locations/definitions/`)
+1. **Location Definitions** (TypeScript modules in `be/data/locations/definitions/`)
+   - LocationRegistry.ts exports all location definitions
    - Define locations with name, description, biome type
    - List of facilities available at each location
    - Travel requirements and discovery conditions
    - Examples: Kennik (starting town), Forest Clearing, Mountain Pass
 
-2. **Biomes** (JSON files in `be/data/locations/biomes/`)
+2. **Biomes** (TypeScript modules in `be/data/locations/biomes/`)
+   - BiomeRegistry.ts exports all biome definitions
    - Define environmental types (forest, mountain, sea)
    - Ambient descriptions and characteristics
    - Affect available resources and activities
 
-3. **Facilities** (JSON files in `be/data/locations/facilities/`)
+3. **Facilities** (TypeScript modules in `be/data/locations/facilities/`)
+   - FacilityRegistry.ts exports all facility definitions
    - Specific buildings or areas within locations
    - Each facility offers different activities
    - Examples: Market, Fishing Dock, Logging Camp, Mine
 
-4. **Activities** (JSON files in `be/data/locations/activities/`)
+4. **Activities** (TypeScript modules in `be/data/locations/activities/`)
+   - ActivityRegistry.ts exports all activity definitions
    - Actions players can perform at facilities
    - Requirements: skills, attributes, equipped items (by subtype), inventory items (with quantity)
    - Time-based completion (duration in seconds)
    - Rewards: XP, items via drop tables
    - Examples: Chop Oak (requires woodcutting-axe equipped), Fish Salmon (requires fishing-rod equipped), Mine Iron (requires mining-pickaxe equipped)
 
-5. **Drop Tables** (JSON files in `be/data/locations/drop-tables/`)
+5. **Drop Tables** (TypeScript modules in `be/data/locations/drop-tables/`)
+   - DropTableRegistry.ts exports all drop table definitions
    - Weighted loot pools for activity rewards
    - Define relative drop rates using weight system
    - Reusable across multiple activities
@@ -698,7 +705,8 @@ The location system provides a rich world exploration and activity framework:
 - Rich location descriptions and lore through biomes
 - Flexible drop table system for easy loot balancing
 - Item requirements system for activities (equipped tools and inventory items)
-- Easy content expansion by adding new JSON files
+- Easy content expansion by creating new TypeScript modules and registering in registries
+- Compile-time validation of all references (itemIds, skillIds, etc.)
 - Full documentation in `project/docs/drop-table-system.md` and `project/docs/item-requirements-system.md`
 
 ## Equipment System
@@ -835,7 +843,7 @@ Three-tier architecture: Skills → Attributes with intelligent scaling to encou
 - L15: 12 XP (26%)
 
 **Key Files:**
-- LocationService ~L185-205: [be/services/locationService.js](be/services/locationService.js) - `calculateScaledXP()` formula
+- LocationService: [be/services/locationService.ts](be/services/locationService.ts) - `calculateScaledXP()` formula
 - Player ~L145-165: [be/models/Player.js](be/models/Player.js) - `addSkillExperience()` with attribute linking
 - Test script: [be/utils/test-xp-scaling.js](be/utils/test-xp-scaling.js)
 
@@ -943,7 +951,7 @@ When the user asks to create game content, invoke the content generator agent us
 2. **Locate item/activity** - Glob by pattern or Grep by ID
 3. **Check if file exists** - Glob verification
 4. **Verify API endpoint** - Grep in routes files
-5. **Find model method** - Grep in Player.js or User.js
+5. **Find model method** - Grep in Player.js (models still JavaScript)
 
 ### I Need Deep Exploration (>10K tokens):
 1. **"How does X work?"** - Multi-file architectural analysis
@@ -1062,10 +1070,10 @@ The chat component uses medieval fantasy theme matching the game design:
 NPC merchants at gathering locations for buying tools and selling resources.
 
 **Key Files:**
-- VendorService: [be/services/vendorService.js](be/services/vendorService.js) - Load definitions, calculate prices
+- VendorService: [be/services/vendorService.ts](be/services/vendorService.ts) - Load from VendorRegistry, calculate prices
 - VendorController: [be/controllers/vendorController.js](be/controllers/vendorController.js) - Buy/sell transactions
 - Vendor Component: [ui/src/app/components/game/vendor/](ui/src/app/components/game/vendor/) - Buy/Sell tabs
-- Vendor definitions: [be/data/vendors/](be/data/vendors/)
+- Vendor Registry: [be/data/vendors/VendorRegistry.ts](be/data/vendors/VendorRegistry.ts) - TypeScript vendor definitions
 
 **Key Features:**
 - Infinite stock (architecture supports limited)
@@ -1075,8 +1083,8 @@ NPC merchants at gathering locations for buying tools and selling resources.
 - Gold sync via auth service
 
 **Configuration:**
-- Vendor JSON: `be/data/vendors/{vendorId}.json` with stock array
-- Facility link: Add `vendorIds` array to facility JSON
+- Vendor TypeScript: Create module in `be/data/vendors/{VendorId}.ts` and register in VendorRegistry
+- Facility link: Add `vendorIds` array to facility TypeScript definition
 - Multiple vendors per facility supported
 
 ## Cooking/Crafting System
@@ -1084,10 +1092,10 @@ NPC merchants at gathering locations for buying tools and selling resources.
 Create items from ingredients with quality inheritance and instance selection.
 
 **Key Files:**
-- RecipeService: [be/services/recipeService.js](be/services/recipeService.js) - Load recipes, validate, calculate quality
+- RecipeService: [be/services/recipeService.ts](be/services/recipeService.ts) - Load from RecipeRegistry, validate, calculate quality
 - CraftingController: [be/controllers/craftingController.js](be/controllers/craftingController.js) - Start/complete/cancel
 - Crafting Component: [ui/src/app/components/game/crafting/](ui/src/app/components/game/crafting/) - Recipe browser, instance selection
-- Recipe definitions: [be/data/recipes/{skill}/](be/data/recipes/)
+- Recipe Registry: [be/data/recipes/RecipeRegistry.ts](be/data/recipes/RecipeRegistry.ts) - TypeScript recipe definitions
 
 **Key Features:**
 - **Instance selection**: Choose specific items by quality/traits (Player.activeCrafting.selectedIngredients Map)
@@ -1102,19 +1110,19 @@ Create items from ingredients with quality inheritance and instance selection.
 - Alchemy (future: potions from herbs)
 
 **Configuration:**
-- Recipe JSON: `be/data/recipes/{skill}/{recipe-id}.json` with ingredients, output, qualityModifier
-- Facility: Set `type: "crafting"` and `craftingSkills: ["cooking"]` in facility JSON
+- Recipe TypeScript: Create module in `be/data/recipes/{skill}/{RecipeId}.ts` and register in RecipeRegistry
+- Facility: Set `type: "crafting"` and `craftingSkills: ["cooking"]` in facility TypeScript definition
 
 ## Combat System
 
 Turn-based combat system with monsters, abilities, and stat tracking.
 
 **Key Files:**
-- CombatService: [be/services/combatService.js](be/services/combatService.js) - Combat logic, damage calculation, monster AI
+- CombatService: [be/services/combatService.ts](be/services/combatService.ts) - Combat logic, damage calculation, monster AI
 - CombatController: [be/controllers/combatController.js](be/controllers/combatController.js) - Start/attack/ability/flee endpoints
 - Combat Component: [ui/src/app/components/game/combat/](ui/src/app/components/game/combat/) - Combat UI, health bars, combat log
-- Monster definitions: [be/data/monsters/definitions/](be/data/monsters/definitions/)
-- Ability definitions: [be/data/abilities/definitions/](be/data/abilities/definitions/)
+- Monster Registry: [be/data/monsters/MonsterRegistry.ts](be/data/monsters/MonsterRegistry.ts) - TypeScript monster definitions
+- Ability Registry: [be/data/abilities/AbilityRegistry.ts](be/data/abilities/AbilityRegistry.ts) - TypeScript ability definitions
 
 **Key Features:**
 - **Turn-based combat**: Player and monster alternate attacks based on weapon speed
@@ -1143,9 +1151,9 @@ Turn-based combat system with monsters, abilities, and stat tracking.
 6. Flee during combat (confirmation) or return after combat ends (instant)
 
 **Configuration:**
-- Monster JSON: `be/data/monsters/definitions/{monster-id}.json` with stats, abilities, resistances
-- Ability JSON: `be/data/abilities/definitions/{ability-id}.json` with damage, cooldown, mana cost
-- Combat activity: Set activity type with combat flag, link to monster via drop table
+- Monster TypeScript: Create module in `be/data/monsters/definitions/{MonsterId}.ts` and register in MonsterRegistry
+- Ability TypeScript: Create module in `be/data/abilities/definitions/{AbilityId}.ts` and register in AbilityRegistry
+- Combat activity: Create activity TypeScript module linking to monster drop table
 - Full documentation: [project/docs/combat-system.md](project/docs/combat-system.md)
 
 ## Next Steps / Ideas
