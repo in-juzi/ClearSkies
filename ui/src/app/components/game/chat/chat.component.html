@@ -28,7 +28,7 @@
       >
         <span class="message-time">{{ formatTime(msg.createdAt) }}</span>
         <span class="message-username">{{ msg.username }}:</span>
-        <span class="message-text">{{ msg.message }}</span>
+        <span class="message-text" [innerHTML]="msg.message | messageFormat"></span>
       </div>
     </div>
 

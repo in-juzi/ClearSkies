@@ -2,7 +2,10 @@ import { Component, OnInit, OnDestroy, inject, signal, ElementRef, ViewChild, Af
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ChatService } from '../../../services/chat.service';
+import { InventoryService } from '../../../services/inventory.service';
 import { ChatMessage } from '../../../models/chat.model';
+import { AddItemRequest } from '../../../models/inventory.model';
+import { MessageFormatPipe } from '../../../pipes/message-format.pipe';
 
 /**
  * Chat command interface
@@ -17,12 +20,13 @@ interface ChatCommand {
 @Component({
   selector: 'app-chat',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MessageFormatPipe],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss'
 })
 export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   chatService = inject(ChatService);
+  inventoryService = inject(InventoryService);
 
   @ViewChild('messageList') private messageList!: ElementRef;
 
@@ -61,6 +65,26 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         this.chatService.clearMessages();
         this.addLocalMessage('Chat history cleared');
       }
+    },
+    {
+      name: '/additem',
+      description: 'Add item to inventory',
+      syntax: '[itemId] [quantity] [modifiers]',
+      execute: (args: string[]) => {
+        if (args.length === 0) {
+          this.addLocalMessage('Usage: /additem [itemId] [quantity] [modifiers]\\nExample: /additem oak_log 10 moisture:3,age:2\\nUse /listitems to see available items');
+          return;
+        }
+        const itemId = args[0];
+        const quantity = parseInt(args[1]) || 1;
+        const modifiers = args.slice(2).join(' ');
+        this.addItemViaCommand(itemId, quantity, modifiers);
+      }
+    },
+    {
+      name: '/listitems',
+      description: 'Show available items and modifier syntax',
+      execute: () => this.showItemList()
     }
   ];
 
@@ -206,6 +230,148 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
       createdAt: new Date()
     });
     this.shouldScrollToBottom = true;
+  }
+
+  /**
+   * Parse item modifiers from command arguments
+   * Format: quality:level,trait:level (e.g., "moisture:3,age:2,pristine:1")
+   */
+  private parseItemModifiers(modifiers: string): { qualities?: { [key: string]: number }, traits?: { [key: string]: number } } {
+    const result: { qualities?: { [key: string]: number }, traits?: { [key: string]: number } } = {};
+
+    if (!modifiers || !modifiers.trim()) {
+      return result;
+    }
+
+    // Known quality and trait types for validation
+    const knownQualities = ['woodGrain', 'moisture', 'age', 'purity', 'sheen'];
+    const knownTraits = ['fragrant', 'knotted', 'weathered', 'pristine', 'cursed', 'blessed', 'masterwork'];
+
+    const pairs = modifiers.split(',');
+
+    for (const pair of pairs) {
+      const [key, value] = pair.trim().split(':');
+
+      if (!key || !value) {
+        continue;
+      }
+
+      const level = parseInt(value);
+      if (isNaN(level)) {
+        continue;
+      }
+
+      // Determine if it's a quality or trait
+      if (knownQualities.includes(key)) {
+        if (level >= 1 && level <= 5) {
+          if (!result.qualities) result.qualities = {};
+          result.qualities[key] = level;
+        }
+      } else if (knownTraits.includes(key)) {
+        if (level >= 1 && level <= 3) {
+          if (!result.traits) result.traits = {};
+          result.traits[key] = level;
+        }
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Add item to inventory via command
+   */
+  private addItemViaCommand(itemId: string, quantity: number, modifiers?: string): void {
+    const request: AddItemRequest = {
+      itemId,
+      quantity: quantity || 1
+    };
+
+    // Parse modifiers if provided
+    if (modifiers) {
+      const parsed = this.parseItemModifiers(modifiers);
+      if (parsed.qualities && Object.keys(parsed.qualities).length > 0) {
+        request.qualities = parsed.qualities;
+      }
+      if (parsed.traits && Object.keys(parsed.traits).length > 0) {
+        request.traits = parsed.traits;
+      }
+    }
+
+    this.inventoryService.addItem(request).subscribe({
+      next: (response) => {
+        let message = `✓ Added ${quantity}x ${itemId}`;
+        if (request.qualities || request.traits) {
+          const mods: string[] = [];
+          if (request.qualities) {
+            mods.push(...Object.entries(request.qualities).map(([k, v]) => `${k}:${v}`));
+          }
+          if (request.traits) {
+            mods.push(...Object.entries(request.traits).map(([k, v]) => `${k}:${v}`));
+          }
+          message += ` (${mods.join(', ')})`;
+        }
+        this.addLocalMessage(message);
+      },
+      error: (error) => {
+        const errorMsg = error.error?.message || 'Failed to add item';
+        this.addLocalMessage(`✗ Error: ${errorMsg}`);
+      }
+    });
+  }
+
+  /**
+   * Show list of available items
+   */
+  private showItemList(): void {
+    // Show loading message
+    this.addLocalMessage('Loading item list...');
+
+    this.inventoryService.getItemDefinitions().subscribe({
+      next: (response) => {
+        // Group items by category
+        const byCategory: { [key: string]: string[] } = {};
+
+        response.items.forEach(item => {
+          const category = item.category || 'other';
+          if (!byCategory[category]) {
+            byCategory[category] = [];
+          }
+          byCategory[category].push(item.itemId);
+        });
+
+        // Format help text with items grouped by category
+        let helpText = `Available Items (${response.items.length} total):\\n\\n`;
+
+        // Sort categories for consistent display
+        const categoryOrder = ['resource', 'equipment', 'consumable'];
+        const sortedCategories = Object.keys(byCategory).sort((a, b) => {
+          const aIndex = categoryOrder.indexOf(a);
+          const bIndex = categoryOrder.indexOf(b);
+          if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
+          if (aIndex !== -1) return -1;
+          if (bIndex !== -1) return 1;
+          return a.localeCompare(b);
+        });
+
+        sortedCategories.forEach(category => {
+          const itemIds = byCategory[category];
+          const capitalizedCategory = category.charAt(0).toUpperCase() + category.slice(1);
+          helpText += `**${capitalizedCategory}** (${itemIds.length}): ${itemIds.join(', ')}\\n\\n`;
+        });
+
+        helpText += '\\n**Usage**: /additem [itemId] [quantity] [modifiers]\\n';
+        helpText += '**Modifiers**: quality:level,trait:level\\n';
+        helpText += '**Qualities**: woodGrain, moisture, age, purity, sheen (levels 1-5)\\n';
+        helpText += '**Traits**: fragrant, knotted, weathered, pristine, cursed, blessed, masterwork (levels 1-3)';
+
+        this.addLocalMessage(helpText);
+      },
+      error: (error) => {
+        console.error('Failed to load item definitions:', error);
+        this.addLocalMessage('✗ Error: Failed to load item list. Please try again.');
+      }
+    });
   }
 
   /**
