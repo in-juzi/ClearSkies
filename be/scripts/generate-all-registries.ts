@@ -45,7 +45,8 @@ const REGISTRY_CONFIGS: Record<string, RegistryConfig> = {
     typeName: 'Recipe',
     typeImportPath: '../../types/crafting',
     idField: 'recipeId',
-    registryClassName: 'RecipeRegistry'
+    registryClassName: 'RecipeRegistry',
+    flatStructure: true  // Recipes are organized in subdirectories (cooking, smithing), not definitions/
   },
   vendors: {
     name: 'Vendors',
@@ -111,7 +112,7 @@ const REGISTRY_CONFIGS: Record<string, RegistryConfig> = {
 /**
  * Find all TypeScript files recursively
  */
-function findTsFiles(dir: string, baseDir: string): Array<{ className: string; relativePath: string; subdirectory?: string }> {
+function findTsFiles(dir: string, baseDir: string, flatStructure: boolean = false): Array<{ className: string; relativePath: string; subdirectory?: string }> {
   const results: Array<{ className: string; relativePath: string; subdirectory?: string }> = [];
 
   if (!fs.existsSync(dir)) {
@@ -125,7 +126,7 @@ function findTsFiles(dir: string, baseDir: string): Array<{ className: string; r
 
     if (entry.isDirectory()) {
       // Recursively find files in subdirectories
-      const subResults = findTsFiles(fullPath, baseDir);
+      const subResults = findTsFiles(fullPath, baseDir, flatStructure);
       const subdirName = path.relative(baseDir, path.dirname(fullPath + '/dummy')).split(path.sep)[0];
 
       subResults.forEach(result => {
@@ -136,7 +137,14 @@ function findTsFiles(dir: string, baseDir: string): Array<{ className: string; r
       });
     } else if (entry.isFile() && entry.name.endsWith('.ts')) {
       const className = path.basename(entry.name, '.ts');
-      const relativePath = './definitions/' + path.relative(baseDir, fullPath).replace(/\\/g, '/').replace('.ts', '');
+
+      // Skip registry files to avoid circular imports
+      if (className.endsWith('Registry')) {
+        continue;
+      }
+
+      const pathPrefix = flatStructure ? './' : './definitions/';
+      const relativePath = pathPrefix + path.relative(baseDir, fullPath).replace(/\\/g, '/').replace('.ts', '');
 
       results.push({ className, relativePath });
     }
@@ -256,7 +264,7 @@ function main() {
       console.log(`📦 Generating ${config.registryClassName}...`);
 
       const definitionsPath = path.join(__dirname, '..', config.definitionsDir);
-      const files = findTsFiles(definitionsPath, definitionsPath);
+      const files = findTsFiles(definitionsPath, definitionsPath, config.flatStructure || false);
 
       const registryContent = generateRegistry(config, files);
       const outputPath = path.join(__dirname, '..', config.outputFile);
@@ -272,7 +280,7 @@ function main() {
     console.log(`📦 Generating ${config.registryClassName}...`);
 
     const definitionsPath = path.join(__dirname, '..', config.definitionsDir);
-    const files = findTsFiles(definitionsPath, definitionsPath);
+    const files = findTsFiles(definitionsPath, definitionsPath, config.flatStructure || false);
 
     const registryContent = generateRegistry(config, files);
     const outputPath = path.join(__dirname, '..', config.outputFile);
