@@ -79,8 +79,11 @@ export interface Vendor {
  */
 export interface VendorStock {
   itemId: string;
-  price: number;
-  stock: number | 'infinite';
+  buyPrice: number; // Price player pays to buy from vendor
+  price?: number; // Legacy field, kept for compatibility
+  stockType: 'infinite' | 'limited';
+  stock?: number | 'infinite'; // Legacy field, kept for compatibility
+  currentStock?: number; // For limited stock items
   restockInterval?: number; // seconds
   restockQuantity?: number;
 }

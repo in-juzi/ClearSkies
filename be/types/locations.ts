@@ -8,7 +8,7 @@ import { ExperienceRewards, QuantityRange, SkillName } from './common';
 
 export type Biome = 'sea' | 'forest' | 'mountain' | 'plains' | 'desert' | 'swamp';
 
-export type FacilityType = 'gathering' | 'trading' | 'crafting' | 'combat';
+export type FacilityType = 'gathering' | 'resource-gathering' | 'trading' | 'crafting' | 'combat';
 
 export type ActivityType = 'resource-gathering' | 'combat' | 'social';
 
@@ -44,6 +44,7 @@ export interface NavigationLink {
  */
 export interface NavigationRequirements {
   skills?: Record<SkillName, number>;
+  attributes?: Record<string, number>;
   completedQuests?: string[];
   items?: Array<{
     itemId: string;
@@ -119,7 +120,8 @@ export interface GatheringActivity extends Activity {
  */
 export interface GatheringRewards {
   experience: ExperienceRewards;
-  dropTables: string[];
+  dropTables?: string[];
+  items?: any[]; // Optional legacy field for direct item rewards
 }
 
 /**
@@ -127,10 +129,19 @@ export interface GatheringRewards {
  */
 export interface CombatActivity extends Activity {
   type: 'combat';
-  combatConfig: {
+  duration?: number; // Optional duration for stub activities
+  rewards?: any; // Optional rewards for stub activities
+  stub?: boolean; // Flag for stub activities
+  stubMessage?: string; // Message for stub activities
+  combatConfig?: {
     monsterId: string;
   };
 }
+
+/**
+ * Union type for all activity types
+ */
+export type ActivityUnion = GatheringActivity | CombatActivity;
 
 // ===== DROP TABLE DEFINITIONS =====
 
@@ -148,10 +159,14 @@ export interface DropTable {
  * Individual drop entry
  */
 export interface DropTableEntry {
-  itemId: string;
+  itemId?: string;
   weight: number;
-  quantity: QuantityRange;
-  qualityBonus?: Record<string, number>;
+  quantity?: QuantityRange | number; // Can be a number or a range object
+  qualityBonus?: number | Record<string, number>; // Can be a number or a map of quality bonuses
+  type?: string; // Optional type field for special drop types
+  comment?: string; // Optional comment for documentation
+  dropNothing?: boolean; // Optional flag for no-drop entries
+  dropTableId?: string; // For nested drop tables
 }
 
 // ===== BIOME DEFINITIONS =====
@@ -163,8 +178,13 @@ export interface BiomeDefinition {
   biomeId: Biome;
   name: string;
   description: string;
-  ambientDescription: string;
-  characteristics: string[];
+  ambientDescription?: string;
+  characteristics?: string[];
+  theme?: {
+    primaryColor: string;
+    secondaryColor: string;
+    accentColor: string;
+  };
 }
 
 // ===== PLAYER LOCATION STATE =====

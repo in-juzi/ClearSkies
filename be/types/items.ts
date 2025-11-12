@@ -176,21 +176,41 @@ export interface ResourceProperties extends ItemProperties {
 export interface QualityDefinition {
   qualityId: string;
   name: string;
+  shorthand: string;
   description: string;
-  levels: QualityLevel[];
+  applicableCategories: string[];
+  valueType: string;
+  maxLevel: number;
+  levels: Record<string, QualityLevel>;
 }
 
 /**
  * Quality level (1-5)
  */
 export interface QualityLevel {
-  level: number;
   name: string;
   description: string;
   effects: {
-    vendorPriceMultiplier: number;
-    craftingBonusMultiplier?: number;
-    alchemyPotencyMultiplier?: number;
+    alchemy?: {
+      potencyMultiplier: number;
+    };
+    vendorPrice?: {
+      modifier: number;
+    };
+    crafting?: {
+      bonusMultiplier?: number;
+      qualityBonus?: number;
+    };
+    cooking?: {
+      bonusMultiplier?: number;
+      qualityBonus?: number;
+      yieldMultiplier?: number;
+    };
+    smithing?: {
+      bonusMultiplier?: number;
+      qualityBonus?: number;
+    };
+    [key: string]: any; // Allow additional effect types
   };
 }
 
@@ -200,23 +220,47 @@ export interface QualityLevel {
 export interface TraitDefinition {
   traitId: string;
   name: string;
+  shorthand: string;
   description: string;
   rarity: Rarity;
-  levels: TraitLevel[];
+  applicableCategories: string[];
+  maxLevel: number;
+  levels: Record<string, TraitLevel>;
 }
 
 /**
  * Trait level (1-3)
  */
 export interface TraitLevel {
-  level: number;
   name: string;
   description: string;
   effects: {
-    vendorPriceMultiplier: number;
-    craftingBonusMultiplier?: number;
-    combatBonusMultiplier?: number;
-    durabilityMultiplier?: number;
+    vendorPrice?: {
+      modifier: number;
+    };
+    crafting?: {
+      bonusMultiplier?: number;
+      damageBonus?: number;
+      durabilityMultiplier?: number;
+    };
+    combat?: {
+      bonusMultiplier?: number;
+      damageBonus?: number;
+      healthDrain?: number;
+      durabilityMultiplier?: number;
+    };
+    durability?: {
+      multiplier: number;
+    };
+    alchemy?: {
+      bonusProperties: string[];
+    };
+    smithing?: {
+      bonusMultiplier?: number;
+      qualityRetention?: number;
+      qualityBonus?: number;
+    };
+    [key: string]: any; // Allow additional effect types
   };
 }
 

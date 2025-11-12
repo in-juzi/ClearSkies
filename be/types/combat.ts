@@ -29,7 +29,7 @@ export interface Monster {
     mana: Stats;
   };
   attributes: Record<AttributeName, Attribute>;
-  skills: Record<SkillName, Skill>;
+  skills: Partial<Record<SkillName, Skill>>; // Monsters may only have combat skills
   equipment: MonsterEquipment;
   combatStats: {
     armor: number;
@@ -126,6 +126,7 @@ export interface AbilityEffects {
     amount: number;
     duration: number;
   };
+  critChanceBonus?: number; // Bonus critical hit chance
 }
 
 // ===== COMBAT STATE =====
