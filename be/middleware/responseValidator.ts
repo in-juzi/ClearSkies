@@ -4,23 +4,25 @@
  * Only active in development mode to catch circular reference issues early
  */
 
-const { jsonSafe } = require('../utils/jsonSafe');
+import { Request, Response, NextFunction } from 'express';
+import { jsonSafe } from '../utils/jsonSafe';
 
 /**
  * Middleware that intercepts res.json() to validate serialization
  * Catches circular reference errors before they reach the client
  */
-function responseValidator(req, res, next) {
+function responseValidator(req: Request, res: Response, next: NextFunction): void {
   // Only run in development mode
   if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'dev') {
-    return next();
+    next();
+    return;
   }
 
   // Store the original res.json function
   const originalJson = res.json;
 
   // Override res.json to add validation
-  res.json = function(data) {
+  res.json = function (data: any) {
     const endpoint = `${req.method} ${req.path}`;
 
     try {
@@ -33,12 +35,12 @@ function responseValidator(req, res, next) {
       // Log the error with context
       console.error(`\n[Response Validation Failed]`);
       console.error(`Endpoint: ${endpoint}`);
-      console.error(`Error: ${e.message}\n`);
+      console.error(`Error: ${(e as Error).message}\n`);
 
       // Return a 500 error to the client with details
       return res.status(500).json({
         message: 'Response serialization failed',
-        error: e.message,
+        error: (e as Error).message,
         endpoint: endpoint,
         hint: 'Check server logs for detailed circular reference analysis'
       });
@@ -48,4 +50,4 @@ function responseValidator(req, res, next) {
   next();
 }
 
-module.exports = responseValidator;
+export default responseValidator;

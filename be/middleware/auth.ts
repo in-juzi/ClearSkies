@@ -1,12 +1,13 @@
-const { verifyToken } = require('../utils/jwt');
-const User = require('../models/User');
+import { Request, Response, NextFunction } from 'express';
+import { verifyToken } from '../utils/jwt';
+import User from '../models/User';
 
 /**
  * Middleware to protect routes that require authentication
  */
-const protect = async (req, res, next) => {
+export const protect = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    let token;
+    let token: string | undefined;
 
     // Check for token in Authorization header
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
@@ -15,10 +16,11 @@ const protect = async (req, res, next) => {
 
     // Check if token exists
     if (!token) {
-      return res.status(401).json({
+      res.status(401).json({
         success: false,
         message: 'Not authorized to access this route. Please login.'
       });
+      return;
     }
 
     // Verify token
@@ -28,28 +30,29 @@ const protect = async (req, res, next) => {
     const user = await User.findById(decoded.id).select('-password');
 
     if (!user) {
-      return res.status(401).json({
+      res.status(401).json({
         success: false,
         message: 'User not found'
       });
+      return;
     }
 
     if (!user.isActive) {
-      return res.status(401).json({
+      res.status(401).json({
         success: false,
         message: 'Account is deactivated'
       });
+      return;
     }
 
     // Attach user to request object
     req.user = user;
     next();
-
   } catch (error) {
-    return res.status(401).json({
+    res.status(401).json({
       success: false,
       message: 'Not authorized to access this route',
-      error: error.message
+      error: (error as Error).message
     });
   }
 };
@@ -57,9 +60,9 @@ const protect = async (req, res, next) => {
 /**
  * Optional authentication - attaches user if token is valid but doesn't block request
  */
-const optionalAuth = async (req, res, next) => {
+export const optionalAuth = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    let token;
+    let token: string | undefined;
 
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
       token = req.headers.authorization.split(' ')[1];
@@ -79,9 +82,4 @@ const optionalAuth = async (req, res, next) => {
     // Continue without user
     next();
   }
-};
-
-module.exports = {
-  protect,
-  optionalAuth
 };
