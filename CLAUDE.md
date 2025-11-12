@@ -63,6 +63,8 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 **Hot-reload items:** POST `/api/inventory/reload` (no restart needed)
 **API endpoints:** See route files in `be/routes/` - all require JWT except auth register/login
 
+> **IMPORTANT**: **NEVER start backend/frontend servers** - they are always running during development. Only rebuild with `npm run build` if code changes require it. If you need to restart servers, ask the user first.
+
 ## Quick File Reference
 
 ### Frequently Modified Files
