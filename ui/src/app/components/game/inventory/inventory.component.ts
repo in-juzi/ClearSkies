@@ -2,6 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InventoryService } from '../../../services/inventory.service';
+import { EquipmentService } from '../../../services/equipment.service';
 import { ConfirmDialogService } from '../../../services/confirm-dialog.service';
 import { ItemDetails } from '../../../models/inventory.model';
 import { ItemModifiersComponent } from '../../shared/item-modifiers/item-modifiers.component';
@@ -17,6 +18,7 @@ import { ItemDetailsPanelComponent } from '../../shared/item-details-panel/item-
 })
 export class InventoryComponent implements OnInit {
   private confirmDialog = inject(ConfirmDialogService);
+  private equipmentService = inject(EquipmentService);
 
   selectedItem: ItemDetails | null = null;
   selectedCategory: string = 'all';
@@ -112,6 +114,17 @@ export class InventoryComponent implements OnInit {
         // Close panel if all items were dropped
         if (this.selectedItem && quantityToRemove >= this.selectedItem.quantity) {
           this.selectedItem = null;
+        } else {
+          // Partial drop - update selected item with new quantity
+          setTimeout(() => {
+            const updatedItem = this.inventoryService.inventory().find(i => i.instanceId === instanceId);
+            if (updatedItem) {
+              this.selectedItem = updatedItem;
+            } else {
+              // Item no longer exists (all were dropped)
+              this.selectedItem = null;
+            }
+          }, 100);
         }
       },
       error: (error) => {
@@ -161,6 +174,8 @@ export class InventoryComponent implements OnInit {
     this.inventoryService.equipItem(instanceId, slot).subscribe({
       next: () => {
         console.log('Item equipped');
+        // Reload equipment service to update equipment display
+        this.equipmentService.loadEquippedItems().subscribe();
         // Wait for inventory to reload, then update selected item
         setTimeout(() => {
           const updatedItem = this.inventoryService.inventory().find(i => i.instanceId === instanceId);
@@ -190,6 +205,8 @@ export class InventoryComponent implements OnInit {
     this.inventoryService.unequipItem(slot).subscribe({
       next: () => {
         console.log('Item unequipped');
+        // Reload equipment service to update equipment display
+        this.equipmentService.loadEquippedItems().subscribe();
         // Wait for inventory to reload, then update selected item
         setTimeout(() => {
           const updatedItem = this.inventoryService.inventory().find(i => i.instanceId === instanceId);

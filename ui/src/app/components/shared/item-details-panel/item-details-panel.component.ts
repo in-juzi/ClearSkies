@@ -28,17 +28,39 @@ export class ItemDetailsPanelComponent implements OnChanges {
   combatStats: any = null;
   loadingCombatStats: boolean = false;
 
+  // Drag functionality
+  isDragging: boolean = false;
+  dragOffsetX: number = 0;
+  dragOffsetY: number = 0;
+  currentX: number = 0;
+  currentY: number = 0;
+
   constructor(public inventoryService: InventoryService) {}
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['item'] && this.item) {
-      // Reset drop quantity
-      this.dropQuantity = 1;
+    if (changes['item']) {
+      if (this.item) {
+        // Reset drop quantity to 1 (but cap it to available quantity)
+        this.dropQuantity = Math.min(1, this.item.quantity);
 
-      // Load combat stats if it's a weapon
-      this.combatStats = null;
-      if (this.item.definition.category === 'equipment' && this.item.definition.subcategories?.includes('weapon')) {
-        this.loadCombatStats(this.item.instanceId);
+        // If item quantity changed (after a partial drop), ensure dropQuantity doesn't exceed new max
+        if (changes['item'].previousValue &&
+            changes['item'].previousValue.instanceId === this.item.instanceId &&
+            changes['item'].previousValue.quantity !== this.item.quantity) {
+          // Item quantity changed - cap dropQuantity to new maximum
+          this.dropQuantity = Math.min(this.dropQuantity, this.item.quantity);
+        }
+
+        // Load combat stats if it's a weapon or armor
+        this.combatStats = null;
+        const isWeapon = this.item.definition.subcategories?.includes('weapon');
+        const isArmor = this.item.definition.subcategories?.includes('armor');
+        if (this.item.definition.category === 'equipment' && (isWeapon || isArmor)) {
+          this.loadCombatStats(this.item.instanceId);
+        }
+      } else {
+        // Item cleared
+        this.dropQuantity = 1;
       }
     }
   }
@@ -187,5 +209,52 @@ export class ItemDetailsPanelComponent implements OnChanges {
     }
 
     return effects.join(', ');
+  }
+
+  /**
+   * Start dragging the panel
+   */
+  onDragStart(event: MouseEvent): void {
+    this.isDragging = true;
+    const panel = (event.target as HTMLElement).closest('.item-details-panel') as HTMLElement;
+    if (panel) {
+      const rect = panel.getBoundingClientRect();
+      this.dragOffsetX = event.clientX - rect.left;
+      this.dragOffsetY = event.clientY - rect.top;
+      this.currentX = rect.left;
+      this.currentY = rect.top;
+    }
+  }
+
+  /**
+   * Handle dragging movement
+   */
+  onDrag(event: MouseEvent): void {
+    if (this.isDragging) {
+      event.preventDefault();
+      this.currentX = event.clientX - this.dragOffsetX;
+      this.currentY = event.clientY - this.dragOffsetY;
+    }
+  }
+
+  /**
+   * Stop dragging the panel
+   */
+  onDragEnd(): void {
+    this.isDragging = false;
+  }
+
+  /**
+   * Get the transform style for the panel position
+   */
+  getPanelStyle(): any {
+    if (this.isDragging || (this.currentX !== 0 || this.currentY !== 0)) {
+      return {
+        transform: 'none',
+        left: `${this.currentX}px`,
+        top: `${this.currentY}px`
+      };
+    }
+    return {};
   }
 }

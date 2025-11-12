@@ -36,9 +36,6 @@
             }
             <div class="item-info">
               <div class="item-name">{{ item.definition.name }}</div>
-              @if (item.definition.properties['defense']) {
-                <div class="item-stat">🛡️ {{ item.definition.properties['defense'] }}</div>
-              }
             </div>
             <div class="item-rarity-badge">{{ item.definition.rarity }}</div>
           </div>
@@ -51,6 +48,75 @@
     <p><strong>Drag & Drop</strong> equipment from inventory to equip</p>
     <p><strong>Right-click</strong> equipped items to unequip</p>
     <p><strong>Left-click</strong> equipped items to view details</p>
+  </div>
+
+  <!-- Equipment Summary -->
+  <div class="equipment-summary">
+    <h3 class="summary-title">Equipment Summary</h3>
+
+    @if (equipmentSummary().itemCount === 0) {
+      <div class="summary-empty">
+        <p>No items equipped</p>
+      </div>
+    } @else {
+      <div class="summary-content">
+        <!-- Offensive Stats -->
+        @if (equipmentSummary().weaponCount > 0) {
+          <div class="stat-group offensive">
+            <h4 class="stat-group-title">Offensive</h4>
+            <div class="stat-items">
+              @if (equipmentSummary().totalDamage.length > 0) {
+                <div class="stat-item">
+                  <span class="stat-label">Damage:</span>
+                  <span class="stat-value">{{ equipmentSummary().totalDamage.join(', ') }}</span>
+                </div>
+              }
+              @if (equipmentSummary().averageAttackSpeed > 0) {
+                <div class="stat-item">
+                  <span class="stat-label">Attack Speed:</span>
+                  <span class="stat-value">{{ equipmentSummary().averageAttackSpeed.toFixed(2) }}s</span>
+                </div>
+              }
+              @if (equipmentSummary().totalCritChance > 0) {
+                <div class="stat-item">
+                  <span class="stat-label">Crit Chance:</span>
+                  <span class="stat-value">{{ (equipmentSummary().totalCritChance * 100).toFixed(1) }}%</span>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Defensive Stats -->
+        @if (equipmentSummary().armorCount > 0 || equipmentSummary().totalEvasion !== 0 || equipmentSummary().totalBlockChance > 0) {
+          <div class="stat-group defensive">
+            <h4 class="stat-group-title">Defensive</h4>
+            <div class="stat-items">
+              @if (equipmentSummary().totalArmor > 0) {
+                <div class="stat-item">
+                  <span class="stat-label">Armor:</span>
+                  <span class="stat-value">{{ equipmentSummary().totalArmor }}</span>
+                </div>
+              }
+              @if (equipmentSummary().totalEvasion !== 0) {
+                <div class="stat-item">
+                  <span class="stat-label">Evasion:</span>
+                  <span class="stat-value" [class.negative]="equipmentSummary().totalEvasion < 0">
+                    {{ equipmentSummary().totalEvasion > 0 ? '+' : '' }}{{ equipmentSummary().totalEvasion }}
+                  </span>
+                </div>
+              }
+              @if (equipmentSummary().totalBlockChance > 0) {
+                <div class="stat-item">
+                  <span class="stat-label">Block Chance:</span>
+                  <span class="stat-value">{{ (equipmentSummary().totalBlockChance * 100).toFixed(1) }}%</span>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
   </div>
 
   <!-- Item Details Panel (Shared Component) -->

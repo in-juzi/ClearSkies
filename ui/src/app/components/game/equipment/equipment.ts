@@ -44,6 +44,75 @@ export class Equipment {
   // Computed signal for equipped items
   equippedItems = computed(() => this.equipmentService.equippedItems());
 
+  // Computed signal for equipment summary stats
+  equipmentSummary = computed(() => {
+    const items = this.equippedItems();
+    const summary = {
+      // Offensive stats
+      totalDamage: [] as string[], // Array of damage rolls
+      averageAttackSpeed: 0,
+      totalCritChance: 0,
+      weaponCount: 0,
+      // Defensive stats
+      totalArmor: 0,
+      totalEvasion: 0,
+      totalBlockChance: 0,
+      armorCount: 0,
+      // Other stats
+      totalWeight: 0,
+      totalDurability: 0,
+      requiredLevel: 0,
+      itemCount: 0
+    };
+
+    Object.values(items).forEach((item: ItemDetails | null) => {
+      if (!item) return;
+
+      const props = item.definition.properties;
+      summary.itemCount++;
+
+      // Accumulate weight
+      summary.totalWeight += props.weight || 0;
+
+      // Accumulate durability
+      summary.totalDurability += props['durability'] || 0;
+
+      // Track highest required level
+      summary.requiredLevel = Math.max(summary.requiredLevel, props['requiredLevel'] || 0);
+
+      // Weapon stats
+      if (props['damageRoll']) {
+        summary.totalDamage.push(props['damageRoll']);
+        summary.weaponCount++;
+      }
+      if (props['attackSpeed']) {
+        summary.averageAttackSpeed += props['attackSpeed'];
+      }
+      if (props['critChance']) {
+        summary.totalCritChance += props['critChance'];
+      }
+
+      // Armor stats
+      if (props['armor']) {
+        summary.totalArmor += props['armor'];
+        summary.armorCount++;
+      }
+      if (props['evasion']) {
+        summary.totalEvasion += props['evasion'];
+      }
+      if (props['blockChance']) {
+        summary.totalBlockChance += props['blockChance'];
+      }
+    });
+
+    // Calculate average attack speed
+    if (summary.weaponCount > 0) {
+      summary.averageAttackSpeed = summary.averageAttackSpeed / summary.weaponCount;
+    }
+
+    return summary;
+  });
+
   // Drag-over state for visual feedback
   dragOverSlot: EquipmentSlot | null = null;
 

@@ -1,5 +1,12 @@
-<div class="item-details-panel" *ngIf="item">
-  <div class="details-header">
+<div class="item-details-panel"
+     *ngIf="item"
+     [ngStyle]="getPanelStyle()"
+     (mousemove)="onDrag($event)"
+     (mouseup)="onDragEnd()"
+     (mouseleave)="onDragEnd()">
+  <div class="details-header"
+       (mousedown)="onDragStart($event)"
+       [style.cursor]="isDragging ? 'grabbing' : 'grab'">
     <h3 [class]="inventoryService.getRarityColor(item.definition.rarity)">
       {{ item.definition.name }}
     </h3>
@@ -49,6 +56,10 @@
     <div class="detail-section" *ngIf="item.definition.category === 'equipment' && item.definition.subcategories?.includes('weapon')">
       <h4 class="section-title">Weapon Stats</h4>
       <div class="weapon-stats-grid">
+        <div class="detail-row" *ngIf="item.definition['slot']">
+          <span class="label">Equipment Slot:</span>
+          <span class="text-purple-400">{{ item.definition['slot'] }}</span>
+        </div>
         <div class="detail-row" *ngIf="item.definition.properties['damageRoll']">
           <span class="label">Damage Roll:</span>
           <span class="text-red-400">{{ item.definition.properties['damageRoll'] }}</span>
@@ -76,8 +87,39 @@
       </div>
     </div>
 
+    <!-- Armor Stats -->
+    <div class="detail-section" *ngIf="item.definition.category === 'equipment' && item.definition.subcategories?.includes('armor')">
+      <h4 class="section-title">Armor Stats</h4>
+      <div class="weapon-stats-grid">
+        <div class="detail-row" *ngIf="item.definition['slot']">
+          <span class="label">Equipment Slot:</span>
+          <span class="text-purple-400">{{ item.definition['slot'] }}</span>
+        </div>
+        <div class="detail-row" *ngIf="item.definition.properties['armor'] !== undefined">
+          <span class="label">Armor:</span>
+          <span class="text-blue-400">{{ item.definition.properties['armor'] }}</span>
+        </div>
+        <div class="detail-row" *ngIf="item.definition.properties['evasion'] !== undefined">
+          <span class="label">Evasion:</span>
+          <span class="text-yellow-400">{{ item.definition.properties['evasion'] }}</span>
+        </div>
+        <div class="detail-row" *ngIf="item.definition.properties['blockChance'] !== undefined">
+          <span class="label">Block Chance:</span>
+          <span class="text-gold-400">{{ (item.definition.properties['blockChance'] * 100).toFixed(1) }}%</span>
+        </div>
+        <div class="detail-row" *ngIf="item.definition.properties['durability'] !== undefined">
+          <span class="label">Durability:</span>
+          <span>{{ item.definition.properties['durability'] }}</span>
+        </div>
+        <div class="detail-row" *ngIf="item.definition.properties['requiredLevel'] !== undefined">
+          <span class="label">Required Level:</span>
+          <span class="text-blue-400">{{ item.definition.properties['requiredLevel'] }}</span>
+        </div>
+      </div>
+    </div>
+
     <!-- Scaled Weapon Stats (with player skill/attribute levels) -->
-    <div class="detail-section" *ngIf="combatStats">
+    <div class="detail-section" *ngIf="combatStats && item.definition.subcategories?.includes('weapon')">
       <h4 class="section-title">Scaled Combat Stats</h4>
       <div class="weapon-stats-grid" *ngIf="!loadingCombatStats">
         <div class="detail-row">
@@ -95,6 +137,36 @@
         <div class="detail-row">
           <span class="label">Level Bonus:</span>
           <span class="text-green-400">+{{ combatStats.totalLevelBonus }} (Skill L{{ combatStats.skillLevel }} + Attr L{{ combatStats.attrLevel }})</span>
+        </div>
+      </div>
+      <div *ngIf="loadingCombatStats" class="text-gray-400 text-center">
+        Loading stats...
+      </div>
+    </div>
+
+    <!-- Scaled Armor Stats -->
+    <div class="detail-section" *ngIf="combatStats && item.definition.subcategories?.includes('armor')">
+      <h4 class="section-title">Scaled Armor Stats</h4>
+      <div class="weapon-stats-grid" *ngIf="!loadingCombatStats">
+        <div class="detail-row" *ngIf="combatStats.armor !== undefined">
+          <span class="label">Armor:</span>
+          <span class="text-blue-400">{{ combatStats.armor }}</span>
+        </div>
+        <div class="detail-row" *ngIf="combatStats.evasion !== undefined">
+          <span class="label">Evasion:</span>
+          <span class="text-yellow-400">{{ combatStats.evasion }}</span>
+        </div>
+        <div class="detail-row" *ngIf="combatStats.blockChance !== undefined">
+          <span class="label">Block Chance:</span>
+          <span class="text-gold-400">{{ (combatStats.blockChance * 100).toFixed(1) }}%</span>
+        </div>
+        <div class="detail-row" *ngIf="combatStats.durability !== undefined">
+          <span class="label">Durability:</span>
+          <span>{{ combatStats.durability }}</span>
+        </div>
+        <div class="detail-row" *ngIf="combatStats.requiredLevel !== undefined">
+          <span class="label">Required Level:</span>
+          <span class="text-blue-400">{{ combatStats.requiredLevel }}</span>
         </div>
       </div>
       <div *ngIf="loadingCombatStats" class="text-gray-400 text-center">

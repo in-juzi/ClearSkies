@@ -7,6 +7,8 @@
   background: var(--gradient-card);
   border-radius: var(--radius-card);
   border: var(--border-default);
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .equipment-title {
@@ -201,6 +203,107 @@
 
     strong {
       color: var(--color-secondary-dark);
+    }
+  }
+}
+
+.equipment-summary {
+  margin-top: var(--spacing-2xl);
+  padding: var(--spacing-l);
+  background: var(--gradient-surface);
+  border-radius: var(--radius-card);
+  border: var(--border-default);
+
+  .summary-title {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-secondary-dark);
+    text-align: center;
+    margin: 0 0 var(--spacing-l) 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    letter-spacing: var(--letter-spacing-wide);
+    text-transform: uppercase;
+  }
+
+  .summary-empty {
+    text-align: center;
+    padding: var(--spacing-xl);
+    color: var(--color-text-tertiary);
+    font-style: italic;
+    opacity: var(--opacity-muted);
+  }
+
+  .summary-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-l);
+  }
+
+  .stat-group {
+    background: var(--color-bg-overlay);
+    border-radius: var(--radius-button);
+    padding: var(--spacing-m);
+    border: var(--border-light);
+
+    &.offensive {
+      border-left: 3px solid var(--color-warning);
+
+      .stat-group-title {
+        color: var(--color-warning);
+      }
+    }
+
+    &.defensive {
+      border-left: 3px solid var(--color-info);
+
+      .stat-group-title {
+        color: var(--color-info);
+      }
+    }
+  }
+
+  .stat-group-title {
+    font-size: var(--font-size-l);
+    font-weight: var(--font-weight-semibold);
+    margin: 0 0 var(--spacing-m) 0;
+    text-transform: uppercase;
+    letter-spacing: var(--letter-spacing-wide);
+  }
+
+  .stat-items {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-s);
+  }
+
+  .stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-xs) var(--spacing-s);
+    background: var(--color-bg-overlay);
+    border-radius: var(--radius-s);
+    border: var(--border-light);
+
+    &:hover {
+      background: var(--color-bg-tertiary);
+      border-color: var(--color-secondary-dark);
+    }
+  }
+
+  .stat-label {
+    font-size: var(--font-size-m);
+    color: var(--color-text-tertiary);
+    font-weight: var(--font-weight-medium);
+  }
+
+  .stat-value {
+    font-size: var(--font-size-m);
+    color: var(--color-text-primary);
+    font-weight: var(--font-weight-semibold);
+
+    &.negative {
+      color: var(--color-danger);
     }
   }
 }
