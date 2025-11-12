@@ -1,64 +1,17 @@
-import * as fs from 'fs';
-import * as path from 'path';
 import itemService from './itemService';
 import { Vendor, StockItem, ItemInstance } from '../types';
+import { VendorRegistry } from '../data/vendors/VendorRegistry';
 
 /**
  * VendorService - Manages vendor data and transactions
  * Singleton pattern like LocationService and ItemService
  */
 class VendorService {
-  private vendors: Map<string, Vendor> = new Map();
-  private vendorsLoaded: boolean = false;
-
-  /**
-   * Load all vendor definitions from JSON files
-   */
-  loadVendorDefinitions(): void {
-    if (this.vendorsLoaded) {
-      return;
-    }
-
-    const vendorsDir = path.join(__dirname, '../data/vendors');
-
-    if (!fs.existsSync(vendorsDir)) {
-      console.warn('⚠️  Vendors directory not found:', vendorsDir);
-      this.vendorsLoaded = true;
-      return;
-    }
-
-    const files = fs.readdirSync(vendorsDir).filter(f => f.endsWith('.json'));
-
-    files.forEach(file => {
-      try {
-        const filePath = path.join(vendorsDir, file);
-        const vendorData = JSON.parse(fs.readFileSync(filePath, 'utf8')) as Vendor;
-
-        // Validate vendor definition
-        if (!vendorData.vendorId) {
-          console.error(`❌ Vendor definition missing vendorId: ${file}`);
-          return;
-        }
-
-        this.vendors.set(vendorData.vendorId, vendorData);
-      } catch (error: any) {
-        console.error(`❌ Error loading vendor ${file}:`, error.message);
-      }
-    });
-
-    console.log(`✓ Loaded ${this.vendors.size} vendor definitions`);
-    this.vendorsLoaded = true;
-  }
-
   /**
    * Get vendor definition by ID
    */
   getVendor(vendorId: string): Vendor | null {
-    if (!this.vendorsLoaded) {
-      this.loadVendorDefinitions();
-    }
-
-    return this.vendors.get(vendorId) || null;
+    return VendorRegistry.get(vendorId) || null;
   }
 
   /**
@@ -160,21 +113,18 @@ class VendorService {
    * Get all vendors (for debugging/admin purposes)
    */
   getAllVendors(): Vendor[] {
-    if (!this.vendorsLoaded) {
-      this.loadVendorDefinitions();
-    }
-
-    return Array.from(this.vendors.values());
+    return VendorRegistry.getAll();
   }
 
   /**
    * Reload vendor definitions (for hot-reload during development)
+   * Note: With compile-time registries, hot-reload requires server restart
    */
   reload(): { message: string; count: number } {
-    this.vendors.clear();
-    this.vendorsLoaded = false;
-    this.loadVendorDefinitions();
-    return { message: 'Vendor definitions reloaded', count: this.vendors.size };
+    return {
+      message: 'Vendor definitions are compiled at build time. Restart server to reload.',
+      count: VendorRegistry.size
+    };
   }
 }
 

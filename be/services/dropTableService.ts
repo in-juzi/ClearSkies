@@ -103,9 +103,10 @@ class DropTableService {
         }
 
         // Otherwise, this is a normal item drop
-        // Calculate quantity
-        const quantity = drop.quantity.min +
-          Math.floor(Math.random() * (drop.quantity.max - drop.quantity.min + 1));
+        // Calculate quantity (handle both number and QuantityRange)
+        const quantity = typeof drop.quantity === 'number'
+          ? drop.quantity
+          : drop.quantity.min + Math.floor(Math.random() * (drop.quantity.max - drop.quantity.min + 1));
 
         // Build the drop result
         const result: DropResult = {
@@ -117,7 +118,9 @@ class DropTableService {
 
         // Apply quality bonuses if specified
         if (drop.qualityBonus) {
-          result.qualityBonus = drop.qualityBonus;
+          result.qualityBonus = typeof drop.qualityBonus === 'number'
+            ? { default: drop.qualityBonus }
+            : drop.qualityBonus;
         }
 
         // Apply any option modifiers
@@ -169,7 +172,9 @@ class DropTableService {
         itemId: drop.itemId || 'nothing',
         weight: drop.weight,
         probability: (drop.weight / totalWeight * 100).toFixed(2) + '%',
-        quantityRange: drop.quantity ? `${drop.quantity.min}-${drop.quantity.max}` : 'N/A',
+        quantityRange: drop.quantity
+          ? (typeof drop.quantity === 'number' ? drop.quantity.toString() : `${drop.quantity.min}-${drop.quantity.max}`)
+          : 'N/A',
         comment: (drop as any).comment
       }))
     };

@@ -1,5 +1,3 @@
-import * as fs from 'fs';
-import * as path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import {
   Monster,
@@ -8,84 +6,27 @@ import {
   DamageResult,
   AttackResult
 } from '../types';
+import { MonsterRegistry } from '../data/monsters/MonsterRegistry';
+import { AbilityRegistry } from '../data/abilities/AbilityRegistry';
 
 class CombatService {
-  private monsters: Map<string, Monster> = new Map();
-  private abilities: Map<string, Ability> = new Map();
-
   constructor() {
-    this.loadMonsters();
-    this.loadAbilities();
-  }
-
-  /**
-   * Load monster definitions from JSON files
-   */
-  loadMonsters(): void {
-    const monstersDir = path.join(__dirname, '../data/monsters/definitions');
-
-    if (!fs.existsSync(monstersDir)) {
-      console.warn(`Monsters directory not found: ${monstersDir}`);
-      return;
-    }
-
-    const files = fs.readdirSync(monstersDir);
-
-    for (const file of files) {
-      if (file.endsWith('.json')) {
-        try {
-          const filePath = path.join(monstersDir, file);
-          const monsterData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-          this.monsters.set(monsterData.monsterId, monsterData as Monster);
-        } catch (error) {
-          console.error(`Error loading monster from ${file}:`, error);
-        }
-      }
-    }
-
-    console.log(`Loaded ${this.monsters.size} monsters`);
-  }
-
-  /**
-   * Load ability definitions from JSON files
-   */
-  loadAbilities(): void {
-    const abilitiesDir = path.join(__dirname, '../data/abilities/definitions');
-
-    if (!fs.existsSync(abilitiesDir)) {
-      console.warn(`Abilities directory not found: ${abilitiesDir}`);
-      return;
-    }
-
-    const files = fs.readdirSync(abilitiesDir);
-
-    for (const file of files) {
-      if (file.endsWith('.json')) {
-        try {
-          const filePath = path.join(abilitiesDir, file);
-          const abilityData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-          this.abilities.set(abilityData.abilityId, abilityData as Ability);
-        } catch (error) {
-          console.error(`Error loading ability from ${file}:`, error);
-        }
-      }
-    }
-
-    console.log(`Loaded ${this.abilities.size} abilities`);
+    console.log(`Loaded ${MonsterRegistry.size} monsters from MonsterRegistry (compile-time)`);
+    console.log(`Loaded ${AbilityRegistry.size} abilities from AbilityRegistry (compile-time)`);
   }
 
   /**
    * Get monster definition by ID
    */
   getMonster(monsterId: string): Monster | undefined {
-    return this.monsters.get(monsterId);
+    return MonsterRegistry.get(monsterId);
   }
 
   /**
    * Get ability definition by ID
    */
   getAbility(abilityId: string): Ability | undefined {
-    return this.abilities.get(abilityId);
+    return AbilityRegistry.get(abilityId);
   }
 
   /**
@@ -93,7 +34,7 @@ class CombatService {
    */
   getAbilitiesForWeapon(skillScalar: string): Ability[] {
     const abilities: Ability[] = [];
-    for (const ability of this.abilities.values()) {
+    for (const ability of AbilityRegistry.getAll()) {
       if (ability.requirements && ability.requirements.weaponTypes) {
         if (ability.requirements.weaponTypes.includes(skillScalar)) {
           abilities.push(ability);

@@ -1,74 +1,26 @@
-import * as fs from 'fs';
-import * as path from 'path';
 import { Recipe } from '../types';
+import { RecipeRegistry } from '../data/recipes/RecipeRegistry';
 
 class RecipeService {
-  private recipes: Map<string, Recipe> = new Map();
-  private recipesLoaded: boolean = false;
-
-  /**
-   * Load all recipe definitions from JSON files
-   */
-  loadRecipes(): void {
-    if (this.recipesLoaded) {
-      return;
-    }
-
-    const recipesDir = path.join(__dirname, '../data/recipes');
-
-    // Load recipes from all skill subdirectories (cooking, smithing, etc.)
-    if (!fs.existsSync(recipesDir)) {
-      console.warn('Recipes directory not found');
-      return;
-    }
-
-    const skillDirs = fs.readdirSync(recipesDir);
-
-    for (const skillDir of skillDirs) {
-      const skillPath = path.join(recipesDir, skillDir);
-      const stats = fs.statSync(skillPath);
-
-      if (!stats.isDirectory()) continue;
-
-      const recipeFiles = fs.readdirSync(skillPath).filter(file => file.endsWith('.json'));
-
-      for (const file of recipeFiles) {
-        try {
-          const recipePath = path.join(skillPath, file);
-          const recipeData = JSON.parse(fs.readFileSync(recipePath, 'utf8')) as Recipe;
-          this.recipes.set(recipeData.recipeId, recipeData);
-        } catch (error: any) {
-          console.error(`Error loading recipe ${file}:`, error.message);
-        }
-      }
-    }
-
-    this.recipesLoaded = true;
-    console.log(`Loaded ${this.recipes.size} recipes`);
-  }
-
   /**
    * Get all recipes
    */
   getAllRecipes(): Recipe[] {
-    this.loadRecipes();
-    return Array.from(this.recipes.values());
+    return RecipeRegistry.getAll();
   }
 
   /**
    * Get single recipe by ID
    */
   getRecipe(recipeId: string): Recipe | null {
-    this.loadRecipes();
-    return this.recipes.get(recipeId) || null;
+    return RecipeRegistry.get(recipeId) || null;
   }
 
   /**
    * Get recipes for a specific skill
    */
   getRecipesBySkill(skillName: string): Recipe[] {
-    this.loadRecipes();
-    return Array.from(this.recipes.values()).filter(recipe => recipe.skill === skillName);
+    return RecipeRegistry.getAll().filter(recipe => recipe.skill === skillName);
   }
 
   /**
@@ -251,11 +203,13 @@ class RecipeService {
 
   /**
    * Reload recipes (for development)
+   * Note: With compile-time registries, hot-reload requires server restart
    */
-  reload(): void {
-    this.recipes.clear();
-    this.recipesLoaded = false;
-    this.loadRecipes();
+  reload(): { message: string; count: number } {
+    return {
+      message: 'Recipe definitions are compiled at build time. Restart server to reload.',
+      count: RecipeRegistry.size
+    };
   }
 }
 

@@ -12,48 +12,45 @@ import {
   TraitMap,
   Rarity
 } from '../types';
+import { ItemRegistry } from '../data/items/ItemRegistry';
+import { QualityRegistry } from '../data/items/qualities/QualityRegistry';
+import { TraitRegistry } from '../data/items/traits/TraitRegistry';
 
 class ItemService {
-  private itemDefinitions: Map<string, Item> = new Map();
   private qualityDefinitions: Map<string, QualityDefinition> = new Map();
   private traitDefinitions: Map<string, TraitDefinition> = new Map();
   private generationConfig: ItemGenerationConfig | null = null;
   private initialized: boolean = false;
 
   /**
-   * Load all item, quality, and trait definitions from JSON files
+   * Load quality, trait, and generation config from registries
+   * Item definitions are now loaded from ItemRegistry (no file I/O needed)
    */
   async loadDefinitions(): Promise<{ items: number; qualities: number; traits: number }> {
     try {
       const dataPath = path.join(__dirname, '../data/items');
 
-      // Load qualities
-      const qualitiesPath = path.join(dataPath, 'qualities/qualities.json');
-      const qualitiesData = await fs.readFile(qualitiesPath, 'utf8');
-      const qualities = JSON.parse(qualitiesData);
-      Object.values(qualities).forEach((quality: any) => {
+      // Load qualities from registry
+      const qualities = QualityRegistry.getAll();
+      qualities.forEach((quality: QualityDefinition) => {
         // Transform applicableCategories to applicableTo for consistency
-        if (quality.applicableCategories && !quality.applicableTo) {
-          quality.applicableTo = quality.applicableCategories;
+        const qualityWithAlias: any = { ...quality };
+        if (quality.applicableCategories && !qualityWithAlias.applicableTo) {
+          qualityWithAlias.applicableTo = quality.applicableCategories;
         }
-        this.qualityDefinitions.set(quality.qualityId, quality as QualityDefinition);
+        this.qualityDefinitions.set(quality.qualityId, qualityWithAlias as QualityDefinition);
       });
 
-      // Load traits
-      const traitsPath = path.join(dataPath, 'traits/traits.json');
-      const traitsData = await fs.readFile(traitsPath, 'utf8');
-      const traits = JSON.parse(traitsData);
-      Object.values(traits).forEach((trait: any) => {
+      // Load traits from registry
+      const traits = TraitRegistry.getAll();
+      traits.forEach((trait: TraitDefinition) => {
         // Transform applicableCategories to applicableTo for consistency
-        if (trait.applicableCategories && !trait.applicableTo) {
-          trait.applicableTo = trait.applicableCategories;
+        const traitWithAlias: any = { ...trait };
+        if (trait.applicableCategories && !traitWithAlias.applicableTo) {
+          traitWithAlias.applicableTo = trait.applicableCategories;
         }
-        this.traitDefinitions.set(trait.traitId, trait as TraitDefinition);
+        this.traitDefinitions.set(trait.traitId, traitWithAlias as TraitDefinition);
       });
-
-      // Load item definitions from multiple files and directories
-      const definitionsPath = path.join(dataPath, 'definitions');
-      await this._loadDefinitionsRecursive(definitionsPath);
 
       // Load generation config
       const configPath = path.join(dataPath, 'generation-config.json');
@@ -76,10 +73,15 @@ class ItemService {
       }
 
       this.initialized = true;
-      console.log(`✓ Loaded ${this.itemDefinitions.size} items, ${this.qualityDefinitions.size} qualities, ${this.traitDefinitions.size} traits`);
+
+      // Items are loaded from ItemRegistry (compile-time, no file I/O)
+      const itemCount = ItemRegistry.size;
+
+      console.log(`✓ Loaded ${itemCount} items from ItemRegistry (compile-time)`);
+      console.log(`✓ Loaded ${this.qualityDefinitions.size} qualities, ${this.traitDefinitions.size} traits`);
 
       return {
-        items: this.itemDefinitions.size,
+        items: itemCount,
         qualities: this.qualityDefinitions.size,
         traits: this.traitDefinitions.size
       };
@@ -90,34 +92,11 @@ class ItemService {
   }
 
   /**
-   * Recursively load item definitions from a directory
-   * Supports both JSON files and subdirectories with JSON files
-   */
-  private async _loadDefinitionsRecursive(dirPath: string): Promise<void> {
-    const entries = await fs.readdir(dirPath, { withFileTypes: true });
-
-    for (const entry of entries) {
-      const fullPath = path.join(dirPath, entry.name);
-
-      if (entry.isDirectory()) {
-        // Recursively load from subdirectory
-        await this._loadDefinitionsRecursive(fullPath);
-      } else if (entry.isFile() && entry.name.endsWith('.json')) {
-        // Load JSON file
-        const fileData = await fs.readFile(fullPath, 'utf8');
-        const items = JSON.parse(fileData);
-        Object.values(items).forEach((item: any) => {
-          this.itemDefinitions.set(item.itemId, item as Item);
-        });
-      }
-    }
-  }
-
-  /**
-   * Hot reload definitions without restarting server
+   * Hot reload definitions
+   * Note: Item definitions cannot be hot-reloaded as they are compile-time imports
+   * Only qualities, traits, and config can be reloaded
    */
   async reloadDefinitions(): Promise<{ items: number; qualities: number; traits: number }> {
-    this.itemDefinitions.clear();
     this.qualityDefinitions.clear();
     this.traitDefinitions.clear();
     return await this.loadDefinitions();
@@ -127,30 +106,28 @@ class ItemService {
    * Get an item definition by ID
    */
   getItemDefinition(itemId: string): Item | undefined {
-    return this.itemDefinitions.get(itemId);
+    return ItemRegistry.get(itemId);
   }
 
   /**
    * Get all item definitions
    */
   getAllItemDefinitions(): Item[] {
-    return Array.from(this.itemDefinitions.values());
+    return ItemRegistry.getAll();
   }
 
   /**
    * Get items by category
    */
   getItemsByCategory(category: ItemCategory): Item[] {
-    return Array.from(this.itemDefinitions.values())
-      .filter(item => item.category === category);
+    return ItemRegistry.getByCategory(category);
   }
 
   /**
    * Get items by subcategory
    */
   getItemsBySubcategory(subcategory: string): Item[] {
-    return Array.from(this.itemDefinitions.values())
-      .filter(item => item.subcategories && item.subcategories.includes(subcategory));
+    return ItemRegistry.getBySubcategory(subcategory);
   }
 
   /**
@@ -159,7 +136,7 @@ class ItemService {
   getAllSubcategories(category: ItemCategory | null = null): string[] {
     const subcategoriesSet = new Set<string>();
 
-    for (const item of this.itemDefinitions.values()) {
+    for (const item of ItemRegistry.getAll()) {
       // Filter by category if specified
       if (category && item.category !== category) {
         continue;
@@ -222,7 +199,7 @@ class ItemService {
         throw new Error(`Quality definition not found: ${qualityId}`);
       }
       // Validate level is integer and in range
-      const maxLevel = qualityDef.levels.length;
+      const maxLevel = qualityDef.maxLevel;
       if (!Number.isInteger(level) || level < 1 || level > maxLevel) {
         throw new Error(`Quality ${qualityId} level ${level} out of range [1, ${maxLevel}]`);
       }
@@ -238,7 +215,7 @@ class ItemService {
         throw new Error(`Trait definition not found: ${traitId}`);
       }
       // Validate level is integer and in range
-      const maxLevel = traitDef.levels.length;
+      const maxLevel = traitDef.maxLevel;
       if (!Number.isInteger(level) || level < 1 || level > maxLevel) {
         throw new Error(`Trait ${traitId} level ${level} out of range [1, ${maxLevel}]`);
       }
@@ -270,8 +247,8 @@ class ItemService {
     if (itemInstance.qualities) {
       for (const [qualityId, level] of Object.entries(itemInstance.qualities)) {
         const qualityDef = this.getQualityDefinition(qualityId);
-        if (qualityDef?.levels?.[level - 1]?.effects?.vendorPriceMultiplier) {
-          const levelModifier = qualityDef.levels[level - 1].effects.vendorPriceMultiplier;
+        if (qualityDef?.levels?.[level.toString()]?.effects?.vendorPrice?.modifier) {
+          const levelModifier = qualityDef.levels[level.toString()].effects.vendorPrice.modifier;
           modifier *= levelModifier;
         }
       }
@@ -281,8 +258,8 @@ class ItemService {
     if (itemInstance.traits) {
       for (const [traitId, level] of Object.entries(itemInstance.traits)) {
         const traitDef = this.getTraitDefinition(traitId);
-        if (traitDef?.levels?.[level - 1]?.effects?.vendorPriceMultiplier) {
-          const levelModifier = traitDef.levels[level - 1].effects.vendorPriceMultiplier;
+        if (traitDef?.levels?.[level.toString()]?.effects?.vendorPrice?.modifier) {
+          const levelModifier = traitDef.levels[level.toString()].effects.vendorPrice.modifier;
           modifier *= levelModifier;
         }
       }
@@ -443,7 +420,7 @@ class ItemService {
       const qualityDef = this.getQualityDefinition(qualityId);
       if (!qualityDef) continue;
 
-      const maxLevel = qualityDef.levels.length;
+      const maxLevel = qualityDef.maxLevel;
       const weights = this._getQualityLevelWeights(tier, maxLevel);
       const level = this._weightedRandomLevel(weights);
 

@@ -1,5 +1,3 @@
-import { promises as fs } from 'fs';
-import * as path from 'path';
 import dropTableService from './dropTableService';
 import {
   Location,
@@ -8,6 +6,10 @@ import {
   BiomeDefinition,
   GatheringActivity
 } from '../types';
+import { LocationRegistry } from '../data/locations/LocationRegistry';
+import { FacilityRegistry } from '../data/locations/FacilityRegistry';
+import { ActivityRegistry } from '../data/locations/ActivityRegistry';
+import { BiomeRegistry } from '../data/locations/BiomeRegistry';
 
 class LocationService {
   private biomes: Map<string, BiomeDefinition> = new Map();
@@ -22,17 +24,18 @@ class LocationService {
   }
 
   /**
-   * Load all location data from JSON files
+   * Load all location data from TypeScript registries
    */
   async loadAll(): Promise<void> {
     try {
-      await Promise.all([
-        this.loadBiomes(),
-        this.loadActivities(),
-        this.loadFacilities(),
-        this.loadLocations(),
-        this.dropTableService.loadAll()
-      ]);
+      // Load from TypeScript registries instead of JSON files
+      this.loadBiomes();
+      this.loadActivities();
+      this.loadFacilities();
+      this.loadLocations();
+
+      await this.dropTableService.loadAll();
+
       this.loaded = true;
       console.log('Location data loaded successfully');
       console.log(`- ${this.biomes.size} biomes`);
@@ -46,71 +49,43 @@ class LocationService {
   }
 
   /**
-   * Load biome definitions
+   * Load biome definitions from registry
    */
-  private async loadBiomes(): Promise<void> {
-    const biomesDir = path.join(__dirname, '../data/locations/biomes');
-    const files = await fs.readdir(biomesDir);
-
-    for (const file of files) {
-      if (file.endsWith('.json')) {
-        const filePath = path.join(biomesDir, file);
-        const data = await fs.readFile(filePath, 'utf8');
-        const biome = JSON.parse(data) as BiomeDefinition;
-        this.biomes.set(biome.biomeId, biome);
-      }
-    }
+  private loadBiomes(): void {
+    const biomes = BiomeRegistry.getAll();
+    biomes.forEach(biome => {
+      this.biomes.set(biome.biomeId, biome);
+    });
   }
 
   /**
-   * Load activity definitions
+   * Load activity definitions from registry
    */
-  private async loadActivities(): Promise<void> {
-    const activitiesDir = path.join(__dirname, '../data/locations/activities');
-    const files = await fs.readdir(activitiesDir);
-
-    for (const file of files) {
-      if (file.endsWith('.json')) {
-        const filePath = path.join(activitiesDir, file);
-        const data = await fs.readFile(filePath, 'utf8');
-        const activity = JSON.parse(data) as Activity;
-        this.activities.set(activity.activityId, activity);
-      }
-    }
+  private loadActivities(): void {
+    const activities = ActivityRegistry.getAll();
+    activities.forEach(activity => {
+      this.activities.set(activity.activityId, activity);
+    });
   }
 
   /**
-   * Load facility definitions
+   * Load facility definitions from registry
    */
-  private async loadFacilities(): Promise<void> {
-    const facilitiesDir = path.join(__dirname, '../data/locations/facilities');
-    const files = await fs.readdir(facilitiesDir);
-
-    for (const file of files) {
-      if (file.endsWith('.json')) {
-        const filePath = path.join(facilitiesDir, file);
-        const data = await fs.readFile(filePath, 'utf8');
-        const facility = JSON.parse(data) as Facility;
-        this.facilities.set(facility.facilityId, facility);
-      }
-    }
+  private loadFacilities(): void {
+    const facilities = FacilityRegistry.getAll();
+    facilities.forEach(facility => {
+      this.facilities.set(facility.facilityId, facility);
+    });
   }
 
   /**
-   * Load location definitions
+   * Load location definitions from registry
    */
-  private async loadLocations(): Promise<void> {
-    const locationsDir = path.join(__dirname, '../data/locations/definitions');
-    const files = await fs.readdir(locationsDir);
-
-    for (const file of files) {
-      if (file.endsWith('.json')) {
-        const filePath = path.join(locationsDir, file);
-        const data = await fs.readFile(filePath, 'utf8');
-        const location = JSON.parse(data) as Location;
-        this.locations.set(location.locationId, location);
-      }
-    }
+  private loadLocations(): void {
+    const locations = LocationRegistry.getAll();
+    locations.forEach(location => {
+      this.locations.set(location.locationId, location);
+    });
   }
 
   /**
@@ -213,7 +188,7 @@ class LocationService {
 
     // Check equipped item requirements (by subtype)
     if (activity.requirements.equipped) {
-      const itemService = require('./itemService');
+      const itemService = require('./itemService').default;
       for (const equippedReq of activity.requirements.equipped) {
         const { subtype } = equippedReq;
         const hasEquipped = player.hasEquippedSubtype(subtype, itemService);
