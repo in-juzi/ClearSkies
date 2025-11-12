@@ -11,7 +11,8 @@
       "Bash(ng generate:*)",
       "Bash(node -e:*)",
       "Bash(node utils/add-item.js:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(npm run validate:*)"
     ],
     "deny": [],
     "ask": []
