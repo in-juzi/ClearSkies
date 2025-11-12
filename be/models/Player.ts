@@ -114,6 +114,7 @@ export interface IPlayer extends Document {
   activeActivity?: ActiveActivity;
   travelState?: TravelState;
   activeCrafting?: ActiveCrafting;
+  unlockedRecipes: string[]; // Recipe IDs player has discovered
   activeCombat?: ActiveCombat;
   lastCombatActivityId?: string;
   combatStats: CombatStats;
@@ -290,6 +291,10 @@ const playerSchema = new Schema<IPlayer>({
     endTime: { type: Date },
     selectedIngredients: { type: Map, of: [String] }
   },
+  unlockedRecipes: {
+    type: [String],
+    default: []
+  },
   activeCombat: {
     activityId: { type: String },
     monsterId: { type: String },
@@ -385,7 +390,12 @@ const playerSchema = new Schema<IPlayer>({
       experience: { type: Number, default: 0, min: 0 },
       mainAttribute: { type: String, default: 'will' }
     },
-    herbalism: {
+    gathering: {
+      level: { type: Number, default: 1, min: 1 },
+      experience: { type: Number, default: 0, min: 0 },
+      mainAttribute: { type: String, default: 'will' }
+    },
+    alchemy: {
       level: { type: Number, default: 1, min: 1 },
       experience: { type: Number, default: 0, min: 0 },
       mainAttribute: { type: String, default: 'will' }
@@ -551,7 +561,7 @@ playerSchema.methods.addSkillExperience = async function(
   };
 }> {
   const validSkills: SkillName[] = [
-    'woodcutting', 'mining', 'fishing', 'smithing', 'cooking', 'herbalism',
+    'woodcutting', 'mining', 'fishing', 'gathering', 'smithing', 'cooking', 'alchemy',
     'oneHanded', 'dualWield', 'twoHanded', 'ranged', 'casting', 'gun'
   ];
 
@@ -594,7 +604,7 @@ playerSchema.methods.addSkillExperience = async function(
 // Get progress to next skill level (0-100%)
 playerSchema.methods.getSkillProgress = function(this: IPlayer, skillName: SkillName): number {
   const validSkills: SkillName[] = [
-    'woodcutting', 'mining', 'fishing', 'smithing', 'cooking', 'herbalism',
+    'woodcutting', 'mining', 'fishing', 'gathering', 'smithing', 'cooking', 'alchemy',
     'oneHanded', 'dualWield', 'twoHanded', 'ranged', 'casting', 'gun'
   ];
 

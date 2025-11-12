@@ -33,7 +33,7 @@ export const getSkills = async (req: Request, res: Response): Promise<void> => {
 
     // Calculate progress for each skill
     const skillNames: SkillName[] = [
-      'woodcutting', 'mining', 'fishing', 'smithing', 'cooking', 'herbalism',
+      'woodcutting', 'mining', 'fishing', 'gathering', 'smithing', 'cooking', 'alchemy',
       'oneHanded', 'dualWield', 'twoHanded', 'ranged', 'casting', 'gun'
     ];
 
@@ -154,7 +154,7 @@ export const getSkill = async (
   try {
     const { skillName } = req.params;
     const validSkills: SkillName[] = [
-      'woodcutting', 'mining', 'fishing', 'smithing', 'cooking', 'herbalism',
+      'woodcutting', 'mining', 'fishing', 'gathering', 'smithing', 'cooking', 'alchemy',
       'oneHanded', 'dualWield', 'twoHanded', 'ranged', 'casting', 'gun'
     ];
 

@@ -53,11 +53,19 @@ const SKILLS_DATA = [
     xpPerLevel: 1000
   },
   {
-    skillId: 'herbalism',
-    name: 'Herbalism',
-    description: 'Gather herbs and plants for cooking and alchemy.',
+    skillId: 'gathering',
+    name: 'Gathering',
+    description: 'Forage for herbs, plants, and natural resources with your bare hands.',
     mainAttribute: 'will',
     icon: 'icons/skills/skill_herbalism.svg',
+    xpPerLevel: 1000
+  },
+  {
+    skillId: 'alchemy',
+    name: 'Alchemy',
+    description: 'Brew potions and tinctures from gathered herbs and reagents.',
+    mainAttribute: 'will',
+    icon: 'icons/skills/skill_alchemy.svg',
     xpPerLevel: 1000
   },
   {
@@ -156,7 +164,7 @@ const ATTRIBUTES_DATA = [
     name: 'Will',
     description: 'Mental fortitude and focus. Enhances crafting and gathering.',
     icon: 'icons/attributes/attr_will.svg',
-    linkedSkills: ['cooking', 'herbalism'],
+    linkedSkills: ['gathering', 'cooking', 'alchemy'],
     xpPerLevel: 1000
   },
   {
