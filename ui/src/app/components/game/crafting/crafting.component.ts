@@ -527,9 +527,7 @@ export class CraftingComponent implements OnInit {
     if (!inventory) return [];
 
     let items: any[];
-    console.log(inventory)
     if (ingredient.subcategory) {
-      console.log('Filtering by subcategory:', ingredient.subcategory);
       // Filter by subcategory
       items = inventory.filter(item =>
         !item.equipped && item.definition?.subcategories?.includes(ingredient.subcategory)

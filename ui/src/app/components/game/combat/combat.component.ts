@@ -322,7 +322,6 @@ export class CombatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
     this.inventoryService.useItem(item.instanceId).subscribe({
       next: (response: any) => {
-        console.log('Item used in combat:', response);
         this.isUsingItem.set(false);
 
         // Update combat state if response includes it
