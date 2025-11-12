@@ -35,6 +35,14 @@ export const ForestClearing: Location = {
         }
       },
       "encounters": []
+    },
+    {
+      "targetLocationId": "goblin-village",
+      "name": "Hidden Path",
+      "description": "A barely visible trail leading deeper into the forest, marked with crude goblin symbols",
+      "travelTime": 10,
+      "requirements": {},
+      "encounters": []
     }
   ],
   "isStartingLocation": false

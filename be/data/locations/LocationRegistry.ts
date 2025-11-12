@@ -8,6 +8,7 @@
 import { Location } from '../../types/locations';
 
 import { ForestClearing } from './definitions/ForestClearing';
+import { GoblinVillage } from './definitions/GoblinVillage';
 import { Kennik } from './definitions/Kennik';
 import { MountainPass } from './definitions/MountainPass';
 
@@ -17,6 +18,7 @@ import { MountainPass } from './definitions/MountainPass';
 export class LocationRegistry {
   private static readonly items = new Map<string, Location>([
     [ForestClearing.locationId, ForestClearing],
+    [GoblinVillage.locationId, GoblinVillage],
     [Kennik.locationId, Kennik],
     [MountainPass.locationId, MountainPass],
   ]);

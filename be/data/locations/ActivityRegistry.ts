@@ -12,6 +12,9 @@ import { ActivityCombatBandit } from './activities/ActivityCombatBandit';
 import { ActivityCombatBandits } from './activities/ActivityCombatBandits';
 import { ActivityCombatForestWolf } from './activities/ActivityCombatForestWolf';
 import { ActivityCombatGoblin } from './activities/ActivityCombatGoblin';
+import { ActivityCombatGoblinScout } from './activities/ActivityCombatGoblinScout';
+import { ActivityCombatGoblinShaman } from './activities/ActivityCombatGoblinShaman';
+import { ActivityCombatGoblinWarriorVillage } from './activities/ActivityCombatGoblinWarriorVillage';
 import { ActivityFishCod } from './activities/ActivityFishCod';
 import { ActivityFishSalmon } from './activities/ActivityFishSalmon';
 import { ActivityFishShrimp } from './activities/ActivityFishShrimp';
@@ -35,6 +38,9 @@ export class ActivityRegistry {
     [ActivityCombatBandits.activityId, ActivityCombatBandits],
     [ActivityCombatForestWolf.activityId, ActivityCombatForestWolf],
     [ActivityCombatGoblin.activityId, ActivityCombatGoblin],
+    [ActivityCombatGoblinScout.activityId, ActivityCombatGoblinScout],
+    [ActivityCombatGoblinShaman.activityId, ActivityCombatGoblinShaman],
+    [ActivityCombatGoblinWarriorVillage.activityId, ActivityCombatGoblinWarriorVillage],
     [ActivityFishCod.activityId, ActivityFishCod],
     [ActivityFishSalmon.activityId, ActivityFishSalmon],
     [ActivityFishShrimp.activityId, ActivityFishShrimp],

@@ -11,6 +11,7 @@ import { ForestBanditCamp } from './facilities/ForestBanditCamp';
 import { ForestHerbGrove } from './facilities/ForestHerbGrove';
 import { ForestLoggingCamp } from './facilities/ForestLoggingCamp';
 import { GoblinCave } from './facilities/GoblinCave';
+import { GoblinVillage } from './facilities/GoblinVillage';
 import { KennikFishingDock } from './facilities/KennikFishingDock';
 import { KennikForge } from './facilities/KennikForge';
 import { KennikHerbGarden } from './facilities/KennikHerbGarden';
@@ -29,6 +30,7 @@ export class FacilityRegistry {
     [ForestHerbGrove.facilityId, ForestHerbGrove],
     [ForestLoggingCamp.facilityId, ForestLoggingCamp],
     [GoblinCave.facilityId, GoblinCave],
+    [GoblinVillage.facilityId, GoblinVillage],
     [KennikFishingDock.facilityId, KennikFishingDock],
     [KennikForge.facilityId, KennikForge],
     [KennikHerbGarden.facilityId, KennikHerbGarden],
