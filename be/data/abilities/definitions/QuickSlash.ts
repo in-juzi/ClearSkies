@@ -12,7 +12,7 @@ export const QuickSlash: Ability = {
   "type": "attack",
   "targetType": "single",
   "powerMultiplier": 1.3,
-  "manaCost": 5,
+  "manaCost": 1,
   "cooldown": 1,
   "requirements": {
     "weaponTypes": [

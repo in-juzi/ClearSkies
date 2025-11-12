@@ -34,11 +34,12 @@
 .error-message {
   background-color: var(--color-error-light);
   border: var(--border-width-thin) solid var(--color-error);
-  color: var(--color-error);
+  color: var(--color-bg-primary);
   padding: var(--spacing-m);
   border-radius: var(--radius-s);
   margin-bottom: var(--spacing-xl);
   text-align: center;
+  font-weight: var(--font-weight-semibold);
 }
 
 .form-group {
