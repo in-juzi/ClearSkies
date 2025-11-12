@@ -518,13 +518,13 @@ export const MATERIAL_COLORS: Record<string, ColorChannels> = {
   },
 
   // Potions
-  health_potion_minor: {
+  health_potion: {
     primary: '#FF6B6B',    // Light coral red liquid (base layer)
     secondary: '#FF4545',  // Slightly darker red (mid-layer depth)
     detail: '#FFB6B6',     // Pale red shimmer/highlight (top layer glow)
     body: '#FFF'           // White glass bottle (container)
   },
-  mana_potion_minor: {
+  mana_potion: {
     primary: '#6B9BFF',    // Light blue liquid (base layer)
     secondary: '#4580FF',  // Slightly darker blue (mid-layer depth)
     detail: '#B6D4FF',     // Pale blue shimmer/highlight (top layer glow)
