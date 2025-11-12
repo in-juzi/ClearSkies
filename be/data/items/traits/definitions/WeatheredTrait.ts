@@ -25,7 +25,7 @@ export const WeatheredTrait: Trait = {
         },
         "alchemy": {
           "bonusProperties": [
-            "durability"
+            "resilience"
           ]
         }
       }
@@ -39,8 +39,8 @@ export const WeatheredTrait: Trait = {
         },
         "alchemy": {
           "bonusProperties": [
-            "durability",
-            "resilience"
+            "resilience",
+            "vitality"
           ]
         }
       }
@@ -54,8 +54,8 @@ export const WeatheredTrait: Trait = {
         },
         "alchemy": {
           "bonusProperties": [
-            "durability",
             "resilience",
+            "vitality",
             "elemental"
           ]
         }
