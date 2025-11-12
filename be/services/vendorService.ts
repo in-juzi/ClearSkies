@@ -1,21 +1,20 @@
-const fs = require('fs');
-const path = require('path');
-const itemService = require('./itemService');
+import * as fs from 'fs';
+import * as path from 'path';
+import itemService from './itemService';
+import { Vendor, StockItem, ItemInstance } from '../types';
 
 /**
  * VendorService - Manages vendor data and transactions
  * Singleton pattern like LocationService and ItemService
  */
 class VendorService {
-  constructor() {
-    this.vendors = new Map(); // vendorId -> vendor definition
-    this.vendorsLoaded = false;
-  }
+  private vendors: Map<string, Vendor> = new Map();
+  private vendorsLoaded: boolean = false;
 
   /**
    * Load all vendor definitions from JSON files
    */
-  loadVendorDefinitions() {
+  loadVendorDefinitions(): void {
     if (this.vendorsLoaded) {
       return;
     }
@@ -33,7 +32,7 @@ class VendorService {
     files.forEach(file => {
       try {
         const filePath = path.join(vendorsDir, file);
-        const vendorData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+        const vendorData = JSON.parse(fs.readFileSync(filePath, 'utf8')) as Vendor;
 
         // Validate vendor definition
         if (!vendorData.vendorId) {
@@ -42,7 +41,7 @@ class VendorService {
         }
 
         this.vendors.set(vendorData.vendorId, vendorData);
-      } catch (error) {
+      } catch (error: any) {
         console.error(`❌ Error loading vendor ${file}:`, error.message);
       }
     });
@@ -53,10 +52,8 @@ class VendorService {
 
   /**
    * Get vendor definition by ID
-   * @param {string} vendorId
-   * @returns {object|null} Vendor definition or null if not found
    */
-  getVendor(vendorId) {
+  getVendor(vendorId: string): Vendor | null {
     if (!this.vendorsLoaded) {
       this.loadVendorDefinitions();
     }
@@ -66,10 +63,8 @@ class VendorService {
 
   /**
    * Get vendor stock with populated item definitions and calculated prices
-   * @param {string} vendorId
-   * @returns {Array} Stock items with item definitions attached
    */
-  getVendorStock(vendorId) {
+  getVendorStock(vendorId: string): any[] {
     const vendor = this.getVendor(vendorId);
     if (!vendor) {
       return [];
@@ -93,11 +88,8 @@ class VendorService {
 
   /**
    * Calculate the price a player pays to buy an item from a vendor
-   * @param {string} vendorId
-   * @param {string} itemId
-   * @returns {number|null} Buy price or null if item not in stock
    */
-  calculateBuyPrice(vendorId, itemId) {
+  calculateBuyPrice(vendorId: string, itemId: string): number | null {
     const vendor = this.getVendor(vendorId);
     if (!vendor) {
       return null;
@@ -108,17 +100,14 @@ class VendorService {
       return null;
     }
 
-    return stockItem.buyPrice;
+    return stockItem.price;
   }
 
   /**
    * Calculate the price a player receives when selling an item to a vendor
    * Uses the item's calculated vendor price (from ItemService) multiplied by vendor's sell multiplier
-   * @param {string} vendorId
-   * @param {object} itemInstance - Item instance from player inventory
-   * @returns {number} Sell price
    */
-  calculateSellPrice(vendorId, itemInstance) {
+  calculateSellPrice(vendorId: string, itemInstance: any): number {
     const vendor = this.getVendor(vendorId);
     if (!vendor) {
       return 0;
@@ -135,19 +124,16 @@ class VendorService {
 
   /**
    * Check if a vendor accepts a specific item
-   * @param {string} vendorId
-   * @param {string} itemId
-   * @returns {boolean} True if vendor accepts the item
    */
-  canVendorAcceptItem(vendorId, itemId) {
+  canVendorAcceptItem(vendorId: string, itemId: string): boolean {
     const vendor = this.getVendor(vendorId);
     if (!vendor) {
       return false;
     }
 
-    // Current implementation: all vendors accept all items if acceptsAllItems is true
+    // Current implementation: all vendors accept all items if buyback is true
     // Future: can add category filtering here
-    if (vendor.acceptsAllItems) {
+    if (vendor.buyback) {
       return true;
     }
 
@@ -160,11 +146,8 @@ class VendorService {
 
   /**
    * Check if vendor has an item in stock
-   * @param {string} vendorId
-   * @param {string} itemId
-   * @returns {boolean} True if item is in stock
    */
-  hasItemInStock(vendorId, itemId) {
+  hasItemInStock(vendorId: string, itemId: string): boolean {
     const vendor = this.getVendor(vendorId);
     if (!vendor) {
       return false;
@@ -175,9 +158,8 @@ class VendorService {
 
   /**
    * Get all vendors (for debugging/admin purposes)
-   * @returns {Array} All vendor definitions
    */
-  getAllVendors() {
+  getAllVendors(): Vendor[] {
     if (!this.vendorsLoaded) {
       this.loadVendorDefinitions();
     }
@@ -188,7 +170,7 @@ class VendorService {
   /**
    * Reload vendor definitions (for hot-reload during development)
    */
-  reload() {
+  reload(): { message: string; count: number } {
     this.vendors.clear();
     this.vendorsLoaded = false;
     this.loadVendorDefinitions();
@@ -197,4 +179,4 @@ class VendorService {
 }
 
 // Export singleton instance
-module.exports = new VendorService();
+export default new VendorService();

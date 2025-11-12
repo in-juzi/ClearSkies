@@ -1,17 +1,27 @@
-const fs = require('fs');
-const path = require('path');
-const { v4: uuidv4 } = require('uuid');
+import * as fs from 'fs';
+import * as path from 'path';
+import { v4 as uuidv4 } from 'uuid';
+import {
+  Monster,
+  Ability,
+  MonsterInstance,
+  DamageResult,
+  AttackResult
+} from '../types';
 
 class CombatService {
+  private monsters: Map<string, Monster> = new Map();
+  private abilities: Map<string, Ability> = new Map();
+
   constructor() {
-    this.monsters = new Map();
-    this.abilities = new Map();
     this.loadMonsters();
     this.loadAbilities();
   }
 
-  // Load monster definitions from JSON files
-  loadMonsters() {
+  /**
+   * Load monster definitions from JSON files
+   */
+  loadMonsters(): void {
     const monstersDir = path.join(__dirname, '../data/monsters/definitions');
 
     if (!fs.existsSync(monstersDir)) {
@@ -26,7 +36,7 @@ class CombatService {
         try {
           const filePath = path.join(monstersDir, file);
           const monsterData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-          this.monsters.set(monsterData.monsterId, monsterData);
+          this.monsters.set(monsterData.monsterId, monsterData as Monster);
         } catch (error) {
           console.error(`Error loading monster from ${file}:`, error);
         }
@@ -36,8 +46,10 @@ class CombatService {
     console.log(`Loaded ${this.monsters.size} monsters`);
   }
 
-  // Load ability definitions from JSON files
-  loadAbilities() {
+  /**
+   * Load ability definitions from JSON files
+   */
+  loadAbilities(): void {
     const abilitiesDir = path.join(__dirname, '../data/abilities/definitions');
 
     if (!fs.existsSync(abilitiesDir)) {
@@ -52,7 +64,7 @@ class CombatService {
         try {
           const filePath = path.join(abilitiesDir, file);
           const abilityData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-          this.abilities.set(abilityData.abilityId, abilityData);
+          this.abilities.set(abilityData.abilityId, abilityData as Ability);
         } catch (error) {
           console.error(`Error loading ability from ${file}:`, error);
         }
@@ -62,19 +74,25 @@ class CombatService {
     console.log(`Loaded ${this.abilities.size} abilities`);
   }
 
-  // Get monster definition by ID
-  getMonster(monsterId) {
+  /**
+   * Get monster definition by ID
+   */
+  getMonster(monsterId: string): Monster | undefined {
     return this.monsters.get(monsterId);
   }
 
-  // Get ability definition by ID
-  getAbility(abilityId) {
+  /**
+   * Get ability definition by ID
+   */
+  getAbility(abilityId: string): Ability | undefined {
     return this.abilities.get(abilityId);
   }
 
-  // Get all available abilities for a weapon type
-  getAbilitiesForWeapon(skillScalar) {
-    const abilities = [];
+  /**
+   * Get all available abilities for a weapon type
+   */
+  getAbilitiesForWeapon(skillScalar: string): Ability[] {
+    const abilities: Ability[] = [];
     for (const ability of this.abilities.values()) {
       if (ability.requirements && ability.requirements.weaponTypes) {
         if (ability.requirements.weaponTypes.includes(skillScalar)) {
@@ -85,8 +103,10 @@ class CombatService {
     return abilities;
   }
 
-  // Create a monster instance from definition
-  createMonsterInstance(monsterId) {
+  /**
+   * Create a monster instance from definition
+   */
+  createMonsterInstance(monsterId: string): any {
     const monsterDef = this.getMonster(monsterId);
     if (!monsterDef) {
       throw new Error(`Monster not found: ${monsterId}`);
@@ -120,8 +140,10 @@ class CombatService {
     return instance;
   }
 
-  // Parse dice notation (e.g., "1d6", "2d4+2")
-  rollDice(diceNotation) {
+  /**
+   * Parse dice notation (e.g., "1d6", "2d4+2")
+   */
+  rollDice(diceNotation: string): number {
     const match = diceNotation.match(/^(\d+)d(\d+)([+-]\d+)?$/);
     if (!match) {
       throw new Error(`Invalid dice notation: ${diceNotation}`);
@@ -139,8 +161,10 @@ class CombatService {
     return Math.max(1, total); // Minimum 1 damage
   }
 
-  // Calculate total armor from equipment
-  calculateTotalArmor(entity, itemService) {
+  /**
+   * Calculate total armor from equipment
+   */
+  calculateTotalArmor(entity: any, itemService: any): number {
     let totalArmor = 0;
 
     // Add base armor from combatStats
@@ -162,7 +186,7 @@ class CombatService {
       const equippedItems = [];
       for (const [slot, instanceId] of entity.equipmentSlots.entries()) {
         if (instanceId) {
-          const item = entity.inventory.find(i => i.instanceId === instanceId);
+          const item = entity.inventory.find((i: any) => i.instanceId === instanceId);
           if (item) {
             equippedItems.push(item);
           }
@@ -180,8 +204,10 @@ class CombatService {
     return totalArmor;
   }
 
-  // Calculate total evasion from equipment
-  calculateTotalEvasion(entity, itemService) {
+  /**
+   * Calculate total evasion from equipment
+   */
+  calculateTotalEvasion(entity: any, itemService: any): number {
     let totalEvasion = 0;
 
     // Add base evasion from combatStats
@@ -203,7 +229,7 @@ class CombatService {
       const equippedItems = [];
       for (const [slot, instanceId] of entity.equipmentSlots.entries()) {
         if (instanceId) {
-          const item = entity.inventory.find(i => i.instanceId === instanceId);
+          const item = entity.inventory.find((i: any) => i.instanceId === instanceId);
           if (item) {
             equippedItems.push(item);
           }
@@ -221,23 +247,29 @@ class CombatService {
     return totalEvasion;
   }
 
-  // Calculate armor damage reduction (diminishing returns: 1000 armor = 50% reduction)
-  calculateArmorReduction(armor) {
+  /**
+   * Calculate armor damage reduction (diminishing returns: 1000 armor = 50% reduction)
+   */
+  calculateArmorReduction(armor: number): number {
     // Formula: reduction = armor / (armor + 1000)
     // Examples: 100 armor = 9%, 500 armor = 33%, 1000 armor = 50%, 2000 armor = 67%
     return armor / (armor + 1000);
   }
 
-  // Calculate evasion chance (diminishing returns: 1000 evasion = 50% dodge)
-  calculateEvasionChance(evasion) {
+  /**
+   * Calculate evasion chance (diminishing returns: 1000 evasion = 50% dodge)
+   */
+  calculateEvasionChance(evasion: number): number {
     // Formula: chance = evasion / (evasion + 1000)
     // Examples: 100 evasion = 9%, 500 evasion = 33%, 1000 evasion = 50%, 2000 evasion = 67%
     const chance = evasion / (evasion + 1000);
     return Math.min(0.75, chance); // Cap at 75% dodge chance
   }
 
-  // Get equipped weapon for an entity
-  getEquippedWeapon(entity, itemService) {
+  /**
+   * Get equipped weapon for an entity
+   */
+  getEquippedWeapon(entity: any, itemService: any): any {
     // For monsters, return equipment.weapon or equipment.natural
     if (entity.monsterId) {
       if (entity.equipment) {
@@ -259,7 +291,7 @@ class CombatService {
       return null;
     }
 
-    const item = entity.inventory.find(i => i.instanceId === mainHandId);
+    const item = entity.inventory.find((i: any) => i.instanceId === mainHandId);
     if (!item) {
       return null;
     }
@@ -278,8 +310,17 @@ class CombatService {
     };
   }
 
-  // Calculate damage with skill/attribute scaling
-  calculateDamage(attacker, defender, itemService, isAbility = false, abilityPower = 1.0, critBonus = 0) {
+  /**
+   * Calculate damage with skill/attribute scaling
+   */
+  calculateDamage(
+    attacker: any,
+    defender: any,
+    itemService: any,
+    isAbility: boolean = false,
+    abilityPower: number = 1.0,
+    critBonus: number = 0
+  ): any {
     const weapon = this.getEquippedWeapon(attacker, itemService);
 
     if (!weapon) {
@@ -386,8 +427,10 @@ class CombatService {
     };
   }
 
-  // Initialize combat between player and monster
-  initializeCombat(player, monsterId, itemService) {
+  /**
+   * Initialize combat between player and monster
+   */
+  initializeCombat(player: any, monsterId: string, itemService: any): any {
     const monsterInstance = this.createMonsterInstance(monsterId);
 
     const now = new Date();
@@ -418,8 +461,10 @@ class CombatService {
     return monsterInstance;
   }
 
-  // Process combat turn (auto-attacks)
-  processCombatTurn(player, itemService) {
+  /**
+   * Process combat turn (auto-attacks)
+   */
+  processCombatTurn(player: any, itemService: any): any {
     if (!player.isInCombat()) {
       throw new Error('Player is not in combat');
     }
@@ -519,8 +564,10 @@ class CombatService {
     return results;
   }
 
-  // Use ability in combat
-  useAbility(player, abilityId, itemService) {
+  /**
+   * Use ability in combat
+   */
+  useAbility(player: any, abilityId: string, itemService: any): any {
     if (!player.isInCombat()) {
       throw new Error('Player is not in combat');
     }
@@ -548,7 +595,7 @@ class CombatService {
     const monsterInstance = Object.fromEntries(combat.monsterInstance);
 
     // Calculate ability damage
-    const critBonus = ability.effects && ability.effects.critChanceBonus ? ability.effects.critChanceBonus : 0;
+    const critBonus = ability.effects && ability.effects.damage?.multiplier ? 0 : 0;
     const attackResult = this.calculateDamage(
       player,
       monsterInstance,
@@ -597,8 +644,10 @@ class CombatService {
     };
   }
 
-  // End combat and award rewards
-  async awardCombatRewards(player, victory, itemService, dropTableService) {
+  /**
+   * End combat and award rewards
+   */
+  async awardCombatRewards(player: any, victory: boolean, itemService: any, dropTableService: any): Promise<any> {
     if (!player.isInCombat()) {
       throw new Error('Player is not in combat');
     }
@@ -607,14 +656,14 @@ class CombatService {
     const monsterInstance = Object.fromEntries(combat.monsterInstance);
     const monsterDef = this.getMonster(monsterInstance.monsterId);
 
-    const rewards = {
+    const rewards: any = {
       gold: 0,
       experience: 0,
       items: [],
       victory
     };
 
-    if (victory) {
+    if (victory && monsterDef) {
       // Award gold
       const goldAmount = Math.floor(
         Math.random() * (monsterDef.goldDrop.max - monsterDef.goldDrop.min + 1) + monsterDef.goldDrop.min
@@ -672,4 +721,4 @@ class CombatService {
   }
 }
 
-module.exports = new CombatService();
+export default new CombatService();

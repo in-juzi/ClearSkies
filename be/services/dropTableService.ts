@@ -1,16 +1,29 @@
-const fs = require('fs').promises;
-const path = require('path');
+import { promises as fs } from 'fs';
+import * as path from 'path';
+import { DropTable } from '../types';
+
+interface DropResult {
+  itemId: string;
+  quantity: number;
+  qualities?: Record<string, number>;
+  traits?: string[];
+  qualityBonus?: Record<string, number>;
+  qualityMultiplier?: number;
+}
+
+interface DropOptions {
+  qualityMultiplier?: number;
+  [key: string]: any;
+}
 
 class DropTableService {
-  constructor() {
-    this.dropTables = new Map();
-    this.loaded = false;
-  }
+  private dropTables: Map<string, DropTable> = new Map();
+  private loaded: boolean = false;
 
   /**
    * Load all drop table definitions from JSON files
    */
-  async loadAll() {
+  async loadAll(): Promise<void> {
     try {
       const dropTablesDir = path.join(__dirname, '../data/locations/drop-tables');
       const files = await fs.readdir(dropTablesDir);
@@ -19,7 +32,7 @@ class DropTableService {
         if (file.endsWith('.json')) {
           const filePath = path.join(dropTablesDir, file);
           const data = await fs.readFile(filePath, 'utf8');
-          const dropTable = JSON.parse(data);
+          const dropTable = JSON.parse(data) as DropTable;
           this.dropTables.set(dropTable.dropTableId, dropTable);
         }
       }
@@ -35,26 +48,22 @@ class DropTableService {
   /**
    * Get a drop table by ID
    */
-  getDropTable(dropTableId) {
+  getDropTable(dropTableId: string): DropTable | undefined {
     return this.dropTables.get(dropTableId);
   }
 
   /**
    * Get all drop tables
    */
-  getAllDropTables() {
+  getAllDropTables(): DropTable[] {
     return Array.from(this.dropTables.values());
   }
 
   /**
    * Roll on a drop table using weighted random selection
    * Supports nested drop tables (drop tables that reference other drop tables)
-   * @param {string} dropTableId - The drop table to roll on
-   * @param {object} options - Optional modifiers (luck, quality multipliers, etc.)
-   * @param {number} depth - Current nesting depth (used internally for recursion protection)
-   * @returns {object|null} The selected drop or null if dropNothing was rolled
    */
-  rollDropTable(dropTableId, options = {}, depth = 0) {
+  rollDropTable(dropTableId: string, options: DropOptions = {}, depth: number = 0): DropResult | null {
     const MAX_DEPTH = 5; // Maximum nesting depth to prevent infinite loops
 
     // Check for excessive nesting depth
@@ -80,17 +89,17 @@ class DropTableService {
       roll -= drop.weight;
       if (roll <= 0) {
         // Check if this is a "drop nothing" entry
-        if (drop.dropNothing) {
+        if ((drop as any).dropNothing) {
           return null;
         }
 
         // Check if this is a nested drop table
         // Support explicit type: "dropTable" or implicit detection (has dropTableId but no itemId)
-        const isNestedTable = drop.type === 'dropTable' || (drop.dropTableId && !drop.itemId);
+        const isNestedTable = (drop as any).type === 'dropTable' || ((drop as any).dropTableId && !drop.itemId);
 
         if (isNestedTable) {
           // Recursively roll on the nested drop table
-          return this.rollDropTable(drop.dropTableId, options, depth + 1);
+          return this.rollDropTable((drop as any).dropTableId, options, depth + 1);
         }
 
         // Otherwise, this is a normal item drop
@@ -99,7 +108,7 @@ class DropTableService {
           Math.floor(Math.random() * (drop.quantity.max - drop.quantity.min + 1));
 
         // Build the drop result
-        const result = {
+        const result: DropResult = {
           itemId: drop.itemId,
           quantity,
           qualities: {},
@@ -127,12 +136,9 @@ class DropTableService {
 
   /**
    * Roll on multiple drop tables
-   * @param {string[]} dropTableIds - Array of drop table IDs to roll on
-   * @param {object} options - Optional modifiers
-   * @returns {object[]} Array of drop results (excluding null drops)
    */
-  rollMultipleDropTables(dropTableIds, options = {}) {
-    const results = [];
+  rollMultipleDropTables(dropTableIds: string[], options: DropOptions = {}): DropResult[] {
+    const results: DropResult[] = [];
 
     for (const dropTableId of dropTableIds) {
       const drop = this.rollDropTable(dropTableId, options);
@@ -146,10 +152,8 @@ class DropTableService {
 
   /**
    * Get drop table statistics (useful for balancing)
-   * @param {string} dropTableId - The drop table to analyze
-   * @returns {object} Statistics about the drop table
    */
-  getDropTableStats(dropTableId) {
+  getDropTableStats(dropTableId: string): any {
     const dropTable = this.dropTables.get(dropTableId);
     if (!dropTable) {
       return null;
@@ -166,7 +170,7 @@ class DropTableService {
         weight: drop.weight,
         probability: (drop.weight / totalWeight * 100).toFixed(2) + '%',
         quantityRange: drop.quantity ? `${drop.quantity.min}-${drop.quantity.max}` : 'N/A',
-        comment: drop.comment
+        comment: (drop as any).comment
       }))
     };
 
@@ -176,7 +180,7 @@ class DropTableService {
   /**
    * Reload all drop tables (useful for hot-reloading during development)
    */
-  async reload() {
+  async reload(): Promise<{ success: boolean; count: number }> {
     this.dropTables.clear();
     await this.loadAll();
     return { success: true, count: this.dropTables.size };
@@ -186,4 +190,4 @@ class DropTableService {
 // Create singleton instance
 const dropTableService = new DropTableService();
 
-module.exports = dropTableService;
+export default dropTableService;

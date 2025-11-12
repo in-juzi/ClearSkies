@@ -1,21 +1,30 @@
-const fs = require('fs').promises;
-const path = require('path');
-const dropTableService = require('./dropTableService');
+import { promises as fs } from 'fs';
+import * as path from 'path';
+import dropTableService from './dropTableService';
+import {
+  Location,
+  Facility,
+  Activity,
+  BiomeDefinition,
+  GatheringActivity
+} from '../types';
 
 class LocationService {
+  private biomes: Map<string, BiomeDefinition> = new Map();
+  private locations: Map<string, Location> = new Map();
+  private facilities: Map<string, Facility> = new Map();
+  private activities: Map<string, Activity> = new Map();
+  private dropTableService: any;
+  private loaded: boolean = false;
+
   constructor() {
-    this.biomes = new Map();
-    this.locations = new Map();
-    this.facilities = new Map();
-    this.activities = new Map();
     this.dropTableService = dropTableService;
-    this.loaded = false;
   }
 
   /**
    * Load all location data from JSON files
    */
-  async loadAll() {
+  async loadAll(): Promise<void> {
     try {
       await Promise.all([
         this.loadBiomes(),
@@ -39,7 +48,7 @@ class LocationService {
   /**
    * Load biome definitions
    */
-  async loadBiomes() {
+  private async loadBiomes(): Promise<void> {
     const biomesDir = path.join(__dirname, '../data/locations/biomes');
     const files = await fs.readdir(biomesDir);
 
@@ -47,7 +56,7 @@ class LocationService {
       if (file.endsWith('.json')) {
         const filePath = path.join(biomesDir, file);
         const data = await fs.readFile(filePath, 'utf8');
-        const biome = JSON.parse(data);
+        const biome = JSON.parse(data) as BiomeDefinition;
         this.biomes.set(biome.biomeId, biome);
       }
     }
@@ -56,7 +65,7 @@ class LocationService {
   /**
    * Load activity definitions
    */
-  async loadActivities() {
+  private async loadActivities(): Promise<void> {
     const activitiesDir = path.join(__dirname, '../data/locations/activities');
     const files = await fs.readdir(activitiesDir);
 
@@ -64,7 +73,7 @@ class LocationService {
       if (file.endsWith('.json')) {
         const filePath = path.join(activitiesDir, file);
         const data = await fs.readFile(filePath, 'utf8');
-        const activity = JSON.parse(data);
+        const activity = JSON.parse(data) as Activity;
         this.activities.set(activity.activityId, activity);
       }
     }
@@ -73,7 +82,7 @@ class LocationService {
   /**
    * Load facility definitions
    */
-  async loadFacilities() {
+  private async loadFacilities(): Promise<void> {
     const facilitiesDir = path.join(__dirname, '../data/locations/facilities');
     const files = await fs.readdir(facilitiesDir);
 
@@ -81,7 +90,7 @@ class LocationService {
       if (file.endsWith('.json')) {
         const filePath = path.join(facilitiesDir, file);
         const data = await fs.readFile(filePath, 'utf8');
-        const facility = JSON.parse(data);
+        const facility = JSON.parse(data) as Facility;
         this.facilities.set(facility.facilityId, facility);
       }
     }
@@ -90,7 +99,7 @@ class LocationService {
   /**
    * Load location definitions
    */
-  async loadLocations() {
+  private async loadLocations(): Promise<void> {
     const locationsDir = path.join(__dirname, '../data/locations/definitions');
     const files = await fs.readdir(locationsDir);
 
@@ -98,7 +107,7 @@ class LocationService {
       if (file.endsWith('.json')) {
         const filePath = path.join(locationsDir, file);
         const data = await fs.readFile(filePath, 'utf8');
-        const location = JSON.parse(data);
+        const location = JSON.parse(data) as Location;
         this.locations.set(location.locationId, location);
       }
     }
@@ -107,7 +116,7 @@ class LocationService {
   /**
    * Get a location with all its related data (biome, facilities, activities)
    */
-  getLocationDetails(locationId) {
+  getLocationDetails(locationId: string): any {
     const location = this.locations.get(locationId);
     if (!location) return null;
 
@@ -137,7 +146,7 @@ class LocationService {
   /**
    * Get facility with its activities
    */
-  getFacilityDetails(facilityId) {
+  getFacilityDetails(facilityId: string): any {
     const facility = this.facilities.get(facilityId);
     if (!facility) return null;
 
@@ -154,31 +163,31 @@ class LocationService {
   /**
    * Get activity by ID
    */
-  getActivity(activityId) {
+  getActivity(activityId: string): Activity | undefined {
     return this.activities.get(activityId);
   }
 
   /**
    * Get all locations
    */
-  getAllLocations() {
+  getAllLocations(): Location[] {
     return Array.from(this.locations.values());
   }
 
   /**
    * Get starting location
    */
-  getStartingLocation() {
+  getStartingLocation(): Location | undefined {
     return Array.from(this.locations.values()).find(loc => loc.isStartingLocation);
   }
 
   /**
    * Check if player meets requirements for an activity
    */
-  meetsActivityRequirements(activity, player) {
+  meetsActivityRequirements(activity: Activity, player: any): { meets: boolean; failures?: string[] } {
     if (!activity.requirements) return { meets: true };
 
-    const failures = [];
+    const failures: string[] = [];
 
     // Check skill requirements
     if (activity.requirements.skills) {
@@ -230,37 +239,27 @@ class LocationService {
       }
     }
 
-    // Legacy support: Check old-style item requirements (deprecated)
-    if (activity.requirements.items) {
-      for (const itemId of activity.requirements.items) {
-        const hasItem = player.inventory?.some(item => item.itemId === itemId);
-        if (!hasItem) {
-          failures.push(`Requires item: ${itemId}`);
-        }
-      }
-    }
-
     return {
       meets: failures.length === 0,
-      failures
+      failures: failures.length > 0 ? failures : undefined
     };
   }
 
   /**
    * Check if player meets requirements for navigation
    */
-  meetsNavigationRequirements(navigationLink, player) {
+  meetsNavigationRequirements(navigationLink: any, player: any): { meets: boolean; failures?: string[] } {
     if (!navigationLink.requirements || Object.keys(navigationLink.requirements).length === 0) {
       return { meets: true };
     }
 
-    const failures = [];
+    const failures: string[] = [];
 
     // Check attribute requirements
     if (navigationLink.requirements.attributes) {
       for (const [attrName, requiredLevel] of Object.entries(navigationLink.requirements.attributes)) {
         const playerAttr = player.attributes?.[attrName];
-        if (!playerAttr || playerAttr.level < requiredLevel) {
+        if (!playerAttr || playerAttr.level < (requiredLevel as number)) {
           failures.push(`Requires ${attrName} level ${requiredLevel}`);
         }
       }
@@ -269,7 +268,7 @@ class LocationService {
     // Check item requirements
     if (navigationLink.requirements.items) {
       for (const itemId of navigationLink.requirements.items) {
-        const hasItem = player.inventory?.some(item => item.itemId === itemId);
+        const hasItem = player.inventory?.some((item: any) => item.itemId === itemId);
         if (!hasItem) {
           failures.push(`Requires item: ${itemId}`);
         }
@@ -278,20 +277,15 @@ class LocationService {
 
     return {
       meets: failures.length === 0,
-      failures
+      failures: failures.length > 0 ? failures : undefined
     };
   }
 
   /**
    * Calculate scaled XP based on player level vs activity level
    * Uses polynomial decay with grace range (0-1 levels over = full XP)
-   *
-   * @param {number} rawXP - Base XP from activity definition
-   * @param {number} playerLevel - Player's current level in the skill
-   * @param {number} activityLevel - Required level for the activity
-   * @returns {number} Scaled XP (minimum 1)
    */
-  calculateScaledXP(rawXP, playerLevel, activityLevel) {
+  calculateScaledXP(rawXP: number, playerLevel: number, activityLevel: number): number {
     const levelDiff = playerLevel - activityLevel;
 
     // Grace range: 0-1 levels over = full XP
@@ -311,10 +305,10 @@ class LocationService {
   /**
    * Calculate activity rewards with XP scaling
    */
-  calculateActivityRewards(activity, options = {}) {
+  calculateActivityRewards(activity: any, options: any = {}): any {
     const { player } = options;
 
-    const rewards = {
+    const rewards: any = {
       experience: {},
       rawExperience: activity.rewards.experience || {}, // Keep raw values for UI
       items: [],
@@ -328,7 +322,7 @@ class LocationService {
           const playerLevel = player.skills[skillName].level;
           const activityLevel = activity.requirements?.skills?.[skillName] || 1;
 
-          rewards.experience[skillName] = this.calculateScaledXP(rawXP, playerLevel, activityLevel);
+          rewards.experience[skillName] = this.calculateScaledXP(rawXP as number, playerLevel, activityLevel);
         } else {
           // No player context or skill not found - use raw XP
           rewards.experience[skillName] = rawXP;
@@ -381,4 +375,4 @@ class LocationService {
 // Create singleton instance
 const locationService = new LocationService();
 
-module.exports = locationService;
+export default locationService;

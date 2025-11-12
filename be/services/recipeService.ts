@@ -1,16 +1,15 @@
-const fs = require('fs');
-const path = require('path');
+import * as fs from 'fs';
+import * as path from 'path';
+import { Recipe } from '../types';
 
 class RecipeService {
-  constructor() {
-    this.recipes = new Map();
-    this.recipesLoaded = false;
-  }
+  private recipes: Map<string, Recipe> = new Map();
+  private recipesLoaded: boolean = false;
 
   /**
    * Load all recipe definitions from JSON files
    */
-  loadRecipes() {
+  loadRecipes(): void {
     if (this.recipesLoaded) {
       return;
     }
@@ -36,9 +35,9 @@ class RecipeService {
       for (const file of recipeFiles) {
         try {
           const recipePath = path.join(skillPath, file);
-          const recipeData = JSON.parse(fs.readFileSync(recipePath, 'utf8'));
+          const recipeData = JSON.parse(fs.readFileSync(recipePath, 'utf8')) as Recipe;
           this.recipes.set(recipeData.recipeId, recipeData);
-        } catch (error) {
+        } catch (error: any) {
           console.error(`Error loading recipe ${file}:`, error.message);
         }
       }
@@ -50,41 +49,36 @@ class RecipeService {
 
   /**
    * Get all recipes
-   * @returns {Array} All recipe definitions
    */
-  getAllRecipes() {
+  getAllRecipes(): Recipe[] {
     this.loadRecipes();
     return Array.from(this.recipes.values());
   }
 
   /**
    * Get single recipe by ID
-   * @param {string} recipeId
-   * @returns {Object|null} Recipe definition or null
    */
-  getRecipe(recipeId) {
+  getRecipe(recipeId: string): Recipe | null {
     this.loadRecipes();
     return this.recipes.get(recipeId) || null;
   }
 
   /**
    * Get recipes for a specific skill
-   * @param {string} skillName - e.g., 'cooking', 'smithing'
-   * @returns {Array} Recipes for the skill
    */
-  getRecipesBySkill(skillName) {
+  getRecipesBySkill(skillName: string): Recipe[] {
     this.loadRecipes();
     return Array.from(this.recipes.values()).filter(recipe => recipe.skill === skillName);
   }
 
   /**
    * Validate if player meets recipe requirements
-   * @param {Object} player - Player document
-   * @param {Object} recipe - Recipe definition
-   * @param {Object} selectedIngredients - Optional map of itemId -> instanceId[] for specific instance selection
-   * @returns {Object} { valid: boolean, message: string }
    */
-  validateRecipeRequirements(player, recipe, selectedIngredients = null) {
+  validateRecipeRequirements(
+    player: any,
+    recipe: Recipe,
+    selectedIngredients: Record<string, string[]> | null = null
+  ): { valid: boolean; message: string } {
     // Check skill level
     if (!player.skills[recipe.skill]) {
       return {
@@ -156,26 +150,25 @@ class RecipeService {
 
   /**
    * Calculate crafting outcome based on ingredient quality and player skill
-   * @param {Object} recipe - Recipe definition
-   * @param {Array} ingredientInstances - Actual ingredient items from inventory
-   * @param {number} playerSkillLevel - Player's skill level
-   * @param {Object} itemService - ItemService instance
-   * @returns {Array} Array of output items with calculated qualities/traits
    */
-  calculateCraftingOutcome(recipe, ingredientInstances, playerSkillLevel, itemService) {
-    // Support both old (single output) and new (outputs array) schema
-    const outputs = recipe.outputs ? recipe.outputs : [recipe.output];
-    const outputItems = [];
+  calculateCraftingOutcome(
+    recipe: Recipe,
+    ingredientInstances: any[],
+    playerSkillLevel: number,
+    itemService: any
+  ): any[] {
+    const outputs = recipe.outputs;
+    const outputItems: any[] = [];
 
     // Collect ingredient qualities and traits once (shared across all outputs)
-    const qualityMaps = [];
+    const qualityMaps: Map<string, number>[] = [];
     for (const ingredient of ingredientInstances) {
       if (ingredient.qualities && ingredient.qualities.size > 0) {
         qualityMaps.push(ingredient.qualities);
       }
     }
 
-    let bestIngredient = null;
+    let bestIngredient: any = null;
     let bestTraitCount = 0;
     if (ingredientInstances.length > 0) {
       bestIngredient = ingredientInstances[0];
@@ -192,7 +185,7 @@ class RecipeService {
 
     // Process each output
     for (const outputDef of outputs) {
-      const output = {
+      const output: any = {
         itemId: outputDef.itemId,
         quantity: outputDef.quantity,
         qualities: new Map(),
@@ -203,7 +196,7 @@ class RecipeService {
       if (outputDef.qualityModifier === 'inherit' && ingredientInstances.length > 0) {
         // If we have qualities, inherit the maximum level for each quality type
         if (qualityMaps.length > 0) {
-          const allQualityTypes = new Set();
+          const allQualityTypes = new Set<string>();
           for (const qualMap of qualityMaps) {
             for (const qualityType of qualMap.keys()) {
               allQualityTypes.add(qualityType);
@@ -231,7 +224,7 @@ class RecipeService {
         if (skillBonus > 0 && output.qualities.size > 0) {
           // Apply skill bonus to the primary quality (first one)
           const primaryQuality = Array.from(output.qualities.keys())[0];
-          const currentLevel = output.qualities.get(primaryQuality);
+          const currentLevel = output.qualities.get(primaryQuality)!;
           const newLevel = Math.min(5, currentLevel + skillBonus); // Cap at level 5
           output.qualities.set(primaryQuality, newLevel);
         }
@@ -259,11 +252,11 @@ class RecipeService {
   /**
    * Reload recipes (for development)
    */
-  reload() {
+  reload(): void {
     this.recipes.clear();
     this.recipesLoaded = false;
     this.loadRecipes();
   }
 }
 
-module.exports = new RecipeService();
+export default new RecipeService();

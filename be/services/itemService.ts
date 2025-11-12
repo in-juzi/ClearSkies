@@ -1,20 +1,29 @@
-const fs = require('fs').promises;
-const path = require('path');
-const { v4: uuidv4 } = require('uuid');
+import { promises as fs } from 'fs';
+import * as path from 'path';
+import { v4 as uuidv4 } from 'uuid';
+import {
+  Item,
+  ItemInstance,
+  QualityDefinition,
+  TraitDefinition,
+  ItemGenerationConfig,
+  ItemCategory,
+  QualityMap,
+  TraitMap,
+  Rarity
+} from '../types';
 
 class ItemService {
-  constructor() {
-    this.itemDefinitions = new Map();
-    this.qualityDefinitions = new Map();
-    this.traitDefinitions = new Map();
-    this.generationConfig = null;
-    this.initialized = false;
-  }
+  private itemDefinitions: Map<string, Item> = new Map();
+  private qualityDefinitions: Map<string, QualityDefinition> = new Map();
+  private traitDefinitions: Map<string, TraitDefinition> = new Map();
+  private generationConfig: ItemGenerationConfig | null = null;
+  private initialized: boolean = false;
 
   /**
    * Load all item, quality, and trait definitions from JSON files
    */
-  async loadDefinitions() {
+  async loadDefinitions(): Promise<{ items: number; qualities: number; traits: number }> {
     try {
       const dataPath = path.join(__dirname, '../data/items');
 
@@ -22,24 +31,24 @@ class ItemService {
       const qualitiesPath = path.join(dataPath, 'qualities/qualities.json');
       const qualitiesData = await fs.readFile(qualitiesPath, 'utf8');
       const qualities = JSON.parse(qualitiesData);
-      Object.values(qualities).forEach(quality => {
+      Object.values(qualities).forEach((quality: any) => {
         // Transform applicableCategories to applicableTo for consistency
         if (quality.applicableCategories && !quality.applicableTo) {
           quality.applicableTo = quality.applicableCategories;
         }
-        this.qualityDefinitions.set(quality.qualityId, quality);
+        this.qualityDefinitions.set(quality.qualityId, quality as QualityDefinition);
       });
 
       // Load traits
       const traitsPath = path.join(dataPath, 'traits/traits.json');
       const traitsData = await fs.readFile(traitsPath, 'utf8');
       const traits = JSON.parse(traitsData);
-      Object.values(traits).forEach(trait => {
+      Object.values(traits).forEach((trait: any) => {
         // Transform applicableCategories to applicableTo for consistency
         if (trait.applicableCategories && !trait.applicableTo) {
           trait.applicableTo = trait.applicableCategories;
         }
-        this.traitDefinitions.set(trait.traitId, trait);
+        this.traitDefinitions.set(trait.traitId, trait as TraitDefinition);
       });
 
       // Load item definitions from multiple files and directories
@@ -52,16 +61,16 @@ class ItemService {
         const configData = await fs.readFile(configPath, 'utf8');
         this.generationConfig = JSON.parse(configData);
         console.log('✓ Loaded generation config');
-      } catch (error) {
+      } catch (error: any) {
         console.warn('⚠ Could not load generation-config.json, using default values:', error.message);
         // Fallback to default config
         this.generationConfig = {
-          qualityGeneration: {
-            countDistribution: { "0": 0.35, "1": 0.45, "2": 0.15, "3": 0.05 },
-            tierBasedLevels: true
-          },
-          traitGeneration: {
-            appearanceRates: { common: 0.02, uncommon: 0.08, rare: 0.15, epic: 0.30 }
+          qualityDistribution: { none: 0.35, one: 0.45, two: 0.15, three: 0.05, four: 0 },
+          traitAppearanceRates: { common: 0.02, uncommon: 0.08, rare: 0.15, epic: 0.30, legendary: 0.50 },
+          qualityLevelDamping: 0.6,
+          tierBasedLevelDistribution: {
+            enabled: true,
+            baseLevelForTier: { 1: 1, 2: 2, 3: 3 }
           }
         };
       }
@@ -84,7 +93,7 @@ class ItemService {
    * Recursively load item definitions from a directory
    * Supports both JSON files and subdirectories with JSON files
    */
-  async _loadDefinitionsRecursive(dirPath) {
+  private async _loadDefinitionsRecursive(dirPath: string): Promise<void> {
     const entries = await fs.readdir(dirPath, { withFileTypes: true });
 
     for (const entry of entries) {
@@ -97,8 +106,8 @@ class ItemService {
         // Load JSON file
         const fileData = await fs.readFile(fullPath, 'utf8');
         const items = JSON.parse(fileData);
-        Object.values(items).forEach(item => {
-          this.itemDefinitions.set(item.itemId, item);
+        Object.values(items).forEach((item: any) => {
+          this.itemDefinitions.set(item.itemId, item as Item);
         });
       }
     }
@@ -107,7 +116,7 @@ class ItemService {
   /**
    * Hot reload definitions without restarting server
    */
-  async reloadDefinitions() {
+  async reloadDefinitions(): Promise<{ items: number; qualities: number; traits: number }> {
     this.itemDefinitions.clear();
     this.qualityDefinitions.clear();
     this.traitDefinitions.clear();
@@ -117,42 +126,38 @@ class ItemService {
   /**
    * Get an item definition by ID
    */
-  getItemDefinition(itemId) {
+  getItemDefinition(itemId: string): Item | undefined {
     return this.itemDefinitions.get(itemId);
   }
 
   /**
    * Get all item definitions
    */
-  getAllItemDefinitions() {
+  getAllItemDefinitions(): Item[] {
     return Array.from(this.itemDefinitions.values());
   }
 
   /**
    * Get items by category
    */
-  getItemsByCategory(category) {
+  getItemsByCategory(category: ItemCategory): Item[] {
     return Array.from(this.itemDefinitions.values())
       .filter(item => item.category === category);
   }
 
   /**
    * Get items by subcategory
-   * @param {string} subcategory - The subcategory to filter by
-   * @returns {Array} Items that have the specified subcategory
    */
-  getItemsBySubcategory(subcategory) {
+  getItemsBySubcategory(subcategory: string): Item[] {
     return Array.from(this.itemDefinitions.values())
       .filter(item => item.subcategories && item.subcategories.includes(subcategory));
   }
 
   /**
    * Get all unique subcategories from items
-   * @param {string} [category] - Optional category to filter by
-   * @returns {Array} Array of unique subcategory strings
    */
-  getAllSubcategories(category = null) {
-    const subcategoriesSet = new Set();
+  getAllSubcategories(category: ItemCategory | null = null): string[] {
+    const subcategoriesSet = new Set<string>();
 
     for (const item of this.itemDefinitions.values()) {
       // Filter by category if specified
@@ -171,26 +176,23 @@ class ItemService {
 
   /**
    * Validate item has required subcategory
-   * @param {string} itemId - The item ID to check
-   * @param {string} subcategory - The required subcategory
-   * @returns {boolean} True if item has the subcategory
    */
-  itemHasSubcategory(itemId, subcategory) {
+  itemHasSubcategory(itemId: string, subcategory: string): boolean {
     const item = this.getItemDefinition(itemId);
-    return item && item.subcategories && item.subcategories.includes(subcategory);
+    return item !== undefined && item.subcategories !== undefined && item.subcategories.includes(subcategory);
   }
 
   /**
    * Get a quality definition by ID
    */
-  getQualityDefinition(qualityId) {
+  getQualityDefinition(qualityId: string): QualityDefinition | undefined {
     return this.qualityDefinitions.get(qualityId);
   }
 
   /**
    * Get a trait definition by ID
    */
-  getTraitDefinition(traitId) {
+  getTraitDefinition(traitId: string): TraitDefinition | undefined {
     return this.traitDefinitions.get(traitId);
   }
 
@@ -199,7 +201,12 @@ class ItemService {
    * qualities: Map of qualityId -> level (integer 1-5)
    * traits: Map of traitId -> level (integer 1-3)
    */
-  createItemInstance(itemId, quantity = 1, qualities = {}, traits = {}) {
+  createItemInstance(
+    itemId: string,
+    quantity: number = 1,
+    qualities: QualityMap = {},
+    traits: TraitMap = {}
+  ): ItemInstance {
     const itemDef = this.getItemDefinition(itemId);
     if (!itemDef) {
       throw new Error(`Item definition not found: ${itemId}`);
@@ -215,8 +222,9 @@ class ItemService {
         throw new Error(`Quality definition not found: ${qualityId}`);
       }
       // Validate level is integer and in range
-      if (!Number.isInteger(level) || level < 1 || level > qualityDef.maxLevel) {
-        throw new Error(`Quality ${qualityId} level ${level} out of range [1, ${qualityDef.maxLevel}]`);
+      const maxLevel = qualityDef.levels.length;
+      if (!Number.isInteger(level) || level < 1 || level > maxLevel) {
+        throw new Error(`Quality ${qualityId} level ${level} out of range [1, ${maxLevel}]`);
       }
     }
 
@@ -230,8 +238,9 @@ class ItemService {
         throw new Error(`Trait definition not found: ${traitId}`);
       }
       // Validate level is integer and in range
-      if (!Number.isInteger(level) || level < 1 || level > traitDef.maxLevel) {
-        throw new Error(`Trait ${traitId} level ${level} out of range [1, ${traitDef.maxLevel}]`);
+      const maxLevel = traitDef.levels.length;
+      if (!Number.isInteger(level) || level < 1 || level > maxLevel) {
+        throw new Error(`Trait ${traitId} level ${level} out of range [1, ${maxLevel}]`);
       }
     }
 
@@ -241,14 +250,14 @@ class ItemService {
       quantity,
       qualities,
       traits,
-      acquiredAt: new Date()
+      equipped: false
     };
   }
 
   /**
    * Calculate the vendor price for an item instance
    */
-  calculateVendorPrice(itemInstance) {
+  calculateVendorPrice(itemInstance: ItemInstance): number {
     const itemDef = this.getItemDefinition(itemInstance.itemId);
     if (!itemDef) {
       throw new Error(`Item definition not found: ${itemInstance.itemId}`);
@@ -261,8 +270,8 @@ class ItemService {
     if (itemInstance.qualities) {
       for (const [qualityId, level] of Object.entries(itemInstance.qualities)) {
         const qualityDef = this.getQualityDefinition(qualityId);
-        if (qualityDef?.levels?.[level]?.effects?.vendorPrice) {
-          const levelModifier = qualityDef.levels[level].effects.vendorPrice.modifier;
+        if (qualityDef?.levels?.[level - 1]?.effects?.vendorPriceMultiplier) {
+          const levelModifier = qualityDef.levels[level - 1].effects.vendorPriceMultiplier;
           modifier *= levelModifier;
         }
       }
@@ -272,8 +281,8 @@ class ItemService {
     if (itemInstance.traits) {
       for (const [traitId, level] of Object.entries(itemInstance.traits)) {
         const traitDef = this.getTraitDefinition(traitId);
-        if (traitDef?.levels?.[level]?.effects?.vendorPrice) {
-          const levelModifier = traitDef.levels[level].effects.vendorPrice.modifier;
+        if (traitDef?.levels?.[level - 1]?.effects?.vendorPriceMultiplier) {
+          const levelModifier = traitDef.levels[level - 1].effects.vendorPriceMultiplier;
           modifier *= levelModifier;
         }
       }
@@ -285,7 +294,7 @@ class ItemService {
   /**
    * Get full item details including definition and calculated properties
    */
-  getItemDetails(itemInstance) {
+  getItemDetails(itemInstance: any): any {
     const itemDef = this.getItemDefinition(itemInstance.itemId);
     if (!itemDef) {
       return null;
@@ -294,37 +303,35 @@ class ItemService {
     const vendorPrice = this.calculateVendorPrice(itemInstance);
 
     // Get quality details (level-based)
-    const qualityDetails = {};
+    const qualityDetails: Record<string, any> = {};
     if (itemInstance.qualities) {
       for (const [qualityId, level] of Object.entries(itemInstance.qualities)) {
         const qualityDef = this.getQualityDefinition(qualityId);
-        if (qualityDef && qualityDef.levels?.[level]) {
+        if (qualityDef && qualityDef.levels?.[level as number - 1]) {
           qualityDetails[qualityId] = {
             qualityId,
             name: qualityDef.name,
-            shorthand: qualityDef.shorthand,
             level,
-            maxLevel: qualityDef.maxLevel,
-            levelData: qualityDef.levels[level]
+            maxLevel: qualityDef.levels.length,
+            levelData: qualityDef.levels[level as number - 1]
           };
         }
       }
     }
 
     // Get trait details (level-based)
-    const traitDetails = {};
+    const traitDetails: Record<string, any> = {};
     if (itemInstance.traits) {
       for (const [traitId, level] of Object.entries(itemInstance.traits)) {
         const traitDef = this.getTraitDefinition(traitId);
-        if (traitDef && traitDef.levels?.[level]) {
+        if (traitDef && traitDef.levels?.[level as number - 1]) {
           traitDetails[traitId] = {
             traitId,
             name: traitDef.name,
-            shorthand: traitDef.shorthand,
             rarity: traitDef.rarity,
             level,
-            maxLevel: traitDef.maxLevel,
-            levelData: traitDef.levels[level]
+            maxLevel: traitDef.levels.length,
+            levelData: traitDef.levels[level as number - 1]
           };
         }
       }
@@ -354,7 +361,7 @@ class ItemService {
    * Check if two item instances can be stacked together
    * Items must have identical itemId, qualities (levels), and traits (levels)
    */
-  canStack(instance1, instance2) {
+  canStack(instance1: ItemInstance, instance2: ItemInstance): boolean {
     // Must be same item
     if (instance1.itemId !== instance2.itemId) {
       return false;
@@ -385,7 +392,7 @@ class ItemService {
   /**
    * Convert a Map/Object to a sorted JSON string for comparison
    */
-  _sortedMapString(map) {
+  _sortedMapString(map: any): string {
     // Handle Mongoose Map objects by converting to plain object
     let plainMap = map;
     if (map && typeof map.toObject === 'function') {
@@ -410,7 +417,7 @@ class ItemService {
    * Generate random qualities for an item based on tier/rarity
    * Returns Map of qualityId -> level (integer 1-5)
    */
-  generateRandomQualities(itemId) {
+  generateRandomQualities(itemId: string): QualityMap {
     const itemDef = this.getItemDefinition(itemId);
     if (!itemDef || !itemDef.allowedQualities.length) {
       return {};
@@ -429,14 +436,14 @@ class ItemService {
     const selectedQualities = this._selectRandomQualities(itemDef.allowedQualities, qualityCount);
 
     // Generate level for each selected quality using tier-based distribution
-    const qualities = {};
+    const qualities: QualityMap = {};
     const tier = itemDef.properties.tier || 1;
 
     for (const qualityId of selectedQualities) {
       const qualityDef = this.getQualityDefinition(qualityId);
       if (!qualityDef) continue;
 
-      const maxLevel = qualityDef.maxLevel;
+      const maxLevel = qualityDef.levels.length;
       const weights = this._getQualityLevelWeights(tier, maxLevel);
       const level = this._weightedRandomLevel(weights);
 
@@ -449,9 +456,9 @@ class ItemService {
   /**
    * Get weighted distribution for quality levels based on tier
    */
-  _getQualityLevelWeights(tier, maxLevel) {
+  private _getQualityLevelWeights(tier: number, maxLevel: number): number[] {
     // Base weights for each tier
-    let weights;
+    let weights: number[];
     if (tier === 1) {
       // Tier 1: Common quality (levels 1-3 most common)
       weights = [0.25, 0.40, 0.25, 0.08, 0.02];
@@ -464,7 +471,7 @@ class ItemService {
     }
 
     // Apply level damping if configured
-    const damping = this.generationConfig.qualityGeneration.levelDamping;
+    const damping = this.generationConfig?.qualityLevelDamping;
     if (damping !== undefined && damping > 0 && damping < 1) {
       weights = this._applyLevelDamping(weights, damping);
     }
@@ -474,11 +481,8 @@ class ItemService {
 
   /**
    * Apply damping to shift probability distribution toward lower levels
-   * @param {Array<number>} weights - Original weight distribution
-   * @param {number} damping - Damping factor (0-1), higher = more damping toward low levels
-   * @returns {Array<number>} Damped weight distribution
    */
-  _applyLevelDamping(weights, damping) {
+  private _applyLevelDamping(weights: number[], damping: number): number[] {
     // Apply exponential decay based on level position
     // Lower levels get boosted, higher levels get reduced
     const dampedWeights = weights.map((weight, index) => {
@@ -495,7 +499,7 @@ class ItemService {
   /**
    * Select a level based on weighted probabilities
    */
-  _weightedRandomLevel(weights) {
+  private _weightedRandomLevel(weights: number[]): number {
     const total = weights.reduce((sum, w) => sum + w, 0);
     let random = Math.random() * total;
 
@@ -513,21 +517,21 @@ class ItemService {
    * Generate random traits for an item based on rarity
    * Returns Map of traitId -> level (integer 1-3)
    */
-  generateRandomTraits(itemId) {
+  generateRandomTraits(itemId: string): TraitMap {
     const itemDef = this.getItemDefinition(itemId);
     if (!itemDef || !itemDef.allowedTraits.length) {
       return {};
     }
 
-    const traits = {};
-    const rarityChances = this.generationConfig.traitGeneration.appearanceRates;
+    const traits: TraitMap = {};
+    const rarityChances = this.generationConfig?.traitAppearanceRates;
 
     for (const traitId of itemDef.allowedTraits) {
       const traitDef = this.getTraitDefinition(traitId);
       if (!traitDef) continue;
 
       // Inverted rarity: rarer traits have LOWER chance to appear
-      const chance = rarityChances[traitDef.rarity] || 0.02;
+      const chance = rarityChances?.[traitDef.rarity] || 0.02;
       if (Math.random() < chance) {
         // Trait appears! Now determine level (1-3)
         // Higher rarity traits have better chance of higher levels
@@ -542,9 +546,9 @@ class ItemService {
   /**
    * Generate a trait level based on trait rarity
    */
-  _generateTraitLevel(rarity) {
+  private _generateTraitLevel(rarity: Rarity): number {
     // Returns 1, 2, or 3
-    let weights;
+    let weights: number[];
 
     if (rarity === 'common') {
       // Common: mostly level 1
@@ -568,22 +572,24 @@ class ItemService {
 
   /**
    * Roll how many qualities an item should have based on config distribution
-   * @param {number} maxAllowed - Maximum allowed qualities for this item
-   * @returns {number} Number of qualities to generate (0 to maxAllowed)
    */
-  _rollQualityCount(maxAllowed) {
-    const distribution = this.generationConfig.qualityGeneration.countDistribution;
+  private _rollQualityCount(maxAllowed: number): number {
+    if (!this.generationConfig) return Math.min(1, maxAllowed);
+
+    const distribution = this.generationConfig.qualityDistribution;
     const random = Math.random();
     let cumulativeProbability = 0;
 
-    // Iterate through distribution (0, 1, 2, 3, etc.)
-    for (const [countStr, probability] of Object.entries(distribution)) {
-      const count = parseInt(countStr);
+    // Iterate through distribution (none, one, two, three, four)
+    const countKeys = ['none', 'one', 'two', 'three', 'four'];
+    for (let i = 0; i < countKeys.length; i++) {
+      const key = countKeys[i] as keyof typeof distribution;
+      const probability = distribution[key];
       cumulativeProbability += probability;
 
       if (random < cumulativeProbability) {
         // Cap at maxAllowed
-        return Math.min(count, maxAllowed);
+        return Math.min(i, maxAllowed);
       }
     }
 
@@ -593,11 +599,8 @@ class ItemService {
 
   /**
    * Randomly select N qualities from the allowed qualities array
-   * @param {Array<string>} allowedQualities - Array of quality IDs
-   * @param {number} count - How many to select
-   * @returns {Array<string>} Array of selected quality IDs
    */
-  _selectRandomQualities(allowedQualities, count) {
+  private _selectRandomQualities(allowedQualities: string[], count: number): string[] {
     if (count >= allowedQualities.length) {
       return [...allowedQualities]; // Return all if count >= allowed
     }
@@ -616,4 +619,4 @@ class ItemService {
 // Create singleton instance
 const itemService = new ItemService();
 
-module.exports = itemService;
+export default itemService;
