@@ -13,6 +13,7 @@ be/.env
 # Build outputs
 ui/dist/
 ui/.angular/
+be/dist/
 
 # Logs
 *.log
