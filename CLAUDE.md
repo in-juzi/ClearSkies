@@ -24,26 +24,29 @@
 - ✅ Game data validation (completed - comprehensive cross-reference validation script)
 - ✅ Goblin Village location (completed - 3 combat encounters with progressive difficulty)
 - ✅ Item details panel (completed - enhanced inventory UI with combat stats preview)
+- ✅ Bronze/Iron equipment crafting (completed - 8 armor pieces + 6 tools via smithing)
+- ✅ Crafting UI filters (completed - search, craftable-only filter, sorting by level/name/XP)
 
 **Recent Changes** (Last 10 commits):
+- refactor: improve crafting backend and type safety
+- feat: add recipe search and filtering to crafting UI
+- chore: regenerate item and recipe registries
+- feat: add smithing recipes for bronze and iron equipment
+- feat: add bronze and iron armor equipment items
+- docs: update CLAUDE.md with new features and content
 - chore: update Claude settings configuration
 - style: minor styling and content adjustments
 - refactor: update location component with better navigation
 - refactor: enhance inventory and equipment UI components
-- refactor: improve combat UI components and styling
-- refactor: improve type safety and service method organization
-- feat: add username support to combat log messages
-- feat: add item details panel component for enhanced inventory UI
-- feat: add Goblin Village location with three combat encounters
-- feat: add Goblin Scout and Goblin Shaman monsters
 
 **Known Issues**:
 - None currently identified
 
 **Next Priorities**:
 - Combat system enhancements (more monsters, abilities, boss fights)
-- Smithing system completion (weapon/armor crafting with tier progression)
+- Steel tier equipment (requires steel ingots from iron + coal)
 - Alchemy system (potion brewing with quality-based effects)
+- Equipment stat application (apply armor/damage bonuses to combat)
 - Vendor enhancements (restocking, skill-based pricing)
 - Player housing
 - Guild/party system
@@ -444,10 +447,10 @@ See [project/docs/content-generator-agent.md](project/docs/content-generator-age
 
 **Core Systems**: Auth/JWT, Player/User models, MongoDB with migrations
 **Game Mechanics**: Skills (12), Attributes (7), XP scaling with 50% skill→attribute passthrough
-**Inventory**: Items (50+), Quality/Trait (5-tier/3-tier), Stacking, Equipment slots (10), Consumables (potions)
+**Inventory**: Items (68+), Quality/Trait (5-tier/3-tier), Stacking, Equipment slots (10), Consumables (potions)
 **World**: Locations, Activities, Drop tables, Travel, Time-based completion
-**Combat**: Turn-based combat, Monsters (3), Abilities (6), Combat stats tracking, Restart encounters
-**Crafting**: Cooking/Smithing, Recipe system, Quality inheritance, Instance selection
+**Combat**: Turn-based combat, Monsters (5), Abilities (6), Combat stats tracking, Restart encounters
+**Crafting**: Cooking (4 recipes) + Smithing (16 recipes), Quality inheritance, Instance selection, Recipe filtering
 **UI**: IconComponent (multi-channel colorization), ItemMiniComponent, AbilityButtonComponent, ItemButtonComponent, Manual/help system
 **Social**: Real-time chat (Socket.io), Vendor trading, Gold system
 
@@ -630,9 +633,12 @@ The inventory system uses a three-tier architecture for flexibility and easy bal
      - `equipment/` - Individual .ts files for each weapon, armor, and tool
      - `resources/` - Individual .ts files for each resource (wood, ore, fish, herbs, gemstones, ingots)
    - **Type-Safe Loading**: ItemService loads from ItemRegistry.ts with compile-time validation
-   - 40+ items total (expanded from 30):
+   - 68+ items total (expanded from 40):
      - Resources: logs, ore (copper, tin, iron, silver), fish, herbs, gemstones, ingots (bronze, iron)
-     - Equipment: weapons (copper_sword, iron_sword), armor, tools (axes, pickaxes, fishing rods)
+     - Equipment:
+       - Weapons: copper_sword, bronze_sword, iron_sword
+       - Armor: Bronze tier (helm, plate, gloves, boots), Iron tier (helm, plate, gloves, boots)
+       - Tools: Bronze/Iron axes, pickaxes, fishing rods
      - Consumables: cooked food, potions
    - Define base properties, allowed qualities, traits, equipment slots, and subtypes
    - All items include `icon` field with path and material for multi-channel colorization
@@ -1118,10 +1124,12 @@ Create items from ingredients with quality inheritance and instance selection.
 - **Time-based**: 6-12 second durations with auto-completion
 - **Auto-select best**: One-click highest quality ingredient selection
 - **Quality badges**: Common, Uncommon, Rare, Epic, Legendary
+- **Recipe filtering**: Search by name/description, show craftable only, sort by level/name/XP
+- **Auto-restart**: Toggle to automatically restart last completed recipe
 
 **Current Skills:**
 - Cooking (4 recipes: shrimp/trout/salmon/cod at kennik-kitchen)
-- Smithing (future: equipment from ore/wood/leather)
+- Smithing (16 recipes: ore smelting, bronze/iron equipment - weapons, armor, tools)
 - Alchemy (future: potions from herbs)
 
 **Configuration:**
