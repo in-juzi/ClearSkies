@@ -13,15 +13,15 @@ export const ActivityGatherNettle: ActivityUnion = {
   "duration": 40,
   "requirements": {
     "skills": {
-      "herbalism": 5
+      "gathering": 5
     }
   },
   "rewards": {
     "experience": {
-      "herbalism": 35
+      "gathering": 35
     },
     "dropTables": [
-      "herbalism-nettle"
+      "gathering-nettle"
     ]
   }
 } as const;

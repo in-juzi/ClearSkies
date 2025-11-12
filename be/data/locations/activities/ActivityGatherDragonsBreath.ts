@@ -13,15 +13,15 @@ export const ActivityGatherDragonsBreath: ActivityUnion = {
   "duration": 65,
   "requirements": {
     "skills": {
-      "herbalism": 15
+      "gathering": 15
     }
   },
   "rewards": {
     "experience": {
-      "herbalism": 75
+      "gathering": 75
     },
     "dropTables": [
-      "herbalism-dragons-breath"
+      "gathering-dragons-breath"
     ]
   }
 } as const;

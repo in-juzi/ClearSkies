@@ -5,8 +5,8 @@
 
 import { DropTable } from '../../../types/locations';
 
-export const HerbalismDragonsBreath: DropTable = {
-  "dropTableId": "herbalism-dragons-breath",
+export const GatheringDragonsBreath: DropTable = {
+  "dropTableId": "gathering-dragons-breath",
   "name": "Dragon's Breath Harvest",
   "description": "Fiery crimson flowers plucked from volcanic soil",
   "drops": [

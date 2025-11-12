@@ -14,12 +14,12 @@ import { CombatGoblinShaman } from './drop-tables/CombatGoblinShaman';
 import { CombatWolfBasic } from './drop-tables/CombatWolfBasic';
 import { FishingSalmon } from './drop-tables/FishingSalmon';
 import { FishingShrimp } from './drop-tables/FishingShrimp';
-import { HerbalismChamomile } from './drop-tables/HerbalismChamomile';
-import { HerbalismDragonsBreath } from './drop-tables/HerbalismDragonsBreath';
-import { HerbalismMandrake } from './drop-tables/HerbalismMandrake';
-import { HerbalismMoonpetal } from './drop-tables/HerbalismMoonpetal';
-import { HerbalismNettle } from './drop-tables/HerbalismNettle';
-import { HerbalismSage } from './drop-tables/HerbalismSage';
+import { GatheringChamomile } from './drop-tables/GatheringChamomile';
+import { GatheringDragonsBreath } from './drop-tables/GatheringDragonsBreath';
+import { GatheringMandrake } from './drop-tables/GatheringMandrake';
+import { GatheringMoonpetal } from './drop-tables/GatheringMoonpetal';
+import { GatheringNettle } from './drop-tables/GatheringNettle';
+import { GatheringSage } from './drop-tables/GatheringSage';
 import { MiningCopper } from './drop-tables/MiningCopper';
 import { MiningTin } from './drop-tables/MiningTin';
 import { RareFishing } from './drop-tables/RareFishing';
@@ -39,12 +39,12 @@ export class DropTableRegistry {
     [CombatWolfBasic.dropTableId, CombatWolfBasic],
     [FishingSalmon.dropTableId, FishingSalmon],
     [FishingShrimp.dropTableId, FishingShrimp],
-    [HerbalismChamomile.dropTableId, HerbalismChamomile],
-    [HerbalismDragonsBreath.dropTableId, HerbalismDragonsBreath],
-    [HerbalismMandrake.dropTableId, HerbalismMandrake],
-    [HerbalismMoonpetal.dropTableId, HerbalismMoonpetal],
-    [HerbalismNettle.dropTableId, HerbalismNettle],
-    [HerbalismSage.dropTableId, HerbalismSage],
+    [GatheringChamomile.dropTableId, GatheringChamomile],
+    [GatheringDragonsBreath.dropTableId, GatheringDragonsBreath],
+    [GatheringMandrake.dropTableId, GatheringMandrake],
+    [GatheringMoonpetal.dropTableId, GatheringMoonpetal],
+    [GatheringNettle.dropTableId, GatheringNettle],
+    [GatheringSage.dropTableId, GatheringSage],
     [MiningCopper.dropTableId, MiningCopper],
     [MiningTin.dropTableId, MiningTin],
     [RareFishing.dropTableId, RareFishing],

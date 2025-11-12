@@ -31,7 +31,7 @@ export const LeatherScraps: ResourceItem = {
   ],
   "allowedTraits": [],
   "icon": {
-    "path": "item-categories/item_cat_leather.svg",
+    "path": "items/folded-paper.svg",
     "material": "leather"
   }
 } as const;

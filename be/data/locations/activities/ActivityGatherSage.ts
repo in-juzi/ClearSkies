@@ -13,15 +13,15 @@ export const ActivityGatherSage: ActivityUnion = {
   "duration": 12,
   "requirements": {
     "skills": {
-      "herbalism": 3
+      "gathering": 3
     }
   },
   "rewards": {
     "experience": {
-      "herbalism": 25
+      "gathering": 25
     },
     "dropTables": [
-      "herbalism-sage"
+      "gathering-sage"
     ]
   }
 } as const;

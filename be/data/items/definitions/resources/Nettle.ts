@@ -22,7 +22,7 @@ export const Nettle: ResourceItem = {
     "weight": 0.15,
     "material": "herb",
     "tier": 2,
-    "skillSource": "herbalism"
+    "skillSource": "gathering"
   },
   "allowedQualities": [],
   "allowedTraits": [

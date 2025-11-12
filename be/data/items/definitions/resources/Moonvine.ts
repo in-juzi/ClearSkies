@@ -25,7 +25,7 @@ export const Moonvine: ResourceItem = {
     "weight": 0.1,
     "material": "herb",
     "tier": 4,
-    "skillSource": "herbalism"
+    "skillSource": "gathering"
   },
   "allowedQualities": [],
   "allowedTraits": [

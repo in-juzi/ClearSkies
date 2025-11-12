@@ -24,7 +24,7 @@ export const Passionflower: ResourceItem = {
     "weight": 0.15,
     "material": "herb",
     "tier": 3,
-    "skillSource": "herbalism"
+    "skillSource": "gathering"
   },
   "allowedQualities": [],
   "allowedTraits": [

@@ -24,7 +24,7 @@ export const TrumpetVine: ResourceItem = {
     "weight": 0.2,
     "material": "herb",
     "tier": 3,
-    "skillSource": "herbalism"
+    "skillSource": "gathering"
   },
   "allowedQualities": [],
   "allowedTraits": [

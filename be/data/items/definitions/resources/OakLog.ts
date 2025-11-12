@@ -11,6 +11,7 @@ export const OakLog: ResourceItem = {
   "description": "A sturdy oak log, useful for construction and crafting",
   "category": "resource",
   "subcategories": [
+    "log",
     "wood",
     "timber",
     "building-material"

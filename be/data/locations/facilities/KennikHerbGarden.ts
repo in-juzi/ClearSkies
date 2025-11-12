@@ -8,9 +8,9 @@ import { Facility } from '../../../types/locations';
 export const KennikHerbGarden: Facility = {
   "facilityId": "kennik-herb-garden",
   "name": "Herb Garden",
-  "description": "A peaceful garden filled with medicinal plants and fragrant herbs. Local healers tend to the plots, sharing their knowledge with aspiring herbalists.",
+  "description": "A peaceful garden filled with medicinal plants and fragrant herbs. Local healers tend to the plots, sharing their knowledge with aspiring gatherers.",
   "type": "resource-gathering",
-  "icon": "herbalism",
+  "icon": "gathering",
   "vendorIds": [
     "kennik-herb-garden-merchant"
   ],

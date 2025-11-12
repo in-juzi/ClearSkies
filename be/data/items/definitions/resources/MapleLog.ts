@@ -11,6 +11,7 @@ export const MapleLog: ResourceItem = {
   "description": "A fine maple log with beautiful grain patterns",
   "category": "resource",
   "subcategories": [
+    "log",
     "wood",
     "timber",
     "crafting-material"

@@ -5,8 +5,8 @@
 
 import { DropTable } from '../../../types/locations';
 
-export const HerbalismMandrake: DropTable = {
-  "dropTableId": "herbalism-mandrake",
+export const GatheringMandrake: DropTable = {
+  "dropTableId": "gathering-mandrake",
   "name": "Mandrake Root Harvest",
   "description": "Mystical mandrake roots unearthed with care",
   "drops": [

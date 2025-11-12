@@ -10,7 +10,7 @@ export const ForestHerbGrove: Facility = {
   "name": "Hidden Herb Grove",
   "description": "A secluded grove deep in the forest where rare herbs flourish in the dappled sunlight. The air is thick with the scent of medicinal plants.",
   "type": "resource-gathering",
-  "icon": "herbalism",
+  "icon": "gathering",
   "activities": [
     "activity-gather-nettle",
     "activity-gather-mandrake"

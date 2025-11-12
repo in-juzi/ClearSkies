@@ -23,7 +23,7 @@ export const MandrakeRoot: ResourceItem = {
     "weight": 0.3,
     "material": "herb",
     "tier": 2,
-    "skillSource": "herbalism"
+    "skillSource": "gathering"
   },
   "allowedQualities": [],
   "allowedTraits": [

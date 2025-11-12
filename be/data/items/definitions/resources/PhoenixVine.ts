@@ -25,7 +25,7 @@ export const PhoenixVine: ResourceItem = {
     "weight": 0.2,
     "material": "herb",
     "tier": 4,
-    "skillSource": "herbalism"
+    "skillSource": "gathering"
   },
   "allowedQualities": [],
   "allowedTraits": [

@@ -11,6 +11,7 @@ export const WillowLog: ResourceItem = {
   "description": "A flexible willow log, prized for its magical properties",
   "category": "resource",
   "subcategories": [
+    "log",
     "wood",
     "timber",
     "magical"

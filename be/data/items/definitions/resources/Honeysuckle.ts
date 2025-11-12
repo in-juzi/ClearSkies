@@ -24,7 +24,7 @@ export const Honeysuckle: ResourceItem = {
     "weight": 0.1,
     "material": "herb",
     "tier": 2,
-    "skillSource": "herbalism"
+    "skillSource": "gathering"
   },
   "allowedQualities": [],
   "allowedTraits": [

@@ -5,8 +5,8 @@
 
 import { DropTable } from '../../../types/locations';
 
-export const HerbalismMoonpetal: DropTable = {
-  "dropTableId": "herbalism-moonpetal",
+export const GatheringMoonpetal: DropTable = {
+  "dropTableId": "gathering-moonpetal",
   "name": "Moonpetal Harvest",
   "description": "Luminescent moonpetals collected under starlight",
   "drops": [

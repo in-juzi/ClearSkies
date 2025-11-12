@@ -5,8 +5,8 @@
 
 import { DropTable } from '../../../types/locations';
 
-export const HerbalismChamomile: DropTable = {
-  "dropTableId": "herbalism-chamomile",
+export const GatheringChamomile: DropTable = {
+  "dropTableId": "gathering-chamomile",
   "name": "Chamomile Harvest",
   "description": "Delicate chamomile flowers gathered from meadows",
   "drops": [

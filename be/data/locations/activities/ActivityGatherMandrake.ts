@@ -13,15 +13,15 @@ export const ActivityGatherMandrake: ActivityUnion = {
   "duration": 50,
   "requirements": {
     "skills": {
-      "herbalism": 8
+      "gathering": 8
     }
   },
   "rewards": {
     "experience": {
-      "herbalism": 45
+      "gathering": 45
     },
     "dropTables": [
-      "herbalism-mandrake"
+      "gathering-mandrake"
     ]
   }
 } as const;

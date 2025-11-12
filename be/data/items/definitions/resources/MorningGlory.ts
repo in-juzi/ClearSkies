@@ -23,7 +23,7 @@ export const MorningGlory: ResourceItem = {
     "weight": 0.1,
     "material": "herb",
     "tier": 1,
-    "skillSource": "herbalism"
+    "skillSource": "gathering"
   },
   "allowedQualities": [],
   "allowedTraits": [

@@ -24,7 +24,7 @@ export const Moonpetal: ResourceItem = {
     "weight": 0.1,
     "material": "herb",
     "tier": 3,
-    "skillSource": "herbalism"
+    "skillSource": "gathering"
   },
   "allowedQualities": [],
   "allowedTraits": [
