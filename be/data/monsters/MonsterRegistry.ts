@@ -10,6 +10,8 @@ import { Monster } from '../../types/combat';
 import { BanditThug } from './definitions/BanditThug';
 import { ForestWolf } from './definitions/ForestWolf';
 import { GoblinWarrior } from './definitions/GoblinWarrior';
+import { GoblinScout } from './definitions/GoblinScout';
+import { GoblinShaman } from './definitions/GoblinShaman';
 
 /**
  * Central registry for all monsters
@@ -19,6 +21,8 @@ export class MonsterRegistry {
     [BanditThug.monsterId, BanditThug],
     [ForestWolf.monsterId, ForestWolf],
     [GoblinWarrior.monsterId, GoblinWarrior],
+    [GoblinScout.monsterId, GoblinScout],
+    [GoblinShaman.monsterId, GoblinShaman],
   ]);
 
   /**

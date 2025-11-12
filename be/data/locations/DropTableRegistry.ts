@@ -9,6 +9,8 @@ import { DropTable } from '../../types/locations';
 
 import { CombatBanditBasic } from './drop-tables/CombatBanditBasic';
 import { CombatGoblinBasic } from './drop-tables/CombatGoblinBasic';
+import { CombatGoblinScout } from './drop-tables/CombatGoblinScout';
+import { CombatGoblinShaman } from './drop-tables/CombatGoblinShaman';
 import { CombatWolfBasic } from './drop-tables/CombatWolfBasic';
 import { FishingSalmon } from './drop-tables/FishingSalmon';
 import { FishingShrimp } from './drop-tables/FishingShrimp';
@@ -32,6 +34,8 @@ export class DropTableRegistry {
   private static readonly items = new Map<string, DropTable>([
     [CombatBanditBasic.dropTableId, CombatBanditBasic],
     [CombatGoblinBasic.dropTableId, CombatGoblinBasic],
+    [CombatGoblinScout.dropTableId, CombatGoblinScout],
+    [CombatGoblinShaman.dropTableId, CombatGoblinShaman],
     [CombatWolfBasic.dropTableId, CombatWolfBasic],
     [FishingSalmon.dropTableId, FishingSalmon],
     [FishingShrimp.dropTableId, FishingShrimp],
