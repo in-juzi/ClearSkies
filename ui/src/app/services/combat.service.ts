@@ -91,13 +91,10 @@ export class CombatService {
    * Start combat with a monster
    */
   startCombat(monsterId: string, activityId?: string): Observable<any> {
-    console.log('[CombatService] Starting combat with monster:', monsterId, 'activityId:', activityId);
     return this.http.post<any>(`${this.apiUrl}/start`, { monsterId, activityId }).pipe(
       tap(response => {
-        console.log('[CombatService] Combat start response:', response);
         if (response.combat) {
           this.setCombatState(response.combat);
-          console.log('[CombatService] Combat state set. inCombat:', this.inCombat(), 'activeCombat:', this.activeCombat());
           this.combatError.set(null);
         } else {
           console.warn('[CombatService] No combat data in response');
@@ -146,16 +143,12 @@ export class CombatService {
   getCombatStatus(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/status`).pipe(
       tap(response => {
-        console.log('[CombatService] Combat status response:', response);
         if (response.inCombat && response.combat) {
-          console.log('[CombatService] Restoring combat state');
           this.setCombatState(response.combat);
         } else {
           if (response.rewards) {
-            console.log('[CombatService] Combat ended with rewards');
             this.handleCombatEnd(response.rewards);
           } else {
-            console.log('[CombatService] No active combat');
             this.stopStatusChecks();
           }
         }
@@ -242,7 +235,6 @@ export class CombatService {
    * Handle combat end and rewards
    */
   private handleCombatEnd(rewards: CombatRewards): void {
-    console.log('[CombatService] Handling combat end with rewards:', rewards);
     // Stop status checks immediately to prevent clearing combat state
     this.stopStatusChecks();
 
@@ -329,10 +321,8 @@ export class CombatService {
    * Restart combat with the same activity
    */
   restartCombat(): Observable<any> {
-    console.log('[CombatService] Restarting combat');
     return this.http.post<any>(`${this.apiUrl}/restart`, {}).pipe(
       tap(response => {
-        console.log('[CombatService] Combat restart response:', response);
         if (response.combat) {
           this.setCombatState(response.combat);
           this.combatEnded.set(false);
@@ -368,7 +358,6 @@ export class CombatService {
    * Stop periodic status checks
    */
   private stopStatusChecks(): void {
-    console.log('[CombatService] Stopping status checks');
     if (this.statusCheckInterval) {
       clearInterval(this.statusCheckInterval);
       this.statusCheckInterval = null;
