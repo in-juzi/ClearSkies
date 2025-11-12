@@ -13,6 +13,9 @@ router.get('/', inventoryController.getInventory);
 // Get single item from inventory
 router.get('/items/:instanceId', inventoryController.getItem);
 
+// Get scaled combat stats for an item
+router.get('/items/:instanceId/combat-stats', inventoryController.getItemCombatStats);
+
 // Add item to inventory
 router.post('/items', inventoryController.addItem);
 

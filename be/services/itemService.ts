@@ -577,7 +577,7 @@ class ItemService {
   /**
    * Randomly select N qualities from the allowed qualities array
    */
-  private _selectRandomQualities(allowedQualities: string[], count: number): string[] {
+  private _selectRandomQualities(allowedQualities: readonly string[], count: number): string[] {
     if (count >= allowedQualities.length) {
       return [...allowedQualities]; // Return all if count >= allowed
     }

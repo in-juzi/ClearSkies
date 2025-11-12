@@ -125,9 +125,23 @@ class LocationService {
     const facility = this.facilities.get(facilityId);
     if (!facility) return null;
 
-    const activities = facility.activities.map(activityId =>
-      this.activities.get(activityId)
-    ).filter(a => a);
+    const activities = facility.activities.map(activityId => {
+      const activity = this.activities.get(activityId);
+      if (!activity) return null;
+
+      // For combat activities, include monster level information
+      if (activity.type === 'combat' && (activity as any).combatConfig?.monsterId) {
+        const monsterService = require('./combatService').default;
+        const monster = monsterService.getMonster((activity as any).combatConfig.monsterId);
+
+        return {
+          ...activity,
+          monsterLevel: monster?.level
+        };
+      }
+
+      return activity;
+    }).filter(a => a);
 
     return {
       ...facility,
@@ -168,7 +182,6 @@ class LocationService {
     if (activity.requirements.skills) {
       for (const [skillName, requiredLevel] of Object.entries(activity.requirements.skills)) {
         const playerSkill = player.skills?.[skillName];
-        console.log(`[Activity Req Check] Skill ${skillName}: Required=${requiredLevel}, Player has=${playerSkill?.level || 'none'}`);
         if (!playerSkill || playerSkill.level < requiredLevel) {
           failures.push(`Requires ${skillName} level ${requiredLevel}`);
         }
@@ -179,7 +192,6 @@ class LocationService {
     if (activity.requirements.attributes) {
       for (const [attrName, requiredLevel] of Object.entries(activity.requirements.attributes)) {
         const playerAttr = player.attributes?.[attrName];
-        console.log(`[Activity Req Check] Attribute ${attrName}: Required=${requiredLevel}, Player has=${playerAttr?.level || 'none'}`);
         if (!playerAttr || playerAttr.level < requiredLevel) {
           failures.push(`Requires ${attrName} level ${requiredLevel}`);
         }
@@ -192,7 +204,6 @@ class LocationService {
       for (const equippedReq of activity.requirements.equipped) {
         const { subtype } = equippedReq;
         const hasEquipped = player.hasEquippedSubtype(subtype, itemService);
-        console.log(`[Activity Req Check] Equipped ${subtype}: Player has=${hasEquipped}`);
         if (!hasEquipped) {
           failures.push(`Requires ${subtype} equipped`);
         }
@@ -204,7 +215,6 @@ class LocationService {
       for (const invReq of activity.requirements.inventory) {
         const { itemId, quantity = 1 } = invReq;
         const hasItem = player.hasInventoryItem(itemId, quantity);
-        console.log(`[Activity Req Check] Inventory ${itemId} (${quantity}x): Player has=${hasItem}`);
         if (!hasItem) {
           const itemService = require('./itemService');
           const itemDef = itemService.getItemDefinition(itemId);

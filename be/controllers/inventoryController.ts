@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import Player from '../models/Player';
 import itemService from '../services/itemService';
 import { QualityMap, TraitMap, ItemCategory, ConsumableItem } from '../types';
+import { isWeaponItem } from '../types/guards';
 
 // ============================================================================
 // Type Definitions for Request Bodies
@@ -234,6 +235,124 @@ export const getItem = async (req: Request<{ instanceId: string }>, res: Respons
   } catch (error) {
     console.error('Get item error:', error);
     res.status(500).json({ message: 'Error fetching item', error: (error as Error).message });
+  }
+};
+
+/**
+ * Get scaled combat stats for a weapon
+ * Calculates actual combat stats based on player's current levels
+ */
+export const getItemCombatStats = async (req: Request<{ instanceId: string }>, res: Response): Promise<void> => {
+  try {
+    const { instanceId } = req.params;
+
+    const player = await Player.findOne({ userId: req.user._id });
+    if (!player) {
+      res.status(404).json({ message: 'Player not found' });
+      return;
+    }
+
+    const item = player.getItem(instanceId);
+    if (!item) {
+      res.status(404).json({ message: 'Item not found in inventory' });
+      return;
+    }
+
+    const itemDef = itemService.getItemDefinition(item.itemId);
+    if (!itemDef) {
+      res.status(404).json({ message: 'Item definition not found' });
+      return;
+    }
+
+    // Only calculate for weapons
+    if (!isWeaponItem(itemDef)) {
+      res.status(400).json({ message: 'Item is not a weapon' });
+      return;
+    }
+
+    // Get the weapon stats
+    const skillScalar = itemDef.properties.skillScalar;
+    const skill = (player.skills as any)[skillScalar];
+    const skillLevel = skill ? skill.level : 1;
+
+    const mainAttr = skill ? skill.mainAttribute : 'strength';
+    const attribute = (player.attributes as any)[mainAttr];
+    const attrLevel = attribute ? attribute.level : 1;
+
+    // Calculate level bonuses (same as combat service)
+    const skillBonus = Math.min(2, Math.floor(skillLevel / 10));
+    const attrBonus = Math.min(2, Math.floor(attrLevel / 10));
+    const totalLevelBonus = skillBonus + attrBonus;
+
+    // Parse damage roll to get min/max
+    const damageRoll = itemDef.properties.damageRoll;
+    const match = damageRoll.match(/^(\d+)d(\d+)([+-]\d+)?$/);
+
+    if (!match) {
+      res.status(400).json({ message: 'Invalid damage roll format' });
+      return;
+    }
+
+    const numDice = parseInt(match[1]);
+    const numFaces = parseInt(match[2]);
+    const modifier = match[3] ? parseInt(match[3]) : 0;
+
+    // Calculate damage ranges
+    const minBaseDamage = numDice + modifier;
+    const maxBaseDamage = (numDice * numFaces) + modifier;
+    const avgBaseDamage = (numDice * (numFaces + 1) / 2) + modifier;
+
+    const minScaledDamage = Math.max(1, minBaseDamage + totalLevelBonus);
+    const maxScaledDamage = maxBaseDamage + totalLevelBonus;
+    const avgScaledDamage = avgBaseDamage + totalLevelBonus;
+
+    // Get crit chance (base + passive bonuses)
+    let critChance = itemDef.properties.critChance || 0.05;
+    // TODO: Add passive abilities support when implemented
+    // if (player.passiveAbilities) {
+    //   for (const ability of player.passiveAbilities) {
+    //     if (ability.effects && ability.effects.critChanceBonus) {
+    //       critChance += ability.effects.critChanceBonus;
+    //     }
+    //   }
+    // }
+
+    // Format scaled damage roll notation (e.g., "1d6+3")
+    const scaledDamageRoll = totalLevelBonus > 0
+      ? `${damageRoll}+${totalLevelBonus}`
+      : totalLevelBonus < 0
+        ? `${damageRoll}${totalLevelBonus}`
+        : damageRoll;
+
+    res.json({
+      success: true,
+      stats: {
+        // Base stats
+        baseDamageRoll: damageRoll,
+        baseDamageRange: `${minBaseDamage}-${maxBaseDamage}`,
+        avgBaseDamage: avgBaseDamage.toFixed(1),
+
+        // Scaled stats
+        scaledDamageRoll: scaledDamageRoll,
+        scaledDamageRange: `${minScaledDamage}-${maxScaledDamage}`,
+        avgScaledDamage: avgScaledDamage.toFixed(1),
+
+        // Other combat stats
+        attackSpeed: itemDef.properties.attackSpeed || 3.0,
+        critChance: critChance,
+
+        // Level breakdown
+        skillLevel,
+        skillBonus,
+        attrLevel,
+        attrBonus,
+        totalLevelBonus,
+        skillScalar
+      }
+    });
+  } catch (error) {
+    console.error('Error calculating combat stats:', error);
+    res.status(500).json({ message: 'Server error calculating combat stats', error: (error as Error).message });
   }
 };
 

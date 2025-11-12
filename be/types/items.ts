@@ -22,15 +22,15 @@ export interface Item {
   name: string;
   description: string;
   category: ItemCategory;
-  subcategories: string[];
+  subcategories: readonly string[];
   baseValue: number;
   rarity: Rarity;
   stackable: boolean;
   maxStack?: number;
   icon: IconConfig;
   properties: ItemProperties;
-  allowedQualities: string[];
-  allowedTraits: string[];
+  allowedQualities: readonly string[];
+  allowedTraits: readonly string[];
 }
 
 /**
