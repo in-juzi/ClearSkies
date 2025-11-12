@@ -289,6 +289,12 @@ export class CraftingComponent implements OnInit {
    * Select a recipe to view details
    */
   selectRecipe(recipe: Recipe): void {
+    // Don't allow selecting locked recipes
+    if (this.isRecipeLocked(recipe)) {
+      this.showMessage('This recipe is locked: ' + this.getUnlockHint(recipe), 'info');
+      return;
+    }
+
     this.selectedRecipe.set(recipe);
     this.message.set(null);
     // Auto-select best quality ingredients
@@ -405,6 +411,24 @@ export class CraftingComponent implements OnInit {
   }
 
   /**
+   * Get lookupKey for an ingredient (itemId or subcategory)
+   */
+  getIngredientLookupKey(ingredient: any): string {
+    return ingredient.itemId || ingredient.subcategory || '';
+  }
+
+  /**
+   * Get display label for an ingredient
+   */
+  getIngredientLabel(ingredient: any): string {
+    if (ingredient.subcategory) {
+      // Capitalize first letter for display
+      return ingredient.subcategory.charAt(0).toUpperCase() + ingredient.subcategory.slice(1);
+    }
+    return ingredient.itemId || 'Unknown';
+  }
+
+  /**
    * Get ingredient availability display
    */
   getIngredientDisplay(itemId: string, required: number): string {
@@ -414,6 +438,29 @@ export class CraftingComponent implements OnInit {
     const available = inventory
       .filter(item => item.itemId === itemId)
       .reduce((sum, item) => sum + item.quantity, 0);
+
+    return `${available}/${required}`;
+  }
+
+  /**
+   * Get ingredient availability display (supports subcategory)
+   */
+  getIngredientDisplayByLookupKey(lookupKey: string, ingredient: any, required: number): string {
+    const inventory = this.playerInventory();
+    if (!inventory) return `0/${required}`;
+
+    let available = 0;
+    if (ingredient.subcategory) {
+      // Count items matching subcategory
+      available = inventory
+        .filter(item => !item.equipped && item.definition?.subcategories?.includes(ingredient.subcategory))
+        .reduce((sum, item) => sum + item.quantity, 0);
+    } else {
+      // Count specific itemId
+      available = inventory
+        .filter(item => item.itemId === lookupKey)
+        .reduce((sum, item) => sum + item.quantity, 0);
+    }
 
     return `${available}/${required}`;
   }
@@ -433,6 +480,29 @@ export class CraftingComponent implements OnInit {
   }
 
   /**
+   * Check if player has enough of an ingredient (supports subcategory)
+   */
+  hasEnoughIngredientByLookupKey(lookupKey: string, ingredient: any, required: number): boolean {
+    const inventory = this.playerInventory();
+    if (!inventory) return false;
+
+    let available = 0;
+    if (ingredient.subcategory) {
+      // Count items matching subcategory
+      available = inventory
+        .filter(item => !item.equipped && item.definition?.subcategories?.includes(ingredient.subcategory))
+        .reduce((sum, item) => sum + item.quantity, 0);
+    } else {
+      // Count specific itemId
+      available = inventory
+        .filter(item => item.itemId === lookupKey)
+        .reduce((sum, item) => sum + item.quantity, 0);
+    }
+
+    return available >= required;
+  }
+
+  /**
    * Get available instances of an ingredient
    */
   getAvailableInstances(itemId: string): any[] {
@@ -447,6 +517,36 @@ export class CraftingComponent implements OnInit {
         const bQuality = this.getQualityScore(b);
         return bQuality - aQuality;
       });
+  }
+
+  /**
+   * Get available instances for an ingredient (supports subcategory)
+   */
+  getAvailableInstancesByIngredient(ingredient: any): any[] {
+    const inventory = this.playerInventory();
+    if (!inventory) return [];
+
+    let items: any[];
+    console.log(inventory)
+    if (ingredient.subcategory) {
+      console.log('Filtering by subcategory:', ingredient.subcategory);
+      // Filter by subcategory
+      items = inventory.filter(item =>
+        !item.equipped && item.definition?.subcategories?.includes(ingredient.subcategory)
+      );
+    } else {
+      // Filter by specific itemId
+      items = inventory.filter(item =>
+        item.itemId === ingredient.itemId && !item.equipped
+      );
+    }
+
+    // Sort by quality score (higher quality first)
+    return items.sort((a, b) => {
+      const aQuality = this.getQualityScore(a);
+      const bQuality = this.getQualityScore(b);
+      return bQuality - aQuality;
+    });
   }
 
   /**
@@ -473,35 +573,43 @@ export class CraftingComponent implements OnInit {
   /**
    * Toggle instance selection
    */
-  toggleInstanceSelection(itemId: string, instanceId: string, maxQuantity: number, required: number): void {
+  toggleInstanceSelection(lookupKey: string, instanceId: string, maxQuantity: number, required: number): void {
     const selected = new Map(this.selectedIngredients());
-    const instanceIds = selected.get(itemId) || [];
+    const instanceIds = selected.get(lookupKey) || [];
 
     // Count how many of this instance are already selected
     const currentCount = instanceIds.filter(id => id === instanceId).length;
 
-    // Count total selected for this itemId
+    // Count total selected for this lookupKey
     const totalSelected = instanceIds.length;
 
-    if (currentCount > 0) {
-      // Remove one instance
-      const index = instanceIds.indexOf(instanceId);
-      if (index > -1) {
-        instanceIds.splice(index, 1);
-      }
+    // Left click adds, right-click or shift-click would remove
+    // For now, we cycle: 0 -> 1 -> 2 -> ... -> maxQuantity -> 0
+    if (currentCount >= maxQuantity || (currentCount > 0 && totalSelected >= required)) {
+      // At max for this instance OR at required total, remove all of this instance
+      const filtered = instanceIds.filter(id => id !== instanceId);
+      selected.set(lookupKey, filtered);
     } else {
-      // Add one instance
+      // Add one more instance
       if (totalSelected < required) {
         // Room available, just add
         instanceIds.push(instanceId);
+        selected.set(lookupKey, instanceIds);
       } else {
-        // Already at capacity, replace the first (oldest) selection
-        instanceIds.shift();
-        instanceIds.push(instanceId);
+        // At capacity but can replace oldest different instance
+        // Find the first instance that's not this one
+        const indexToReplace = instanceIds.findIndex(id => id !== instanceId);
+        if (indexToReplace > -1) {
+          instanceIds.splice(indexToReplace, 1);
+          instanceIds.push(instanceId);
+          selected.set(lookupKey, instanceIds);
+        } else {
+          // All selected are this instance already at max, cycle back to 0
+          selected.set(lookupKey, []);
+        }
       }
     }
 
-    selected.set(itemId, instanceIds);
     this.selectedIngredients.set(selected);
   }
 
@@ -515,11 +623,21 @@ export class CraftingComponent implements OnInit {
   }
 
   /**
+   * Get total selected count for an ingredient by lookupKey
+   */
+  getTotalSelectedByLookupKey(lookupKey: string): number {
+    const selected = this.selectedIngredients();
+    const instanceIds = selected.get(lookupKey) || [];
+    return instanceIds.length;
+  }
+
+  /**
    * Check if we have selected enough ingredients
    */
   hasSelectedEnough(recipe: Recipe): boolean {
     for (const ingredient of recipe.ingredients) {
-      const selected = this.getTotalSelected(ingredient.itemId);
+      const lookupKey = this.getIngredientLookupKey(ingredient);
+      const selected = this.getTotalSelectedByLookupKey(lookupKey);
       if (selected < ingredient.quantity) {
         return false;
       }
@@ -544,7 +662,8 @@ export class CraftingComponent implements OnInit {
 
     // Try to reuse the same instances for each ingredient
     for (const ingredient of recipe.ingredients) {
-      const previousInstanceIds = currentSelection.get(ingredient.itemId) || [];
+      const lookupKey = this.getIngredientLookupKey(ingredient);
+      const previousInstanceIds = currentSelection.get(lookupKey) || [];
       const instanceIds: string[] = [];
       let remaining = ingredient.quantity;
 
@@ -561,6 +680,17 @@ export class CraftingComponent implements OnInit {
         // Find this instance in current inventory
         const item = inventory.find(i => i.instanceId === instanceId && !i.equipped);
         if (item) {
+          // Validate it matches the ingredient requirement
+          if (ingredient.subcategory) {
+            if (!item.definition?.subcategories?.includes(ingredient.subcategory)) {
+              continue; // Skip items that don't match subcategory
+            }
+          } else {
+            if (item.itemId !== ingredient.itemId) {
+              continue; // Skip items with different itemId
+            }
+          }
+
           // Use as many as we need and as many as are available
           const available = Math.min(item.quantity, remaining, prevCount);
           for (let i = 0; i < available; i++) {
@@ -575,7 +705,7 @@ export class CraftingComponent implements OnInit {
         return false;
       }
 
-      newSelection.set(ingredient.itemId, instanceIds);
+      newSelection.set(lookupKey, instanceIds);
     }
 
     // Successfully reused all instances
@@ -590,7 +720,8 @@ export class CraftingComponent implements OnInit {
     const selected = new Map<string, string[]>();
 
     for (const ingredient of recipe.ingredients) {
-      const instances = this.getAvailableInstances(ingredient.itemId);
+      const lookupKey = this.getIngredientLookupKey(ingredient);
+      const instances = this.getAvailableInstancesByIngredient(ingredient);
       const instanceIds: string[] = [];
 
       let remaining = ingredient.quantity;
@@ -604,7 +735,7 @@ export class CraftingComponent implements OnInit {
         remaining -= available;
       }
 
-      selected.set(ingredient.itemId, instanceIds);
+      selected.set(lookupKey, instanceIds);
     }
 
     this.selectedIngredients.set(selected);
@@ -678,5 +809,52 @@ export class CraftingComponent implements OnInit {
    */
   hasActiveFilters(): boolean {
     return this.searchQuery() !== '' || this.showCraftableOnly() || this.sortBy() !== 'level';
+  }
+
+  /**
+   * Check if a recipe is locked
+   */
+  isRecipeLocked(recipe: Recipe): boolean {
+    // If no unlock conditions, it's unlocked by default
+    if (!recipe.unlockConditions) return false;
+
+    // If discoveredByDefault is explicitly false, check if player has unlocked it
+    if (recipe.unlockConditions.discoveredByDefault === false) {
+      const player = this.authService.currentPlayer();
+      if (!player || !player.unlockedRecipes) return true;
+      return !player.unlockedRecipes.includes(recipe.recipeId);
+    }
+
+    // Otherwise it's unlocked by default
+    return false;
+  }
+
+  /**
+   * Get unlock hint for a locked recipe
+   */
+  getUnlockHint(recipe: Recipe): string {
+    if (!recipe.unlockConditions) return '';
+
+    const hints: string[] = [];
+
+    if (recipe.unlockConditions.requiredRecipes && recipe.unlockConditions.requiredRecipes.length > 0) {
+      const requiredNames = recipe.unlockConditions.requiredRecipes
+        .map(recipeId => {
+          const req = this.recipeService.getRecipe(recipeId);
+          return req ? req.name : recipeId;
+        })
+        .join(', ');
+      hints.push(`Craft: ${requiredNames}`);
+    }
+
+    if (recipe.unlockConditions.requiredItems && recipe.unlockConditions.requiredItems.length > 0) {
+      hints.push(`Requires: ${recipe.unlockConditions.requiredItems.join(', ')}`);
+    }
+
+    if (recipe.unlockConditions.questRequired) {
+      hints.push(`Complete quest: ${recipe.unlockConditions.questRequired}`);
+    }
+
+    return hints.length > 0 ? hints.join(' | ') : 'Unlock through progression';
   }
 }

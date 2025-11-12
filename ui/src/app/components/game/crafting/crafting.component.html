@@ -185,20 +185,30 @@
         <div class="recipe-list">
           @for (recipe of filteredRecipes(); track recipe.recipeId) {
             <div class="recipe-card"
-                 (click)="selectRecipe(recipe)"
-                 [class.can-craft]="canCraft(recipe).canCraft"
-                 [class.cannot-craft]="!canCraft(recipe).canCraft">
+                 (click)="!isRecipeLocked(recipe) && selectRecipe(recipe)"
+                 [class.can-craft]="!isRecipeLocked(recipe) && canCraft(recipe).canCraft"
+                 [class.cannot-craft]="!isRecipeLocked(recipe) && !canCraft(recipe).canCraft"
+                 [class.locked]="isRecipeLocked(recipe)"
+                 [title]="isRecipeLocked(recipe) ? getUnlockHint(recipe) : ''">
               <div class="recipe-header">
-                <div class="recipe-name">{{ recipe.name }}</div>
+                <div class="recipe-name">
+                  @if (isRecipeLocked(recipe)) {
+                    <span class="lock-icon">🔒</span>
+                  }
+                  {{ recipe.name }}
+                </div>
                 <div class="recipe-level">Lvl {{ recipe.requiredLevel }}</div>
               </div>
               <div class="recipe-description">{{ recipe.description }}</div>
+              @if (isRecipeLocked(recipe)) {
+                <div class="unlock-hint">{{ getUnlockHint(recipe) }}</div>
+              }
               <div class="recipe-ingredients">
-                @for (ingredient of recipe.ingredients; track ingredient.itemId) {
+                @for (ingredient of recipe.ingredients; track getIngredientLookupKey(ingredient)) {
                   <span class="ingredient"
-                        [class.has-enough]="hasEnoughIngredient(ingredient.itemId, ingredient.quantity)"
-                        [class.not-enough]="!hasEnoughIngredient(ingredient.itemId, ingredient.quantity)">
-                    {{ ingredient.itemId }} ({{ getIngredientDisplay(ingredient.itemId, ingredient.quantity) }})
+                        [class.has-enough]="hasEnoughIngredientByLookupKey(getIngredientLookupKey(ingredient), ingredient, ingredient.quantity)"
+                        [class.not-enough]="!hasEnoughIngredientByLookupKey(getIngredientLookupKey(ingredient), ingredient, ingredient.quantity)">
+                    {{ getIngredientLabel(ingredient) }} ({{ getIngredientDisplayByLookupKey(getIngredientLookupKey(ingredient), ingredient, ingredient.quantity) }})
                   </span>
                 }
               </div>
@@ -232,19 +242,19 @@
       <div class="ingredients-section">
         <h3>Required Ingredients</h3>
 
-        @for (ingredient of selectedRecipe()!.ingredients; track ingredient.itemId) {
+        @for (ingredient of selectedRecipe()!.ingredients; track getIngredientLookupKey(ingredient)) {
           <div class="ingredient-group">
             <div class="ingredient-header">
-              <span class="ingredient-name">{{ ingredient.itemId }}</span>
+              <span class="ingredient-name">{{ getIngredientLabel(ingredient) }}</span>
               <span class="ingredient-selection-count">
-                Selected: {{ getTotalSelected(ingredient.itemId) }} / {{ ingredient.quantity }}
+                Selected: {{ getTotalSelectedByLookupKey(getIngredientLookupKey(ingredient)) }} / {{ ingredient.quantity }}
               </span>
             </div>
 
             <div class="instance-list">
-              @for (instance of getAvailableInstances(ingredient.itemId); track instance.instanceId) {
+              @for (instance of getAvailableInstancesByIngredient(ingredient); track instance.instanceId) {
                 <div class="instance-card"
-                     (click)="toggleInstanceSelection(ingredient.itemId, instance.instanceId, instance.quantity, ingredient.quantity)"
+                     (click)="toggleInstanceSelection(getIngredientLookupKey(ingredient), instance.instanceId, instance.quantity, ingredient.quantity)"
                      [class.selected]="getSelectedQuantity(instance.instanceId) > 0"
                      [class.fully-selected]="getSelectedQuantity(instance.instanceId) === instance.quantity">
                   <div class="instance-info">
@@ -276,9 +286,9 @@
                 </div>
               }
 
-              @if (getAvailableInstances(ingredient.itemId).length === 0) {
+              @if (getAvailableInstancesByIngredient(ingredient).length === 0) {
                 <div class="no-instances">
-                  No {{ ingredient.itemId }} available
+                  No {{ getIngredientLabel(ingredient) }} available
                 </div>
               }
             </div>

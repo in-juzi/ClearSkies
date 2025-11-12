@@ -64,14 +64,28 @@ export class RecipeService {
 
     // Check ingredients
     for (const ingredient of recipe.ingredients) {
-      const totalQuantity = playerInventory
-        .filter(item => item.itemId === ingredient.itemId)
-        .reduce((sum, item) => sum + item.quantity, 0);
+      let totalQuantity = 0;
+      let ingredientName = '';
+
+      if (ingredient.itemId) {
+        // Specific item requirement
+        totalQuantity = playerInventory
+          .filter(item => item.itemId === ingredient.itemId)
+          .reduce((sum, item) => sum + item.quantity, 0);
+        ingredientName = ingredient.itemId;
+      } else if (ingredient.subcategory) {
+        // Subcategory requirement (e.g., "any herb")
+        totalQuantity = playerInventory
+          .filter(item => item.definition?.subcategories?.includes(ingredient.subcategory))
+          .reduce((sum, item) => sum + item.quantity, 0);
+        // Capitalize first letter for display
+        ingredientName = ingredient.subcategory.charAt(0).toUpperCase() + ingredient.subcategory.slice(1);
+      }
 
       if (totalQuantity < ingredient.quantity) {
         return {
           canCraft: false,
-          message: `Requires ${ingredient.quantity}x ${ingredient.itemId} (have ${totalQuantity})`
+          message: `Requires ${ingredient.quantity}x ${ingredientName} (have ${totalQuantity})`
         };
       }
     }

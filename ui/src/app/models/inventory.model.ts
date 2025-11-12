@@ -85,6 +85,7 @@ export interface ItemInstance {
 
 export interface ItemDetails extends ItemInstance {
   definition: ItemDefinition;
+  subcategories?: string[]; // Convenience property from definition
   vendorPrice: number;
   qualityDetails: {
     [qualityId: string]: {

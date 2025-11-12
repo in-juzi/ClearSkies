@@ -1,6 +1,14 @@
 export interface Ingredient {
-  itemId: string;
+  itemId?: string;        // Specific item requirement
+  subcategory?: string;   // OR subcategory match (e.g., "herb", "flower")
   quantity: number;
+}
+
+export interface RecipeUnlockConditions {
+  discoveredByDefault?: boolean;
+  requiredRecipes?: string[];
+  requiredItems?: string[];
+  questRequired?: string;
 }
 
 export interface RecipeOutput {
@@ -20,6 +28,7 @@ export interface Recipe {
   output?: RecipeOutput; // Legacy single output (deprecated)
   outputs?: RecipeOutput[]; // New multi-output schema
   experience: number;
+  unlockConditions?: RecipeUnlockConditions;
 }
 
 export interface ActiveCrafting {

@@ -22,6 +22,7 @@ export interface Player {
     startTime: Date;
     endTime: Date;
   };
+  unlockedRecipes?: string[];
   lastPlayed: Date;
 }
 
@@ -65,9 +66,10 @@ export interface PlayerSkills {
   woodcutting: Skill;
   mining: Skill;
   fishing: Skill;
+  gathering: Skill;  // Renamed from herbalism
   smithing: Skill;
   cooking: Skill;
-  herbalism: Skill;
+  alchemy: Skill;    // NEW: Potion/reagent crafting
   // Combat skills
   oneHanded: Skill;
   dualWield: Skill;
@@ -98,9 +100,10 @@ export interface SkillsResponse {
       woodcutting: SkillWithProgress;
       mining: SkillWithProgress;
       fishing: SkillWithProgress;
+      gathering: SkillWithProgress;  // Renamed from herbalism
       smithing: SkillWithProgress;
       cooking: SkillWithProgress;
-      herbalism: SkillWithProgress;
+      alchemy: SkillWithProgress;    // NEW
       // Combat skills
       oneHanded: SkillWithProgress;
       dualWield: SkillWithProgress;
@@ -138,7 +141,7 @@ export interface SkillExperienceResponse {
   };
 }
 
-export type SkillName = 'woodcutting' | 'mining' | 'fishing' | 'smithing' | 'cooking' | 'herbalism' | 'oneHanded' | 'dualWield' | 'twoHanded' | 'ranged' | 'casting' | 'gun';
+export type SkillName = 'woodcutting' | 'mining' | 'fishing' | 'gathering' | 'smithing' | 'cooking' | 'alchemy' | 'oneHanded' | 'dualWield' | 'twoHanded' | 'ranged' | 'casting' | 'gun';
 export type AttributeName = 'strength' | 'endurance' | 'magic' | 'perception' | 'dexterity' | 'will' | 'charisma';
 
 export interface Location {

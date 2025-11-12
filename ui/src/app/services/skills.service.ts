@@ -18,7 +18,8 @@ export class SkillsService {
     fishing: SkillWithProgress;
     smithing: SkillWithProgress;
     cooking: SkillWithProgress;
-    herbalism: SkillWithProgress;
+    gathering: SkillWithProgress;
+    alchemy: SkillWithProgress;
     oneHanded: SkillWithProgress;
     dualWield: SkillWithProgress;
     twoHanded: SkillWithProgress;
