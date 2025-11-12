@@ -7,6 +7,14 @@
 
 import { Recipe } from '../../types/crafting';
 
+// ALCHEMY
+import { BasicHealthTincture } from './alchemy/BasicHealthTincture';
+import { BasicManaTincture } from './alchemy/BasicManaTincture';
+import { EnhancedHealthPotion } from './alchemy/EnhancedHealthPotion';
+import { EnhancedManaPotion } from './alchemy/EnhancedManaPotion';
+import { ConcentratedVitalityElixir } from './alchemy/ConcentratedVitalityElixir';
+import { FloralRejuvenationDraught } from './alchemy/FloralRejuvenationDraught';
+
 // COOKING
 import { CookCod } from './cooking/CookCod';
 import { CookSalmon } from './cooking/CookSalmon';
@@ -37,6 +45,12 @@ import { SmeltIronIngot } from './smithing/SmeltIronIngot';
  */
 export class RecipeRegistry {
   private static readonly items = new Map<string, Recipe>([
+    [BasicHealthTincture.recipeId, BasicHealthTincture],
+    [BasicManaTincture.recipeId, BasicManaTincture],
+    [EnhancedHealthPotion.recipeId, EnhancedHealthPotion],
+    [EnhancedManaPotion.recipeId, EnhancedManaPotion],
+    [ConcentratedVitalityElixir.recipeId, ConcentratedVitalityElixir],
+    [FloralRejuvenationDraught.recipeId, FloralRejuvenationDraught],
     [CookCod.recipeId, CookCod],
     [CookSalmon.recipeId, CookSalmon],
     [CookShrimp.recipeId, CookShrimp],

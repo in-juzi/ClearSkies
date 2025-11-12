@@ -17,6 +17,7 @@ import { KennikForge } from './facilities/KennikForge';
 import { KennikHerbGarden } from './facilities/KennikHerbGarden';
 import { KennikKitchen } from './facilities/KennikKitchen';
 import { KennikMarket } from './facilities/KennikMarket';
+import { VillageApothecary } from './facilities/VillageApothecary';
 import { MountainMine } from './facilities/MountainMine';
 import { MountainMoonlitMeadow } from './facilities/MountainMoonlitMeadow';
 import { VolcanicGarden } from './facilities/VolcanicGarden';
@@ -36,6 +37,7 @@ export class FacilityRegistry {
     [KennikHerbGarden.facilityId, KennikHerbGarden],
     [KennikKitchen.facilityId, KennikKitchen],
     [KennikMarket.facilityId, KennikMarket],
+    [VillageApothecary.facilityId, VillageApothecary],
     [MountainMine.facilityId, MountainMine],
     [MountainMoonlitMeadow.facilityId, MountainMoonlitMeadow],
     [VolcanicGarden.facilityId, VolcanicGarden],
