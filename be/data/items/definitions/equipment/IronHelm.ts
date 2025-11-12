@@ -31,7 +31,6 @@ export const IronHelm: EquipmentItem = {
     "tier": 2,
     "armor": 15,
     "evasion": 0,
-    "durability": 120,
     "requiredLevel": 3
   },
   "allowedQualities": [],

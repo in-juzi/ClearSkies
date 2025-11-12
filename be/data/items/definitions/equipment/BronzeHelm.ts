@@ -31,7 +31,6 @@ export const BronzeHelm: EquipmentItem = {
     "tier": 1,
     "armor": 10,
     "evasion": 0,
-    "durability": 100,
     "requiredLevel": 7
   },
   "allowedQualities": [],

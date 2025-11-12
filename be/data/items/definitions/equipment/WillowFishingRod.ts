@@ -37,7 +37,6 @@ export const WillowFishingRod: EquipmentItem = {
     "critChance": 0.04,
     "skillScalar": "oneHanded",
     "toolEfficiency": 1.5,
-    "durability": 120,
     "requiredLevel": 5
   },
   "allowedQualities": [

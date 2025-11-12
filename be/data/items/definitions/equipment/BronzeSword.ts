@@ -33,7 +33,6 @@ export const BronzeSword: EquipmentItem = {
     "attackSpeed": 2.4,
     "critChance": 0.05,
     "skillScalar": "oneHanded",
-    "durability": 120,
     "requiredLevel": 5
   },
   "allowedQualities": [],

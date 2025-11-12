@@ -31,7 +31,6 @@ export const WoodenShield: EquipmentItem = {
     "armor": 8,
     "evasion": 2,
     "blockChance": 0.15,
-    "durability": 80,
     "requiredLevel": 1
   },
   "allowedQualities": [

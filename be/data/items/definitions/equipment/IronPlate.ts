@@ -31,7 +31,6 @@ export const IronPlate: EquipmentItem = {
     "tier": 2,
     "armor": 40,
     "evasion": -8,
-    "durability": 200,
     "requiredLevel": 20
   },
   "allowedQualities": [],

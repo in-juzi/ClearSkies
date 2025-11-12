@@ -272,7 +272,6 @@ export const getItemCombatStats = async (req: Request<{ instanceId: string }>, r
           armor: itemDef.properties.armor || 0,
           evasion: itemDef.properties.evasion || 0,
           blockChance: itemDef.properties.blockChance || 0,
-          durability: itemDef.properties.durability,
           requiredLevel: itemDef.properties.requiredLevel || 1
         }
       });

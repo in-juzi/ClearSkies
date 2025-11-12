@@ -25,8 +25,7 @@ export const MasterworkTrait: Trait = {
           "modifier": 1.8
         },
         "combat": {
-          "damageBonus": 0.2,
-          "durabilityMultiplier": 1.4
+          "damageBonus": 0.2
         }
       }
     },
@@ -38,8 +37,7 @@ export const MasterworkTrait: Trait = {
           "modifier": 2.5
         },
         "combat": {
-          "damageBonus": 0.35,
-          "durabilityMultiplier": 1.8
+          "damageBonus": 0.35
         }
       }
     },
@@ -51,8 +49,7 @@ export const MasterworkTrait: Trait = {
           "modifier": 4
         },
         "combat": {
-          "damageBonus": 0.6,
-          "durabilityMultiplier": 2.5
+          "damageBonus": 0.6
         }
       }
     }

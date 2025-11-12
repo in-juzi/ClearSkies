@@ -31,7 +31,6 @@ export const BronzePlate: EquipmentItem = {
     "tier": 1,
     "armor": 25,
     "evasion": -5,
-    "durability": 150,
     "requiredLevel": 10
   },
   "allowedQualities": [],

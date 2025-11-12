@@ -37,7 +37,6 @@ export const BambooFishingRod: EquipmentItem = {
     "critChance": 0.03,
     "skillScalar": "oneHanded",
     "toolEfficiency": 1,
-    "durability": 80,
     "requiredLevel": 1
   },
   "allowedQualities": [

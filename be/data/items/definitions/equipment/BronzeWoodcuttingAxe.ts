@@ -37,7 +37,6 @@ export const BronzeWoodcuttingAxe: EquipmentItem = {
     "critChance": 0.04,
     "skillScalar": "oneHanded",
     "toolEfficiency": 1,
-    "durability": 100,
     "requiredLevel": 1
   },
   "allowedQualities": [],

@@ -31,7 +31,6 @@ export const BronzeGloves: EquipmentItem = {
     "tier": 1,
     "armor": 6,
     "evasion": 0,
-    "durability": 90,
     "requiredLevel": 5
   },
   "allowedQualities": [],

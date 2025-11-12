@@ -31,7 +31,6 @@ export const IronBoots: EquipmentItem = {
     "tier": 2,
     "armor": 12,
     "evasion": -2,
-    "durability": 130,
     "requiredLevel": 16
   },
   "allowedQualities": [],

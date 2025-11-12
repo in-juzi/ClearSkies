@@ -33,7 +33,6 @@ export const IronSword: EquipmentItem = {
     "attackSpeed": 2.6,
     "critChance": 0.06,
     "skillScalar": "oneHanded",
-    "durability": 150,
     "requiredLevel": 5
   },
   "allowedQualities": [],

@@ -33,6 +33,6 @@ export const HealthPotionMinor: ConsumableItem = {
   ],
   "icon": {
     "path": "item-categories/item_cat_potion_1.svg",
-    "material": "health_potion_minor"
+    "material": "health_potion"
   }
 } as const;

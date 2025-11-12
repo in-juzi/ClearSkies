@@ -37,7 +37,6 @@ export const RareIronMiningPickaxeOffhand: EquipmentItem = {
     "critChance": 0.06,
     "skillScalar": "dualWield",
     "toolEfficiency": 1.2,
-    "durability": 120,
     "requiredLevel": 8
   },
   "allowedQualities": [],

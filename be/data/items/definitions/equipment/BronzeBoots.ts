@@ -31,7 +31,6 @@ export const BronzeBoots: EquipmentItem = {
     "tier": 1,
     "armor": 8,
     "evasion": 0,
-    "durability": 95,
     "requiredLevel": 6
   },
   "allowedQualities": [],

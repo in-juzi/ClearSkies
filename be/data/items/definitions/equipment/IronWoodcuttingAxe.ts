@@ -37,7 +37,6 @@ export const IronWoodcuttingAxe: EquipmentItem = {
     "critChance": 0.05,
     "skillScalar": "oneHanded",
     "toolEfficiency": 1.5,
-    "durability": 150,
     "requiredLevel": 5
   },
   "allowedQualities": [],

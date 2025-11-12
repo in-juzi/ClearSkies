@@ -60,7 +60,6 @@ export interface EquipmentItem extends Item {
  * Equipment-specific properties
  */
 export interface EquipmentProperties extends ItemProperties {
-  durability: number;
   requiredLevel: number;
   // Weapon properties
   damageRoll?: string;
@@ -239,16 +238,11 @@ export interface TraitLevel {
     crafting?: {
       bonusMultiplier?: number;
       damageBonus?: number;
-      durabilityMultiplier?: number;
     };
     combat?: {
       bonusMultiplier?: number;
       damageBonus?: number;
       healthDrain?: number;
-      durabilityMultiplier?: number;
-    };
-    durability?: {
-      multiplier: number;
     };
     alchemy?: {
       bonusProperties: string[];

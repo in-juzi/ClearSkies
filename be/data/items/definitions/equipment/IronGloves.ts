@@ -31,7 +31,6 @@ export const IronGloves: EquipmentItem = {
     "tier": 2,
     "armor": 10,
     "evasion": -1,
-    "durability": 120,
     "requiredLevel": 14
   },
   "allowedQualities": [],
