@@ -69,7 +69,6 @@ export interface EquipmentProperties extends ItemProperties {
   skillScalar?: string;
   toolEfficiency?: number;
   // Armor properties
-  defense?: number;
   armor?: number;
   evasion?: number;
   blockChance?: number;
@@ -106,7 +105,6 @@ export interface ArmorItem extends EquipmentItem {
  * Armor-specific properties
  */
 export interface ArmorProperties extends EquipmentProperties {
-  defense?: number;
   armor?: number;
   evasion?: number;
   blockChance?: number;

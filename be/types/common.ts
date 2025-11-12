@@ -24,9 +24,11 @@ export type SkillName =
   | 'woodcutting'
   | 'mining'
   | 'fishing'
-  | 'herbalism'
+  | 'herbalism'  // DEPRECATED: Use 'gathering' instead (migration 008)
+  | 'gathering'  // NEW: Renamed from herbalism
   | 'smithing'
   | 'cooking'
+  | 'alchemy'    // NEW: Potion/reagent crafting
   | 'oneHanded'
   | 'dualWield'
   | 'twoHanded'

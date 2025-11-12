@@ -7,6 +7,16 @@ import { SkillName } from './common';
 // ===== RECIPE DEFINITIONS =====
 
 /**
+ * Recipe unlock conditions
+ */
+export interface RecipeUnlockConditions {
+  discoveredByDefault?: boolean;      // Default: true for backward compatibility
+  requiredRecipes?: string[];         // Must craft these recipes first
+  requiredItems?: string[];           // Unlock by possessing items
+  questRequired?: string;             // Future: quest completion gate
+}
+
+/**
  * Recipe definition
  */
 export interface Recipe {
@@ -19,13 +29,17 @@ export interface Recipe {
   ingredients: RecipeIngredient[];
   outputs: RecipeOutput[];
   experience: number;
+  unlockConditions?: RecipeUnlockConditions; // Optional recipe discovery system
 }
 
 /**
  * Recipe ingredient requirement
+ * Supports both specific items (itemId) and subcategory matching (subcategory)
+ * Exactly one of itemId or subcategory must be provided
  */
 export interface RecipeIngredient {
-  itemId: string;
+  itemId?: string;          // Specific item requirement (traditional)
+  subcategory?: string;     // OR match any item with this subcategory (new)
   quantity: number;
 }
 

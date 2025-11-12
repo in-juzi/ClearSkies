@@ -1,7 +1,9 @@
 import { Recipe } from '../types';
 import { RecipeRegistry } from '../data/recipes/RecipeRegistry';
+import itemService from './itemService';
 
 class RecipeService {
+  private itemService = itemService;
   /**
    * Get all recipes
    */
@@ -46,16 +48,26 @@ class RecipeService {
       };
     }
 
-    // Check ingredients
+    // Check ingredients (supports both specific itemId and subcategory matching)
     for (const ingredient of recipe.ingredients) {
+      // Determine lookup key: itemId for specific, subcategory for flexible
+      const lookupKey = ingredient.itemId || ingredient.subcategory;
+      if (!lookupKey) {
+        return {
+          valid: false,
+          message: 'Invalid recipe: ingredient must have itemId or subcategory'
+        };
+      }
+
       // If specific instances selected, validate those
-      if (selectedIngredients && selectedIngredients[ingredient.itemId]) {
-        const selectedInstanceIds = selectedIngredients[ingredient.itemId];
+      if (selectedIngredients && selectedIngredients[lookupKey]) {
+        const selectedInstanceIds = selectedIngredients[lookupKey];
 
         if (selectedInstanceIds.length < ingredient.quantity) {
+          const displayName = ingredient.itemId || `any ${ingredient.subcategory}`;
           return {
             valid: false,
-            message: `Please select ${ingredient.quantity}x ${ingredient.itemId} (selected ${selectedInstanceIds.length})`
+            message: `Please select ${ingredient.quantity}x ${displayName} (selected ${selectedInstanceIds.length})`
           };
         }
 
@@ -65,30 +77,59 @@ class RecipeService {
           if (!item) {
             return {
               valid: false,
-              message: `Selected ${ingredient.itemId} instance not found`
+              message: `Selected instance not found`
             };
           }
-          if (item.itemId !== ingredient.itemId) {
-            return {
-              valid: false,
-              message: `Invalid instance selected for ${ingredient.itemId}`
-            };
+
+          // For itemId: exact match. For subcategory: check if item has that subcategory
+          if (ingredient.itemId) {
+            if (item.itemId !== ingredient.itemId) {
+              return {
+                valid: false,
+                message: `Invalid instance selected for ${ingredient.itemId}`
+              };
+            }
+          } else if (ingredient.subcategory) {
+            const itemDef = this.itemService.getItemDefinition(item.itemId);
+            if (!itemDef || !itemDef.subcategories?.includes(ingredient.subcategory)) {
+              return {
+                valid: false,
+                message: `Selected item does not match subcategory: ${ingredient.subcategory}`
+              };
+            }
           }
+
           if (item.equipped) {
             return {
               valid: false,
-              message: `Cannot use equipped ${ingredient.itemId}`
+              message: `Cannot use equipped items`
             };
           }
         }
       } else {
-        // No specific selection, check total quantity
-        const totalQuantity = player.getInventoryItemQuantity(ingredient.itemId);
+        // No specific selection, check total quantity available
+        let totalQuantity = 0;
+
+        if (ingredient.itemId) {
+          // Specific item: use existing method
+          totalQuantity = player.getInventoryItemQuantity(ingredient.itemId);
+        } else if (ingredient.subcategory) {
+          // Subcategory: count all items matching subcategory
+          for (const item of player.inventory) {
+            if (!item.equipped) {
+              const itemDef = this.itemService.getItemDefinition(item.itemId);
+              if (itemDef && itemDef.subcategories?.includes(ingredient.subcategory)) {
+                totalQuantity += item.quantity || 1;
+              }
+            }
+          }
+        }
 
         if (totalQuantity < ingredient.quantity) {
+          const displayName = ingredient.itemId || `any ${ingredient.subcategory}`;
           return {
             valid: false,
-            message: `Requires ${ingredient.quantity}x ${ingredient.itemId} (have ${totalQuantity})`
+            message: `Requires ${ingredient.quantity}x ${displayName} (have ${totalQuantity})`
           };
         }
       }
@@ -98,6 +139,75 @@ class RecipeService {
       valid: true,
       message: 'Requirements met'
     };
+  }
+
+  /**
+   * Check which recipes the player should have unlocked
+   * Returns array of newly unlocked recipe IDs
+   */
+  checkRecipeUnlocks(player: any): string[] {
+    const allRecipes = this.getAllRecipes();
+    const newlyUnlocked: string[] = [];
+
+    for (const recipe of allRecipes) {
+      // Skip if already unlocked
+      if (player.unlockedRecipes && player.unlockedRecipes.includes(recipe.recipeId)) {
+        continue;
+      }
+
+      // No unlock conditions means unlocked by default (backward compatibility)
+      if (!recipe.unlockConditions || recipe.unlockConditions.discoveredByDefault !== false) {
+        newlyUnlocked.push(recipe.recipeId);
+        continue;
+      }
+
+      let shouldUnlock = false;
+
+      // Check required recipes (must have crafted these recipes)
+      if (recipe.unlockConditions.requiredRecipes && recipe.unlockConditions.requiredRecipes.length > 0) {
+        const allRequiredCrafted = recipe.unlockConditions.requiredRecipes.every(
+          reqRecipeId => player.unlockedRecipes && player.unlockedRecipes.includes(reqRecipeId)
+        );
+        if (allRequiredCrafted) {
+          shouldUnlock = true;
+        }
+      }
+
+      // Check required items (must have in inventory)
+      if (recipe.unlockConditions.requiredItems && recipe.unlockConditions.requiredItems.length > 0) {
+        const allRequiredOwned = recipe.unlockConditions.requiredItems.every(
+          itemId => player.hasInventoryItem && player.hasInventoryItem(itemId, 1)
+        );
+        if (allRequiredOwned) {
+          shouldUnlock = true;
+        }
+      }
+
+      // Future: quest completion checks can be added here
+      // if (recipe.unlockConditions.questRequired) { ... }
+
+      if (shouldUnlock) {
+        newlyUnlocked.push(recipe.recipeId);
+      }
+    }
+
+    return newlyUnlocked;
+  }
+
+  /**
+   * Check if a specific recipe is unlocked for the player
+   */
+  isRecipeUnlocked(player: any, recipeId: string): boolean {
+    const recipe = this.getRecipe(recipeId);
+    if (!recipe) return false;
+
+    // No unlock conditions means unlocked by default
+    if (!recipe.unlockConditions || recipe.unlockConditions.discoveredByDefault !== false) {
+      return true;
+    }
+
+    // Check if player has unlocked this recipe
+    return player.unlockedRecipes && player.unlockedRecipes.includes(recipeId);
   }
 
   /**

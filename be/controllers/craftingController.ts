@@ -107,6 +107,15 @@ export const startCrafting = async (
       return;
     }
 
+    // Check if recipe is unlocked
+    if (!recipeService.isRecipeUnlocked(player, recipeId)) {
+      res.status(403).json({
+        message: 'Recipe not yet discovered',
+        hint: 'This recipe must be unlocked through progression'
+      });
+      return;
+    }
+
     // Validate requirements
     const validation = recipeService.validateRecipeRequirements(player, recipe, selectedIngredients);
     if (!validation.valid) {
@@ -204,10 +213,13 @@ export const completeCrafting = async (req: Request, res: Response): Promise<voi
     const selectedIngredients = player.activeCrafting.selectedIngredients;
 
     for (const ingredient of recipe.ingredients) {
+      // Determine the lookup key for selectedIngredients Map
+      const lookupKey = ingredient.itemId || ingredient.subcategory;
+
       // selectedIngredients is a Mongoose Map, so we need to use .get() method
       const instanceIds = selectedIngredients.get
-        ? selectedIngredients.get(ingredient.itemId)
-        : (selectedIngredients as any)[ingredient.itemId];
+        ? selectedIngredients.get(lookupKey)
+        : (selectedIngredients as any)[lookupKey];
 
       // Check if specific instances were selected
       if (instanceIds && instanceIds.length > 0) {
@@ -230,11 +242,23 @@ export const completeCrafting = async (req: Request, res: Response): Promise<voi
         }
       } else {
         // Auto-select instances (original behavior)
-        const items = player.getItemsByItemId(ingredient.itemId);
+        let items: any[] = [];
+
+        if (ingredient.itemId) {
+          // Specific item requirement
+          items = player.getItemsByItemId(ingredient.itemId);
+        } else if (ingredient.subcategory) {
+          // Subcategory requirement - get all items matching subcategory
+          items = player.inventory.filter((item: any) => {
+            const itemDef = itemService.getItemDefinition(item.itemId);
+            return itemDef?.subcategories?.includes(ingredient.subcategory);
+          });
+        }
 
         if (items.length === 0) {
+          const ingredientName = ingredient.itemId || ingredient.subcategory;
           res.status(400).json({
-            message: `Missing ingredient: ${ingredient.itemId}`
+            message: `Missing ingredient: ${ingredientName}`
           });
           return;
         }
@@ -257,8 +281,9 @@ export const completeCrafting = async (req: Request, res: Response): Promise<voi
         }
 
         if (remaining > 0) {
+          const ingredientName = ingredient.itemId || ingredient.subcategory;
           res.status(400).json({
-            message: `Not enough ${ingredient.itemId}`
+            message: `Not enough ${ingredientName}`
           });
           return;
         }
@@ -281,6 +306,16 @@ export const completeCrafting = async (req: Request, res: Response): Promise<voi
 
     // Award XP
     await player.addSkillExperience(recipe.skill, recipe.experience);
+
+    // Check for newly unlocked recipes
+    const newlyUnlocked = recipeService.checkRecipeUnlocks(player);
+    if (newlyUnlocked.length > 0) {
+      // Add newly unlocked recipes to player
+      if (!player.unlockedRecipes) {
+        player.unlockedRecipes = [];
+      }
+      player.unlockedRecipes.push(...newlyUnlocked);
+    }
 
     // Clear active crafting
     player.activeCrafting = {
@@ -317,7 +352,8 @@ export const completeCrafting = async (req: Request, res: Response): Promise<voi
       recipe: {
         recipeId: recipe.recipeId,
         name: recipe.name
-      }
+      },
+      newlyUnlockedRecipes: newlyUnlocked.length > 0 ? newlyUnlocked : undefined
     });
   } catch (error) {
     console.error('Error completing crafting:', error);

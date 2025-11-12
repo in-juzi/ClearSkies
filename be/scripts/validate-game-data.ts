@@ -335,12 +335,27 @@ function validateRecipes() {
     // Check ingredient references
     for (const ingredient of recipe.ingredients) {
       result.totalChecks++;
-      if (!ItemRegistry.has(ingredient.itemId)) {
-        addError(
-          'recipe',
-          `Ingredient item not found: ${ingredient.itemId}`,
-          `recipes/${recipe.recipeId}`
+      if (ingredient.itemId) {
+        // Specific item requirement
+        if (!ItemRegistry.has(ingredient.itemId)) {
+          addError(
+            'recipe',
+            `Ingredient item not found: ${ingredient.itemId}`,
+            `recipes/${recipe.recipeId}`
+          );
+        }
+      } else if (ingredient.subcategory) {
+        // Subcategory requirement - validate that at least one item has this subcategory
+        const itemsWithSubcategory = ItemRegistry.getAll().filter(
+          item => item.subcategories && item.subcategories.includes(ingredient.subcategory!)
         );
+        if (itemsWithSubcategory.length === 0) {
+          addWarning(
+            'recipe',
+            `No items found with subcategory: ${ingredient.subcategory}`,
+            `recipes/${recipe.recipeId}`
+          );
+        }
       }
     }
 
@@ -353,6 +368,33 @@ function validateRecipes() {
           `Output item not found: ${output.itemId}`,
           `recipes/${recipe.recipeId}`
         );
+      }
+    }
+
+    // Check unlock condition references
+    if (recipe.unlockConditions?.requiredRecipes) {
+      for (const requiredRecipeId of recipe.unlockConditions.requiredRecipes) {
+        result.totalChecks++;
+        if (!RecipeRegistry.has(requiredRecipeId)) {
+          addError(
+            'recipe',
+            `Required recipe not found: ${requiredRecipeId}`,
+            `recipes/${recipe.recipeId} unlockConditions`
+          );
+        }
+      }
+    }
+
+    if (recipe.unlockConditions?.requiredItems) {
+      for (const requiredItemId of recipe.unlockConditions.requiredItems) {
+        result.totalChecks++;
+        if (!ItemRegistry.has(requiredItemId)) {
+          addError(
+            'recipe',
+            `Required item not found: ${requiredItemId}`,
+            `recipes/${recipe.recipeId} unlockConditions`
+          );
+        }
       }
     }
   }

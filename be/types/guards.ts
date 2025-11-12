@@ -90,7 +90,6 @@ export function hasWeaponProperties(item: EquipmentItem): item is WeaponItem {
  */
 export function hasArmorProperties(item: EquipmentItem): item is ArmorItem {
   return (
-    item.properties.defense !== undefined ||
     item.properties.armor !== undefined ||
     item.properties.evasion !== undefined
   );
