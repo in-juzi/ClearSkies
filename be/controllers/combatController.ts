@@ -143,7 +143,7 @@ export const executeAction = async (
 
     if (action === 'attack') {
       // Process auto-attack (combat turn)
-      actionResult = combatService.processCombatTurn(player, itemService);
+      actionResult = combatService.processCombatTurn(player, itemService, req.user!.username);
     } else if (action === 'ability') {
       if (!abilityId) {
         res.status(400).json({ message: 'Ability ID is required' });
@@ -151,10 +151,10 @@ export const executeAction = async (
       }
 
       // Use ability
-      actionResult = combatService.useAbility(player, abilityId, itemService);
+      actionResult = combatService.useAbility(player, abilityId, itemService, req.user!.username);
 
       // Also process combat turn (monster can attack back)
-      const turnResult = combatService.processCombatTurn(player, itemService);
+      const turnResult = combatService.processCombatTurn(player, itemService, req.user!.username);
       actionResult = {
         ...actionResult,
         ...turnResult
@@ -176,14 +176,46 @@ export const executeAction = async (
     // Check for combat end
     let combatEnded = false;
     let rewards: any = null;
+    let finalCombatState: any = null;
 
-    if (actionResult.playerDefeated) {
-      // Player defeated
-      rewards = await combatService.awardCombatRewards(player, false, itemService, dropTableService);
-      combatEnded = true;
-    } else if (actionResult.monsterDefeated) {
-      // Monster defeated
-      rewards = await combatService.awardCombatRewards(player, true, itemService, dropTableService);
+    if (actionResult.playerDefeated || actionResult.monsterDefeated) {
+      // Capture final combat state BEFORE clearing combat
+      const monsterInstance = Object.fromEntries(player.activeCombat.monsterInstance);
+      const weapon = combatService.getEquippedWeapon(player, itemService);
+      const availableAbilities = weapon
+        ? combatService.getAbilitiesForWeapon(weapon.skillScalar)
+        : [];
+
+      finalCombatState = {
+        activityId: player.activeCombat.activityId || null,
+        monsterId: monsterInstance.monsterId,
+        monsterName: monsterInstance.name,
+        monsterLevel: monsterInstance.level,
+        monsterHealth: monsterInstance.stats.health,
+        playerHealth: {
+          current: player.stats.health.current,
+          max: player.stats.health.max
+        },
+        playerMana: {
+          current: player.stats.mana.current,
+          max: player.stats.mana.max
+        },
+        playerNextAttackTime: player.activeCombat.playerNextAttackTime,
+        monsterNextAttackTime: player.activeCombat.monsterNextAttackTime,
+        turnCount: player.activeCombat.turnCount,
+        combatLog: player.activeCombat.combatLog, // Include full log for final state
+        availableAbilities,
+        abilityCooldowns: Object.fromEntries(player.activeCombat.abilityCooldowns),
+        combatEnded: true // Flag to indicate combat is over
+      };
+
+      // Award rewards and clear combat
+      if (actionResult.playerDefeated) {
+        rewards = await combatService.awardCombatRewards(player, false, itemService, dropTableService);
+      } else if (actionResult.monsterDefeated) {
+        rewards = await combatService.awardCombatRewards(player, true, itemService, dropTableService);
+      }
+
       combatEnded = true;
     } else {
       await player.save();
@@ -193,7 +225,7 @@ export const executeAction = async (
     if (combatEnded) {
       res.json({
         message: rewards.victory ? 'Victory!' : 'Defeated!',
-        combat: null,
+        combat: finalCombatState, // Send final state instead of null
         rewards
       });
       return;
@@ -265,7 +297,7 @@ export const getCombatStatus = async (req: Request, res: Response): Promise<void
     }
 
     // Process any pending auto-attacks
-    const turnResult = combatService.processCombatTurn(player, itemService);
+    const turnResult = combatService.processCombatTurn(player, itemService, req.user!.username);
 
     // Check for combat end
     if (turnResult.playerDefeated) {

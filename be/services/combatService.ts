@@ -405,7 +405,7 @@ class CombatService {
   /**
    * Process combat turn (auto-attacks)
    */
-  processCombatTurn(player: any, itemService: any): any {
+  processCombatTurn(player: any, itemService: any, username?: string): any {
     if (!player.isInCombat()) {
       throw new Error('Player is not in combat');
     }
@@ -447,12 +447,13 @@ class CombatService {
       }
 
       // Log attack
+      const playerName = username || 'You';
       if (attackResult.isDodge) {
-        player.addCombatLog(`Your attack missed - ${monsterInstance.name} dodged!`, 'miss');
+        player.addCombatLog(`${playerName}'s attack missed - ${monsterInstance.name} dodged!`, 'miss');
       } else if (attackResult.isCrit) {
-        player.addCombatLog(`CRITICAL HIT! You deal ${attackResult.damage} damage with ${attackResult.weaponName}!`, 'crit');
+        player.addCombatLog(`CRITICAL HIT! ${playerName} deals ${attackResult.damage} damage with ${attackResult.weaponName}!`, 'crit');
       } else {
-        player.addCombatLog(`You deal ${attackResult.damage} damage with ${attackResult.weaponName}.`, 'damage');
+        player.addCombatLog(`${playerName} deals ${attackResult.damage} damage with ${attackResult.weaponName}.`, 'damage');
       }
 
       results.playerAttacked = true;
@@ -461,7 +462,7 @@ class CombatService {
       // Check if monster is defeated
       if (monsterInstance.stats.health.current <= 0) {
         results.monsterDefeated = true;
-        player.addCombatLog(`You defeated ${monsterInstance.name}!`, 'system');
+        player.addCombatLog(`${playerName} defeated ${monsterInstance.name}!`, 'system');
         combat.monsterInstance = new Map(Object.entries(monsterInstance));
         return results;
       }
@@ -486,10 +487,11 @@ class CombatService {
       }
 
       // Log attack
+      const playerName = username || 'You';
       if (attackResult.isDodge) {
-        player.addCombatLog(`${monsterInstance.name}'s attack missed - you dodged!`, 'dodge');
+        player.addCombatLog(`${monsterInstance.name}'s attack missed - ${playerName} dodged!`, 'dodge');
       } else if (attackResult.isCrit) {
-        player.addCombatLog(`${monsterInstance.name} CRITICALLY HITS you for ${attackResult.damage} damage!`, 'crit');
+        player.addCombatLog(`${monsterInstance.name} CRITICALLY HITS ${playerName} for ${attackResult.damage} damage!`, 'crit');
       } else {
         player.addCombatLog(`${monsterInstance.name} deals ${attackResult.damage} damage.`, 'damage');
       }
@@ -508,7 +510,7 @@ class CombatService {
   /**
    * Use ability in combat
    */
-  useAbility(player: any, abilityId: string, itemService: any): any {
+  useAbility(player: any, abilityId: string, itemService: any, username?: string): any {
     if (!player.isInCombat()) {
       throw new Error('Player is not in combat');
     }
@@ -556,12 +558,13 @@ class CombatService {
     }
 
     // Log ability use
+    const playerName = username || 'You';
     if (attackResult.isDodge) {
       player.addCombatLog(`${ability.name} missed - ${monsterInstance.name} dodged!`, 'miss');
     } else if (attackResult.isCrit) {
-      player.addCombatLog(`CRITICAL ${ability.name}! You deal ${attackResult.damage} damage!`, 'ability');
+      player.addCombatLog(`CRITICAL ${ability.name}! ${playerName} deals ${attackResult.damage} damage!`, 'ability');
     } else {
-      player.addCombatLog(`You use ${ability.name} for ${attackResult.damage} damage!`, 'ability');
+      player.addCombatLog(`${playerName} uses ${ability.name} for ${attackResult.damage} damage!`, 'ability');
     }
 
     // Set cooldown
@@ -573,7 +576,7 @@ class CombatService {
     // Check if monster is defeated
     const monsterDefeated = monsterInstance.stats.health.current <= 0;
     if (monsterDefeated) {
-      player.addCombatLog(`You defeated ${monsterInstance.name}!`, 'system');
+      player.addCombatLog(`${playerName} defeated ${monsterInstance.name}!`, 'system');
     }
 
     return {
