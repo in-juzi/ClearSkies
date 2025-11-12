@@ -35,7 +35,7 @@ export class Equipment {
     { name: 'necklace', label: 'Necklace', icon: 'assets/icons/item-categories/item_cat_amulet.svg', position: { row: 2, col: 3 } },
     { name: 'mainHand', label: 'Main Hand', icon: 'assets/icons/item-categories/item_cat_sword.svg', position: { row: 3, col: 1 } },
     { name: 'belt', label: 'Belt', icon: 'assets/icons/item-categories/item_cat_belt.svg', position: { row: 3, col: 2 } },
-    { name: 'offHand', label: 'Off Hand', icon: 'assets/icons/item-categories/item_cat_axe.svg', position: { row: 3, col: 3 } },
+    { name: 'offHand', label: 'Off Hand', icon: 'assets/icons/item-categories/item_cat_shield.svg', position: { row: 3, col: 3 } },
     { name: 'ringLeft', label: 'Ring (L)', icon: 'assets/icons/item-categories/item_cat_ring.svg', position: { row: 4, col: 1 } },
     { name: 'boots', label: 'Boots', icon: 'assets/icons/item-categories/item_cat_boot.svg', position: { row: 4, col: 2 } },
     { name: 'ringRight', label: 'Ring (R)', icon: 'assets/icons/item-categories/item_cat_ring.svg', position: { row: 4, col: 3 } }
@@ -60,7 +60,6 @@ export class Equipment {
       armorCount: 0,
       // Other stats
       totalWeight: 0,
-      totalDurability: 0,
       requiredLevel: 0,
       itemCount: 0
     };
@@ -73,9 +72,6 @@ export class Equipment {
 
       // Accumulate weight
       summary.totalWeight += props.weight || 0;
-
-      // Accumulate durability
-      summary.totalDurability += props['durability'] || 0;
 
       // Track highest required level
       summary.requiredLevel = Math.max(summary.requiredLevel, props['requiredLevel'] || 0);

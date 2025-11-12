@@ -194,12 +194,6 @@ export class ItemDetailsPanelComponent implements OnChanges {
       effects.push(`Health Drain -${effectData.healthDrain}/sec`);
     }
 
-    if (effectData.durabilityMultiplier !== undefined) {
-      const percentNum = (effectData.durabilityMultiplier - 1) * 100;
-      const percent = percentNum.toFixed(0);
-      effects.push(`Durability ${percentNum >= 0 ? '+' : ''}${percent}%`);
-    }
-
     if (effectData.difficultyIncrease !== undefined) {
       effects.push(`Difficulty +${effectData.difficultyIncrease}%`);
     }

@@ -76,10 +76,6 @@
           <span class="label">Skill:</span>
           <span class="text-purple-400">{{ item.definition.properties['skillScalar'] }}</span>
         </div>
-        <div class="detail-row" *ngIf="item.definition.properties['durability'] !== undefined">
-          <span class="label">Durability:</span>
-          <span>{{ item.definition.properties['durability'] }}</span>
-        </div>
         <div class="detail-row" *ngIf="item.definition.properties['requiredLevel'] !== undefined">
           <span class="label">Required Level:</span>
           <span class="text-blue-400">{{ item.definition.properties['requiredLevel'] }}</span>
@@ -106,10 +102,6 @@
         <div class="detail-row" *ngIf="item.definition.properties['blockChance'] !== undefined">
           <span class="label">Block Chance:</span>
           <span class="text-gold-400">{{ (item.definition.properties['blockChance'] * 100).toFixed(1) }}%</span>
-        </div>
-        <div class="detail-row" *ngIf="item.definition.properties['durability'] !== undefined">
-          <span class="label">Durability:</span>
-          <span>{{ item.definition.properties['durability'] }}</span>
         </div>
         <div class="detail-row" *ngIf="item.definition.properties['requiredLevel'] !== undefined">
           <span class="label">Required Level:</span>
@@ -159,10 +151,6 @@
         <div class="detail-row" *ngIf="combatStats.blockChance !== undefined">
           <span class="label">Block Chance:</span>
           <span class="text-gold-400">{{ (combatStats.blockChance * 100).toFixed(1) }}%</span>
-        </div>
-        <div class="detail-row" *ngIf="combatStats.durability !== undefined">
-          <span class="label">Durability:</span>
-          <span>{{ combatStats.durability }}</span>
         </div>
         <div class="detail-row" *ngIf="combatStats.requiredLevel !== undefined">
           <span class="label">Required Level:</span>
