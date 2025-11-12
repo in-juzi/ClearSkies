@@ -10,7 +10,7 @@ export const MountainMoonlitMeadow: Facility = {
   "name": "Moonlit Meadow",
   "description": "A high mountain meadow bathed in ethereal moonlight. Luminescent flowers bloom here under the stars, creating an otherworldly scene.",
   "type": "resource-gathering",
-  "icon": "herbalism",
+  "icon": "gathering",
   "activities": [
     "activity-gather-moonpetal"
   ]

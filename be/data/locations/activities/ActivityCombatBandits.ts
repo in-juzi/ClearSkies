@@ -25,7 +25,7 @@ export const ActivityCombatBandits: ActivityUnion = {
     },
     "items": [
       {
-        "itemId": "copper_sword",
+        "itemId": "bronze_sword",
         "quantity": {
           "min": 1,
           "max": 1

@@ -10,7 +10,7 @@ export const VolcanicGarden: Facility = {
   "name": "Volcanic Garden",
   "description": "A treacherous garden where rare crimson flowers grow in the heat of volcanic soil. The ground is warm beneath your feet, and steam rises from cracks in the earth.",
   "type": "resource-gathering",
-  "icon": "herbalism",
+  "icon": "gathering",
   "activities": [
     "activity-gather-dragons-breath"
   ]
