@@ -83,6 +83,15 @@ export const MATERIAL_COLORS: Record<string, ColorChannels> = {
     edge: '#DAA520',      // Goldenrod edge
     detail: '#A0826D'     // Tan detail
   },
+  bronze_sword: {
+    primary: '#CD853F',   // Bronze gold (fallback)
+    guard: '#8B7355',     // Dark bronze guard
+    blade: '#B8860B',     // Dark goldenrod blade body
+    edge: '#DAA520',      // Goldenrod sharp edge
+    handle: '#6B4423',    // Dark brown leather-wrapped handle
+    detail: '#A0826D',    // Tan pommel/guard details
+    secondary: '#8B7355'  // Dark bronze crossguard
+  },
   bronze_ingot: {
     primary: '#CD853F',   // Bronze gold (main body)
     secondary: '#B8860B', // Darker golden bronze (shadows)
@@ -136,6 +145,42 @@ export const MATERIAL_COLORS: Record<string, ColorChannels> = {
     blade: '#C0C0C0',     // Iron blade body
     edge: '#E8E8E8',      // Light silver edge
     detail: '#A9A9A9'     // Dark silver detail
+  },
+  bronze_gloves: {
+    primary: '#CD853F',   // Bronze gold (finger plates and palm)
+    secondary: '#8B7355', // Dark bronze (wrist guards)
+    edge: '#DAA520',      // Goldenrod (wrist cuff highlights)
+    detail: '#A0826D'     // Tan (finger joint accents)
+  },
+  iron_gloves: {
+    primary: '#696969',   // Dim gray (finger plates and palm)
+    secondary: '#4A4A4A', // Very dark gray (wrist guards)
+    edge: '#A9A9A9',      // Dark gray (wrist cuff highlights)
+    detail: '#808080'     // Gray (finger joint accents)
+  },
+  bronze_boots: {
+    primary: '#CD853F',   // Bronze gold (main boot plates)
+    secondary: '#8B7355', // Dark bronze (reinforcement straps)
+    edge: '#DAA520',      // Goldenrod (sole highlights)
+    detail: '#A0826D'     // Tan (rivet accents)
+  },
+  iron_boots: {
+    primary: '#696969',   // Dim gray (main boot greaves)
+    secondary: '#4A4A4A', // Very dark gray (reinforcement plates)
+    edge: '#A9A9A9',      // Dark gray (sole highlights)
+    detail: '#808080'     // Gray (rivet accents)
+  },
+  bronze_helm: {
+    primary: '#CD853F',   // Bronze gold (helmet dome and side panels)
+    secondary: '#8B7355', // Dark bronze (cheek and neck guards)
+    edge: '#DAA520',      // Goldenrod (brow band highlights)
+    detail: '#A0826D'     // Tan (face opening trim and gorget)
+  },
+  iron_helm: {
+    primary: '#696969',   // Dim gray (helmet dome and side panels)
+    secondary: '#4A4A4A', // Very dark gray (cheek and neck guards)
+    edge: '#A9A9A9',      // Dark gray (brow band highlights)
+    detail: '#808080'     // Gray (face opening trim and gorget)
   },
   steel: {
     primary: '#B0C4DE',   // Light steel blue
