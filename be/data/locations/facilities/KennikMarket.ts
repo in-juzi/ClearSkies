@@ -1,0 +1,19 @@
+/**
+ * Village Market
+ * A bustling marketplace where locals trade goods and supplies. The aroma of fresh cooking and the gli...
+ */
+
+import { Facility } from '../../../types/locations';
+
+export const KennikMarket: Facility = {
+  "facilityId": "kennik-market",
+  "name": "Village Market",
+  "description": "A bustling marketplace where locals trade goods and supplies. The aroma of fresh cooking and the glint of potion vials beckon travelers to browse the wares.",
+  "type": "trading",
+  "icon": "market",
+  "vendorIds": [
+    "kennik-potion-seller",
+    "kennik-cook"
+  ],
+  "activities": []
+} as const;

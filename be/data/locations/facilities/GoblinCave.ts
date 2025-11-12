@@ -1,4 +1,11 @@
-{
+/**
+ * Goblin Cave
+ * A dark cave carved into the mountainside, home to aggressive goblin warriors. The sound of crude wea...
+ */
+
+import { Facility } from '../../../types/locations';
+
+export const GoblinCave: Facility = {
   "facilityId": "goblin-cave",
   "name": "Goblin Cave",
   "description": "A dark cave carved into the mountainside, home to aggressive goblin warriors. The sound of crude weapons being sharpened echoes from within.",
@@ -7,4 +14,4 @@
   "activities": [
     "activity-combat-goblin"
   ]
-}
+} as const;

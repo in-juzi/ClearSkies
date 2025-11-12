@@ -1,4 +1,11 @@
-{
+/**
+ * Forest Clearing
+ * A peaceful clearing in the heart of the woods. Ancient oak trees tower overhead, and the sounds of w...
+ */
+
+import { Location } from '../../../types/locations';
+
+export const ForestClearing: Location = {
   "locationId": "forest-clearing",
   "name": "Forest Clearing",
   "description": "A peaceful clearing in the heart of the woods. Ancient oak trees tower overhead, and the sounds of wildlife echo through the branches.",
@@ -31,4 +38,4 @@
     }
   ],
   "isStartingLocation": false
-}
+} as const;

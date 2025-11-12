@@ -1,4 +1,11 @@
-{
+/**
+ * Kennik
+ * A small fishing village on this nameless island. Over time, it also became a paltry port for the sai...
+ */
+
+import { Location } from '../../../types/locations';
+
+export const Kennik: Location = {
   "locationId": "kennik",
   "name": "Kennik",
   "description": "A small fishing village on this nameless island. Over time, it also became a paltry port for the sailors coming from the mainland.",
@@ -21,4 +28,4 @@
     }
   ],
   "isStartingLocation": true
-}
+} as const;

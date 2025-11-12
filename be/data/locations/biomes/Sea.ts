@@ -1,4 +1,11 @@
-{
+/**
+ * Coastal
+ * The salty air and sound of waves create a maritime atmosphere
+ */
+
+import { BiomeDefinition } from '../../../types/locations';
+
+export const Sea: BiomeDefinition = {
   "biomeId": "sea",
   "name": "Coastal",
   "description": "The salty air and sound of waves create a maritime atmosphere",
@@ -7,4 +14,4 @@
     "secondaryColor": "#1A3A4F",
     "accentColor": "#87CEEB"
   }
-}
+} as const;

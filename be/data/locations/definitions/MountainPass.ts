@@ -1,4 +1,11 @@
-{
+/**
+ * Mountain Pass
+ * A high mountain pass where the air is thin and cold. Rocky outcroppings reveal precious ore veins.
+ */
+
+import { Location } from '../../../types/locations';
+
+export const MountainPass: Location = {
   "locationId": "mountain-pass",
   "name": "Mountain Pass",
   "description": "A high mountain pass where the air is thin and cold. Rocky outcroppings reveal precious ore veins.",
@@ -20,4 +27,4 @@
     }
   ],
   "isStartingLocation": false
-}
+} as const;
