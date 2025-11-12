@@ -29,18 +29,20 @@
 - ✅ Item details panel (completed - enhanced inventory UI with combat stats preview)
 - ✅ Bronze/Iron equipment crafting (completed - 8 armor pieces + 6 tools via smithing)
 - ✅ Equipment stats summary (completed - total armor/evasion/damage display in equipment panel)
+- ✅ Durability system removal (completed - simplified item system by removing unused durability mechanic)
+- ✅ Signal-based reactivity (completed - location component uses computed signals for better change detection)
 
 **Recent Changes** (Last 10 commits):
+- docs: update CLAUDE.md with recent changes
+- chore: remove unused imports from components
+- feat: add shield icon and update offHand slot display
+- fix: improve location component reactivity with computed signals
+- refactor: remove durability from frontend UI
+- refactor: update WeatheredTrait alchemy properties
+- refactor: remove durability system from items
+- refactor: remove Copper Sword and update related items to Bronze Sword; adjust facility icons for consistency
+- docs: update CLAUDE.md with alchemy system and recent features
 - chore: miscellaneous updates and documentation
-- style: add new material colors and split icon paths
-- feat: add chat command autocomplete with keyboard navigation
-- feat: add combat stats preview to equipment and inventory UI
-- feat: enhance crafting UI with subcategory selection and recipe unlocks
-- feat: implement subcategory-based crafting system
-- feat: add alchemy recipes and health/mana potions
-- feat: add alchemy skill and rename herbalism to gathering
-- refactor: rename herbalism to gathering across game data
-- docs: update CLAUDE.md with smithing equipment and crafting filter features
 
 **Known Issues**:
 - None currently identified
