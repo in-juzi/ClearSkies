@@ -42,11 +42,9 @@ locationService
   .then(() => console.log('✓ Location definitions loaded'))
   .catch(err => console.error('Failed to load location definitions:', err));
 
-// Load vendor definitions
-vendorService.loadVendorDefinitions();
-
-// Load recipe definitions
-recipeService.loadRecipes();
+// Vendor and recipe definitions are now loaded at compile-time via registries
+console.log(`✓ Loaded ${require('./data/vendors/VendorRegistry').VendorRegistry.size} vendors from VendorRegistry (compile-time)`);
+console.log(`✓ Loaded ${require('./data/recipes/RecipeRegistry').RecipeRegistry.size} recipes from RecipeRegistry (compile-time)`);
 
 // Middleware
 app.use(cors());

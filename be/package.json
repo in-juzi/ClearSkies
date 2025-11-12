@@ -14,7 +14,10 @@
     "build": "tsc && npm run copy-data",
     "copy-data": "node -e \"require('fs').cpSync('data', 'dist/data', {recursive: true})\"",
     "build:watch": "tsc --watch",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "generate:items": "npx ts-node scripts/convert-json-to-ts.ts && npx ts-node scripts/generate-registry.ts",
+    "generate:registry": "npx ts-node scripts/generate-registry.ts",
+    "test:items": "npx ts-node scripts/test-item-registry.ts"
   },
   "keywords": [],
   "author": "",
