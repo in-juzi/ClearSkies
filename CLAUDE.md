@@ -749,7 +749,7 @@ The equipment system allows players to equip items to specific body slots for st
 2. **Equipment Items** (Item definitions with `slot` field)
    - Must include `slot` field indicating which slot they can be equipped to
    - Examples: iron_helm (head), leather_tunic (body), copper_sword (mainHand), wooden_shield (offHand)
-   - Properties include armor, evasion, damage, durability, required level
+   - Properties include armor, evasion, damage, required level
    - Equipment items are non-stackable (stackable: false)
 
 3. **Equipment UI** (3x4 grid with square slots)
@@ -1211,7 +1211,6 @@ See `project/journal.md` for detailed development possibilities including:
 - Quest system
 - Crafting system (using inventory items)
 - Alchemy system (quality-based recipes)
-- Equipment durability and repair
 - Item enchantments
 - Trading and auction house
 - World map
