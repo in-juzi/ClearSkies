@@ -56,7 +56,26 @@ class ItemService {
       const configPath = path.join(dataPath, 'generation-config.json');
       try {
         const configData = await fs.readFile(configPath, 'utf8');
-        this.generationConfig = JSON.parse(configData);
+        const rawConfig = JSON.parse(configData);
+
+        // Transform from file format to internal format
+        this.generationConfig = {
+          qualityDistribution: {
+            none: rawConfig.qualityGeneration?.countDistribution?.["0"] ?? 0.35,
+            one: rawConfig.qualityGeneration?.countDistribution?.["1"] ?? 0.45,
+            two: rawConfig.qualityGeneration?.countDistribution?.["2"] ?? 0.15,
+            three: rawConfig.qualityGeneration?.countDistribution?.["3"] ?? 0.05,
+            four: rawConfig.qualityGeneration?.countDistribution?.["4"] ?? 0
+          },
+          traitAppearanceRates: rawConfig.traitGeneration?.appearanceRates ?? {
+            common: 0.02, uncommon: 0.08, rare: 0.15, epic: 0.30, legendary: 0.50
+          },
+          qualityLevelDamping: rawConfig.qualityGeneration?.levelDamping ?? 0.6,
+          tierBasedLevelDistribution: {
+            enabled: rawConfig.qualityGeneration?.tierBasedLevels ?? true,
+            baseLevelForTier: { 1: 1, 2: 2, 3: 3 }
+          }
+        };
         console.log('✓ Loaded generation config');
       } catch (error: any) {
         console.warn('⚠ Could not load generation-config.json, using default values:', error.message);

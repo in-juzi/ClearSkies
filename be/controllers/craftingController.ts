@@ -295,11 +295,29 @@ export const completeCrafting = async (req: Request, res: Response): Promise<voi
     // Get enhanced item details for crafted items
     const itemDetails = outputItems.map(item => itemService.getItemDetails(item));
 
+    // Get XP results for detailed response
+    const skillResult = player.skills[recipe.skill];
+    const attributeResult = player.attributes[skillResult.mainAttribute];
+
     res.json({
       message: `Successfully crafted ${recipe.name}`,
-      items: itemDetails,
-      experience: recipe.experience,
-      skill: recipe.skill
+      outputs: itemDetails,
+      experience: {
+        skill: recipe.skill,
+        xp: recipe.experience,
+        skillResult: {
+          level: skillResult.level,
+          experience: skillResult.experience
+        },
+        attributeResult: {
+          level: attributeResult.level,
+          experience: attributeResult.experience
+        }
+      },
+      recipe: {
+        recipeId: recipe.recipeId,
+        name: recipe.name
+      }
     });
   } catch (error) {
     console.error('Error completing crafting:', error);

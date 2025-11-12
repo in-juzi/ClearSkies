@@ -29,5 +29,5 @@ export const SmeltBronzeIngot: Recipe = {
       "qualityModifier": "inherit"
     }
   ],
-  "experience": 30
+  "experience": 100
 } as const;

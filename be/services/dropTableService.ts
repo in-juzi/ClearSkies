@@ -1,6 +1,5 @@
-import { promises as fs } from 'fs';
-import * as path from 'path';
 import { DropTable } from '../types';
+import { DropTableRegistry } from '../data/locations/DropTableRegistry';
 
 interface DropResult {
   itemId: string;
@@ -21,20 +20,16 @@ class DropTableService {
   private loaded: boolean = false;
 
   /**
-   * Load all drop table definitions from JSON files
+   * Load all drop table definitions from DropTableRegistry
    */
   async loadAll(): Promise<void> {
     try {
-      const dropTablesDir = path.join(__dirname, '../data/locations/drop-tables');
-      const files = await fs.readdir(dropTablesDir);
+      // Load from TypeScript registry instead of JSON files
+      const allDropTables = DropTableRegistry.getAll();
 
-      for (const file of files) {
-        if (file.endsWith('.json')) {
-          const filePath = path.join(dropTablesDir, file);
-          const data = await fs.readFile(filePath, 'utf8');
-          const dropTable = JSON.parse(data) as DropTable;
-          this.dropTables.set(dropTable.dropTableId, dropTable);
-        }
+      this.dropTables.clear();
+      for (const dropTable of allDropTables) {
+        this.dropTables.set(dropTable.dropTableId, dropTable);
       }
 
       this.loaded = true;

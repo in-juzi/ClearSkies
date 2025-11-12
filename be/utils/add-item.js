@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 require('dotenv').config();
 
-const connectDB = require('../config/database');
-const Player = require('../models/Player');
-const itemService = require('../services/itemService');
+const connectDB = require('../dist/config/database').default;
+const Player = require('../dist/models/Player').default;
+const itemService = require('../dist/services/itemService').default;
 
 // ============================================================================
 // ITEM PRESETS - Reusable item sets for testing and development
@@ -41,6 +41,18 @@ const ITEM_PRESETS = {
     { itemId: 'trumpet_vine', quantity: 1 },
     { itemId: 'moonvine', quantity: 1 },
     { itemId: 'phoenix_vine', quantity: 1 }
+  ],
+
+  // Smithing ores - for testing bronze crafting
+  smithingOres: [
+    { itemId: 'copper_ore', quantity: 20 },
+    { itemId: 'tin_ore', quantity: 20 }
+  ],
+
+  // Smithing materials - wood and leather for crafting
+  smithingMaterials: [
+    { itemId: 'oak_log', quantity: 10 },
+    { itemId: 'leather_scraps', quantity: 10 }
   ]
 };
 
@@ -49,7 +61,7 @@ const ITEM_PRESETS = {
 // ============================================================================
 
 // Which preset to use (change this to use different item sets)
-const ACTIVE_PRESET = 'combatConsumables';
+const ACTIVE_PRESET = 'smithingOres';
 
 // Target player character name
 const TARGET_PLAYER = 'Juzi';
