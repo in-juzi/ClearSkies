@@ -5,7 +5,7 @@
 **Active Features**:
 - ✅ Herbalism system (completed - 6 herbs, 4 gathering locations)
 - ✅ Combat skills framework (completed - 6 combat skills added)
-- ✅ Turn-based combat system (completed - monsters, abilities, combat activities)
+- ✅ Turn-based combat system (completed - 5 monsters, abilities, combat activities)
 - ✅ Combat UI components (completed - ability/item buttons, auto-scroll log, restart encounters)
 - ✅ Consumable items system (completed - health/mana potions usable in/out of combat)
 - ✅ Manual/help system (completed - full game guide with 6 sections)
@@ -20,18 +20,22 @@
 - ✅ 5-level quality system with 3-level trait system (completed - quality expanded to 5 levels)
 - ✅ Smithing foundation (completed - ore smelting, ingot crafting, Village Forge)
 - ✅ TypeScript data layer migration (completed - all game data migrated from JSON to TypeScript registries)
+- ✅ Item constants system (completed - type-safe constants for item definitions)
+- ✅ Game data validation (completed - comprehensive cross-reference validation script)
+- ✅ Goblin Village location (completed - 3 combat encounters with progressive difficulty)
+- ✅ Item details panel (completed - enhanced inventory UI with combat stats preview)
 
 **Recent Changes** (Last 10 commits):
-- docs: document TypeScript data layer migration
-- build: add TypeScript data layer compilation support
-- refactor: extend TypeScript type system for data layer
-- refactor: update services to use TypeScript registries
-- refactor: migrate recipe and vendor definitions to TypeScript
-- refactor: migrate monster and ability definitions to TypeScript
-- refactor: migrate activity and drop table definitions to TypeScript
-- refactor: migrate location, biome, and facility definitions to TypeScript
-- refactor: migrate quality and trait definitions to TypeScript
-- refactor: migrate item definitions from JSON to TypeScript
+- chore: update Claude settings configuration
+- style: minor styling and content adjustments
+- refactor: update location component with better navigation
+- refactor: enhance inventory and equipment UI components
+- refactor: improve combat UI components and styling
+- refactor: improve type safety and service method organization
+- feat: add username support to combat log messages
+- feat: add item details panel component for enhanced inventory UI
+- feat: add Goblin Village location with three combat encounters
+- feat: add Goblin Scout and Goblin Shaman monsters
 
 **Known Issues**:
 - None currently identified
@@ -57,6 +61,7 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 
 **Add items to player:** `cd be && node utils/add-item.js` (edit itemId on line 28)
 **Create content:** Use Content Generator agent - describe what you want in natural language
+**Validate game data:** `cd be && npm run validate` - checks all cross-references
 **Add recipe:** Create TypeScript module in `be/data/recipes/{skill}/{RecipeId}.ts` and register in RecipeRegistry
 **Fix backend bug:** Check Critical Code Locations section for file:line references
 **Restart servers:** Backend (:3000), Frontend (:4200) - check if already running first!
@@ -65,6 +70,8 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 **API endpoints:** See route files in `be/routes/` - all require JWT except auth register/login
 
 > **IMPORTANT**: **NEVER start backend/frontend servers** - they are always running during development. Only rebuild with `npm run build` if code changes require it. If you need to restart servers, ask the user first.
+
+> **Content Creation Reference**: When creating new game content (monsters, locations, activities, drop tables), refer to [project/docs/content-creation-pitfalls.md](project/docs/content-creation-pitfalls.md) for common pitfalls and solutions.
 
 ## Quick File Reference
 
@@ -88,12 +95,13 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 - Crafting: [ui/src/app/components/game/crafting/crafting.component.ts](ui/src/app/components/game/crafting/crafting.component.ts), [ui/src/app/components/game/crafting/crafting.component.html](ui/src/app/components/game/crafting/crafting.component.html)
 - Combat: [ui/src/app/components/game/combat/combat.component.ts](ui/src/app/components/game/combat/combat.component.ts), [ui/src/app/components/game/combat/combat.component.html](ui/src/app/components/game/combat/combat.component.html)
 - Manual: [ui/src/app/components/manual/manual.component.ts](ui/src/app/components/manual/manual.component.ts), [ui/src/app/components/manual/sections/](ui/src/app/components/manual/sections/)
-- Shared Components: [ui/src/app/components/shared/item-mini/item-mini.component.ts](ui/src/app/components/shared/item-mini/item-mini.component.ts), [ui/src/app/components/shared/item-modifiers/item-modifiers.component.ts](ui/src/app/components/shared/item-modifiers/item-modifiers.component.ts), [ui/src/app/components/shared/icon/icon.component.ts](ui/src/app/components/shared/icon/icon.component.ts), [ui/src/app/components/shared/xp-mini/xp-mini.component.ts](ui/src/app/components/shared/xp-mini/xp-mini.component.ts), [ui/src/app/components/shared/ability-button/ability-button.component.ts](ui/src/app/components/shared/ability-button/ability-button.component.ts), [ui/src/app/components/shared/item-button/item-button.component.ts](ui/src/app/components/shared/item-button/item-button.component.ts)
+- Shared Components: [ui/src/app/components/shared/item-mini/item-mini.component.ts](ui/src/app/components/shared/item-mini/item-mini.component.ts), [ui/src/app/components/shared/item-modifiers/item-modifiers.component.ts](ui/src/app/components/shared/item-modifiers/item-modifiers.component.ts), [ui/src/app/components/shared/item-details-panel/item-details-panel.component.ts](ui/src/app/components/shared/item-details-panel/item-details-panel.component.ts), [ui/src/app/components/shared/icon/icon.component.ts](ui/src/app/components/shared/icon/icon.component.ts), [ui/src/app/components/shared/xp-mini/xp-mini.component.ts](ui/src/app/components/shared/xp-mini/xp-mini.component.ts), [ui/src/app/components/shared/ability-button/ability-button.component.ts](ui/src/app/components/shared/ability-button/ability-button.component.ts), [ui/src/app/components/shared/item-button/item-button.component.ts](ui/src/app/components/shared/item-button/item-button.component.ts)
 - Services: [ui/src/app/services/inventory.service.ts](ui/src/app/services/inventory.service.ts), [ui/src/app/services/location.service.ts](ui/src/app/services/location.service.ts), [ui/src/app/services/skills.service.ts](ui/src/app/services/skills.service.ts), [ui/src/app/services/auth.service.ts](ui/src/app/services/auth.service.ts), [ui/src/app/services/manual.service.ts](ui/src/app/services/manual.service.ts), [ui/src/app/services/chat.service.ts](ui/src/app/services/chat.service.ts), [ui/src/app/services/vendor.service.ts](ui/src/app/services/vendor.service.ts), [ui/src/app/services/recipe.service.ts](ui/src/app/services/recipe.service.ts), [ui/src/app/services/crafting.service.ts](ui/src/app/services/crafting.service.ts), [ui/src/app/services/combat.service.ts](ui/src/app/services/combat.service.ts), [ui/src/app/services/icon.service.ts](ui/src/app/services/icon.service.ts)
 - Constants: [ui/src/app/constants/material-colors.constants.ts](ui/src/app/constants/material-colors.constants.ts)
 
 **Game Data (TypeScript):**
 - Item Registry: [be/data/items/ItemRegistry.ts](be/data/items/ItemRegistry.ts) - All items in [definitions/](be/data/items/definitions/)
+- Item Constants: [be/data/constants/item-constants.ts](be/data/constants/item-constants.ts) - Type-safe constants for item definitions
 - Location Registry: [be/data/locations/LocationRegistry.ts](be/data/locations/LocationRegistry.ts) - All locations in [definitions/](be/data/locations/definitions/)
 - Activity Registry: [be/data/locations/ActivityRegistry.ts](be/data/locations/ActivityRegistry.ts) - All activities in [activities/](be/data/locations/activities/)
 - Drop Table Registry: [be/data/locations/DropTableRegistry.ts](be/data/locations/DropTableRegistry.ts) - All drop tables in [drop-tables/](be/data/locations/drop-tables/)
@@ -109,6 +117,7 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 - [be/utils/add-item.js](be/utils/add-item.js) - Add items to player inventory
 - [be/utils/content-generator.js](be/utils/content-generator.js) - Interactive content creation
 - [be/utils/test-xp-scaling.js](be/utils/test-xp-scaling.js) - XP formula testing
+- [be/scripts/validate-game-data.ts](be/scripts/validate-game-data.ts) - Validate cross-references (npm run validate)
 - [project/utils/split-svg-paths.js](project/utils/split-svg-paths.js) - Split SVG paths (basic, no normalization)
 - [project/utils/split-svg-paths-normalized.js](project/utils/split-svg-paths-normalized.js) - Split SVG paths with coordinate normalization (recommended)
 
@@ -159,21 +168,25 @@ cd be && node utils/add-item.js
 
 ### Adding New Item Definition
 **File**: `be/data/items/definitions/{category}/{ItemId}.ts`
-**Template**:
+**Template** (with constants - recommended):
 ```typescript
 import { ResourceItem } from '../../../types';
+import { RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL } from '../../../constants/item-constants';
 
 export const NewItem: ResourceItem = {
   itemId: 'new_item',
   name: 'New Item',
   description: 'Medieval fantasy description...',
   category: 'resource',
-  rarity: 'common',
-  tier: 1,
+  rarity: RARITY.COMMON,
   baseValue: 10,
   stackable: true,
-  allowedQualities: ['purity'],
-  allowedTraits: ['pristine', 'blessed'],
+  properties: {
+    tier: TIER.T1,
+    material: MATERIAL.GENERIC
+  },
+  allowedQualities: QUALITY_SETS.ORE,
+  allowedTraits: TRAIT_SETS.EQUIPMENT_PRISTINE,
   icon: {
     path: 'item-categories/icon.svg',
     material: 'generic'
@@ -181,6 +194,8 @@ export const NewItem: ResourceItem = {
 };
 ```
 **Then register in**: `be/data/items/ItemRegistry.ts`
+
+**Item Constants**: See [be/data/constants/item-constants.ts](be/data/constants/item-constants.ts) and [README](be/data/constants/README.md) for all available constants (RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL, SLOT, WEAPON_SUBTYPE, etc.)
 
 ### Adding New Activity
 **File**: `be/data/locations/activities/{ActivityId}.ts`
@@ -1137,10 +1152,11 @@ Turn-based combat system with monsters, abilities, and stat tracking.
 - **UI components**: Reusable ability-button and item-button components with cooldowns, tooltips
 
 **Current Content:**
-- Monsters: Bandit Thug (L3, one-handed), Forest Wolf (L2, ranged), Goblin Warrior (L4, two-handed)
+- Monsters: Bandit Thug (L3, one-handed), Forest Wolf (L2, ranged), Goblin Warrior (L4, two-handed), Goblin Scout (L5, ranged), Goblin Shaman (L6, casting)
 - Abilities: Heavy Strike, Quick Slash (one-handed), Aimed Shot, Rapid Fire (ranged), Fire Bolt, Ice Shard (casting)
-- Combat activities: 3 combat encounters at different locations requiring appropriate weapon skills
-- Combat drops: Raw meat, fangs, animal hide, saber tooth + gold and basic equipment
+- Combat activities: 6 combat encounters at 3 locations (Forest Clearing, Goblin Village) requiring appropriate weapon skills
+- Combat drops: Raw meat, fangs, leather scraps, herbs, potions, crude equipment + gold
+- Locations: Goblin Village (3 progressive combat encounters), Forest Clearing (3 encounters)
 
 **Combat Flow:**
 1. Player starts combat via activity (requires appropriate weapon equipped)
