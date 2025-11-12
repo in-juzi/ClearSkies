@@ -1,4 +1,11 @@
-{
+/**
+ * Cook Shrimp
+ * Sauté plump shrimp in garlic and oil until they curl and turn a vibrant pink.
+ */
+
+import { Recipe } from '../../../types/crafting';
+
+export const CookShrimp: Recipe = {
   "recipeId": "cook-shrimp",
   "name": "Cook Shrimp",
   "description": "Sauté plump shrimp in garlic and oil until they curl and turn a vibrant pink.",
@@ -19,4 +26,4 @@
     }
   ],
   "experience": 25
-}
+} as const;

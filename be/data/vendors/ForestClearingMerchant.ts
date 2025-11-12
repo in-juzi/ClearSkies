@@ -1,4 +1,11 @@
-{
+/**
+ * Woodsman Bjorn
+ * A burly woodcutter with arms like tree trunks and a thick beard. His hands are calloused from years ...
+ */
+
+import { Vendor } from '../../types/crafting';
+
+export const ForestClearingMerchant: Vendor = {
   "vendorId": "forest-clearing-merchant",
   "name": "Woodsman Bjorn",
   "description": "A burly woodcutter with arms like tree trunks and a thick beard. His hands are calloused from years of swinging axes.",
@@ -13,4 +20,4 @@
       "stockType": "infinite"
     }
   ]
-}
+} as const;

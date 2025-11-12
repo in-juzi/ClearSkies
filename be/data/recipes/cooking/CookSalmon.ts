@@ -1,4 +1,11 @@
-{
+/**
+ * Cook Salmon
+ * Grill fresh salmon over an open flame until the flesh turns a delicate pink and flakes easily.
+ */
+
+import { Recipe } from '../../../types/crafting';
+
+export const CookSalmon: Recipe = {
   "recipeId": "cook-salmon",
   "name": "Cook Salmon",
   "description": "Grill fresh salmon over an open flame until the flesh turns a delicate pink and flakes easily.",
@@ -19,4 +26,4 @@
     }
   ],
   "experience": 35
-}
+} as const;

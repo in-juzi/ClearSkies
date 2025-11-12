@@ -1,4 +1,11 @@
-{
+/**
+ * Dockmaster Halvard
+ * A weathered fisherman with sun-darkened skin and keen eyes. He's spent decades on the waters and kno...
+ */
+
+import { Vendor } from '../../types/crafting';
+
+export const KennikDockMerchant: Vendor = {
   "vendorId": "kennik-dock-merchant",
   "name": "Dockmaster Halvard",
   "description": "A weathered fisherman with sun-darkened skin and keen eyes. He's spent decades on the waters and knows every fishing spot around Kennik.",
@@ -13,4 +20,4 @@
       "stockType": "infinite"
     }
   ]
-}
+} as const;

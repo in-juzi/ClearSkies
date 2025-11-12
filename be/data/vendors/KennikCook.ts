@@ -1,4 +1,11 @@
-{
+/**
+ * Cook Marta
+ * A cheerful woman with flour-dusted apron and warm smile. The delicious aroma of her cooking draws tr...
+ */
+
+import { Vendor } from '../../types/crafting';
+
+export const KennikCook: Vendor = {
   "vendorId": "kennik-cook",
   "name": "Cook Marta",
   "description": "A cheerful woman with flour-dusted apron and warm smile. The delicious aroma of her cooking draws travelers from across the village.",
@@ -18,4 +25,4 @@
       "stockType": "infinite"
     }
   ]
-}
+} as const;

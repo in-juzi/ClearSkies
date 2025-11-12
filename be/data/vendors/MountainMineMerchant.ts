@@ -1,4 +1,11 @@
-{
+/**
+ * Miner Gerta
+ * A grizzled miner with hands stained black from coal dust. Her sharp eyes can spot a valuable vein fr...
+ */
+
+import { Vendor } from '../../types/crafting';
+
+export const MountainMineMerchant: Vendor = {
   "vendorId": "mountain-mine-merchant",
   "name": "Miner Gerta",
   "description": "A grizzled miner with hands stained black from coal dust. Her sharp eyes can spot a valuable vein from across the cavern.",
@@ -13,4 +20,4 @@
       "stockType": "infinite"
     }
   ]
-}
+} as const;

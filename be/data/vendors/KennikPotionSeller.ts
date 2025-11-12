@@ -1,4 +1,11 @@
-{
+/**
+ * Alchemist Elara
+ * A mysterious woman with silver-streaked hair and stained fingers from years of brewing potions. Her ...
+ */
+
+import { Vendor } from '../../types/crafting';
+
+export const KennikPotionSeller: Vendor = {
   "vendorId": "kennik-potion-seller",
   "name": "Alchemist Elara",
   "description": "A mysterious woman with silver-streaked hair and stained fingers from years of brewing potions. Her shelves are lined with bubbling vials and aromatic herbs.",
@@ -13,4 +20,4 @@
       "stockType": "infinite"
     }
   ]
-}
+} as const;

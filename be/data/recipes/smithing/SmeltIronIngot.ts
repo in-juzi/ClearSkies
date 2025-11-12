@@ -1,4 +1,11 @@
-{
+/**
+ * Smelt Iron Ingot
+ * Heat raw iron ore in the scorching flames until impurities burn away, leaving a heavy iron ingot.
+ */
+
+import { Recipe } from '../../../types/crafting';
+
+export const SmeltIronIngot: Recipe = {
   "recipeId": "smelt-iron-ingot",
   "name": "Smelt Iron Ingot",
   "description": "Heat raw iron ore in the scorching flames until impurities burn away, leaving a heavy iron ingot.",
@@ -19,4 +26,4 @@
     }
   ],
   "experience": 45
-}
+} as const;

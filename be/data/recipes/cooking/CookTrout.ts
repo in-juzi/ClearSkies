@@ -1,4 +1,11 @@
-{
+/**
+ * Cook Trout
+ * Pan-fry tender trout fillets with a touch of herbs and butter until golden brown.
+ */
+
+import { Recipe } from '../../../types/crafting';
+
+export const CookTrout: Recipe = {
   "recipeId": "cook-trout",
   "name": "Cook Trout",
   "description": "Pan-fry tender trout fillets with a touch of herbs and butter until golden brown.",
@@ -19,4 +26,4 @@
     }
   ],
   "experience": 20
-}
+} as const;
