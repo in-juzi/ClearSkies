@@ -1143,3 +1143,72 @@ See `project/journal.md` for detailed development possibilities including:
 - World map
 - Real-time multiplayer features
 - NPC interactions and vendors
+
+## TypeScript Type System
+
+The backend uses an **interfaces-only TypeScript migration** for compile-time type safety without runtime changes.
+
+### Architecture
+
+**Type Definitions** ([be/types/](be/types/)):
+- [common.ts](be/types/common.ts) - Base types (Rarity, Stats, Skill, IconConfig, ItemInstance)
+- [items.ts](be/types/items.ts) - Item hierarchy (Item, EquipmentItem, WeaponItem, ArmorItem, ConsumableItem, ResourceItem)
+- [combat.ts](be/types/combat.ts) - Combat system (Monster, Ability, ActiveCombat, CombatStats)
+- [locations.ts](be/types/locations.ts) - Locations (Location, Facility, Activity, DropTable, Biome)
+- [crafting.ts](be/types/crafting.ts) - Crafting (Recipe, Vendor, ActiveCrafting)
+- [guards.ts](be/types/guards.ts) - Type guard functions (isWeaponItem, isEquipmentItem, etc.)
+- [index.ts](be/types/index.ts) - Central export file
+
+**Typed Services**:
+- [itemService.ts](be/services/itemService.ts) - Item management with full type annotations
+- [combatService.ts](be/services/combatService.ts) - Combat calculations with typed monsters/abilities
+- [locationService.ts](be/services/locationService.ts) - Location/activity system with type safety
+- [recipeService.ts](be/services/recipeService.ts) - Recipe management with typed ingredients/outputs
+- [vendorService.ts](be/services/vendorService.ts) - Vendor transactions with typed stock
+
+### Features
+
+✅ **70+ TypeScript interfaces** covering all game systems
+✅ **Type guards** for runtime type narrowing (`isWeaponItem`, `isEquipmentItem`)
+✅ **100% backward compatible** - works alongside existing JavaScript
+✅ **Compile-time validation** - catches errors before runtime
+✅ **IDE support** - IntelliSense, autocomplete, jump-to-definition
+✅ **Declaration files** (.d.ts) generated for external use
+✅ **Source maps** for debugging TypeScript code
+
+### Build Commands
+
+```bash
+npm run build          # Compile TypeScript to JavaScript
+npm run build:watch    # Watch mode for development
+npm run type-check     # Type check without emitting files
+```
+
+### Usage Example
+
+```typescript
+import { Item, isWeaponItem } from '../types';
+import itemService from '../services/itemService';
+
+// Type-safe item retrieval
+const item: Item | undefined = itemService.getItemDefinition('iron_sword');
+
+// Type narrowing with guards
+if (isWeaponItem(item)) {
+  item.properties.damageRoll; // ✅ Autocomplete + type checking
+  item.properties.armor;       // ❌ Compile error - weapons don't have armor
+}
+```
+
+### Configuration
+
+**tsconfig.json**: TypeScript compiler settings
+- Target: ES2020
+- Module: CommonJS
+- Strict mode: Disabled (gradual migration)
+- Declaration files: Enabled (.d.ts generation)
+- Source maps: Enabled
+- Allows JavaScript: Yes (hybrid codebase)
+
+**Output**: Compiled files in `be/dist/`
+
