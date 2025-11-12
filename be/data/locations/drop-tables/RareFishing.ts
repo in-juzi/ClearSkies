@@ -11,7 +11,7 @@ export const RareFishing: DropTable = {
   "description": "Rare treasures pulled from the water",
   "drops": [
     {
-      "itemId": "copper_sword",
+      "itemId": "bronze_sword",
       "weight": 3,
       "quantity": {
         "min": 1,

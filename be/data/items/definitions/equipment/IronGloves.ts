@@ -22,14 +22,13 @@ export const IronGloves: EquipmentItem = {
   "rarity": "common",
   "stackable": false,
   "icon": {
-    "path": "item-categories/item_cat_body.svg",
-    "material": "iron"
+    "path": "items/gauntlet.svg",
+    "material": "iron_gloves"
   },
   "properties": {
     "weight": 4,
     "material": "iron",
     "tier": 2,
-    "defense": 3,
     "armor": 10,
     "evasion": -1,
     "durability": 120,

@@ -22,14 +22,13 @@ export const BronzeGloves: EquipmentItem = {
   "rarity": "common",
   "stackable": false,
   "icon": {
-    "path": "item-categories/item_cat_body.svg",
-    "material": "bronze"
+    "path": "items/gauntlet.svg",
+    "material": "bronze_gloves"
   },
   "properties": {
     "weight": 3,
     "material": "bronze",
     "tier": 1,
-    "defense": 2,
     "armor": 6,
     "evasion": 0,
     "durability": 90,

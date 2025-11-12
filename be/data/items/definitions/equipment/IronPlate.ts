@@ -29,7 +29,6 @@ export const IronPlate: EquipmentItem = {
     "weight": 20,
     "material": "iron",
     "tier": 2,
-    "defense": 8,
     "armor": 40,
     "evasion": -8,
     "durability": 200,

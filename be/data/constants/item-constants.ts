@@ -166,7 +166,8 @@ export const SKILL_SOURCE = {
   WOODCUTTING: 'woodcutting',
   MINING: 'mining',
   FISHING: 'fishing',
-  HERBALISM: 'herbalism',
+  GATHERING: 'gathering',  // Renamed from HERBALISM
+  ALCHEMY: 'alchemy',      // NEW: Potion/reagent crafting
   SMITHING: 'smithing',
   COOKING: 'cooking',
   COMBAT: 'combat',

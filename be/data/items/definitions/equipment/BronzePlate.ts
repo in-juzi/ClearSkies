@@ -29,7 +29,6 @@ export const BronzePlate: EquipmentItem = {
     "weight": 15,
     "material": "bronze",
     "tier": 1,
-    "defense": 5,
     "armor": 25,
     "evasion": -5,
     "durability": 150,

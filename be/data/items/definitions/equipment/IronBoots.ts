@@ -22,14 +22,13 @@ export const IronBoots: EquipmentItem = {
   "rarity": "common",
   "stackable": false,
   "icon": {
-    "path": "item-categories/item_cat_body.svg",
-    "material": "iron"
+    "path": "items/metal-boot.svg",
+    "material": "iron_boots"
   },
   "properties": {
     "weight": 6,
     "material": "iron",
     "tier": 2,
-    "defense": 4,
     "armor": 12,
     "evasion": -2,
     "durability": 130,

@@ -22,14 +22,13 @@ export const IronHelm: EquipmentItem = {
   "rarity": "common",
   "stackable": false,
   "icon": {
-    "path": "item-categories/item_cat_body.svg",
-    "material": "iron"
+    "path": "items/light-helm.svg",
+    "material": "iron_helm"
   },
   "properties": {
     "weight": 6,
     "material": "iron",
     "tier": 2,
-    "defense": 5,
     "armor": 15,
     "evasion": 0,
     "durability": 120,

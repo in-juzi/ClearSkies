@@ -29,7 +29,6 @@ export const LeatherTunic: EquipmentItem = {
     "weight": 5,
     "material": "leather",
     "tier": 1,
-    "defense": 3,
     "armor": 10,
     "evasion": 8,
     "durability": 90,

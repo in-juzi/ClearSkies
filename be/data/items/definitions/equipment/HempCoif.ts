@@ -29,7 +29,6 @@ export const HempCoif: EquipmentItem = {
     "weight": 1,
     "material": "cloth",
     "tier": 1,
-    "defense": 1,
     "armor": 2,
     "evasion": 5,
     "durability": 50,

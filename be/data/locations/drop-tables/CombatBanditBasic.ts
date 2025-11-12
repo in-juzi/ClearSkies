@@ -35,7 +35,7 @@ export const CombatBanditBasic: DropTable = {
       }
     },
     {
-      "itemId": "copper_sword",
+      "itemId": "bronze_sword",
       "weight": 10,
       "quantity": {
         "min": 1,

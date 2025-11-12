@@ -22,14 +22,13 @@ export const BronzeBoots: EquipmentItem = {
   "rarity": "common",
   "stackable": false,
   "icon": {
-    "path": "item-categories/item_cat_body.svg",
-    "material": "bronze"
+    "path": "items/metal-boot.svg",
+    "material": "bronze_boots"
   },
   "properties": {
     "weight": 4,
     "material": "bronze",
     "tier": 1,
-    "defense": 2,
     "armor": 8,
     "evasion": 0,
     "durability": 95,

@@ -22,14 +22,13 @@ export const BronzeHelm: EquipmentItem = {
   "rarity": "common",
   "stackable": false,
   "icon": {
-    "path": "item-categories/item_cat_body.svg",
-    "material": "bronze"
+    "path": "items/light-helm.svg",
+    "material": "bronze_helm"
   },
   "properties": {
     "weight": 5,
     "material": "bronze",
     "tier": 1,
-    "defense": 3,
     "armor": 10,
     "evasion": 0,
     "durability": 100,

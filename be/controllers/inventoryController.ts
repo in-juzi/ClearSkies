@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import Player from '../models/Player';
 import itemService from '../services/itemService';
 import { QualityMap, TraitMap, ItemCategory, ConsumableItem } from '../types';
-import { isWeaponItem } from '../types/guards';
+import { isWeaponItem, isArmorItem } from '../types/guards';
 
 // ============================================================================
 // Type Definitions for Request Bodies
@@ -264,9 +264,24 @@ export const getItemCombatStats = async (req: Request<{ instanceId: string }>, r
       return;
     }
 
+    // Handle armor items
+    if (isArmorItem(itemDef)) {
+      res.json({
+        success: true,
+        stats: {
+          armor: itemDef.properties.armor || 0,
+          evasion: itemDef.properties.evasion || 0,
+          blockChance: itemDef.properties.blockChance || 0,
+          durability: itemDef.properties.durability,
+          requiredLevel: itemDef.properties.requiredLevel || 1
+        }
+      });
+      return;
+    }
+
     // Only calculate for weapons
     if (!isWeaponItem(itemDef)) {
-      res.status(400).json({ message: 'Item is not a weapon' });
+      res.status(400).json({ message: 'Item is not a weapon or armor' });
       return;
     }
 
