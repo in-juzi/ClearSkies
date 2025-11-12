@@ -1,4 +1,11 @@
-{
+/**
+ * Ice Shard
+ * Launch a jagged spike of ice that pierces your foe. The cold slows and damages.
+ */
+
+import { Ability } from '../../../types/combat';
+
+export const IceShard: Ability = {
   "abilityId": "ice_shard",
   "name": "Ice Shard",
   "description": "Launch a jagged spike of ice that pierces your foe. The cold slows and damages.",
@@ -8,7 +15,9 @@
   "manaCost": 15,
   "cooldown": 2,
   "requirements": {
-    "weaponTypes": ["casting"],
+    "weaponTypes": [
+      "casting"
+    ],
     "minSkillLevel": 1
   },
   "effects": {
@@ -21,4 +30,4 @@
     "path": "abilities/ice_shard.svg",
     "material": "default"
   }
-}
+} as const;

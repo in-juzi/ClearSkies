@@ -1,4 +1,11 @@
-{
+/**
+ * Fire Bolt
+ * Hurl a bolt of searing flame at your enemy. The arcane fires burn hot and true.
+ */
+
+import { Ability } from '../../../types/combat';
+
+export const FireBolt: Ability = {
   "abilityId": "fire_bolt",
   "name": "Fire Bolt",
   "description": "Hurl a bolt of searing flame at your enemy. The arcane fires burn hot and true.",
@@ -8,7 +15,9 @@
   "manaCost": 20,
   "cooldown": 3,
   "requirements": {
-    "weaponTypes": ["casting"],
+    "weaponTypes": [
+      "casting"
+    ],
     "minSkillLevel": 1
   },
   "effects": {
@@ -21,4 +30,4 @@
     "path": "abilities/fire_bolt.svg",
     "material": "default"
   }
-}
+} as const;

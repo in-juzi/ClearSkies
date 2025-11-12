@@ -1,4 +1,11 @@
-{
+/**
+ * Aimed Shot
+ * Take careful aim and fire a precise shot with increased critical hit chance. Patience yields deadly ...
+ */
+
+import { Ability } from '../../../types/combat';
+
+export const AimedShot: Ability = {
   "abilityId": "aimed_shot",
   "name": "Aimed Shot",
   "description": "Take careful aim and fire a precise shot with increased critical hit chance. Patience yields deadly results.",
@@ -8,7 +15,10 @@
   "manaCost": 10,
   "cooldown": 2,
   "requirements": {
-    "weaponTypes": ["ranged", "gun"],
+    "weaponTypes": [
+      "ranged",
+      "gun"
+    ],
     "minSkillLevel": 1
   },
   "effects": {
@@ -22,4 +32,4 @@
     "path": "abilities/aimed_shot.svg",
     "material": "default"
   }
-}
+} as const;

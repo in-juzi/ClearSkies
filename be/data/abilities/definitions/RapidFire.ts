@@ -1,4 +1,11 @@
-{
+/**
+ * Rapid Fire
+ * Unleash a flurry of quick shots that deal moderate damage. Quantity has a quality all its own.
+ */
+
+import { Ability } from '../../../types/combat';
+
+export const RapidFire: Ability = {
   "abilityId": "rapid_fire",
   "name": "Rapid Fire",
   "description": "Unleash a flurry of quick shots that deal moderate damage. Quantity has a quality all its own.",
@@ -8,7 +15,10 @@
   "manaCost": 12,
   "cooldown": 2,
   "requirements": {
-    "weaponTypes": ["ranged", "gun"],
+    "weaponTypes": [
+      "ranged",
+      "gun"
+    ],
     "minSkillLevel": 3
   },
   "effects": {
@@ -21,4 +31,4 @@
     "path": "abilities/rapid_fire.svg",
     "material": "default"
   }
-}
+} as const;
