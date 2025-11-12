@@ -1,0 +1,42 @@
+/**
+ * Copper Ore Mining
+ * Common copper ore deposits found in mountain mines
+ */
+
+import { DropTable } from '../../../types/locations';
+
+export const MiningCopper: DropTable = {
+  "dropTableId": "mining-copper",
+  "name": "Copper Ore Mining",
+  "description": "Common copper ore deposits found in mountain mines",
+  "drops": [
+    {
+      "type": "item",
+      "itemId": "copper_ore",
+      "weight": 80,
+      "quantity": {
+        "min": 1,
+        "max": 3
+      },
+      "qualityBonus": 0,
+      "comment": "Standard copper ore drop"
+    },
+    {
+      "type": "item",
+      "itemId": "copper_ore",
+      "weight": 15,
+      "quantity": {
+        "min": 2,
+        "max": 4
+      },
+      "qualityBonus": 1,
+      "comment": "Higher quality copper ore"
+    },
+    {
+      "type": "dropTable",
+      "dropTableId": "rare-low-mining",
+      "weight": 5,
+      "comment": "Rare gemstone drops (5% chance) - rolls on shared rare table"
+    }
+  ]
+} as const;

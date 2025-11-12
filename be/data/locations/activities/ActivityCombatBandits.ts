@@ -1,0 +1,43 @@
+/**
+ * Fight Bandits
+ * Engage forest bandits in combat
+ */
+
+import { ActivityUnion } from '../../../types/locations';
+
+export const ActivityCombatBandits: ActivityUnion = {
+  "activityId": "activity-combat-bandits",
+  "name": "Fight Bandits",
+  "description": "Engage forest bandits in combat",
+  "type": "combat",
+  "duration": 60,
+  "requirements": {
+    "skills": {
+      "oneHanded": 1
+    },
+    "attributes": {
+      "strength": 3
+    }
+  },
+  "rewards": {
+    "experience": {
+      "oneHanded": 50
+    },
+    "items": [
+      {
+        "itemId": "copper_sword",
+        "quantity": {
+          "min": 1,
+          "max": 1
+        },
+        "chance": 0.1
+      }
+    ],
+    "gold": {
+      "min": 10,
+      "max": 30
+    }
+  },
+  "stub": true,
+  "stubMessage": "Combat system not yet implemented. You fought bravely against the bandits!"
+} as const;
