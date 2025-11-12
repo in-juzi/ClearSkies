@@ -28,6 +28,7 @@ export interface Combat {
   combatLog: CombatLogEntry[];
   availableAbilities: Ability[];
   abilityCooldowns: { [abilityId: string]: number };
+  combatEnded?: boolean; // Flag indicating combat has ended
 }
 
 export interface CombatLogEntry {
@@ -40,7 +41,7 @@ export interface Ability {
   abilityId: string;
   name: string;
   description: string;
-  type: string;
+  type: 'attack' | 'buff' | 'debuff' | 'heal';
   powerMultiplier: number;
   manaCost: number;
   cooldown: number;
@@ -115,10 +116,17 @@ export class CombatService {
     return this.http.post<any>(`${this.apiUrl}/action`, body).pipe(
       tap(response => {
         if (response.combat) {
-          this.setCombatState(response.combat);
+          // Check if combat ended with final state included
+          if (response.rewards && response.combat.combatEnded) {
+            // Combat ended - we have final state with monster at 0 HP
+            this.handleCombatEnd(response.combat, response.rewards);
+          } else {
+            // Ongoing combat - normal state update
+            this.setCombatState(response.combat);
+          }
         } else if (response.rewards) {
-          // Combat ended
-          this.handleCombatEnd(response.rewards);
+          // Legacy: Combat ended without final state (shouldn't happen anymore)
+          this.handleCombatEnd(null, response.rewards);
         }
         this.combatError.set(null);
       })
@@ -144,10 +152,15 @@ export class CombatService {
     return this.http.get<any>(`${this.apiUrl}/status`).pipe(
       tap(response => {
         if (response.inCombat && response.combat) {
-          this.setCombatState(response.combat);
+          // Check if combat ended with final state
+          if (response.rewards && response.combat.combatEnded) {
+            this.handleCombatEnd(response.combat, response.rewards);
+          } else {
+            this.setCombatState(response.combat);
+          }
         } else {
           if (response.rewards) {
-            this.handleCombatEnd(response.rewards);
+            this.handleCombatEnd(null, response.rewards);
           } else {
             this.stopStatusChecks();
           }
@@ -234,28 +247,33 @@ export class CombatService {
   /**
    * Handle combat end and rewards
    */
-  private handleCombatEnd(rewards: CombatRewards): void {
+  private handleCombatEnd(finalCombatState: any | null, rewards: CombatRewards): void {
     // Stop status checks immediately to prevent clearing combat state
     this.stopStatusChecks();
 
-    // Add rewards to combat log instead of showing modal
-    const combat = this.activeCombat();
-    if (combat) {
-      // Set monster health to 0 to visually show defeat
-      if (rewards.victory) {
-        combat.monsterHealth.current = 0;
-      }
+    if (finalCombatState) {
+      // We have the final combat state from the backend with accurate HP, timers, and logs
+      this.setCombatState(finalCombatState);
+    } else {
+      // Legacy fallback: manually update combat state
+      const combat = this.activeCombat();
+      if (combat) {
+        // Set monster health to 0 to visually show defeat
+        if (rewards.victory) {
+          combat.monsterHealth.current = 0;
+        }
 
-      const rewardMessages = this.formatRewardsForLog(rewards);
-      rewardMessages.forEach(msg => {
-        combat.combatLog.push({
-          timestamp: new Date(),
-          message: msg.message,
-          type: msg.type as any
+        const rewardMessages = this.formatRewardsForLog(rewards);
+        rewardMessages.forEach(msg => {
+          combat.combatLog.push({
+            timestamp: new Date(),
+            message: msg.message,
+            type: msg.type as any
+          });
         });
-      });
-      // Update combat state with new log entries
-      this.activeCombat.set({ ...combat });
+        // Update combat state with new log entries
+        this.activeCombat.set({ ...combat });
+      }
     }
 
     this.inCombat.set(false);

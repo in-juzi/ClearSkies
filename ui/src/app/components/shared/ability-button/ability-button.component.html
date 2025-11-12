@@ -46,15 +46,73 @@
     <div class="ability-tooltip">
       <div class="tooltip-header">
         <div class="tooltip-name">{{ ability().name }}</div>
-        @if (ability().type) {
-          <div class="tooltip-type">{{ ability().type }}</div>
-        }
+        <div class="tooltip-badges">
+          @if (abilityTypeLabel()) {
+            <div class="tooltip-type" [class]="'tooltip-type-' + ability().type">
+              {{ abilityTypeLabel() }}
+            </div>
+          }
+          @if (targetTypeLabel()) {
+            <div class="tooltip-target">{{ targetTypeLabel() }}</div>
+          }
+        </div>
       </div>
 
       <div class="tooltip-description">
         {{ ability().description }}
       </div>
 
+      <!-- Effects Section -->
+      @if (damageText() || healingText() || buffText()) {
+        <div class="tooltip-effects">
+          <div class="section-label">Effects</div>
+          @if (damageText()) {
+            <div class="effect-item effect-damage">
+              <span class="effect-icon">⚔️</span>
+              <span class="effect-text">{{ damageText() }}</span>
+            </div>
+          }
+          @if (healingText()) {
+            <div class="effect-item effect-heal">
+              <span class="effect-icon">💚</span>
+              <span class="effect-text">{{ healingText() }}</span>
+            </div>
+          }
+          @if (buffText()) {
+            <div class="effect-item effect-buff">
+              <span class="effect-icon">✨</span>
+              <span class="effect-text">{{ buffText() }}</span>
+            </div>
+          }
+          @if (ability().effects?.critChanceBonus) {
+            <div class="effect-item effect-crit">
+              <span class="effect-icon">💥</span>
+              <span class="effect-text">+{{ ability().effects!.critChanceBonus }}% critical chance</span>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Requirements Section -->
+      @if (weaponRequirementsText() || skillRequirementText()) {
+        <div class="tooltip-requirements">
+          <div class="section-label">Requirements</div>
+          @if (weaponRequirementsText()) {
+            <div class="requirement-item">
+              <span class="requirement-icon">🗡️</span>
+              <span class="requirement-text">{{ weaponRequirementsText() }}</span>
+            </div>
+          }
+          @if (skillRequirementText()) {
+            <div class="requirement-item">
+              <span class="requirement-icon">📊</span>
+              <span class="requirement-text">{{ skillRequirementText() }}</span>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Stats Section -->
       <div class="tooltip-stats">
         @if ((ability().manaCost ?? 0) > 0) {
           <div class="tooltip-stat">
@@ -67,6 +125,13 @@
           <div class="tooltip-stat">
             <span class="stat-label">Cooldown:</span>
             <span class="stat-value">{{ ability().cooldown }} turns</span>
+          </div>
+        }
+
+        @if (ability().powerMultiplier && ability().powerMultiplier !== 1) {
+          <div class="tooltip-stat">
+            <span class="stat-label">Power:</span>
+            <span class="stat-value">{{ ability().powerMultiplier }}x</span>
           </div>
         }
       </div>

@@ -6,7 +6,7 @@
       <!-- Player Side -->
       <div class="combatant player-side">
         <div class="combatant-info">
-          <div class="combatant-name">{{ player()?.characterName || 'You' }}</div>
+          <div class="combatant-name">{{ authService.currentUser()?.username || 'You' }}</div>
           <div class="combatant-level">Level {{ player()?.level || 1 }}</div>
         </div>
 

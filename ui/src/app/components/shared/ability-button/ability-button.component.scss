@@ -199,8 +199,9 @@
   bottom: calc(100% + 12px);
   left: 50%;
   transform: translateX(-50%) translateY(4px);
-  width: 280px;
-  padding: 12px;
+  width: 320px;
+  max-width: 90vw;
+  padding: 14px;
   background: linear-gradient(135deg, rgba(26, 26, 46, 0.98), rgba(22, 33, 62, 0.98));
   border: 2px solid var(--color-accent-purple);
   border-radius: 8px;
@@ -210,6 +211,7 @@
   transition: all 0.2s ease;
   pointer-events: none;
   z-index: 1000;
+  backdrop-filter: blur(8px);
 
   // Tooltip arrow
   &::after {
@@ -228,7 +230,7 @@
 
 .tooltip-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 8px;
   margin-bottom: 8px;
@@ -240,25 +242,159 @@
   font-size: 16px;
   font-weight: bold;
   color: var(--color-secondary);
+  flex: 1;
+}
+
+.tooltip-badges {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-end;
 }
 
 .tooltip-type {
   font-size: 11px;
   font-weight: 600;
+  color: white;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.tooltip-type-attack {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  box-shadow: 0 2px 4px rgba(220, 38, 38, 0.3);
+}
+
+.tooltip-type-buff {
+  background: linear-gradient(135deg, #16a34a, #15803d);
+  box-shadow: 0 2px 4px rgba(22, 163, 74, 0.3);
+}
+
+.tooltip-type-debuff {
+  background: linear-gradient(135deg, #9333ea, #7e22ce);
+  box-shadow: 0 2px 4px rgba(147, 51, 234, 0.3);
+}
+
+.tooltip-type-heal {
+  background: linear-gradient(135deg, #059669, #047857);
+  box-shadow: 0 2px 4px rgba(5, 150, 105, 0.3);
+}
+
+.tooltip-target {
+  font-size: 10px;
+  font-weight: 500;
   color: var(--color-text-secondary);
   text-transform: uppercase;
   padding: 2px 6px;
-  background: rgba(102, 126, 234, 0.2);
-  border-radius: 4px;
+  background: rgba(102, 126, 234, 0.15);
+  border-radius: 3px;
+  border: 1px solid rgba(102, 126, 234, 0.3);
 }
 
 .tooltip-description {
   font-size: 13px;
   color: var(--color-text-primary);
   line-height: 1.4;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
+// Section label for effects and requirements
+.section-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-accent-purple);
+  margin-bottom: 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+// Effects section
+.tooltip-effects {
+  margin-bottom: 10px;
+  padding: 8px;
+  background: rgba(102, 126, 234, 0.05);
+  border-radius: 6px;
+  border: 1px solid rgba(102, 126, 234, 0.15);
+}
+
+.effect-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--color-text-primary);
+  padding: 4px 0;
+
+  &:not(:last-child) {
+    margin-bottom: 2px;
+  }
+}
+
+.effect-icon {
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.effect-text {
+  flex: 1;
+  line-height: 1.3;
+}
+
+.effect-damage .effect-text {
+  color: #fca5a5;
+}
+
+.effect-heal .effect-text {
+  color: #86efac;
+}
+
+.effect-buff .effect-text {
+  color: #c4b5fd;
+}
+
+.effect-crit .effect-text {
+  color: #fbbf24;
+}
+
+// Requirements section
+.tooltip-requirements {
+  margin-bottom: 10px;
+  padding: 8px;
+  background: rgba(251, 191, 36, 0.05);
+  border-radius: 6px;
+  border: 1px solid rgba(251, 191, 36, 0.2);
+}
+
+.requirement-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--color-text-primary);
+  padding: 3px 0;
+
+  &:not(:last-child) {
+    margin-bottom: 2px;
+  }
+}
+
+.requirement-icon {
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.requirement-text {
+  flex: 1;
+  color: #fbbf24;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+// Stats section
 .tooltip-stats {
   display: flex;
   flex-direction: column;

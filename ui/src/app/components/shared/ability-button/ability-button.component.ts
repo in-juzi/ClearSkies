@@ -3,6 +3,7 @@ import { IconComponent } from '../icon/icon.component';
 
 /**
  * Base ability interface for all ability types (combat, gathering, crafting)
+ * Extended to include full combat ability properties
  */
 export interface BaseAbility {
   abilityId: string;
@@ -14,7 +15,28 @@ export interface BaseAbility {
   };
   manaCost?: number;
   cooldown?: number;
-  type?: string;
+  type?: 'attack' | 'buff' | 'debuff' | 'heal';
+  targetType?: 'single' | 'aoe' | 'self';
+  powerMultiplier?: number;
+  requirements?: {
+    weaponTypes?: string[];
+    minSkillLevel?: number;
+  };
+  effects?: {
+    damage?: {
+      type: 'physical' | 'magical';
+      multiplier: number;
+    };
+    heal?: {
+      multiplier: number;
+    };
+    buff?: {
+      stat: string;
+      amount: number;
+      duration: number;
+    };
+    critChanceBonus?: number;
+  };
 }
 
 /**
@@ -103,6 +125,119 @@ export class AbilityButtonComponent {
     }
     return '';
   });
+
+  /**
+   * Get formatted damage text for display
+   */
+  damageText = computed(() => {
+    const ability = this.ability();
+    if (!ability.effects?.damage) return null;
+
+    const mult = ability.effects.damage.multiplier;
+    const type = ability.effects.damage.type;
+    const percentage = Math.round((mult - 1) * 100);
+
+    if (mult === 1) {
+      return `Base ${type} damage`;
+    } else if (mult > 1) {
+      return `${percentage}% increased ${type} damage`;
+    } else {
+      return `${Math.abs(percentage)}% reduced ${type} damage`;
+    }
+  });
+
+  /**
+   * Get formatted healing text for display
+   */
+  healingText = computed(() => {
+    const ability = this.ability();
+    if (!ability.effects?.heal) return null;
+
+    const mult = ability.effects.heal.multiplier;
+    const percentage = Math.round(mult * 100);
+
+    return `Heals for ${percentage}% of power`;
+  });
+
+  /**
+   * Get formatted buff text for display
+   */
+  buffText = computed(() => {
+    const ability = this.ability();
+    if (!ability.effects?.buff) return null;
+
+    const buff = ability.effects.buff;
+    return `+${buff.amount} ${buff.stat} for ${buff.duration} turns`;
+  });
+
+  /**
+   * Get formatted weapon requirements
+   */
+  weaponRequirementsText = computed(() => {
+    const reqs = this.ability().requirements?.weaponTypes;
+    if (!reqs || reqs.length === 0) return null;
+
+    return reqs.map(w => this.formatWeaponType(w)).join(' or ');
+  });
+
+  /**
+   * Get formatted skill requirement
+   */
+  skillRequirementText = computed(() => {
+    const minLevel = this.ability().requirements?.minSkillLevel;
+    if (!minLevel) return null;
+
+    return `Requires level ${minLevel}`;
+  });
+
+  /**
+   * Get ability type badge text
+   */
+  abilityTypeLabel = computed(() => {
+    const type = this.ability().type;
+    if (!type) return null;
+
+    const labels: Record<string, string> = {
+      attack: 'Attack',
+      buff: 'Buff',
+      debuff: 'Debuff',
+      heal: 'Heal'
+    };
+
+    return labels[type] || type;
+  });
+
+  /**
+   * Get target type display text
+   */
+  targetTypeLabel = computed(() => {
+    const target = this.ability().targetType;
+    if (!target) return null;
+
+    const labels: Record<string, string> = {
+      single: 'Single Target',
+      aoe: 'Area of Effect',
+      self: 'Self'
+    };
+
+    return labels[target] || target;
+  });
+
+  /**
+   * Format weapon type for display
+   */
+  private formatWeaponType(weaponType: string): string {
+    const formatted: Record<string, string> = {
+      oneHanded: 'One-Handed',
+      twoHanded: 'Two-Handed',
+      dualWield: 'Dual Wield',
+      ranged: 'Ranged',
+      casting: 'Casting Staff',
+      gun: 'Firearm'
+    };
+
+    return formatted[weaponType] || weaponType;
+  }
 
   /**
    * Handle button click

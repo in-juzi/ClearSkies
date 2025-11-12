@@ -16,7 +16,7 @@ import { ItemButtonComponent } from '../../shared/item-button/item-button.compon
 })
 export class CombatComponent implements OnInit, OnDestroy, AfterViewChecked {
   private combatService = inject(CombatService);
-  private authService = inject(AuthService);
+  authService = inject(AuthService);
   private confirmDialog = inject(ConfirmDialogService);
   inventoryService = inject(InventoryService);
 
@@ -177,6 +177,15 @@ export class CombatComponent implements OnInit, OnDestroy, AfterViewChecked {
    * Update attack timer values
    */
   private updateTimers(): void {
+    const combat = this.activeCombat();
+
+    // Stop updating timers if combat has ended
+    if (combat?.combatEnded || this.combatEnded()) {
+      this.playerAttackTimer.set(0);
+      this.monsterAttackTimer.set(0);
+      return;
+    }
+
     const playerTime = this.combatService.getTimeUntilPlayerAttack();
     const monsterTime = this.combatService.getTimeUntilMonsterAttack();
 
