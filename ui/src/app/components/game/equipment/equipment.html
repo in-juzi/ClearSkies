@@ -25,7 +25,10 @@
 
         <!-- Equipped item -->
         @if (getItemInSlot(slot.name); as item) {
-          <div class="slot-item" [class]="getRarityClass(item.definition.rarity)">
+          <div
+            class="slot-item"
+            [class]="getRarityClass(item.definition.rarity)"
+            (click)="onItemClick(slot.name)">
             @if (item.definition.icon) {
               <app-icon [icon]="item.definition.icon" [autoSize]="true" class="item-icon"></app-icon>
             } @else {
@@ -47,5 +50,20 @@
   <div class="equipment-help">
     <p><strong>Drag & Drop</strong> equipment from inventory to equip</p>
     <p><strong>Right-click</strong> equipped items to unequip</p>
+    <p><strong>Left-click</strong> equipped items to view details</p>
   </div>
+
+  <!-- Item Details Panel (Shared Component) -->
+  <app-item-details-panel
+    *ngIf="selectedItem"
+    [item]="selectedItem"
+    [showActions]="true"
+    [showDropControls]="false"
+    (close)="closeItemDetails()"
+    (equipItem)="equipItem($event)"
+    (unequipItem)="unequipItem($event)"
+    (useItem)="useItem($event)"
+    (removeItem)="removeItem($event.instanceId)"
+    (removeAllItems)="removeAllItems($event)">
+  </app-item-details-panel>
 </div>

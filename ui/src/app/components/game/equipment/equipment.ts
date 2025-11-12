@@ -4,6 +4,7 @@ import { EquipmentService } from '../../../services/equipment.service';
 import { InventoryService } from '../../../services/inventory.service';
 import { ItemDetails, EquipmentSlot } from '../../../models/inventory.model';
 import { IconComponent } from '../../shared/icon/icon.component';
+import { ItemDetailsPanelComponent } from '../../shared/item-details-panel/item-details-panel.component';
 
 interface SlotConfig {
   name: EquipmentSlot;
@@ -15,13 +16,16 @@ interface SlotConfig {
 @Component({
   selector: 'app-equipment',
   standalone: true,
-  imports: [CommonModule, IconComponent],
+  imports: [CommonModule, IconComponent, ItemDetailsPanelComponent],
   templateUrl: './equipment.html',
   styleUrl: './equipment.scss',
 })
 export class Equipment {
   equipmentService = inject(EquipmentService);
   inventoryService = inject(InventoryService);
+
+  // Selected item for details panel
+  selectedItem: ItemDetails | null = null;
 
   // Slot configuration with grid positions
   slotConfigs: SlotConfig[] = [
@@ -133,5 +137,79 @@ export class Equipment {
    */
   getRarityClass(rarity: string): string {
     return `rarity-${rarity}`;
+  }
+
+  /**
+   * Handle click on equipped item - show details panel
+   */
+  onItemClick(slotName: EquipmentSlot): void {
+    const item = this.getItemInSlot(slotName);
+    if (item) {
+      this.selectedItem = item;
+    }
+  }
+
+  /**
+   * Close item details panel
+   */
+  closeItemDetails(): void {
+    this.selectedItem = null;
+  }
+
+  /**
+   * Handle equip action from details panel
+   * (Not typically used in equipment component, but included for completeness)
+   */
+  equipItem(instanceId: string): void {
+    // The shared panel might emit this, but items are already equipped in this view
+    console.log('Item is already equipped:', instanceId);
+  }
+
+  /**
+   * Handle unequip action from details panel
+   */
+  unequipItem(instanceId: string): void {
+    if (!this.selectedItem) return;
+
+    const slot = this.selectedItem.definition.slot;
+    if (!slot) {
+      console.error('Item has no slot defined');
+      return;
+    }
+
+    this.equipmentService.unequipItem(slot).subscribe({
+      next: () => {
+        console.log('Item unequipped');
+        this.inventoryService.getInventory().subscribe();
+        this.selectedItem = null;
+      },
+      error: (error) => {
+        console.error('Error unequipping item:', error);
+      }
+    });
+  }
+
+  /**
+   * Handle use item action from details panel
+   * (Not applicable for equipped items, but included for interface completeness)
+   */
+  useItem(instanceId: string): void {
+    console.log('Cannot use equipped items directly');
+  }
+
+  /**
+   * Handle remove item action from details panel
+   * (Cannot drop equipped items)
+   */
+  removeItem(instanceId: string): void {
+    console.log('Cannot drop equipped items. Unequip first.');
+  }
+
+  /**
+   * Handle remove all action from details panel
+   * (Cannot drop equipped items)
+   */
+  removeAllItems(instanceId: string): void {
+    console.log('Cannot drop equipped items. Unequip first.');
   }
 }

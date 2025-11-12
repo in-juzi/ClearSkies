@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, Renderer2, ElementRef } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InventoryService } from '../../../services/inventory.service';
@@ -6,35 +6,20 @@ import { ConfirmDialogService } from '../../../services/confirm-dialog.service';
 import { ItemDetails } from '../../../models/inventory.model';
 import { ItemModifiersComponent } from '../../shared/item-modifiers/item-modifiers.component';
 import { IconComponent } from '../../shared/icon/icon.component';
+import { ItemDetailsPanelComponent } from '../../shared/item-details-panel/item-details-panel.component';
 
 @Component({
   selector: 'app-inventory',
   standalone: true,
-  imports: [CommonModule, FormsModule, ItemModifiersComponent, IconComponent],
+  imports: [CommonModule, FormsModule, ItemModifiersComponent, IconComponent, ItemDetailsPanelComponent],
   templateUrl: './inventory.component.html',
   styleUrl: './inventory.component.css'
 })
 export class InventoryComponent implements OnInit {
   private confirmDialog = inject(ConfirmDialogService);
-  
+
   selectedItem: ItemDetails | null = null;
   selectedCategory: string = 'all';
-  dropQuantity: number = 1; // Quantity to drop
-  isUsingItem: boolean = false; // Track if item is being used
-
-  // Drag state
-  private isDragging = false;
-  private dragStartX = 0;
-  private dragStartY = 0;
-  private panelStartX = 0;
-  private panelStartY = 0;
-  private dragElement: HTMLElement | null = null;
-
-  // Store panel position (defaults to center)
-  panelLeft: string = '50%';
-  panelTop: string = '50%';
-  panelTransform: string = 'translate(-50%, -50%)';
-  hasBeenDragged = false;
 
   categories = [
     { value: 'all', label: 'All Items', shortLabel: 'All' },
@@ -44,9 +29,7 @@ export class InventoryComponent implements OnInit {
   ];
 
   constructor(
-    public inventoryService: InventoryService,
-    private renderer: Renderer2,
-    private el: ElementRef
+    public inventoryService: InventoryService
   ) {}
 
   ngOnInit(): void {
@@ -73,8 +56,6 @@ export class InventoryComponent implements OnInit {
 
   selectItem(item: ItemDetails): void {
     this.selectedItem = item;
-    // Reset drop quantity to 1 when selecting a new item
-    this.dropQuantity = 1;
   }
 
   closeItemDetails(): void {
@@ -111,7 +92,7 @@ export class InventoryComponent implements OnInit {
   }
 
   async removeItem(instanceId: string, quantity?: number): Promise<void> {
-    const quantityToRemove = quantity || this.dropQuantity;
+    const quantityToRemove = quantity || 1;
     const itemName = this.selectedItem?.definition.name || 'this item';
 
     const confirmed = await this.confirmDialog.confirm({
@@ -128,11 +109,9 @@ export class InventoryComponent implements OnInit {
     this.inventoryService.removeItem({ instanceId, quantity: quantityToRemove }).subscribe({
       next: () => {
         console.log('Item removed');
-        // Close panel if all items were dropped, otherwise reset quantity to 1
+        // Close panel if all items were dropped
         if (this.selectedItem && quantityToRemove >= this.selectedItem.quantity) {
           this.selectedItem = null;
-        } else {
-          this.dropQuantity = 1;
         }
       },
       error: (error) => {
@@ -229,14 +208,11 @@ export class InventoryComponent implements OnInit {
    * Use a consumable item
    */
   useItem(instanceId: string): void {
-    if (!this.selectedItem || this.isUsingItem) return;
-
-    this.isUsingItem = true;
+    if (!this.selectedItem) return;
 
     this.inventoryService.useItem(instanceId).subscribe({
       next: (response: any) => {
         console.log('Item used successfully:', response);
-        this.isUsingItem = false;
 
         // Close the details panel if item quantity is now 0
         setTimeout(() => {
@@ -252,169 +228,10 @@ export class InventoryComponent implements OnInit {
       },
       error: (error: any) => {
         console.error('Error using item:', error);
-        this.isUsingItem = false;
         // Optionally show error message to user
         alert(error.error?.message || 'Failed to use item');
       }
     });
-  }
-
-  updateDropQuantity(value: number): void {
-    if (!this.selectedItem) return;
-
-    // Clamp value between 1 and item quantity
-    this.dropQuantity = Math.max(1, Math.min(value, this.selectedItem.quantity));
-  }
-
-  getMaxDropQuantity(): number {
-    return this.selectedItem?.quantity || 1;
-  }
-
-  getQualityKeys(qualities: any): string[] {
-    if (!qualities) return [];
-    return Object.keys(qualities);
-  }
-
-  formatEffectType(effectKey: string): string {
-    const typeMap: { [key: string]: string } = {
-      'vendorPrice': 'Vendor Price',
-      'alchemy': 'Alchemy',
-      'smithing': 'Smithing',
-      'cooking': 'Cooking',
-      'burning': 'Burning',
-      'combat': 'Combat',
-      'consumption': 'Consumption'
-    };
-    return typeMap[effectKey] || effectKey;
-  }
-
-  formatEffectValue(effectData: any): string {
-    if (!effectData) return '';
-
-    const effects: string[] = [];
-
-    // Handle different effect properties
-    if (effectData.modifier !== undefined) {
-      const percentNum = (effectData.modifier - 1) * 100;
-      const percent = percentNum.toFixed(0);
-      effects.push(`${percentNum >= 0 ? '+' : ''}${percent}%`);
-    }
-
-    if (effectData.potencyMultiplier !== undefined) {
-      const percentNum = (effectData.potencyMultiplier - 1) * 100;
-      const percent = percentNum.toFixed(0);
-      effects.push(`Potency ${percentNum >= 0 ? '+' : ''}${percent}%`);
-    }
-
-    if (effectData.qualityBonus !== undefined) {
-      const percent = (effectData.qualityBonus * 100).toFixed(0);
-      effects.push(`Quality +${percent}%`);
-    }
-
-    if (effectData.efficiencyMultiplier !== undefined) {
-      const percentNum = (effectData.efficiencyMultiplier - 1) * 100;
-      const percent = percentNum.toFixed(0);
-      effects.push(`Efficiency ${percentNum >= 0 ? '+' : ''}${percent}%`);
-    }
-
-    if (effectData.healingMultiplier !== undefined) {
-      const percentNum = (effectData.healingMultiplier - 1) * 100;
-      const percent = percentNum.toFixed(0);
-      effects.push(`Healing ${percentNum >= 0 ? '+' : ''}${percent}%`);
-    }
-
-    if (effectData.damageBonus !== undefined) {
-      const percent = (effectData.damageBonus * 100).toFixed(0);
-      effects.push(`Damage +${percent}%`);
-    }
-
-    if (effectData.healthDrain !== undefined) {
-      effects.push(`Health Drain -${effectData.healthDrain}/sec`);
-    }
-
-    if (effectData.durabilityMultiplier !== undefined) {
-      const percentNum = (effectData.durabilityMultiplier - 1) * 100;
-      const percent = percentNum.toFixed(0);
-      effects.push(`Durability ${percentNum >= 0 ? '+' : ''}${percent}%`);
-    }
-
-    if (effectData.difficultyIncrease !== undefined) {
-      effects.push(`Difficulty +${effectData.difficultyIncrease}%`);
-    }
-
-    if (effectData.bonusProperties !== undefined && Array.isArray(effectData.bonusProperties)) {
-      effects.push(`Grants: ${effectData.bonusProperties.join(', ')}`);
-    }
-
-    return effects.join(', ');
-  }
-
-  // Drag functionality for item details panel
-  onDragStart(event: MouseEvent, element: HTMLElement): void {
-    // Only allow dragging from the header
-    const target = event.target as HTMLElement;
-    if (!target.closest('.details-header') || target.closest('.close-button')) {
-      return;
-    }
-
-    event.preventDefault();
-    this.isDragging = true;
-    this.dragElement = element;
-
-    // Get current panel position
-    const rect = element.getBoundingClientRect();
-    this.panelStartX = rect.left;
-    this.panelStartY = rect.top;
-
-    // Store mouse start position
-    this.dragStartX = event.clientX;
-    this.dragStartY = event.clientY;
-
-    // Add global mouse listeners
-    this.renderer.listen('document', 'mousemove', (e) => this.onDrag(e));
-    this.renderer.listen('document', 'mouseup', () => this.onDragEnd());
-
-    // Add dragging class for cursor style
-    this.renderer.addClass(element, 'dragging');
-  }
-
-  private onDrag(event: MouseEvent): void {
-    if (!this.isDragging || !this.dragElement) return;
-
-    event.preventDefault();
-
-    // Calculate new position
-    const deltaX = event.clientX - this.dragStartX;
-    const deltaY = event.clientY - this.dragStartY;
-
-    const newLeft = this.panelStartX + deltaX;
-    const newTop = this.panelStartY + deltaY;
-
-    // Update panel position (use px instead of % after first drag)
-    this.panelLeft = `${newLeft}px`;
-    this.panelTop = `${newTop}px`;
-    this.panelTransform = 'none';
-    this.hasBeenDragged = true;
-  }
-
-  private onDragEnd(): void {
-    if (!this.isDragging) return;
-
-    this.isDragging = false;
-
-    // Remove dragging class
-    if (this.dragElement) {
-      this.renderer.removeClass(this.dragElement, 'dragging');
-      this.dragElement = null;
-    }
-  }
-
-  resetPanelPosition(): void {
-    // Reset to center
-    this.panelLeft = '50%';
-    this.panelTop = '50%';
-    this.panelTransform = 'translate(-50%, -50%)';
-    this.hasBeenDragged = false;
   }
 
   // Item drag-and-drop handlers for equipment and vendor selling

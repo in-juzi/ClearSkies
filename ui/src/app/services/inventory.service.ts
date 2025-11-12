@@ -124,6 +124,13 @@ export class InventoryService {
   }
 
   /**
+   * Get scaled combat stats for an item
+   */
+  getItemCombatStats(instanceId: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/items/${instanceId}/combat-stats`);
+  }
+
+  /**
    * Helper: Get items by category
    */
   getItemsByCategory(category: string): ItemDetails[] {
