@@ -7,6 +7,14 @@
 
 import { Rarity } from '../../types/common';
 
+// ===== CATEGORY VALUES =====
+
+export const CATEGORY = {
+  CONSUMABLE: 'consumable',
+  EQUIPMENT: 'equipment',
+  RESOURCE: 'resource',
+} as const;
+
 // ===== RARITY VALUES =====
 
 export const RARITY = {
@@ -125,14 +133,134 @@ export const TIER = {
   T5: 5,
 } as const;
 
-// ===== SUBCATEGORIES =====
+// ===== INDIVIDUAL SUBCATEGORY VALUES =====
 
 /**
- * Common subcategory combinations for resources
+ * Individual subcategory constants for use in recipe ingredients,
+ * filtering, and type checking. These provide type safety and
+ * autocomplete when working with single subcategory values.
+ *
+ * Usage:
+ * - Recipe ingredients: { subcategory: SUBCATEGORY.HERB, quantity: 2 }
+ * - Filtering: items.filter(i => i.subcategories.includes(SUBCATEGORY.HERB))
+ * - Type guards: item.subcategories?.includes(SUBCATEGORY.WEAPON)
+ */
+export const SUBCATEGORY = {
+  // Primary categories
+  HERB: 'herb',
+  FLOWER: 'flower',
+  FISH: 'fish',
+  ORE: 'ore',
+  INGOT: 'ingot',
+  GEMSTONE: 'gemstone',
+  WOOD: 'wood',
+  LOG: 'log',
+  ROOT: 'root',
+
+  // Equipment types
+  WEAPON: 'weapon',
+  ARMOR: 'armor',
+  TOOL: 'tool',
+  HEADGEAR: 'headgear',
+
+  // Weapon subtypes (as subcategories)
+  SWORD: 'sword',
+  AXE: 'axe',
+  SHIELD: 'shield',
+  PICKAXE: 'pickaxe',
+  ROD: 'rod',
+
+  // Armor piece types
+  BODY_ARMOR: 'body-armor',
+  FOOTWEAR: 'footwear',
+  HANDWEAR: 'handwear',
+
+  // Weapon characteristics
+  MELEE: 'melee',
+  ONE_HANDED: 'one-handed',
+  DEFENSIVE: 'defensive',
+
+  // Gathering tool types
+  WOODCUTTING: 'woodcutting',
+  MINING: 'mining',
+  FISHING: 'fishing',
+  GATHERING: 'gathering',
+
+  // Material types (for subcategories)
+  LEATHER: 'leather',
+
+  // Item properties
+  ALCHEMICAL: 'alchemical',
+  MEDICINAL: 'medicinal',
+  AROMATIC: 'aromatic',
+  SEASONING: 'seasoning',
+  DECORATIVE: 'decorative',
+  MAGICAL: 'magical',
+  RARE: 'rare',
+
+  // Food categories
+  FOOD: 'food',
+  COOKED: 'cooked',
+  COOKING: 'cooking',
+  COOKING_INGREDIENT: 'cooking-ingredient',
+
+  // Crafting skills
+  CRAFTING: 'crafting',
+  SMITHING: 'smithing',
+  SMITHING_INGREDIENT: 'smithing-ingredient',
+  ALCHEMY: 'alchemy',
+
+  // Consumable types
+  POTION: 'potion',
+  HEALING: 'healing',
+  MANA: 'mana',
+  TINCTURE: 'tincture',
+  ELIXIR: 'elixir',
+  CONSUMABLE: 'consumable',
+
+  // Monster drops
+  MONSTER_DROP: 'monster-drop',
+
+  // Water types
+  FRESHWATER: 'freshwater',
+  SALTWATER: 'saltwater',
+  SHELLFISH: 'shellfish',
+
+  // Material types
+  METAL: 'metal',
+  MEDIUM_ARMOR: 'medium-armor',
+  LIGHT_ARMOR: 'light-armor',
+  HEAVY_ARMOR: 'heavy-armor',
+
+  // Other categories
+  PLANT: 'plant',
+  MEDICINE: 'medicine',
+  FUEL: 'fuel',
+  TIMBER: 'timber',
+  BUILDING_MATERIAL: 'building-material',
+  CRYSTAL: 'crystal',
+  JEWELRY: 'jewelry',
+  ENCHANTING: 'enchanting',
+  SALVAGE: 'salvage',
+  CLOTH: 'cloth',
+} as const;
+
+// ===== SUBCATEGORIES (ARRAYS) =====
+
+/**
+ * Common subcategory combinations for item definitions.
+ * These provide convenient arrays of related subcategories.
+ *
+ * Usage:
+ * - Item definitions: subcategories: SUBCATEGORIES.HERB
+ * - Custom combinations: [SUBCATEGORY.FLOWER, SUBCATEGORY.AROMATIC]
  */
 export const SUBCATEGORIES = {
-  // Wood resources
+  // Wood resources (logs)
   WOOD: ['wood', 'crafting', 'fuel'],
+  WOOD_LOG: ['log', 'wood', 'timber', 'crafting'],
+  WOOD_LOG_BUILDING: ['log', 'wood', 'timber', 'building-material'],
+  WOOD_LOG_MAGICAL: ['log', 'wood', 'timber', 'magical'],
 
   // Ore resources
   ORE: ['ore', 'crafting', 'smithing'],
@@ -140,8 +268,11 @@ export const SUBCATEGORIES = {
   // Ingot resources
   INGOT: ['ingot', 'crafting', 'smithing', 'metal'],
 
-  // Fish resources
+  // Fish resources (raw)
   FISH: ['fish', 'food', 'cooking'],
+  FISH_FRESHWATER: ['fish', 'freshwater'],
+  FISH_SALTWATER: ['fish', 'saltwater'],
+  FISH_SHELLFISH: ['fish', 'shellfish', 'saltwater'],
 
   // Gemstone resources
   GEMSTONE: ['gemstone', 'crystal', 'jewelry', 'enchanting'],
@@ -152,12 +283,22 @@ export const SUBCATEGORIES = {
   // Monster drops
   MONSTER_DROP: ['monster-drop', 'crafting'],
   MONSTER_DROP_ALCHEMY: ['monster-drop', 'alchemy'],
+  MONSTER_DROP_FOOD: ['monster-drop', 'food', 'cooking-ingredient'],
+  MONSTER_DROP_CLOTH: ['monster-drop', 'cloth', 'salvage'],
+  MONSTER_DROP_METAL: ['monster-drop', 'metal', 'smithing-ingredient', 'salvage'],
 
   // Cooked food
   COOKED_FOOD: ['food', 'cooked', 'consumable'],
 
-  // Potions
+  // Potions (health)
   POTION: ['potion', 'consumable', 'alchemy'],
+  HEALTH_POTION: ['potion', 'healing', 'alchemical'],
+  HEALTH_TINCTURE: ['potion', 'healing', 'alchemical', 'tincture'],
+  HEALTH_ELIXIR: ['potion', 'healing', 'alchemical', 'elixir'],
+
+  // Potions (mana)
+  MANA_POTION: ['potion', 'mana', 'alchemical'],
+  MANA_TINCTURE: ['potion', 'mana', 'alchemical', 'tincture'],
 } as const;
 
 // ===== SKILL SOURCES =====
