@@ -3,7 +3,7 @@ import Player from '../models/Player';
 import locationService from '../services/locationService';
 import itemService from '../services/itemService';
 import dropTableService from '../services/dropTableService';
-import { GatheringActivity } from '../types';
+import { GatheringActivity } from '@shared/types';
 import { schedulePlayerTurn, scheduleMonsterTurn } from './combatHandler';
 
 // Track active activity timers per user

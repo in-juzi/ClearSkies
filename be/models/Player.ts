@@ -9,7 +9,7 @@ import {
   TraitMap,
   EquipmentSlot,
   CombatLogType
-} from '../types';
+} from '@shared/types';
 
 // ============================================================================
 // Type Definitions

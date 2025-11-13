@@ -1,5 +1,5 @@
 import itemService from './itemService';
-import { Vendor, StockItem, ItemInstance } from '../types';
+import { Vendor, StockItem, ItemInstance } from '@shared/types';
 import { VendorRegistry } from '../data/vendors/VendorRegistry';
 
 /**

@@ -1,4 +1,4 @@
-import { DropTable } from '../types';
+import { DropTable } from '@shared/types';
 import { DropTableRegistry } from '../data/locations/DropTableRegistry';
 
 interface DropResult {

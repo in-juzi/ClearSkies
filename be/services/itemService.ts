@@ -11,7 +11,7 @@ import {
   QualityMap,
   TraitMap,
   Rarity
-} from '../types';
+} from '@shared/types';
 import { ItemRegistry } from '../data/items/ItemRegistry';
 import { QualityRegistry } from '../data/items/qualities/QualityRegistry';
 import { TraitRegistry } from '../data/items/traits/TraitRegistry';

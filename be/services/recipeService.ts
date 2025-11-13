@@ -1,4 +1,4 @@
-import { Recipe } from '../types';
+import { Recipe } from '@shared/types';
 import { RecipeRegistry } from '../data/recipes/RecipeRegistry';
 import itemService from './itemService';
 

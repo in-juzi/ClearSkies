@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import Player from '../models/Player';
 import itemService from '../services/itemService';
-import { QualityMap, TraitMap, ItemCategory, ConsumableItem } from '../types';
+import { QualityMap, TraitMap, ItemCategory, ConsumableItem } from '@shared/types';
 import { isWeaponItem, isArmorItem } from '../types/guards';
 
 // ============================================================================

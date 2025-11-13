@@ -14,7 +14,7 @@ import { MonsterRegistry } from '../data/monsters/MonsterRegistry';
 import { AbilityRegistry } from '../data/abilities/AbilityRegistry';
 import { VendorRegistry } from '../data/vendors/VendorRegistry';
 import { RecipeRegistry } from '../data/recipes/RecipeRegistry';
-import { DropTable, GatheringActivity, CombatActivity, ActivityUnion } from '../types';
+import { DropTable, GatheringActivity, CombatActivity, ActivityUnion } from '@shared/types';
 
 interface ValidationError {
   severity: 'error' | 'warning';

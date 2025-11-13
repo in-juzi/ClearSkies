@@ -5,7 +5,7 @@ import {
   MonsterInstance,
   DamageResult,
   AttackResult
-} from '../types';
+} from '@shared/types';
 import { MonsterRegistry } from '../data/monsters/MonsterRegistry';
 import { AbilityRegistry } from '../data/abilities/AbilityRegistry';
 

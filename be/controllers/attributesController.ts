@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import Player from '../models/Player';
-import { AttributeName } from '../types';
+import { AttributeName } from '@shared/types';
 
 // ============================================================================
 // Type Definitions for Request Bodies

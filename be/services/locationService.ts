@@ -5,7 +5,7 @@ import {
   Activity,
   BiomeDefinition,
   GatheringActivity
-} from '../types';
+} from '@shared/types';
 import { LocationRegistry } from '../data/locations/LocationRegistry';
 import { FacilityRegistry } from '../data/locations/FacilityRegistry';
 import { ActivityRegistry } from '../data/locations/ActivityRegistry';
