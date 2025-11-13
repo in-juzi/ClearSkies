@@ -403,6 +403,72 @@ class CombatService {
   }
 
   /**
+   * Start combat from activity handler (wrapper for initializeCombat)
+   * Returns a result object suitable for socket responses
+   */
+  startCombat(player: any, monsterId: string, activityId: string, itemService: any): any {
+    try {
+      // Check if player already in combat
+      if (player.isInCombat()) {
+        return {
+          success: false,
+          message: 'Already in combat'
+        };
+      }
+
+      // Initialize combat
+      const monsterInstance = this.initializeCombat(player, monsterId, itemService);
+
+      // Store the activity ID that started this combat
+      player.lastCombatActivityId = activityId;
+
+      // Get player's available abilities based on equipped weapon
+      const weapon = this.getEquippedWeapon(player, itemService);
+      const availableAbilities = weapon ? this.getAbilitiesForWeapon(weapon.skillScalar) : [];
+
+      return {
+        success: true,
+        message: `Combat started with ${monsterInstance.name}!`,
+        monster: {
+          monsterId: monsterInstance.monsterId,
+          name: monsterInstance.name,
+          level: monsterInstance.level,
+          health: monsterInstance.stats.health,
+          mana: monsterInstance.stats.mana
+        },
+        combat: {
+          activityId: activityId,
+          turnCount: player.activeCombat.turnCount,
+          combatLog: player.activeCombat.combatLog,
+          playerNextAttackTime: player.activeCombat.playerNextAttackTime,
+          monsterNextAttackTime: player.activeCombat.monsterNextAttackTime,
+          player: {
+            currentHp: player.stats.health.current,
+            maxHp: player.stats.health.max,
+            currentMana: player.stats.mana.current,
+            maxMana: player.stats.mana.max
+          },
+          availableAbilities: availableAbilities.map((ability: Ability) => ({
+            abilityId: ability.abilityId,
+            name: ability.name,
+            description: ability.description,
+            manaCost: ability.manaCost,
+            cooldown: ability.cooldown,
+            powerMultiplier: ability.powerMultiplier,
+            icon: ability.icon
+          })),
+          abilityCooldowns: {}
+        }
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.message || 'Failed to start combat'
+      };
+    }
+  }
+
+  /**
    * Process combat turn (auto-attacks)
    */
   processCombatTurn(player: any, itemService: any, username?: string): any {
@@ -451,9 +517,9 @@ class CombatService {
       if (attackResult.isDodge) {
         player.addCombatLog(`${playerName}'s attack missed - ${monsterInstance.name} dodged!`, 'miss');
       } else if (attackResult.isCrit) {
-        player.addCombatLog(`CRITICAL HIT! ${playerName} deals ${attackResult.damage} damage with ${attackResult.weaponName}!`, 'crit');
+        player.addCombatLog(`CRITICAL HIT! ${playerName} deals ${attackResult.damage} damage with ${attackResult.weaponName}!`, 'crit', attackResult.damage, 'monster');
       } else {
-        player.addCombatLog(`${playerName} deals ${attackResult.damage} damage with ${attackResult.weaponName}.`, 'damage');
+        player.addCombatLog(`${playerName} deals ${attackResult.damage} damage with ${attackResult.weaponName}.`, 'damage', attackResult.damage, 'monster');
       }
 
       results.playerAttacked = true;
@@ -491,9 +557,9 @@ class CombatService {
       if (attackResult.isDodge) {
         player.addCombatLog(`${monsterInstance.name}'s attack missed - ${playerName} dodged!`, 'dodge');
       } else if (attackResult.isCrit) {
-        player.addCombatLog(`${monsterInstance.name} CRITICALLY HITS ${playerName} for ${attackResult.damage} damage!`, 'crit');
+        player.addCombatLog(`${monsterInstance.name} CRITICALLY HITS ${playerName} for ${attackResult.damage} damage!`, 'crit', attackResult.damage, 'player');
       } else {
-        player.addCombatLog(`${monsterInstance.name} deals ${attackResult.damage} damage.`, 'damage');
+        player.addCombatLog(`${monsterInstance.name} deals ${attackResult.damage} damage.`, 'damage', attackResult.damage, 'player');
       }
 
       results.monsterAttacked = true;
@@ -562,9 +628,9 @@ class CombatService {
     if (attackResult.isDodge) {
       player.addCombatLog(`${ability.name} missed - ${monsterInstance.name} dodged!`, 'miss');
     } else if (attackResult.isCrit) {
-      player.addCombatLog(`CRITICAL ${ability.name}! ${playerName} deals ${attackResult.damage} damage!`, 'ability');
+      player.addCombatLog(`CRITICAL ${ability.name}! ${playerName} deals ${attackResult.damage} damage!`, 'ability', attackResult.damage, 'monster');
     } else {
-      player.addCombatLog(`${playerName} uses ${ability.name} for ${attackResult.damage} damage!`, 'ability');
+      player.addCombatLog(`${playerName} uses ${ability.name} for ${attackResult.damage} damage!`, 'ability', attackResult.damage, 'monster');
     }
 
     // Set cooldown
@@ -625,12 +691,16 @@ class CombatService {
       // Award loot from drop tables
       const droppedItems = dropTableService.rollMultipleDropTables(monsterDef.lootTables);
       for (const dropResult of droppedItems) {
+        // Generate random qualities and traits for combat drops
+        const qualities = itemService.generateRandomQualities(dropResult.itemId);
+        const traits = itemService.generateRandomTraits(dropResult.itemId);
+
         // Use itemService to create proper item instances with Maps
         const itemInstance = itemService.createItemInstance(
           dropResult.itemId,
           dropResult.quantity,
-          dropResult.qualities || {},
-          dropResult.traits || []
+          qualities,
+          traits
         );
 
         player.addItem(itemInstance);

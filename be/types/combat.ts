@@ -133,12 +133,20 @@ export interface AbilityEffects {
 
 /**
  * Active combat state (stored in Player.activeCombat)
+ * Matches the MongoDB schema in Player.ts
  */
 export interface ActiveCombat {
-  monster: MonsterInstance;
-  turnState: TurnState;
-  abilityCooldowns: Record<string, number>;
+  activityId: string;
+  monsterId: string;
+  monsterInstance: Map<string, any>; // Stores monster state (hp, mana, etc.)
+  playerLastAttackTime?: Date;
+  monsterLastAttackTime?: Date;
+  playerNextAttackTime?: Date;
+  monsterNextAttackTime?: Date;
+  turnCount: number;
+  abilityCooldowns: Map<string, number>; // abilityId -> cooldown timestamp
   combatLog: CombatLogEntry[];
+  startTime?: Date;
 }
 
 /**
@@ -164,12 +172,15 @@ export interface TurnState {
 
 /**
  * Combat log entry
+ * Matches the MongoDB schema in Player.ts
  */
 export interface CombatLogEntry {
-  timestamp: number;
+  timestamp: Date;
   message: string;
-  type: 'damage' | 'heal' | 'ability' | 'status' | 'loot' | 'experience';
-  actor: 'player' | 'monster';
+  type: 'damage' | 'heal' | 'dodge' | 'miss' | 'crit' | 'ability' | 'system';
+  damageValue?: number;
+  target?: 'player' | 'monster';
+  isNew?: boolean;
 }
 
 // ===== COMBAT STATS =====

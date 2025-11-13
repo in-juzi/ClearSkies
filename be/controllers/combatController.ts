@@ -322,6 +322,24 @@ export const getCombatStatus = async (req: Request, res: Response): Promise<void
 
     await player.save();
 
+    // Deep clone the combat log entries before clearing flags
+    const combatLogForResponse = player.activeCombat.combatLog.slice(-10).map((entry: any) => ({
+      timestamp: entry.timestamp,
+      message: entry.message,
+      type: entry.type,
+      damageValue: entry.damageValue,
+      target: entry.target,
+      isNew: entry.isNew  // Preserve the true value for response
+    }));
+
+    // Mark all entries as not new in the database
+    player.activeCombat.combatLog.forEach((entry: any) => {
+      entry.isNew = false;
+    });
+
+    // Save before sending response to prevent race condition
+    await player.save();
+
     // Get current monster instance
     const monsterInstance = Object.fromEntries(player.activeCombat.monsterInstance);
 
@@ -349,11 +367,12 @@ export const getCombatStatus = async (req: Request, res: Response): Promise<void
       playerNextAttackTime: player.activeCombat.playerNextAttackTime,
       monsterNextAttackTime: player.activeCombat.monsterNextAttackTime,
       turnCount: player.activeCombat.turnCount,
-      combatLog: player.activeCombat.combatLog.slice(-10), // Last 10 entries
+      combatLog: combatLogForResponse, // Use cloned entries with isNew still true
       availableAbilities,
       abilityCooldowns: Object.fromEntries(player.activeCombat.abilityCooldowns)
     };
 
+    // Send response with cloned combat log
     res.json({
       inCombat: true,
       combat: combatState
