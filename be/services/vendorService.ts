@@ -84,9 +84,8 @@ class VendorService {
       return false;
     }
 
-    // Current implementation: all vendors accept all items if buyback is true
-    // Future: can add category filtering here
-    if (vendor.buyback) {
+    // Check if vendor accepts all items (buyback or acceptsAllItems)
+    if (vendor.buyback || vendor.acceptsAllItems) {
       return true;
     }
 

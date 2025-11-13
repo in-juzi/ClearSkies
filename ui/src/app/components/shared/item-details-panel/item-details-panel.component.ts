@@ -51,6 +51,9 @@ export class ItemDetailsPanelComponent implements OnChanges {
           this.dropQuantity = Math.min(this.dropQuantity, this.item.quantity);
         }
 
+        // Reset isUsingItem flag when item changes (after use completes)
+        this.isUsingItem = false;
+
         // Load combat stats if it's a weapon or armor
         this.combatStats = null;
         const isWeapon = this.item.definition.subcategories?.includes('weapon');
@@ -61,6 +64,7 @@ export class ItemDetailsPanelComponent implements OnChanges {
       } else {
         // Item cleared
         this.dropQuantity = 1;
+        this.isUsingItem = false;
       }
     }
   }
@@ -105,7 +109,7 @@ export class ItemDetailsPanelComponent implements OnChanges {
     if (this.item) {
       this.isUsingItem = true;
       this.useItem.emit(this.item.instanceId);
-      // Parent component should reset isUsingItem after use completes
+      // isUsingItem will be reset in ngOnChanges when item updates after use
     }
   }
 

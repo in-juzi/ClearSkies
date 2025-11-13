@@ -51,6 +51,9 @@ export interface CombatLogEntry {
   timestamp: Date;
   message: string;
   type: CombatLogType;
+  damageValue?: number;
+  target?: 'player' | 'monster';
+  isNew?: boolean;
 }
 
 export interface ActiveCombat {
@@ -178,7 +181,7 @@ export interface IPlayer extends Document {
     manaRestored: number;
   };
   isInCombat(): boolean;
-  addCombatLog(message: string, type?: CombatLogType): void;
+  addCombatLog(message: string, type?: CombatLogType, damageValue?: number, target?: 'player' | 'monster'): void;
   clearCombat(): void;
   isAbilityOnCooldown(abilityId: string): boolean;
   setAbilityCooldown(abilityId: string, cooldownTurns: number): void;
@@ -308,7 +311,10 @@ const playerSchema = new Schema<IPlayer>({
     combatLog: [{
       timestamp: { type: Date, default: Date.now },
       message: { type: String },
-      type: { type: String, enum: ['damage', 'heal', 'dodge', 'miss', 'crit', 'ability', 'system'] }
+      type: { type: String, enum: ['damage', 'heal', 'dodge', 'miss', 'crit', 'ability', 'system'] },
+      damageValue: { type: Number },
+      target: { type: String, enum: ['player', 'monster'] },
+      isNew: { type: Boolean, default: true }
     }],
     startTime: { type: Date }
   },
@@ -962,7 +968,7 @@ playerSchema.methods.isInCombat = function(this: IPlayer): boolean {
 };
 
 // Add combat log entry
-playerSchema.methods.addCombatLog = function(this: IPlayer, message: string, type: CombatLogType = 'system'): void {
+playerSchema.methods.addCombatLog = function(this: IPlayer, message: string, type: CombatLogType = 'system', damageValue?: number, target?: 'player' | 'monster'): void {
   if (!this.activeCombat) {
     throw new Error('Player is not in combat');
   }
@@ -970,7 +976,10 @@ playerSchema.methods.addCombatLog = function(this: IPlayer, message: string, typ
   const logEntry: CombatLogEntry = {
     timestamp: new Date(),
     message,
-    type
+    type,
+    damageValue,
+    target,
+    isNew: true
   };
 
   // Keep only last 50 entries to prevent bloat

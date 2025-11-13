@@ -52,10 +52,8 @@ export class GameComponent implements OnInit {
     this.attributesService.getAllAttributes().subscribe();
 
     // Check combat status (restores combat state if player was in combat on page refresh)
-    this.combatService.getCombatStatus().subscribe({
-      error: (err) => {
-        console.error('Failed to check combat status:', err);
-      }
+    this.combatService.checkCombatStatus().catch((err: any) => {
+      console.error('Failed to check combat status:', err);
     });
   }
 
