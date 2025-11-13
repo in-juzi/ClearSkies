@@ -250,17 +250,26 @@ export class LocationComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Check if activity has valid duration
+   */
+  hasValidDuration(activity: Activity | null): boolean {
+    return !!(activity?.duration && activity.duration > 0);
+  }
+
+  /**
    * Get skill icon path
    */
-  getSkillIcon(skillName: string): string {
-    return this.skillIcons[skillName as SkillName] || '';
+  getSkillIcon(skillName: string | unknown): string {
+    const name = String(skillName);
+    return this.skillIcons[name as SkillName] || '';
   }
 
   /**
    * Get skill display name
    */
-  getSkillDisplayName(skillName: string): string {
-    return this.skillNames[skillName as SkillName] || skillName;
+  getSkillDisplayName(skillName: string | unknown): string {
+    const name = String(skillName);
+    return this.skillNames[name as SkillName] || name;
   }
 
   /**

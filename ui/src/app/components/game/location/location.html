@@ -129,9 +129,11 @@
       <p>{{ selectedActivity()!.description }}</p>
 
       <div class="activity-info">
-        <div class="info-item" *ngIf="selectedActivity()!.duration !== undefined && selectedActivity()!.duration > 0">
-          <strong>Duration:</strong> {{ selectedActivity()!.duration }}s
-        </div>
+        @if (hasValidDuration(selectedActivity())) {
+          <div class="info-item">
+            <strong>Duration:</strong> {{ selectedActivity()!.duration }}s
+          </div>
+        }
         <div class="info-item">
           <strong>Type:</strong> {{ selectedActivity()!.type }}
         </div>
