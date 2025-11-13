@@ -1,17 +1,19 @@
 import { Injectable, signal, effect, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
-import { environment } from '../../environments/environment';
+import { Subject } from 'rxjs';
 import { ActiveCrafting, CraftingResult } from '../models/recipe.model';
 import { InventoryService } from './inventory.service';
+import { SkillsService } from './skills.service';
+import { AttributesService } from './attributes.service';
+import { SocketService } from './socket.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CraftingService {
-  private apiUrl = `${environment.apiUrl}/crafting`;
-  private timerInterval: any;
   private inventoryService = inject(InventoryService);
+  private skillsService = inject(SkillsService);
+  private attributesService = inject(AttributesService);
+  private socketService = inject(SocketService);
 
   // Signals for reactive state
   activeCrafting = signal<ActiveCrafting | null>(null);
@@ -19,142 +21,257 @@ export class CraftingService {
   isCrafting = signal<boolean>(false);
   lastResult = signal<CraftingResult | null>(null);
 
-  constructor(private http: HttpClient) {
-    // Auto-update remaining time every second
+  // Observable for crafting completion events
+  craftingCompleted$ = new Subject<CraftingResult>();
+
+  // Observable for crafting errors
+  craftingError$ = new Subject<{ error: string; message: string }>();
+
+  // Progress update timer
+  private progressTimer: any = null;
+
+  // Store last recipe for auto-restart
+  private lastRecipeId: string | null = null;
+  private lastSelectedIngredients: { [itemId: string]: string[] } | null = null;
+
+  constructor() {
+    // Set up socket event listeners when connected
     effect(() => {
-      const active = this.activeCrafting();
-      if (active) {
-        this.startTimer();
-      } else {
-        this.stopTimer();
+      if (this.socketService.isConnected()) {
+        this.setupSocketListeners();
       }
+    });
+  }
+
+  /**
+   * Start progress timer to update remaining time
+   */
+  private startProgressTimer(endTime: Date): void {
+    // Clear any existing timer
+    this.stopProgressTimer();
+
+    // Update progress every second
+    this.progressTimer = setInterval(() => {
+      const remainingTime = Math.max(0, Math.floor((endTime.getTime() - Date.now()) / 1000));
+
+      this.remainingTime.set(remainingTime);
+
+      // Stop timer when time is up
+      if (remainingTime <= 0) {
+        this.stopProgressTimer();
+      }
+    }, 1000);
+  }
+
+  /**
+   * Stop progress timer
+   */
+  private stopProgressTimer(): void {
+    if (this.progressTimer) {
+      clearInterval(this.progressTimer);
+      this.progressTimer = null;
+    }
+  }
+
+  /**
+   * Set up socket event listeners for crafting
+   */
+  private setupSocketListeners(): void {
+    // Crafting events
+    this.socketService.on('crafting:started', (data: any) => {
+      console.log('Crafting started event:', data);
+      const endTime = new Date(data.endTime);
+      const remainingTime = Math.max(0, Math.floor((endTime.getTime() - Date.now()) / 1000));
+
+      this.activeCrafting.set({
+        recipeId: data.recipeId,
+        startTime: new Date(data.startTime || Date.now()),
+        endTime: endTime,
+        selectedIngredients: {}
+      });
+
+      this.isCrafting.set(true);
+      this.remainingTime.set(remainingTime);
+
+      // Start timer to update progress
+      this.startProgressTimer(endTime);
+    });
+
+    this.socketService.on('crafting:completed', (data: any) => {
+      console.log('Crafting completed event:', data);
+
+      // Stop progress timer
+      this.stopProgressTimer();
+
+      // Get the active crafting recipeId before clearing it
+      const currentRecipeId = this.activeCrafting()?.recipeId;
+
+      // Clear active crafting
+      this.activeCrafting.set(null);
+      this.isCrafting.set(false);
+      this.remainingTime.set(0);
+
+      // Refresh player data
+      this.skillsService.getSkills().subscribe();
+      this.attributesService.getAllAttributes().subscribe();
+      this.inventoryService.getInventory().subscribe();
+
+      // Construct proper CraftingResult object matching the interface
+      const result: CraftingResult = {
+        message: `Crafted ${data.recipeName}!`,
+        output: data.result,
+        experience: {
+          skill: data.skillUpdate?.name || 'unknown',
+          xp: data.xpGained || 0,
+          skillResult: data.skillUpdate,
+          attributeResult: data.attributeUpdate
+        },
+        recipe: {
+          recipeId: currentRecipeId || 'unknown',
+          name: data.recipeName
+        }
+      };
+
+      this.lastResult.set(result);
+
+      // Emit completion event for UI notifications
+      this.craftingCompleted$.next(result);
+
+      // Auto-restart if we have stored recipe details
+      if (this.lastRecipeId) {
+        this.startCrafting(this.lastRecipeId, this.lastSelectedIngredients || undefined).catch((error) => {
+          console.error('Failed to auto-restart crafting:', error);
+          // Clear stored recipe on error
+          this.lastRecipeId = null;
+          this.lastSelectedIngredients = null;
+        });
+      }
+    });
+
+    this.socketService.on('crafting:cancelled', (data: any) => {
+      console.log('Crafting cancelled event:', data);
+
+      // Stop progress timer
+      this.stopProgressTimer();
+
+      // Clear stored recipe (don't auto-restart cancelled crafting)
+      this.lastRecipeId = null;
+      this.lastSelectedIngredients = null;
+
+      this.activeCrafting.set(null);
+      this.isCrafting.set(false);
+      this.remainingTime.set(0);
+    });
+
+    this.socketService.on('crafting:error', (data: any) => {
+      console.error('Crafting error event:', data);
+
+      // Stop progress timer
+      this.stopProgressTimer();
+
+      // Clear stored recipe on error
+      this.lastRecipeId = null;
+      this.lastSelectedIngredients = null;
+
+      this.craftingError$.next({
+        error: data.message,
+        message: data.message
+      });
+      this.activeCrafting.set(null);
+      this.isCrafting.set(false);
+      this.remainingTime.set(0);
     });
   }
 
   /**
    * Start crafting a recipe
    */
-  startCrafting(recipeId: string, selectedIngredients?: { [itemId: string]: string[] }): Observable<any> {
-    const body: any = { recipeId };
-    if (selectedIngredients) {
-      body.selectedIngredients = selectedIngredients;
+  async startCrafting(recipeId: string, selectedIngredients?: { [itemId: string]: string[] }): Promise<any> {
+    try {
+      // Set isCrafting immediately to prevent UI flicker during auto-restart
+      this.isCrafting.set(true);
+
+      const response = await this.socketService.emit('crafting:start', {
+        recipeId,
+        selectedIngredients
+      });
+
+      if (!response.success) {
+        this.isCrafting.set(false);
+        throw new Error(response.message || 'Failed to start crafting');
+      }
+
+      // Store for auto-restart
+      this.lastRecipeId = recipeId;
+      this.lastSelectedIngredients = selectedIngredients || null;
+
+      // Set active crafting immediately (will be updated by socket event)
+      this.activeCrafting.set({
+        recipeId,
+        startTime: new Date(response.crafting?.startTime || Date.now()),
+        endTime: new Date(response.crafting?.endTime || Date.now()),
+        selectedIngredients: selectedIngredients || {}
+      });
+
+      return response;
+    } catch (error: any) {
+      this.isCrafting.set(false);
+      console.error('Error starting crafting:', error);
+      throw error;
     }
-
-    // Set isCrafting immediately to prevent UI flicker during auto-restart
-    // This ensures the crafting panel stays visible during the HTTP request
-    this.isCrafting.set(true);
-
-    return this.http.post<any>(`${this.apiUrl}/start`, body).pipe(
-      tap(response => {
-        if (response.activeCrafting) {
-          this.activeCrafting.set({
-            recipeId: response.activeCrafting.recipeId,
-            startTime: new Date(response.activeCrafting.startTime),
-            endTime: new Date(response.activeCrafting.endTime),
-            selectedIngredients: response.activeCrafting.selectedIngredients
-          });
-          // isCrafting already set above
-          this.updateRemainingTime();
-        } else {
-          // If no active crafting in response, reset state
-          this.isCrafting.set(false);
-        }
-      })
-    );
-  }
-
-  /**
-   * Complete active crafting
-   */
-  completeCrafting(): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/complete`, {}).pipe(
-      tap(response => {
-        // Refresh inventory to show new items and removed ingredients
-        // IMPORTANT: Do this BEFORE setting lastResult to ensure inventory updates
-        // before any auto-restart logic runs
-        this.inventoryService.getInventory().subscribe(() => {
-          // Set lastResult after inventory refresh completes
-          // This triggers auto-restart with updated inventory
-          this.lastResult.set(response);
-        });
-      })
-    );
   }
 
   /**
    * Cancel active crafting
    */
-  cancelCrafting(): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/cancel`, {}).pipe(
-      tap(() => {
+  async cancelCrafting(): Promise<any> {
+    try {
+      const response = await this.socketService.emit('crafting:cancel', {});
+
+      if (response.success) {
         this.activeCrafting.set(null);
         this.isCrafting.set(false);
         this.remainingTime.set(0);
-      })
-    );
-  }
-
-  /**
-   * Check if crafting is complete and auto-complete if ready
-   */
-  checkAndCompleteCrafting(): Observable<any> | null {
-    const active = this.activeCrafting();
-    if (!active) return null;
-
-    const now = new Date();
-    const endTime = new Date(active.endTime);
-
-    if (now >= endTime) {
-      return this.completeCrafting();
-    }
-
-    return null;
-  }
-
-  /**
-   * Start timer to update remaining time
-   */
-  private startTimer(): void {
-    this.stopTimer(); // Clear any existing timer
-
-    this.timerInterval = setInterval(() => {
-      this.updateRemainingTime();
-
-      // Auto-complete when time is up
-      if (this.remainingTime() <= 0) {
-        const completion = this.checkAndCompleteCrafting();
-        if (completion) {
-          completion.subscribe();
-        }
+        this.lastRecipeId = null;
+        this.lastSelectedIngredients = null;
       }
-    }, 1000);
-  }
 
-  /**
-   * Stop timer
-   */
-  private stopTimer(): void {
-    if (this.timerInterval) {
-      clearInterval(this.timerInterval);
-      this.timerInterval = null;
+      return response;
+    } catch (error) {
+      console.error('Error cancelling crafting:', error);
+      throw error;
     }
   }
 
   /**
-   * Update remaining time signal
+   * Check crafting status (for reconnection)
    */
-  private updateRemainingTime(): void {
-    const active = this.activeCrafting();
-    if (!active) {
-      this.remainingTime.set(0);
-      return;
+  async checkCraftingStatus(): Promise<void> {
+    try {
+      const response = await this.socketService.emit('crafting:getStatus', {});
+
+      if (response.success && response.active) {
+        // Update crafting state from server
+        this.activeCrafting.set({
+          recipeId: response.crafting.recipeId,
+          startTime: new Date(response.crafting.startTime),
+          endTime: new Date(response.crafting.endTime),
+          selectedIngredients: {}
+        });
+        this.isCrafting.set(true);
+        this.remainingTime.set(response.crafting.timeRemaining);
+
+        // Start timer to update progress
+        this.startProgressTimer(new Date(response.crafting.endTime));
+      } else if (response.success && !response.active) {
+        // No active crafting
+        this.activeCrafting.set(null);
+        this.isCrafting.set(false);
+        this.remainingTime.set(0);
+      }
+    } catch (error) {
+      console.error('Error checking crafting status:', error);
     }
-
-    const now = new Date();
-    const endTime = new Date(active.endTime);
-    const remaining = Math.max(0, Math.ceil((endTime.getTime() - now.getTime()) / 1000));
-
-    this.remainingTime.set(remaining);
   }
 
   /**
@@ -168,6 +285,13 @@ export class CraftingService {
    * Cleanup on service destroy
    */
   ngOnDestroy(): void {
-    this.stopTimer();
+    // Stop progress timer
+    this.stopProgressTimer();
+
+    // Remove socket listeners
+    this.socketService.off('crafting:started');
+    this.socketService.off('crafting:completed');
+    this.socketService.off('crafting:cancelled');
+    this.socketService.off('crafting:error');
   }
 }

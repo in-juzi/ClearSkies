@@ -253,20 +253,17 @@ export class CraftingComponent implements OnInit {
       selectedIngredients[itemId] = instanceIds;
     });
 
-    this.craftingService.startCrafting(recipe.recipeId, selectedIngredients).subscribe({
-      next: (response) => {
-        // Clear result AFTER craft starts to prevent effect from retriggering during transition
-        this.craftingService.clearResult();
-        // Reset restarting flag now that craft has started
-        this.isRestarting.set(false);
-      },
-      error: (error) => {
-        console.error('Error restarting crafting:', error);
-        this.craftingService.clearResult();
-        this.autoRestartEnabled.set(false);
-        this.isRestarting.set(false);
-        this.showMessage('Auto-restart failed: ' + (error.error?.message || 'Unknown error'), 'error');
-      }
+    this.craftingService.startCrafting(recipe.recipeId, selectedIngredients).then((response: any) => {
+      // Clear result AFTER craft starts to prevent effect from retriggering during transition
+      this.craftingService.clearResult();
+      // Reset restarting flag now that craft has started
+      this.isRestarting.set(false);
+    }).catch((error: any) => {
+      console.error('Error restarting crafting:', error);
+      this.craftingService.clearResult();
+      this.autoRestartEnabled.set(false);
+      this.isRestarting.set(false);
+      this.showMessage('Auto-restart failed: ' + (error.message || 'Unknown error'), 'error');
     });
   }
 
@@ -353,19 +350,16 @@ export class CraftingComponent implements OnInit {
       });
     }
 
-    this.craftingService.startCrafting(recipe.recipeId, selectedIngredients).subscribe({
-      next: (response) => {
-        this.showMessage(`Started crafting ${recipe.name}`, 'success');
-        this.lastCraftedRecipeId.set(recipe.recipeId);
-        // Enable auto-restart by default
-        this.autoRestartEnabled.set(true);
-        this.selectedRecipe.set(null);
-        // Don't clear selection - keep it for auto-restart
-      },
-      error: (error) => {
-        console.error('Error starting crafting:', error);
-        this.showMessage(error.error?.message || 'Failed to start crafting', 'error');
-      }
+    this.craftingService.startCrafting(recipe.recipeId, selectedIngredients).then((response: any) => {
+      this.showMessage(`Started crafting ${recipe.name}`, 'success');
+      this.lastCraftedRecipeId.set(recipe.recipeId);
+      // Enable auto-restart by default
+      this.autoRestartEnabled.set(true);
+      this.selectedRecipe.set(null);
+      // Don't clear selection - keep it for auto-restart
+    }).catch((error: any) => {
+      console.error('Error starting crafting:', error);
+      this.showMessage(error.message || 'Failed to start crafting', 'error');
     });
   }
 
@@ -380,33 +374,13 @@ export class CraftingComponent implements OnInit {
    * Cancel active crafting
    */
   cancelCrafting(): void {
-    this.craftingService.cancelCrafting().subscribe({
-      next: () => {
-        this.autoRestartEnabled.set(false);
-        this.clearSelection();
-        this.showMessage('Crafting cancelled', 'info');
-      },
-      error: (error) => {
-        console.error('Error cancelling crafting:', error);
-        this.showMessage('Failed to cancel crafting', 'error');
-      }
-    });
-  }
-
-  /**
-   * Complete crafting (called automatically by service when time is up)
-   */
-  completeCrafting(): void {
-    this.craftingService.completeCrafting().subscribe({
-      next: (response) => {
-        this.showMessage(`Crafted ${response.recipe.name}!`, 'success');
-        // Refresh inventory
-        this.inventoryService.getInventory().subscribe();
-      },
-      error: (error) => {
-        console.error('Error completing crafting:', error);
-        this.showMessage(error.error?.message || 'Failed to complete crafting', 'error');
-      }
+    this.craftingService.cancelCrafting().then(() => {
+      this.autoRestartEnabled.set(false);
+      this.clearSelection();
+      this.showMessage('Crafting cancelled', 'info');
+    }).catch((error: any) => {
+      console.error('Error cancelling crafting:', error);
+      this.showMessage('Failed to cancel crafting', 'error');
     });
   }
 

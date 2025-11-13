@@ -64,9 +64,8 @@ export type QualityModifier = 'inherit' | 'skillBased' | 'fixed';
  */
 export interface ActiveCrafting {
   recipeId: string;
-  facilityId: string;
-  startTime: number;
-  completionTime: number;
+  startTime: Date;
+  endTime: Date;
   selectedIngredients: Map<string, string[]>; // itemId -> instanceIds[]
 }
 
