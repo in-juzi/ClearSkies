@@ -1,160 +1,76 @@
 import { Injectable, signal, effect, inject } from '@angular/core';
-import { io, Socket } from 'socket.io-client';
 import { ChatMessage, ChatHistoryResponse, SendMessageResponse, ConnectionStatus } from '../models/chat.model';
-import { AuthService } from './auth.service';
-import { environment } from '../../environments/environment';
+import { SocketService } from './socket.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChatService {
-  private authService = inject(AuthService);
+  private socketService = inject(SocketService);
 
   // Private signals for internal state
-  private socketSignal = signal<Socket | null>(null);
   private messagesSignal = signal<ChatMessage[]>([]);
-  private connectionStatusSignal = signal<ConnectionStatus>('disconnected');
-  private errorMessageSignal = signal<string | null>(null);
 
   // Public readonly signals
   readonly messages = this.messagesSignal.asReadonly();
-  readonly connectionStatus = this.connectionStatusSignal.asReadonly();
-  readonly errorMessage = this.errorMessageSignal.asReadonly();
-  readonly isConnected = signal(false);
+  readonly connectionStatus = this.socketService.connectionStatus;
+  readonly errorMessage = this.socketService.errorMessage;
+  readonly isConnected = this.socketService.isConnected;
 
   constructor() {
-    // Auto-connect when user is authenticated
+    // Set up chat event listener
     effect(() => {
-      if (this.authService.isAuthenticated()) {
-        this.connect();
-      } else {
-        this.disconnect();
+      if (this.socketService.isConnected()) {
+        this.setupChatListeners();
       }
     });
   }
 
   /**
-   * Connect to Socket.io server
+   * Set up chat event listeners
    */
-  connect(): void {
-    // Don't reconnect if already connected
-    if (this.socketSignal()) {
-      return;
-    }
-
-    const token = localStorage.getItem('clearskies_token');
-    if (!token) {
-      console.error('No auth token found');
-      return;
-    }
-
-    this.connectionStatusSignal.set('connecting');
-
-    // Socket.io connects to base URL (not /api path)
-    const baseUrl = environment.apiUrl.replace('/api', '');
-    const socket = io(baseUrl, {
-      auth: { token }
-    });
-
-    // Connection events
-    socket.on('connect', () => {
-      console.log('✓ Connected to chat server');
-      this.connectionStatusSignal.set('connected');
-      this.isConnected.set(true);
-      this.errorMessageSignal.set(null);
-
-      // Don't load history - users only see messages from when they connect
-    });
-
-    socket.on('connect_error', (error) => {
-      console.error('Chat connection error:', error.message);
-      this.connectionStatusSignal.set('error');
-      this.isConnected.set(false);
-      this.errorMessageSignal.set(error.message);
-    });
-
-    socket.on('disconnect', (reason) => {
-      console.log('✗ Disconnected from chat:', reason);
-      this.connectionStatusSignal.set('disconnected');
-      this.isConnected.set(false);
-
-      // Auto-reconnect on unexpected disconnect
-      if (reason === 'io server disconnect') {
-        // Server disconnected us, try reconnecting
-        socket.connect();
-      }
-    });
-
+  private setupChatListeners(): void {
     // Chat message event
-    socket.on('chat:message', (message: ChatMessage) => {
+    this.socketService.on<ChatMessage>('chat:message', (message: ChatMessage) => {
       this.messagesSignal.update(messages => [...messages, message]);
     });
-
-    this.socketSignal.set(socket);
-  }
-
-  /**
-   * Disconnect from Socket.io server
-   */
-  disconnect(): void {
-    const socket = this.socketSignal();
-    if (socket) {
-      socket.disconnect();
-      this.socketSignal.set(null);
-      this.connectionStatusSignal.set('disconnected');
-      this.isConnected.set(false);
-      this.messagesSignal.set([]);
-    }
   }
 
   /**
    * Load chat history from server
    */
-  loadHistory(limit: number = 50): void {
-    const socket = this.socketSignal();
-    if (!socket) {
-      console.error('Socket not connected');
-      return;
-    }
-
-    socket.emit('chat:getHistory', { limit }, (response: ChatHistoryResponse) => {
+  async loadHistory(limit: number = 50): Promise<void> {
+    try {
+      const response = await this.socketService.emit<ChatHistoryResponse>('chat:getHistory', { limit });
       if (response.success && response.messages) {
         this.messagesSignal.set(response.messages);
       } else {
         console.error('Failed to load chat history:', response.message);
       }
-    });
+    } catch (error) {
+      console.error('Error loading chat history:', error);
+    }
   }
 
   /**
    * Send a chat message
    */
-  sendMessage(message: string): Promise<SendMessageResponse> {
-    return new Promise((resolve, reject) => {
-      const socket = this.socketSignal();
-      if (!socket) {
-        reject({ success: false, message: 'Not connected to chat' });
-        return;
-      }
+  async sendMessage(message: string): Promise<SendMessageResponse> {
+    if (!message || message.trim().length === 0) {
+      throw { success: false, message: 'Message cannot be empty' };
+    }
 
-      if (!message || message.trim().length === 0) {
-        reject({ success: false, message: 'Message cannot be empty' });
-        return;
-      }
+    if (message.length > 500) {
+      throw { success: false, message: 'Message too long (max 500 characters)' };
+    }
 
-      if (message.length > 500) {
-        reject({ success: false, message: 'Message too long (max 500 characters)' });
-        return;
-      }
+    const response = await this.socketService.emit<SendMessageResponse>('chat:sendMessage', { message });
 
-      socket.emit('chat:sendMessage', { message }, (response: SendMessageResponse) => {
-        if (response.success) {
-          resolve(response);
-        } else {
-          reject(response);
-        }
-      });
-    });
+    if (!response.success) {
+      throw response;
+    }
+
+    return response;
   }
 
   /**
@@ -181,19 +97,10 @@ export class ChatService {
   /**
    * Get online user count from server
    */
-  getOnlineCount(): void {
-    const socket = this.socketSignal();
-    if (!socket) {
-      this.addLocalMessage({
-        userId: 'system',
-        username: 'System',
-        message: 'Not connected to chat',
-        createdAt: new Date()
-      });
-      return;
-    }
+  async getOnlineCount(): Promise<void> {
+    try {
+      const response = await this.socketService.emit<{ success: boolean; count?: number; message?: string }>('chat:getOnlineCount');
 
-    socket.emit('chat:getOnlineCount', (response: { success: boolean; count?: number; message?: string }) => {
       if (response.success && response.count !== undefined) {
         const count = response.count;
         const plural = count === 1 ? 'user' : 'users';
@@ -211,6 +118,20 @@ export class ChatService {
           createdAt: new Date()
         });
       }
-    });
+    } catch (error) {
+      this.addLocalMessage({
+        userId: 'system',
+        username: 'System',
+        message: 'Not connected to chat',
+        createdAt: new Date()
+      });
+    }
+  }
+
+  /**
+   * Get socket for backward compatibility
+   */
+  getSocket() {
+    return this.socketService.getSocket();
   }
 }
