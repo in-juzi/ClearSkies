@@ -4,24 +4,22 @@
  */
 
 import { ConsumableItem } from '../../../../types/items';
+import { CATEGORY, RARITY, TIER, MATERIAL, SKILL_SOURCE, SUBCATEGORIES } from '../../../constants/item-constants';
 
 export const Pike: ConsumableItem = {
   "itemId": "pike",
   "name": "Pike",
   "description": "A fierce pike with sharp teeth",
-  "category": "consumable",
-  "subcategories": [
-    "fish",
-    "freshwater"
-  ],
+  "category": CATEGORY.CONSUMABLE,
+  "subcategories": SUBCATEGORIES.FISH_FRESHWATER,
   "baseValue": 50,
-  "rarity": "uncommon",
+  "rarity": RARITY.UNCOMMON,
   "stackable": true,
   "properties": {
     "weight": 2,
-    "material": "fish",
-    "tier": 3,
-    "skillSource": "fishing"
+    "material": MATERIAL.GENERIC,
+    "tier": TIER.T3,
+    "skillSource": SKILL_SOURCE.FISHING
   },
   "allowedQualities": [
     "size",

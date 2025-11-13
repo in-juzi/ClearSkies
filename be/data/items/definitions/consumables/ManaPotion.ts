@@ -4,14 +4,14 @@
  */
 
 import { ConsumableItem } from '../../../../types/items';
-import { RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL } from '../../../constants/item-constants';
+import { CATEGORY, RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL, SUBCATEGORIES } from '../../../constants/item-constants';
 
 export const ManaPotion: ConsumableItem = {
   itemId: 'mana_potion',
   name: 'Mana Potion',
   description: 'A refined alchemical brew that restores moderate mana. Enhanced with sage for mental clarity.',
-  category: 'consumable',
-  subcategories: ['potion', 'mana', 'alchemical'],
+  category: CATEGORY.CONSUMABLE,
+  subcategories: SUBCATEGORIES.MANA_POTION,
   baseValue: 50,
   rarity: RARITY.UNCOMMON,
   stackable: true,

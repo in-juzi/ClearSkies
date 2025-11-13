@@ -4,22 +4,23 @@
  */
 
 import { EquipmentItem } from '../../../../types/items';
+import { SUBCATEGORY, CATEGORY, RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL, SLOT, ARMOR_SUBTYPE } from '../../../constants/item-constants';
 
 export const BronzeBoots: EquipmentItem = {
   "itemId": "bronze_boots",
   "name": "Bronze Boots",
   "description": "Bronze greaves and boots providing solid leg protection",
-  "category": "equipment",
+  "category": CATEGORY.EQUIPMENT,
   "subcategories": [
-    "armor",
-    "footwear",
-    "medium-armor",
-    "metal"
+    SUBCATEGORY.ARMOR,
+    SUBCATEGORY.FOOTWEAR,
+    SUBCATEGORY.MEDIUM_ARMOR,
+    SUBCATEGORY.METAL
   ],
-  "subtype": "boots",
-  "slot": "boots",
+  "subtype": ARMOR_SUBTYPE.BOOTS,
+  "slot": SLOT.BOOTS,
   "baseValue": 110,
-  "rarity": "common",
+  "rarity": RARITY.COMMON,
   "stackable": false,
   "icon": {
     "path": "items/metal-boot.svg",
@@ -27,17 +28,12 @@ export const BronzeBoots: EquipmentItem = {
   },
   "properties": {
     "weight": 4,
-    "material": "bronze",
-    "tier": 1,
+    "material": MATERIAL.BRONZE,
+    "tier": TIER.T1,
     "armor": 8,
     "evasion": 0,
     "requiredLevel": 6
   },
-  "allowedQualities": [],
-  "allowedTraits": [
-    "pristine",
-    "cursed",
-    "blessed",
-    "masterwork"
-  ]
+  "allowedQualities": QUALITY_SETS.NONE,
+  "allowedTraits": TRAIT_SETS.EQUIPMENT_PRISTINE
 } as const;

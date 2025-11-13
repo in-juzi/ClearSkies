@@ -4,14 +4,14 @@
  */
 
 import { ConsumableItem } from '../../../../types/items';
-import { RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL } from '../../../constants/item-constants';
+import { CATEGORY, RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL, SUBCATEGORIES } from '../../../constants/item-constants';
 
 export const ManaPotionWeak: ConsumableItem = {
   itemId: 'weak_mana_potion',
   name: 'Weak Mana Tincture',
   description: 'A basic alchemical tincture that restores a small amount of mana. Crafted from common herbs.',
-  category: 'consumable',
-  subcategories: ['potion', 'mana', 'alchemical', 'tincture'],
+  category: CATEGORY.CONSUMABLE,
+  subcategories: SUBCATEGORIES.MANA_TINCTURE,
   baseValue: 25,
   rarity: RARITY.COMMON,
   stackable: true,

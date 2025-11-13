@@ -5,6 +5,7 @@
 
 import { ResourceItem } from '../../../../types/items';
 import {
+  CATEGORY,
   RARITY,
   TIER,
   SUBCATEGORIES,
@@ -18,7 +19,7 @@ export const Amethyst: ResourceItem = {
   "itemId": "amethyst",
   "name": "Amethyst",
   "description": "A stunning purple quartz prized for its royal color and calming properties",
-  "category": "resource",
+  "category": CATEGORY.RESOURCE,
   "subcategories": SUBCATEGORIES.GEMSTONE,
   "baseValue": 35,
   "rarity": RARITY.COMMON,

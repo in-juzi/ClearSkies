@@ -4,30 +4,24 @@
  */
 
 import { ResourceItem } from '../../../../types/items';
+import { CATEGORY, RARITY, TIER, QUALITY_SETS, TRAIT_SETS, SUBCATEGORIES, MATERIAL, SKILL_SOURCE } from '../../../constants/item-constants';
 
 export const IronOre: ResourceItem = {
   "itemId": "iron_ore",
   "name": "Iron Ore",
   "description": "Raw iron ore, the backbone of any smithy",
-  "category": "resource",
-  "subcategories": [
-    "ore",
-    "mineral",
-    "metal"
-  ],
+  "category": CATEGORY.RESOURCE,
+  "subcategories": SUBCATEGORIES.ORE,
   "baseValue": 60,
-  "rarity": "common",
+  "rarity": RARITY.COMMON,
   "stackable": true,
   "properties": {
     "weight": 6,
-    "material": "ore",
-    "tier": 2,
-    "skillSource": "mining"
+    "material": MATERIAL.GENERIC,
+    "tier": TIER.T2,
+    "skillSource": SKILL_SOURCE.MINING
   },
-  "allowedQualities": [
-    "purity",
-    "sheen"
-  ],
+  "allowedQualities": QUALITY_SETS.ORE,
   "allowedTraits": [
     "pristine",
     "cursed"

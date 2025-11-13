@@ -4,26 +4,22 @@
  */
 
 import { ResourceItem } from '../../../../types/items';
+import { CATEGORY, RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL, SKILL_SOURCE, SUBCATEGORIES } from '../../../constants/item-constants';
 
 export const MapleLog: ResourceItem = {
   "itemId": "maple_log",
   "name": "Maple Log",
   "description": "A fine maple log with beautiful grain patterns",
-  "category": "resource",
-  "subcategories": [
-    "log",
-    "wood",
-    "timber",
-    "crafting-material"
-  ],
+  "category": CATEGORY.RESOURCE,
+  "subcategories": SUBCATEGORIES.WOOD_LOG,
   "baseValue": 75,
-  "rarity": "uncommon",
+  "rarity": RARITY.UNCOMMON,
   "stackable": true,
   "properties": {
     "weight": 0.5,
-    "material": "wood",
-    "tier": 3,
-    "skillSource": "woodcutting"
+    "material": MATERIAL.MAPLE,
+    "tier": TIER.T3,
+    "skillSource": SKILL_SOURCE.WOODCUTTING
   },
   "allowedQualities": [
     "woodGrain",

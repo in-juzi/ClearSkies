@@ -4,39 +4,36 @@
  */
 
 import { EquipmentItem } from '../../../../types/items';
+import { SUBCATEGORY, CATEGORY, RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL, SLOT, ARMOR_SUBTYPE } from '../../../constants/item-constants';
 
 export const HempCoif: EquipmentItem = {
   "itemId": "hemp_coif",
   "name": "Hemp Coif",
   "description": "A simple cloth head covering made from hemp",
-  "category": "equipment",
+  "category": CATEGORY.EQUIPMENT,
   "subcategories": [
-    "armor",
-    "headgear",
-    "light-armor",
-    "cloth"
+    SUBCATEGORY.ARMOR,
+    SUBCATEGORY.HEADGEAR,
+    SUBCATEGORY.LIGHT_ARMOR,
+    SUBCATEGORY.CLOTH
   ],
-  "subtype": "coif",
-  "slot": "head",
+  "subtype": ARMOR_SUBTYPE.COIF,
+  "slot": SLOT.HEAD,
   "baseValue": 20,
-  "rarity": "common",
+  "rarity": RARITY.COMMON,
   "stackable": false,
   "icon": {
     "path": "item-categories/item_cat_body.svg",
-    "material": "hemp"
+    "material": MATERIAL.HEMP
   },
   "properties": {
     "weight": 1,
-    "material": "cloth",
-    "tier": 1,
+    "material": MATERIAL.HEMP,
+    "tier": TIER.T1,
     "armor": 2,
     "evasion": 5,
     "requiredLevel": 1
   },
-  "allowedQualities": [],
-  "allowedTraits": [
-    "weathered",
-    "pristine",
-    "blessed"
-  ]
+  "allowedQualities": QUALITY_SETS.NONE,
+  "allowedTraits": TRAIT_SETS.WOOD_PRISTINE
 } as const;

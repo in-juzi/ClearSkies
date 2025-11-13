@@ -4,22 +4,23 @@
  */
 
 import { EquipmentItem } from '../../../../types/items';
+import { SUBCATEGORY, CATEGORY, RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL, SLOT, ARMOR_SUBTYPE } from '../../../constants/item-constants';
 
 export const IronGloves: EquipmentItem = {
   "itemId": "iron_gloves",
   "name": "Iron Gloves",
   "description": "Articulated iron gauntlets protecting hands while allowing full mobility",
-  "category": "equipment",
+  "category": CATEGORY.EQUIPMENT,
   "subcategories": [
-    "armor",
-    "handwear",
-    "heavy-armor",
-    "metal"
+    SUBCATEGORY.ARMOR,
+    SUBCATEGORY.HANDWEAR,
+    SUBCATEGORY.HEAVY_ARMOR,
+    SUBCATEGORY.METAL
   ],
-  "subtype": "gloves",
-  "slot": "gloves",
+  "subtype": ARMOR_SUBTYPE.GLOVES,
+  "slot": SLOT.GLOVES,
   "baseValue": 160,
-  "rarity": "common",
+  "rarity": RARITY.COMMON,
   "stackable": false,
   "icon": {
     "path": "items/gauntlet.svg",
@@ -27,17 +28,12 @@ export const IronGloves: EquipmentItem = {
   },
   "properties": {
     "weight": 4,
-    "material": "iron",
-    "tier": 2,
+    "material": MATERIAL.IRON,
+    "tier": TIER.T2,
     "armor": 10,
     "evasion": -1,
     "requiredLevel": 14
   },
-  "allowedQualities": [],
-  "allowedTraits": [
-    "pristine",
-    "cursed",
-    "blessed",
-    "masterwork"
-  ]
+  "allowedQualities": QUALITY_SETS.NONE,
+  "allowedTraits": TRAIT_SETS.EQUIPMENT_PRISTINE
 } as const;

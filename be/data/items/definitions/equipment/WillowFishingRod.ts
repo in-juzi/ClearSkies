@@ -4,25 +4,26 @@
  */
 
 import { EquipmentItem } from '../../../../types/items';
+import { SUBCATEGORY, CATEGORY, RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL, SLOT, WEAPON_SUBTYPE, SKILL_SOURCE } from '../../../constants/item-constants';
 
 export const WillowFishingRod: EquipmentItem = {
   "itemId": "willow_fishing_rod",
   "name": "Willow Fishing Rod",
   "description": "A flexible fishing rod made from willow wood",
-  "category": "equipment",
+  "category": CATEGORY.EQUIPMENT,
   "subcategories": [
-    "tool",
-    "weapon",
-    "gathering",
-    "fishing",
-    "rod",
-    "melee",
-    "one-handed"
+    SUBCATEGORY.TOOL,
+    SUBCATEGORY.WEAPON,
+    SUBCATEGORY.GATHERING,
+    SUBCATEGORY.FISHING,
+    SUBCATEGORY.ROD,
+    SUBCATEGORY.MELEE,
+    SUBCATEGORY.ONE_HANDED
   ],
-  "subtype": "fishing-rod",
-  "slot": "mainHand",
+  "subtype": WEAPON_SUBTYPE.FISHING_ROD,
+  "slot": SLOT.MAIN_HAND,
   "baseValue": 150,
-  "rarity": "common",
+  "rarity": RARITY.COMMON,
   "stackable": false,
   "icon": {
     "path": "items/fishing-pole.svg",
@@ -30,21 +31,15 @@ export const WillowFishingRod: EquipmentItem = {
   },
   "properties": {
     "weight": 2,
-    "material": "willow",
-    "tier": 2,
+    "material": MATERIAL.WILLOW,
+    "tier": TIER.T2,
     "damageRoll": "1d3",
     "attackSpeed": 2.4,
     "critChance": 0.04,
-    "skillScalar": "oneHanded",
+    "skillScalar": SKILL_SOURCE.ONE_HANDED,
     "toolEfficiency": 1.5,
     "requiredLevel": 5
   },
-  "allowedQualities": [
-    "woodGrain"
-  ],
-  "allowedTraits": [
-    "pristine",
-    "blessed",
-    "masterwork"
-  ]
+  "allowedQualities": QUALITY_SETS.WOOD_GRAIN,
+  "allowedTraits": TRAIT_SETS.EQUIPMENT_PRISTINE
 } as const;

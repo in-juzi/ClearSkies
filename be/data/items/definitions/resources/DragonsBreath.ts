@@ -4,12 +4,13 @@
  */
 
 import { ResourceItem } from '../../../../types/items';
+import { CATEGORY, RARITY, TIER, QUALITY_SETS, MATERIAL, SKILL_SOURCE } from '../../../constants/item-constants';
 
 export const DragonsBreath: ResourceItem = {
   "itemId": "dragons_breath",
   "name": "Dragon's Breath",
   "description": "Rare crimson flowers that grow in volcanic soil, their petals warm to the touch",
-  "category": "resource",
+  "category": CATEGORY.RESOURCE,
   "subcategories": [
     "flower",
     "herb",
@@ -18,15 +19,15 @@ export const DragonsBreath: ResourceItem = {
     "rare"
   ],
   "baseValue": 100,
-  "rarity": "rare",
+  "rarity": RARITY.RARE,
   "stackable": true,
   "properties": {
     "weight": 0.2,
-    "material": "herb",
-    "tier": 3,
-    "skillSource": "gathering"
+    "material": MATERIAL.HEMP,
+    "tier": TIER.T3,
+    "skillSource": SKILL_SOURCE.GATHERING
   },
-  "allowedQualities": [],
+  "allowedQualities": QUALITY_SETS.NONE,
   "allowedTraits": [
     "pristine",
     "cursed",

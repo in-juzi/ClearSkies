@@ -4,31 +4,29 @@
  */
 
 import { ResourceItem } from '../../../../types/items';
+import { SUBCATEGORY, CATEGORY, RARITY, TIER, QUALITY_SETS, TRAIT_SETS, SUBCATEGORIES, MATERIAL, SKILL_SOURCE } from '../../../constants/item-constants';
 
 export const SilverOre: ResourceItem = {
   "itemId": "silver_ore",
   "name": "Silver Ore",
   "description": "Precious silver ore with a lustrous shine",
-  "category": "resource",
+  "category": CATEGORY.RESOURCE,
   "subcategories": [
     "ore",
     "mineral",
-    "metal",
+    SUBCATEGORY.METAL,
     "precious"
   ],
   "baseValue": 120,
-  "rarity": "uncommon",
+  "rarity": RARITY.UNCOMMON,
   "stackable": true,
   "properties": {
     "weight": 5.5,
-    "material": "ore",
-    "tier": 3,
-    "skillSource": "mining"
+    "material": MATERIAL.GENERIC,
+    "tier": TIER.T3,
+    "skillSource": SKILL_SOURCE.MINING
   },
-  "allowedQualities": [
-    "purity",
-    "sheen"
-  ],
+  "allowedQualities": QUALITY_SETS.ORE,
   "allowedTraits": [
     "pristine",
     "blessed"

@@ -4,12 +4,13 @@
  */
 
 import { ResourceItem } from '../../../../types/items';
+import { CATEGORY, RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL, SKILL_SOURCE } from '../../../constants/item-constants';
 
 export const Wisteria: ResourceItem = {
   "itemId": "wisteria",
   "name": "Wisteria",
   "description": "Cascading clusters of lavender blossoms that hang like fragrant curtains from ancient vines",
-  "category": "resource",
+  "category": CATEGORY.RESOURCE,
   "subcategories": [
     "flower",
     "herb",
@@ -18,20 +19,16 @@ export const Wisteria: ResourceItem = {
     "alchemical"
   ],
   "baseValue": 28,
-  "rarity": "uncommon",
+  "rarity": RARITY.UNCOMMON,
   "stackable": true,
   "properties": {
     "weight": 0.15,
-    "material": "herb",
-    "tier": 2,
-    "skillSource": "gathering"
+    "material": MATERIAL.HEMP,
+    "tier": TIER.T2,
+    "skillSource": SKILL_SOURCE.GATHERING
   },
-  "allowedQualities": [],
-  "allowedTraits": [
-    "fragrant",
-    "pristine",
-    "blessed"
-  ],
+  "allowedQualities": QUALITY_SETS.NONE,
+  "allowedTraits": TRAIT_SETS.HERB_PRISTINE,
   "icon": {
     "path": "items/vine-flower.svg",
     "material": "wisteria"

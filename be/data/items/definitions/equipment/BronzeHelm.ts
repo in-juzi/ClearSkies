@@ -4,22 +4,23 @@
  */
 
 import { EquipmentItem } from '../../../../types/items';
+import { SUBCATEGORY, CATEGORY, RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL, SLOT, ARMOR_SUBTYPE } from '../../../constants/item-constants';
 
 export const BronzeHelm: EquipmentItem = {
   "itemId": "bronze_helm",
   "name": "Bronze Helm",
   "description": "A protective helmet forged from bronze plates",
-  "category": "equipment",
+  "category": CATEGORY.EQUIPMENT,
   "subcategories": [
-    "armor",
-    "headgear",
-    "medium-armor",
-    "metal"
+    SUBCATEGORY.ARMOR,
+    SUBCATEGORY.HEADGEAR,
+    SUBCATEGORY.MEDIUM_ARMOR,
+    SUBCATEGORY.METAL
   ],
-  "subtype": "helm",
-  "slot": "head",
+  "subtype": ARMOR_SUBTYPE.HELM,
+  "slot": SLOT.HEAD,
   "baseValue": 130,
-  "rarity": "common",
+  "rarity": RARITY.COMMON,
   "stackable": false,
   "icon": {
     "path": "items/light-helm.svg",
@@ -27,17 +28,12 @@ export const BronzeHelm: EquipmentItem = {
   },
   "properties": {
     "weight": 5,
-    "material": "bronze",
-    "tier": 1,
+    "material": MATERIAL.BRONZE,
+    "tier": TIER.T1,
     "armor": 10,
     "evasion": 0,
     "requiredLevel": 7
   },
-  "allowedQualities": [],
-  "allowedTraits": [
-    "pristine",
-    "cursed",
-    "blessed",
-    "masterwork"
-  ]
+  "allowedQualities": QUALITY_SETS.NONE,
+  "allowedTraits": TRAIT_SETS.EQUIPMENT_PRISTINE
 } as const;

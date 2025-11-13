@@ -4,25 +4,26 @@
  */
 
 import { EquipmentItem } from '../../../../types/items';
+import { SUBCATEGORY, CATEGORY, RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL, SLOT, WEAPON_SUBTYPE, SKILL_SOURCE } from '../../../constants/item-constants';
 
 export const BronzeWoodcuttingAxe: EquipmentItem = {
   "itemId": "bronze_woodcutting_axe",
   "name": "Bronze Woodcutting Axe",
   "description": "A basic axe for chopping trees",
-  "category": "equipment",
+  "category": CATEGORY.EQUIPMENT,
   "subcategories": [
-    "tool",
-    "weapon",
-    "gathering",
-    "woodcutting",
-    "axe",
-    "melee",
-    "one-handed"
+    SUBCATEGORY.TOOL,
+    SUBCATEGORY.WEAPON,
+    SUBCATEGORY.GATHERING,
+    SUBCATEGORY.WOODCUTTING,
+    SUBCATEGORY.AXE,
+    SUBCATEGORY.MELEE,
+    SUBCATEGORY.ONE_HANDED
   ],
-  "subtype": "woodcutting-axe",
-  "slot": "mainHand",
+  "subtype": WEAPON_SUBTYPE.WOODCUTTING_AXE,
+  "slot": SLOT.MAIN_HAND,
   "baseValue": 80,
-  "rarity": "common",
+  "rarity": RARITY.COMMON,
   "stackable": false,
   "icon": {
     "path": "item-categories/item_cat_axe.svg",
@@ -30,19 +31,15 @@ export const BronzeWoodcuttingAxe: EquipmentItem = {
   },
   "properties": {
     "weight": 4,
-    "material": "bronze",
-    "tier": 1,
+    "material": MATERIAL.BRONZE,
+    "tier": TIER.T1,
     "damageRoll": "1d3",
     "attackSpeed": 2.8,
     "critChance": 0.04,
-    "skillScalar": "oneHanded",
+    "skillScalar": SKILL_SOURCE.ONE_HANDED,
     "toolEfficiency": 1,
     "requiredLevel": 1
   },
-  "allowedQualities": [],
-  "allowedTraits": [
-    "pristine",
-    "blessed",
-    "masterwork"
-  ]
+  "allowedQualities": QUALITY_SETS.NONE,
+  "allowedTraits": TRAIT_SETS.EQUIPMENT_PRISTINE
 } as const;

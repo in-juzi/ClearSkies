@@ -4,40 +4,36 @@
  */
 
 import { EquipmentItem } from '../../../../types/items';
+import { SUBCATEGORY, CATEGORY, RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL, SLOT, ARMOR_SUBTYPE } from '../../../constants/item-constants';
 
 export const IronPlate: EquipmentItem = {
   "itemId": "iron_plate",
   "name": "Iron Plate Armor",
   "description": "A full suit of iron plate armor, pinnacle of defensive metalwork",
-  "category": "equipment",
+  "category": CATEGORY.EQUIPMENT,
   "subcategories": [
-    "armor",
-    "body-armor",
-    "heavy-armor",
-    "metal"
+    SUBCATEGORY.ARMOR,
+    SUBCATEGORY.BODY_ARMOR,
+    SUBCATEGORY.HEAVY_ARMOR,
+    SUBCATEGORY.METAL
   ],
-  "subtype": "plate",
-  "slot": "body",
+  "subtype": ARMOR_SUBTYPE.PLATE,
+  "slot": SLOT.BODY,
   "baseValue": 400,
-  "rarity": "uncommon",
+  "rarity": RARITY.UNCOMMON,
   "stackable": false,
   "icon": {
     "path": "item-categories/item_cat_body.svg",
-    "material": "iron"
+    "material": MATERIAL.IRON
   },
   "properties": {
     "weight": 20,
-    "material": "iron",
-    "tier": 2,
+    "material": MATERIAL.IRON,
+    "tier": TIER.T2,
     "armor": 40,
     "evasion": -8,
     "requiredLevel": 20
   },
-  "allowedQualities": [],
-  "allowedTraits": [
-    "pristine",
-    "cursed",
-    "blessed",
-    "masterwork"
-  ]
+  "allowedQualities": QUALITY_SETS.NONE,
+  "allowedTraits": TRAIT_SETS.EQUIPMENT_PRISTINE
 } as const;

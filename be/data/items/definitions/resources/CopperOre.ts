@@ -4,33 +4,25 @@
  */
 
 import { ResourceItem } from '../../../../types/items';
+import { CATEGORY, RARITY, TIER, QUALITY_SETS, TRAIT_SETS, SUBCATEGORIES, MATERIAL, SKILL_SOURCE } from '../../../constants/item-constants';
 
 export const CopperOre: ResourceItem = {
   "itemId": "copper_ore",
   "name": "Copper Ore",
   "description": "Raw copper ore, ready to be smelted",
-  "category": "resource",
-  "subcategories": [
-    "ore",
-    "mineral",
-    "metal"
-  ],
+  "category": CATEGORY.RESOURCE,
+  "subcategories": SUBCATEGORIES.ORE,
   "baseValue": 30,
-  "rarity": "common",
+  "rarity": RARITY.COMMON,
   "stackable": true,
   "properties": {
     "weight": 5,
-    "material": "ore",
-    "tier": 1,
-    "skillSource": "mining"
+    "material": MATERIAL.GENERIC,
+    "tier": TIER.T1,
+    "skillSource": SKILL_SOURCE.MINING
   },
-  "allowedQualities": [
-    "purity",
-    "sheen"
-  ],
-  "allowedTraits": [
-    "pristine"
-  ],
+  "allowedQualities": QUALITY_SETS.ORE,
+  "allowedTraits": TRAIT_SETS.PRISTINE,
   "icon": {
     "path": "item-categories/item_cat_ore.svg",
     "material": "copper_ore"

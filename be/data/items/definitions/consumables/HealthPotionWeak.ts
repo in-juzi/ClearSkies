@@ -4,14 +4,14 @@
  */
 
 import { ConsumableItem } from '../../../../types/items';
-import { RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL } from '../../../constants/item-constants';
+import { CATEGORY, RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL, SUBCATEGORIES } from '../../../constants/item-constants';
 
 export const HealthPotionWeak: ConsumableItem = {
   itemId: 'weak_health_potion',
   name: 'Weak Health Tincture',
   description: 'A basic alchemical remedy that restores a small amount of health. Crafted from common herbs.',
-  category: 'consumable',
-  subcategories: ['potion', 'healing', 'alchemical', 'tincture'],
+  category: CATEGORY.CONSUMABLE,
+  subcategories: SUBCATEGORIES.HEALTH_TINCTURE,
   baseValue: 25,
   rarity: RARITY.COMMON,
   stackable: true,

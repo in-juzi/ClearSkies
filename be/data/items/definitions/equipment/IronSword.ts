@@ -4,42 +4,38 @@
  */
 
 import { EquipmentItem } from '../../../../types/items';
+import { SUBCATEGORY, CATEGORY, RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL, SLOT, WEAPON_SUBTYPE, SKILL_SOURCE } from '../../../constants/item-constants';
 
 export const IronSword: EquipmentItem = {
   "itemId": "iron_sword",
   "name": "Iron Sword",
   "description": "A reliable iron sword",
-  "category": "equipment",
+  "category": CATEGORY.EQUIPMENT,
   "subcategories": [
-    "weapon",
-    "sword",
-    "melee",
-    "one-handed"
+    SUBCATEGORY.WEAPON,
+    SUBCATEGORY.SWORD,
+    SUBCATEGORY.MELEE,
+    SUBCATEGORY.ONE_HANDED
   ],
-  "subtype": "sword",
-  "slot": "mainHand",
+  "subtype": WEAPON_SUBTYPE.SWORD,
+  "slot": SLOT.MAIN_HAND,
   "baseValue": 250,
-  "rarity": "common",
+  "rarity": RARITY.COMMON,
   "stackable": false,
   "icon": {
     "path": "item-categories/item_cat_sword.svg",
-    "material": "iron"
+    "material": MATERIAL.IRON
   },
   "properties": {
     "weight": 5,
-    "material": "iron",
-    "tier": 2,
+    "material": MATERIAL.IRON,
+    "tier": TIER.T2,
     "damageRoll": "1d5",
     "attackSpeed": 2.6,
     "critChance": 0.06,
-    "skillScalar": "oneHanded",
+    "skillScalar": SKILL_SOURCE.ONE_HANDED,
     "requiredLevel": 5
   },
-  "allowedQualities": [],
-  "allowedTraits": [
-    "pristine",
-    "cursed",
-    "blessed",
-    "masterwork"
-  ]
+  "allowedQualities": QUALITY_SETS.NONE,
+  "allowedTraits": TRAIT_SETS.EQUIPMENT_PRISTINE
 } as const;

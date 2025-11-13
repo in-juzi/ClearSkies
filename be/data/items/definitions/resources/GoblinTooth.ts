@@ -4,34 +4,26 @@
  */
 
 import { ResourceItem } from '../../../../types/items';
+import { CATEGORY, RARITY, TIER, QUALITY_SETS, TRAIT_SETS, SUBCATEGORIES, MATERIAL, SKILL_SOURCE } from '../../../constants/item-constants';
 
 export const GoblinTooth: ResourceItem = {
   "itemId": "goblin_tooth",
   "name": "Goblin Tooth",
   "description": "A jagged tooth from a goblin warrior. Goblins are known for their sharp teeth and fiercer bite.",
-  "category": "resource",
-  "subcategories": [
-    "monster-drop",
-    "bone",
-    "crafting-material",
-    "collectible"
-  ],
-  "rarity": "common",
+  "category": CATEGORY.RESOURCE,
+  "subcategories": SUBCATEGORIES.MONSTER_DROP,
+  "rarity": RARITY.COMMON,
   "baseValue": 7,
   "stackable": true,
   "maxStack": 999,
   "properties": {
     "weight": 0.1,
-    "material": "bone",
-    "tier": 1,
-    "skillSource": "combat"
+    "material": MATERIAL.GENERIC,
+    "tier": TIER.T1,
+    "skillSource": SKILL_SOURCE.COMBAT
   },
-  "allowedQualities": [
-    "sheen"
-  ],
-  "allowedTraits": [
-    "cursed"
-  ],
+  "allowedQualities": QUALITY_SETS.SHEEN,
+  "allowedTraits": TRAIT_SETS.CURSED,
   "icon": {
     "path": "items/fangs.svg",
     "material": "bone"

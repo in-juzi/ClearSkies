@@ -4,40 +4,36 @@
  */
 
 import { EquipmentItem } from '../../../../types/items';
+import { SUBCATEGORY, CATEGORY, RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL, SLOT, ARMOR_SUBTYPE } from '../../../constants/item-constants';
 
 export const LeatherTunic: EquipmentItem = {
   "itemId": "leather_tunic",
   "name": "Leather Tunic",
   "description": "A basic leather chest piece",
-  "category": "equipment",
+  "category": CATEGORY.EQUIPMENT,
   "subcategories": [
-    "armor",
-    "body-armor",
-    "medium-armor",
-    "leather"
+    SUBCATEGORY.ARMOR,
+    SUBCATEGORY.BODY_ARMOR,
+    SUBCATEGORY.MEDIUM_ARMOR,
+    SUBCATEGORY.LEATHER
   ],
-  "subtype": "tunic",
-  "slot": "body",
+  "subtype": ARMOR_SUBTYPE.TUNIC,
+  "slot": SLOT.BODY,
   "baseValue": 75,
-  "rarity": "common",
+  "rarity": RARITY.COMMON,
   "stackable": false,
   "icon": {
     "path": "item-categories/item_cat_body.svg",
-    "material": "leather"
+    "material": MATERIAL.LEATHER
   },
   "properties": {
     "weight": 5,
-    "material": "leather",
-    "tier": 1,
+    "material": MATERIAL.LEATHER,
+    "tier": TIER.T1,
     "armor": 10,
     "evasion": 8,
     "requiredLevel": 1
   },
-  "allowedQualities": [],
-  "allowedTraits": [
-    "weathered",
-    "pristine",
-    "blessed",
-    "masterwork"
-  ]
+  "allowedQualities": QUALITY_SETS.NONE,
+  "allowedTraits": TRAIT_SETS.WOOD_PRISTINE
 } as const;

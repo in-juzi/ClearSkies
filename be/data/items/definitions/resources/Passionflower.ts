@@ -4,12 +4,13 @@
  */
 
 import { ResourceItem } from '../../../../types/items';
+import { CATEGORY, RARITY, TIER, QUALITY_SETS, MATERIAL, SKILL_SOURCE } from '../../../constants/item-constants';
 
 export const Passionflower: ResourceItem = {
   "itemId": "passionflower",
   "name": "Passionflower",
   "description": "Exotic purple blooms with intricate radiating centers, said to inspire dreams and deep meditation",
-  "category": "resource",
+  "category": CATEGORY.RESOURCE,
   "subcategories": [
     "flower",
     "herb",
@@ -18,15 +19,15 @@ export const Passionflower: ResourceItem = {
     "rare"
   ],
   "baseValue": 50,
-  "rarity": "rare",
+  "rarity": RARITY.RARE,
   "stackable": true,
   "properties": {
     "weight": 0.15,
-    "material": "herb",
-    "tier": 3,
-    "skillSource": "gathering"
+    "material": MATERIAL.HEMP,
+    "tier": TIER.T3,
+    "skillSource": SKILL_SOURCE.GATHERING
   },
-  "allowedQualities": [],
+  "allowedQualities": QUALITY_SETS.NONE,
   "allowedTraits": [
     "fragrant",
     "pristine",

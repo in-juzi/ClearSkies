@@ -4,42 +4,36 @@
  */
 
 import { EquipmentItem } from '../../../../types/items';
+import { SUBCATEGORY, CATEGORY, RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL, SLOT, WEAPON_SUBTYPE } from '../../../constants/item-constants';
 
 export const WoodenShield: EquipmentItem = {
   "itemId": "wooden_shield",
   "name": "Wooden Shield",
   "description": "A simple wooden shield for basic protection",
-  "category": "equipment",
+  "category": CATEGORY.EQUIPMENT,
   "subcategories": [
-    "armor",
-    "shield",
-    "defensive"
+    SUBCATEGORY.ARMOR,
+    SUBCATEGORY.SHIELD,
+    SUBCATEGORY.DEFENSIVE
   ],
-  "subtype": "shield",
-  "slot": "offHand",
+  "subtype": WEAPON_SUBTYPE.SHIELD,
+  "slot": SLOT.OFF_HAND,
   "baseValue": 50,
-  "rarity": "common",
+  "rarity": RARITY.COMMON,
   "stackable": false,
   "icon": {
     "path": "item-categories/item_cat_body.svg",
-    "material": "oak"
+    "material": MATERIAL.OAK
   },
   "properties": {
     "weight": 3,
-    "material": "wood",
-    "tier": 1,
+    "material": MATERIAL.OAK,
+    "tier": TIER.T1,
     "armor": 8,
     "evasion": 2,
     "blockChance": 0.15,
     "requiredLevel": 1
   },
-  "allowedQualities": [
-    "woodGrain"
-  ],
-  "allowedTraits": [
-    "weathered",
-    "pristine",
-    "blessed",
-    "masterwork"
-  ]
+  "allowedQualities": QUALITY_SETS.WOOD_GRAIN,
+  "allowedTraits": TRAIT_SETS.WOOD_PRISTINE
 } as const;

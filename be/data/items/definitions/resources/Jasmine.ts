@@ -4,12 +4,13 @@
  */
 
 import { ResourceItem } from '../../../../types/items';
+import { CATEGORY, RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL, SKILL_SOURCE } from '../../../constants/item-constants';
 
 export const Jasmine: ResourceItem = {
   "itemId": "jasmine",
   "name": "Jasmine",
   "description": "Elegant white star-shaped flowers with an intoxicating sweet fragrance, prized in perfumes and teas",
-  "category": "resource",
+  "category": CATEGORY.RESOURCE,
   "subcategories": [
     "flower",
     "herb",
@@ -18,20 +19,16 @@ export const Jasmine: ResourceItem = {
     "decorative"
   ],
   "baseValue": 15,
-  "rarity": "common",
+  "rarity": RARITY.COMMON,
   "stackable": true,
   "properties": {
     "weight": 0.1,
-    "material": "herb",
-    "tier": 1,
-    "skillSource": "gathering"
+    "material": MATERIAL.HEMP,
+    "tier": TIER.T1,
+    "skillSource": SKILL_SOURCE.GATHERING
   },
-  "allowedQualities": [],
-  "allowedTraits": [
-    "fragrant",
-    "pristine",
-    "blessed"
-  ],
+  "allowedQualities": QUALITY_SETS.NONE,
+  "allowedTraits": TRAIT_SETS.HERB_PRISTINE,
   "icon": {
     "path": "items/vine-flower.svg",
     "material": "jasmine"

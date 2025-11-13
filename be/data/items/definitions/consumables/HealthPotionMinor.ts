@@ -4,33 +4,25 @@
  */
 
 import { ConsumableItem } from '../../../../types/items';
+import { CATEGORY, RARITY, TIER, QUALITY_SETS, TRAIT_SETS, SUBCATEGORIES, MATERIAL } from '../../../constants/item-constants';
 
 export const HealthPotionMinor: ConsumableItem = {
   "itemId": "health_potion_minor",
   "name": "Minor Health Potion",
   "description": "A small potion that restores a modest amount of health",
-  "category": "consumable",
-  "subcategories": [
-    "potion",
-    "healing",
-    "alchemical",
-    "liquid"
-  ],
+  "category": CATEGORY.CONSUMABLE,
+  "subcategories": SUBCATEGORIES.POTION,
   "baseValue": 50,
-  "rarity": "common",
+  "rarity": RARITY.COMMON,
   "stackable": true,
   "properties": {
     "weight": 0.3,
-    "material": "potion",
-    "tier": 1,
+    "material": MATERIAL.GENERIC,
+    "tier": TIER.T1,
     "healthRestore": 30
   },
-  "allowedQualities": [],
-  "allowedTraits": [
-    "pristine",
-    "blessed",
-    "cursed"
-  ],
+  "allowedQualities": QUALITY_SETS.NONE,
+  "allowedTraits": TRAIT_SETS.POTION,
   "icon": {
     "path": "item-categories/item_cat_potion_1.svg",
     "material": "health_potion"

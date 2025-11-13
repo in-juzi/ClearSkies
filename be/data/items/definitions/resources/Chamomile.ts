@@ -4,12 +4,13 @@
  */
 
 import { ResourceItem } from '../../../../types/items';
+import { CATEGORY, RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL, SKILL_SOURCE } from '../../../constants/item-constants';
 
 export const Chamomile: ResourceItem = {
   "itemId": "chamomile",
   "name": "Chamomile",
   "description": "Delicate white flowers with a soothing aroma, commonly used in teas and healing salves",
-  "category": "resource",
+  "category": CATEGORY.RESOURCE,
   "subcategories": [
     "flower",
     "herb",
@@ -17,15 +18,15 @@ export const Chamomile: ResourceItem = {
     "medicinal"
   ],
   "baseValue": 12,
-  "rarity": "common",
+  "rarity": RARITY.COMMON,
   "stackable": true,
   "properties": {
     "weight": 0.1,
-    "material": "herb",
-    "tier": 1,
-    "skillSource": "gathering"
+    "material": MATERIAL.HEMP,
+    "tier": TIER.T1,
+    "skillSource": SKILL_SOURCE.GATHERING
   },
-  "allowedQualities": [],
+  "allowedQualities": QUALITY_SETS.NONE,
   "allowedTraits": [
     "fragrant",
     "pristine"

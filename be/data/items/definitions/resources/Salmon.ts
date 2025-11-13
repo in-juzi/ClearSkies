@@ -4,24 +4,22 @@
  */
 
 import { ConsumableItem } from '../../../../types/items';
+import { CATEGORY, RARITY, TIER, MATERIAL, SKILL_SOURCE, SUBCATEGORIES } from '../../../constants/item-constants';
 
 export const Salmon: ConsumableItem = {
   "itemId": "salmon",
   "name": "Salmon",
   "description": "A prized salmon, rich in flavor",
-  "category": "consumable",
-  "subcategories": [
-    "fish",
-    "freshwater"
-  ],
+  "category": CATEGORY.CONSUMABLE,
+  "subcategories": SUBCATEGORIES.FISH_FRESHWATER,
   "baseValue": 35,
-  "rarity": "uncommon",
+  "rarity": RARITY.UNCOMMON,
   "stackable": true,
   "properties": {
     "weight": 1.5,
-    "material": "fish",
-    "tier": 2,
-    "skillSource": "fishing"
+    "material": MATERIAL.GENERIC,
+    "tier": TIER.T2,
+    "skillSource": SKILL_SOURCE.FISHING
   },
   "allowedQualities": [
     "size",

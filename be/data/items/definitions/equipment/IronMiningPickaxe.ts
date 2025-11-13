@@ -4,25 +4,26 @@
  */
 
 import { EquipmentItem } from '../../../../types/items';
+import { SUBCATEGORY, CATEGORY, RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL, SLOT, WEAPON_SUBTYPE, SKILL_SOURCE } from '../../../constants/item-constants';
 
 export const IronMiningPickaxe: EquipmentItem = {
   "itemId": "iron_mining_pickaxe",
   "name": "Iron Mining Pickaxe",
   "description": "A sturdy iron pickaxe for mining ore",
-  "category": "equipment",
+  "category": CATEGORY.EQUIPMENT,
   "subcategories": [
-    "tool",
-    "weapon",
-    "gathering",
-    "mining",
-    "pickaxe",
-    "melee",
-    "one-handed"
+    SUBCATEGORY.TOOL,
+    SUBCATEGORY.WEAPON,
+    SUBCATEGORY.GATHERING,
+    SUBCATEGORY.MINING,
+    SUBCATEGORY.PICKAXE,
+    SUBCATEGORY.MELEE,
+    SUBCATEGORY.ONE_HANDED
   ],
-  "subtype": "mining-pickaxe",
-  "slot": "mainHand",
+  "subtype": WEAPON_SUBTYPE.MINING_PICKAXE,
+  "slot": SLOT.MAIN_HAND,
   "baseValue": 220,
-  "rarity": "common",
+  "rarity": RARITY.COMMON,
   "stackable": false,
   "icon": {
     "path": "items/pickaxe.svg",
@@ -30,19 +31,15 @@ export const IronMiningPickaxe: EquipmentItem = {
   },
   "properties": {
     "weight": 6,
-    "material": "iron",
-    "tier": 2,
+    "material": MATERIAL.IRON,
+    "tier": TIER.T2,
     "damageRoll": "1d4",
     "attackSpeed": 3.2,
     "critChance": 0.05,
-    "skillScalar": "oneHanded",
+    "skillScalar": SKILL_SOURCE.ONE_HANDED,
     "toolEfficiency": 1.5,
     "requiredLevel": 5
   },
-  "allowedQualities": [],
-  "allowedTraits": [
-    "pristine",
-    "blessed",
-    "masterwork"
-  ]
+  "allowedQualities": QUALITY_SETS.NONE,
+  "allowedTraits": TRAIT_SETS.EQUIPMENT_PRISTINE
 } as const;

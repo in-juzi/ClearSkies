@@ -4,12 +4,13 @@
  */
 
 import { ResourceItem } from '../../../../types/items';
+import { CATEGORY, RARITY, TIER, QUALITY_SETS, MATERIAL, SKILL_SOURCE } from '../../../constants/item-constants';
 
 export const TrumpetVine: ResourceItem = {
   "itemId": "trumpet_vine",
   "name": "Trumpet Vine",
   "description": "Bold scarlet-orange blooms shaped like heralds' trumpets, their fiery petals crackling with latent energy",
-  "category": "resource",
+  "category": CATEGORY.RESOURCE,
   "subcategories": [
     "flower",
     "herb",
@@ -18,15 +19,15 @@ export const TrumpetVine: ResourceItem = {
     "rare"
   ],
   "baseValue": 60,
-  "rarity": "rare",
+  "rarity": RARITY.RARE,
   "stackable": true,
   "properties": {
     "weight": 0.2,
-    "material": "herb",
-    "tier": 3,
-    "skillSource": "gathering"
+    "material": MATERIAL.HEMP,
+    "tier": TIER.T3,
+    "skillSource": SKILL_SOURCE.GATHERING
   },
-  "allowedQualities": [],
+  "allowedQualities": QUALITY_SETS.NONE,
   "allowedTraits": [
     "pristine",
     "blessed",

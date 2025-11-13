@@ -4,14 +4,14 @@
  */
 
 import { ConsumableItem } from '../../../../types/items';
-import { RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL } from '../../../constants/item-constants';
+import { CATEGORY, RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL, SUBCATEGORIES } from '../../../constants/item-constants';
 
 export const HealthPotion: ConsumableItem = {
   itemId: 'health_potion',
   name: 'Health Potion',
   description: 'A refined alchemical brew that restores moderate health. Enhanced with chamomile for calming properties.',
-  category: 'consumable',
-  subcategories: ['potion', 'healing', 'alchemical'],
+  category: CATEGORY.CONSUMABLE,
+  subcategories: SUBCATEGORIES.HEALTH_POTION,
   baseValue: 50,
   rarity: RARITY.UNCOMMON,
   stackable: true,

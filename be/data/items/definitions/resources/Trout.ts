@@ -4,24 +4,22 @@
  */
 
 import { ConsumableItem } from '../../../../types/items';
+import { CATEGORY, RARITY, TIER, MATERIAL, SKILL_SOURCE, SUBCATEGORIES } from '../../../constants/item-constants';
 
 export const Trout: ConsumableItem = {
   "itemId": "trout",
   "name": "Trout",
   "description": "A freshly caught trout",
-  "category": "consumable",
-  "subcategories": [
-    "fish",
-    "freshwater"
-  ],
+  "category": CATEGORY.CONSUMABLE,
+  "subcategories": SUBCATEGORIES.FISH_FRESHWATER,
   "baseValue": 15,
-  "rarity": "common",
+  "rarity": RARITY.COMMON,
   "stackable": true,
   "properties": {
     "weight": 1,
-    "material": "fish",
-    "tier": 1,
-    "skillSource": "fishing"
+    "material": MATERIAL.GENERIC,
+    "tier": TIER.T1,
+    "skillSource": SKILL_SOURCE.FISHING
   },
   "allowedQualities": [
     "size",

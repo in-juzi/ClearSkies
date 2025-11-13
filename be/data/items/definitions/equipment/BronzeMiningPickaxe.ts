@@ -4,25 +4,26 @@
  */
 
 import { EquipmentItem } from '../../../../types/items';
+import { SUBCATEGORY, CATEGORY, RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL, SLOT, WEAPON_SUBTYPE, SKILL_SOURCE } from '../../../constants/item-constants';
 
 export const BronzeMiningPickaxe: EquipmentItem = {
   "itemId": "bronze_mining_pickaxe",
   "name": "Bronze Mining Pickaxe",
   "description": "A basic pickaxe for mining ore",
-  "category": "equipment",
+  "category": CATEGORY.EQUIPMENT,
   "subcategories": [
-    "tool",
-    "weapon",
-    "gathering",
-    "mining",
-    "pickaxe",
-    "melee",
-    "one-handed"
+    SUBCATEGORY.TOOL,
+    SUBCATEGORY.WEAPON,
+    SUBCATEGORY.GATHERING,
+    SUBCATEGORY.MINING,
+    SUBCATEGORY.PICKAXE,
+    SUBCATEGORY.MELEE,
+    SUBCATEGORY.ONE_HANDED
   ],
-  "subtype": "mining-pickaxe",
-  "slot": "mainHand",
+  "subtype": WEAPON_SUBTYPE.MINING_PICKAXE,
+  "slot": SLOT.MAIN_HAND,
   "baseValue": 90,
-  "rarity": "common",
+  "rarity": RARITY.COMMON,
   "stackable": false,
   "icon": {
     "path": "items/pickaxe.svg",
@@ -30,19 +31,15 @@ export const BronzeMiningPickaxe: EquipmentItem = {
   },
   "properties": {
     "weight": 5,
-    "material": "bronze",
-    "tier": 1,
+    "material": MATERIAL.BRONZE,
+    "tier": TIER.T1,
     "damageRoll": "1d3",
     "attackSpeed": 3,
     "critChance": 0.04,
-    "skillScalar": "oneHanded",
+    "skillScalar": SKILL_SOURCE.ONE_HANDED,
     "toolEfficiency": 1,
     "requiredLevel": 1
   },
-  "allowedQualities": [],
-  "allowedTraits": [
-    "pristine",
-    "blessed",
-    "masterwork"
-  ]
+  "allowedQualities": QUALITY_SETS.NONE,
+  "allowedTraits": TRAIT_SETS.EQUIPMENT_PRISTINE
 } as const;

@@ -4,14 +4,14 @@
  */
 
 import { ConsumableItem } from '../../../../types/items';
-import { RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL } from '../../../constants/item-constants';
+import { CATEGORY, RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL, SUBCATEGORIES } from '../../../constants/item-constants';
 
 export const HealthPotionStrong: ConsumableItem = {
   itemId: 'strong_health_potion',
   name: 'Strong Health Elixir',
   description: 'A potent alchemical elixir that restores substantial health. Combines multiple herbs for maximum efficacy.',
-  category: 'consumable',
-  subcategories: ['potion', 'healing', 'alchemical', 'elixir'],
+  category: CATEGORY.CONSUMABLE,
+  subcategories: SUBCATEGORIES.HEALTH_ELIXIR,
   baseValue: 100,
   rarity: RARITY.RARE,
   stackable: true,

@@ -4,12 +4,13 @@
  */
 
 import { ResourceItem } from '../../../../types/items';
+import { CATEGORY, RARITY, TIER, QUALITY_SETS, MATERIAL, SKILL_SOURCE } from '../../../constants/item-constants';
 
 export const Moonvine: ResourceItem = {
   "itemId": "moonvine",
   "name": "Moonvine",
   "description": "Ethereal silver-blue flowers that bloom only under moonlight, their petals glowing with celestial radiance",
-  "category": "resource",
+  "category": CATEGORY.RESOURCE,
   "subcategories": [
     "flower",
     "herb",
@@ -19,15 +20,15 @@ export const Moonvine: ResourceItem = {
     "nocturnal"
   ],
   "baseValue": 120,
-  "rarity": "epic",
+  "rarity": RARITY.EPIC,
   "stackable": true,
   "properties": {
     "weight": 0.1,
-    "material": "herb",
-    "tier": 4,
-    "skillSource": "gathering"
+    "material": MATERIAL.HEMP,
+    "tier": TIER.T4,
+    "skillSource": SKILL_SOURCE.GATHERING
   },
-  "allowedQualities": [],
+  "allowedQualities": QUALITY_SETS.NONE,
   "allowedTraits": [
     "fragrant",
     "pristine",

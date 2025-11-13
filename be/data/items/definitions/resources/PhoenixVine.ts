@@ -4,12 +4,13 @@
  */
 
 import { ResourceItem } from '../../../../types/items';
+import { CATEGORY, RARITY, TIER, QUALITY_SETS, MATERIAL, SKILL_SOURCE } from '../../../constants/item-constants';
 
 export const PhoenixVine: ResourceItem = {
   "itemId": "phoenix_vine",
   "name": "Phoenix Vine",
   "description": "Legendary crimson blooms with molten gold centers, said to regenerate from ash and grant vitality to the worthy",
-  "category": "resource",
+  "category": CATEGORY.RESOURCE,
   "subcategories": [
     "flower",
     "herb",
@@ -19,15 +20,15 @@ export const PhoenixVine: ResourceItem = {
     "legendary"
   ],
   "baseValue": 150,
-  "rarity": "epic",
+  "rarity": RARITY.EPIC,
   "stackable": true,
   "properties": {
     "weight": 0.2,
-    "material": "herb",
-    "tier": 4,
-    "skillSource": "gathering"
+    "material": MATERIAL.HEMP,
+    "tier": TIER.T4,
+    "skillSource": SKILL_SOURCE.GATHERING
   },
-  "allowedQualities": [],
+  "allowedQualities": QUALITY_SETS.NONE,
   "allowedTraits": [
     "pristine",
     "blessed",
