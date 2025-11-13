@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ClearSkies Socket.io Test</title>
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 900px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #1a1a2e;
+      color: #eee;
+    }
+    h1 { color: #ffd700; }
+    h2 { color: #9d4edd; border-bottom: 2px solid #9d4edd; padding-bottom: 5px; }
+    .section {
+      background: #16213e;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 8px;
+      border: 1px solid #533483;
+    }
+    input, button {
+      padding: 10px;
+      margin: 5px;
+      border-radius: 4px;
+      border: 1px solid #533483;
+    }
+    input {
+      background: #0f3460;
+      color: #eee;
+      width: 300px;
+    }
+    button {
+      background: #9d4edd;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover { background: #c77dff; }
+    button:disabled {
+      background: #555;
+      cursor: not-allowed;
+    }
+    #log {
+      background: #0f0f0f;
+      border: 1px solid #533483;
+      padding: 15px;
+      height: 300px;
+      overflow-y: scroll;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      margin-top: 20px;
+    }
+    .log-entry {
+      margin: 5px 0;
+      padding: 5px;
+      border-left: 3px solid #9d4edd;
+      padding-left: 10px;
+    }
+    .log-success { border-left-color: #10b981; }
+    .log-error { border-left-color: #ef4444; }
+    .log-event { border-left-color: #ffd700; }
+    .status {
+      display: inline-block;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-weight: bold;
+      margin-left: 10px;
+    }
+    .connected { background: #10b981; color: white; }
+    .disconnected { background: #ef4444; color: white; }
+  </style>
+</head>
+<body>
+  <h1>🎮 ClearSkies Socket.io Backend Test</h1>
+
+  <div class="section">
+    <h2>Connection</h2>
+    <div>
+      Status: <span class="status disconnected" id="status">Disconnected</span>
+    </div>
+    <div style="margin-top: 10px;">
+      <input type="text" id="token" placeholder="Enter JWT token from browser (clearskies_token)">
+      <button onclick="connect()">Connect</button>
+      <button onclick="disconnect()">Disconnect</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>🌲 Activity Tests</h2>
+    <div>
+      <input type="text" id="activityId" placeholder="Activity ID (e.g., chop-oak)" value="chop-oak">
+      <input type="text" id="facilityId" placeholder="Facility ID (e.g., logging-camp)" value="logging-camp">
+    </div>
+    <div>
+      <button onclick="startActivity()" id="btnStartActivity" disabled>Start Activity</button>
+      <button onclick="cancelActivity()" id="btnCancelActivity" disabled>Cancel Activity</button>
+      <button onclick="getActivityStatus()" id="btnActivityStatus" disabled>Get Status</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>🗺️ Travel Tests</h2>
+    <div>
+      <input type="text" id="locationId" placeholder="Location ID (e.g., forest-clearing)" value="forest-clearing">
+    </div>
+    <div>
+      <button onclick="startTravel()" id="btnStartTravel" disabled>Start Travel</button>
+      <button onclick="cancelTravel()" id="btnCancelTravel" disabled>Cancel Travel</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>🔨 Crafting Tests</h2>
+    <div>
+      <input type="text" id="recipeId" placeholder="Recipe ID (e.g., cook_shrimp)" value="cook_shrimp">
+    </div>
+    <div>
+      <button onclick="startCrafting()" id="btnStartCrafting" disabled>Start Crafting</button>
+      <button onclick="cancelCrafting()" id="btnCancelCrafting" disabled>Cancel Crafting</button>
+      <button onclick="getCraftingStatus()" id="btnCraftingStatus" disabled>Get Status</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>⚔️ Combat Tests</h2>
+    <div>
+      <button onclick="attackMonster()" id="btnAttack" disabled>Attack</button>
+      <button onclick="getCombatStatus()" id="btnCombatStatus" disabled>Get Combat Status</button>
+      <button onclick="fleeCombat()" id="btnFlee" disabled>Flee</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>📜 Event Log</h2>
+    <button onclick="clearLog()">Clear Log</button>
+    <div id="log"></div>
+  </div>
+
+  <script>
+    let socket = null;
+
+    function log(message, type = 'info') {
+      const logDiv = document.getElementById('log');
+      const entry = document.createElement('div');
+      entry.className = `log-entry log-${type}`;
+      const timestamp = new Date().toLocaleTimeString();
+      entry.innerHTML = `<span style="color: #888;">[${timestamp}]</span> ${message}`;
+      logDiv.appendChild(entry);
+      logDiv.scrollTop = logDiv.scrollHeight;
+    }
+
+    function clearLog() {
+      document.getElementById('log').innerHTML = '';
+    }
+
+    function updateButtons(connected) {
+      const buttons = [
+        'btnStartActivity', 'btnCancelActivity', 'btnActivityStatus',
+        'btnStartTravel', 'btnCancelTravel',
+        'btnStartCrafting', 'btnCancelCrafting', 'btnCraftingStatus',
+        'btnAttack', 'btnCombatStatus', 'btnFlee'
+      ];
+      buttons.forEach(id => {
+        document.getElementById(id).disabled = !connected;
+      });
+    }
+
+    function connect() {
+      const token = document.getElementById('token').value;
+      if (!token) {
+        alert('Please enter JWT token');
+        return;
+      }
+
+      socket = io('http://localhost:3000', {
+        auth: { token }
+      });
+
+      socket.on('connect', () => {
+        log('✅ Connected to server', 'success');
+        document.getElementById('status').textContent = 'Connected';
+        document.getElementById('status').className = 'status connected';
+        updateButtons(true);
+      });
+
+      socket.on('connect_error', (error) => {
+        log(`❌ Connection error: ${error.message}`, 'error');
+      });
+
+      socket.on('disconnect', (reason) => {
+        log(`✗ Disconnected: ${reason}`, 'error');
+        document.getElementById('status').textContent = 'Disconnected';
+        document.getElementById('status').className = 'status disconnected';
+        updateButtons(false);
+      });
+
+      // Activity events
+      socket.on('activity:started', (data) => {
+        log(`📢 [Event] Activity started: ${data.name} (${data.duration}s)`, 'event');
+      });
+
+      socket.on('activity:completed', (data) => {
+        log(`📢 [Event] Activity completed: ${data.activity}`, 'event');
+        log(`  → XP gained: ${JSON.stringify(data.rewards.experience)}`, 'event');
+        log(`  → Items: ${JSON.stringify(data.rewards.items)}`, 'event');
+      });
+
+      socket.on('activity:cancelled', (data) => {
+        log(`📢 [Event] Activity cancelled`, 'event');
+      });
+
+      socket.on('activity:error', (data) => {
+        log(`📢 [Event] Activity error: ${data.message}`, 'error');
+      });
+
+      // Travel events
+      socket.on('travel:started', (data) => {
+        log(`📢 [Event] Travel started to: ${data.locationName} (${data.duration}s)`, 'event');
+      });
+
+      socket.on('travel:completed', (data) => {
+        log(`📢 [Event] Travel completed: Arrived at ${data.locationName}`, 'event');
+      });
+
+      socket.on('travel:cancelled', (data) => {
+        log(`📢 [Event] Travel cancelled`, 'event');
+      });
+
+      // Crafting events
+      socket.on('crafting:started', (data) => {
+        log(`📢 [Event] Crafting started: ${data.recipeName} (${data.duration}s)`, 'event');
+      });
+
+      socket.on('crafting:completed', (data) => {
+        log(`📢 [Event] Crafting completed: ${data.recipeName}`, 'event');
+        log(`  → Crafted: ${data.result.itemId} x${data.result.quantity}`, 'event');
+        log(`  → XP gained: ${data.xpGained}`, 'event');
+      });
+
+      socket.on('crafting:cancelled', (data) => {
+        log(`📢 [Event] Crafting cancelled`, 'event');
+      });
+
+      // Combat events
+      socket.on('combat:playerAttack', (data) => {
+        log(`📢 [Event] Player attacked - Monster HP: ${data.monster.currentHp}/${data.monster.maxHp}`, 'event');
+      });
+
+      socket.on('combat:monsterAttack', (data) => {
+        log(`📢 [Event] Monster attacked - Player HP: ${data.player.currentHp}/${data.player.maxHp}`, 'event');
+      });
+
+      socket.on('combat:victory', (data) => {
+        log(`📢 [Event] Combat victory! Rewards: ${JSON.stringify(data.rewards)}`, 'event');
+      });
+
+      socket.on('combat:defeat', (data) => {
+        log(`📢 [Event] Combat defeat - Respawning...`, 'event');
+      });
+    }
+
+    function disconnect() {
+      if (socket) {
+        socket.disconnect();
+        socket = null;
+      }
+    }
+
+    // Activity functions
+    function startActivity() {
+      const activityId = document.getElementById('activityId').value;
+      const facilityId = document.getElementById('facilityId').value;
+
+      socket.emit('activity:start', { activityId, facilityId }, (response) => {
+        if (response.success) {
+          log(`✅ ${response.message}`, 'success');
+        } else {
+          log(`❌ ${response.message}`, 'error');
+        }
+      });
+    }
+
+    function cancelActivity() {
+      socket.emit('activity:cancel', {}, (response) => {
+        if (response.success) {
+          log(`✅ ${response.message}`, 'success');
+        } else {
+          log(`❌ ${response.message}`, 'error');
+        }
+      });
+    }
+
+    function getActivityStatus() {
+      socket.emit('activity:getStatus', {}, (response) => {
+        if (response.success) {
+          if (response.active) {
+            log(`✅ Active: ${response.activity.name} (${response.activity.timeRemaining}s remaining)`, 'success');
+          } else {
+            log(`✅ No active activity`, 'success');
+          }
+        } else {
+          log(`❌ ${response.message}`, 'error');
+        }
+      });
+    }
+
+    // Travel functions
+    function startTravel() {
+      const locationId = document.getElementById('locationId').value;
+
+      socket.emit('travel:start', { locationId }, (response) => {
+        if (response.success) {
+          log(`✅ ${response.message}`, 'success');
+        } else {
+          log(`❌ ${response.message}`, 'error');
+        }
+      });
+    }
+
+    function cancelTravel() {
+      socket.emit('travel:cancel', {}, (response) => {
+        if (response.success) {
+          log(`✅ ${response.message}`, 'success');
+        } else {
+          log(`❌ ${response.message}`, 'error');
+        }
+      });
+    }
+
+    // Crafting functions
+    function startCrafting() {
+      const recipeId = document.getElementById('recipeId').value;
+
+      socket.emit('crafting:start', { recipeId }, (response) => {
+        if (response.success) {
+          log(`✅ ${response.message}`, 'success');
+        } else {
+          log(`❌ ${response.message}`, 'error');
+        }
+      });
+    }
+
+    function cancelCrafting() {
+      socket.emit('crafting:cancel', {}, (response) => {
+        if (response.success) {
+          log(`✅ ${response.message}`, 'success');
+        } else {
+          log(`❌ ${response.message}`, 'error');
+        }
+      });
+    }
+
+    function getCraftingStatus() {
+      socket.emit('crafting:getStatus', {}, (response) => {
+        if (response.success) {
+          if (response.active) {
+            log(`✅ Active: ${response.crafting.recipeName} (${response.crafting.timeRemaining}s remaining)`, 'success');
+          } else {
+            log(`✅ No active crafting`, 'success');
+          }
+        } else {
+          log(`❌ ${response.message}`, 'error');
+        }
+      });
+    }
+
+    // Combat functions
+    function attackMonster() {
+      socket.emit('combat:attack', {}, (response) => {
+        if (response.success) {
+          log(`✅ Attack successful`, 'success');
+        } else {
+          log(`❌ ${response.message}`, 'error');
+        }
+      });
+    }
+
+    function getCombatStatus() {
+      socket.emit('combat:getStatus', {}, (response) => {
+        if (response.success) {
+          if (response.inCombat) {
+            log(`✅ In combat: Monster HP ${response.combat.monster.currentHp}/${response.combat.monster.maxHp}`, 'success');
+          } else {
+            log(`✅ Not in combat`, 'success');
+          }
+        } else {
+          log(`❌ ${response.message}`, 'error');
+        }
+      });
+    }
+
+    function fleeCombat() {
+      socket.emit('combat:flee', {}, (response) => {
+        if (response.success) {
+          log(`✅ ${response.message}`, 'success');
+        } else {
+          log(`❌ ${response.message}`, 'error');
+        }
+      });
+    }
+
+    // Auto-fill token from localStorage if available
+    window.addEventListener('load', () => {
+      log('📝 Test page loaded. Enter your JWT token to connect.', 'info');
+      log('💡 You can find your token in browser localStorage: clearskies_token', 'info');
+    });
+  </script>
+</body>
+</html>

@@ -11,6 +11,9 @@ import vendorService from './services/vendorService';
 import recipeService from './services/recipeService';
 import responseValidator from './middleware/responseValidator';
 import chatHandler from './sockets/chatHandler';
+import activityHandler from './sockets/activityHandler';
+import craftingHandler from './sockets/craftingHandler';
+import combatHandler from './sockets/combatHandler';
 
 // Import routes
 import authRoutes from './routes/auth';
@@ -68,6 +71,11 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Test sockets page (development only)
+app.get('/test-sockets.html', (req, res) => {
+  res.sendFile(__dirname + '/test-sockets.html');
+});
+
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/skills', skillsRoutes);
@@ -92,13 +100,16 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
 // Initialize Socket.io
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:4200',
+    origin: ['http://localhost:4200', 'http://localhost:3000'],
     credentials: true
   }
 });
 
-// Socket.io chat handlers
+// Socket.io handlers
 chatHandler(io);
+activityHandler(io);
+craftingHandler(io);
+combatHandler(io);
 
 // Start server
 server.listen(PORT, () => {
