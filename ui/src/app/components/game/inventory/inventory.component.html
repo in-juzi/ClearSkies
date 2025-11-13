@@ -2,6 +2,10 @@
   <!-- Header -->
   <div class="inventory-header">
     <h2 class="text-2xl font-bold text-gold-400">Inventory</h2>
+    <div class="alt-hint" *ngIf="isAltKeyHeld">
+      <span class="hint-icon">⚡</span>
+      <span class="hint-text">{{ vendorService.isVendorOpen() ? 'Quick Sell Mode' : 'Quick Drop Mode' }}</span>
+    </div>
   </div>
 
   <!-- Category Filter -->
@@ -22,10 +26,13 @@
       class="inventory-item"
       [class]="getRarityClass(item.definition.rarity)"
       [class.equipped]="item.equipped"
+      [class.alt-sell-mode]="isAltKeyHeld && vendorService.isVendorOpen()"
+      [class.alt-drop-mode]="isAltKeyHeld && !vendorService.isVendorOpen()"
       [draggable]="true"
-      (click)="selectItem(item)"
+      (click)="onItemClick($event, item)"
       (dragstart)="onItemDragStart($event, item)"
-      (dragend)="onItemDragEnd($event)">
+      (dragend)="onItemDragEnd($event)"
+      [title]="'Alt+Click to ' + (vendorService.isVendorOpen() ? 'sell' : 'drop')">
       <!-- Item icon (left side) -->
       <div class="item-icon">
         <app-icon

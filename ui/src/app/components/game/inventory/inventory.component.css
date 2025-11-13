@@ -19,6 +19,36 @@
   flex-shrink: 0;
 }
 
+.alt-hint {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-s);
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(139, 92, 246, 0.1) 100%);
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  border-radius: var(--radius-s);
+  font-size: var(--font-size-s);
+  font-weight: var(--font-weight-semibold);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.hint-icon {
+  font-size: var(--font-size-l);
+}
+
+.hint-text {
+  color: var(--color-accent-purple);
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
 .inventory-stats-container {
   margin-top: auto;
   padding-top: var(--spacing-l);
@@ -147,6 +177,17 @@
 .inventory-item:hover {
   transform: translateX(2px);
   box-shadow: var(--shadow-m);
+}
+
+/* Alt+Click visual feedback */
+.inventory-item.alt-drop-mode {
+  border-color: #ef4444 !important; /* Red for drop */
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+}
+
+.inventory-item.alt-sell-mode {
+  border-color: #10b981 !important; /* Green for sell */
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
 }
 
 .item-icon {

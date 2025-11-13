@@ -1,8 +1,10 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, HostListener, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InventoryService } from '../../../services/inventory.service';
 import { EquipmentService } from '../../../services/equipment.service';
+import { VendorService } from '../../../services/vendor.service';
+import { ChatService } from '../../../services/chat.service';
 import { ConfirmDialogService } from '../../../services/confirm-dialog.service';
 import { ItemDetails } from '../../../models/inventory.model';
 import { ItemModifiersComponent } from '../../shared/item-modifiers/item-modifiers.component';
@@ -19,9 +21,12 @@ import { ItemDetailsPanelComponent } from '../../shared/item-details-panel/item-
 export class InventoryComponent implements OnInit {
   private confirmDialog = inject(ConfirmDialogService);
   private equipmentService = inject(EquipmentService);
+  private chatService = inject(ChatService);
+  public vendorService = inject(VendorService); // Public for template access
 
   selectedItem: ItemDetails | null = null;
   selectedCategory: string = 'all';
+  isAltKeyHeld: boolean = false; // Track Alt key state for visual feedback
 
   categories = [
     { value: 'all', label: 'All Items', shortLabel: 'All' },
@@ -33,6 +38,20 @@ export class InventoryComponent implements OnInit {
   constructor(
     public inventoryService: InventoryService
   ) {}
+
+  @HostListener('window:keydown', ['$event'])
+  handleKeyDown(event: KeyboardEvent): void {
+    if (event.altKey) {
+      this.isAltKeyHeld = true;
+    }
+  }
+
+  @HostListener('window:keyup', ['$event'])
+  handleKeyUp(event: KeyboardEvent): void {
+    if (!event.altKey) {
+      this.isAltKeyHeld = false;
+    }
+  }
 
   ngOnInit(): void {
     this.loadInventory();
@@ -56,12 +75,106 @@ export class InventoryComponent implements OnInit {
     return this.inventoryService.getSortedItemsByCategory(this.selectedCategory);
   }
 
+  /**
+   * Handle item click with Alt key support for quick actions
+   * Alt+Click: Drop item (or sell to vendor if vendor is open)
+   * Regular click: Open item details panel
+   */
+  onItemClick(event: MouseEvent, item: ItemDetails): void {
+    // Alt+Click: Quick drop or quick sell
+    if (event.altKey) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      // Check if vendor is open
+      if (this.vendorService.isVendorOpen()) {
+        this.quickSellItem(item);
+      } else {
+        this.quickDropItem(item);
+      }
+    } else {
+      // Normal click: Select item to show details
+      this.selectItem(item);
+    }
+  }
+
   selectItem(item: ItemDetails): void {
     this.selectedItem = item;
   }
 
   closeItemDetails(): void {
     this.selectedItem = null;
+  }
+
+  /**
+   * Quick drop item without confirmation (Alt+Click)
+   * Drops one item from the stack
+   */
+  private quickDropItem(item: ItemDetails): void {
+    const quantityToDrop = 1;
+
+    this.inventoryService.removeItem({ instanceId: item.instanceId, quantity: quantityToDrop }).subscribe({
+      next: () => {
+        console.log(`Quick dropped 1x ${item.definition.name}`);
+        // Close panel if this was the selected item and all were dropped
+        if (this.selectedItem?.instanceId === item.instanceId && quantityToDrop >= item.quantity) {
+          this.selectedItem = null;
+        }
+      },
+      error: (error) => {
+        console.error('Error quick dropping item:', error);
+      }
+    });
+  }
+
+  /**
+   * Quick sell item to vendor without confirmation (Alt+Click)
+   * Sells the entire stack
+   */
+  private quickSellItem(item: ItemDetails): void {
+    const vendorId = this.vendorService.currentVendor()?.vendorId;
+    const vendorName = this.vendorService.currentVendor()?.name || 'vendor';
+
+    if (!vendorId) {
+      console.error('No vendor open');
+      return;
+    }
+
+    const quantityToSell = item.quantity; // Sell entire stack
+
+    this.vendorService.sellItem(vendorId, item.instanceId, quantityToSell).subscribe({
+      next: (response) => {
+        const goldAmount = response.transaction?.totalPrice || 0;
+        const pricePerItem = response.transaction?.pricePerItem || 0;
+
+        // Send message to chat
+        const message = `You sold ${quantityToSell}x ${item.definition.name} to ${vendorName} for ${goldAmount}g (${pricePerItem}g each)`;
+        this.chatService.addLocalMessage({
+          userId: 'system',
+          username: 'System',
+          message: message,
+          createdAt: new Date()
+        });
+
+        // Update inventory
+        this.inventoryService.getInventory().subscribe();
+
+        // Close panel if this was the selected item (all were sold)
+        if (this.selectedItem?.instanceId === item.instanceId) {
+          this.selectedItem = null;
+        }
+      },
+      error: (error) => {
+        const errorMsg = error.error?.message || 'Failed to sell item';
+        this.chatService.addLocalMessage({
+          userId: 'system',
+          username: 'System',
+          message: `❌ ${errorMsg}`,
+          createdAt: new Date()
+        });
+        console.error('Error quick selling item:', error);
+      }
+    });
   }
 
   getRarityClass(rarity: string): string {
