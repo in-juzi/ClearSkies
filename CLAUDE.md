@@ -32,18 +32,20 @@
 - ✅ Durability system removal (completed - simplified item system by removing unused durability mechanic)
 - ✅ Signal-based reactivity (completed - location component uses computed signals for better change detection)
 - ✅ Socket.io migration (completed - activities, crafting, and combat migrated from HTTP polling to real-time events)
+- ✅ Shared type system (completed - @shared/types package eliminates duplicate type definitions)
+- ✅ CATEGORY/SUBCATEGORY constants (completed - type-safe constants for all 90+ item definitions)
 
 **Recent Changes** (Last 10 commits):
-- chore: update utility script and fix item definition
-- refactor: improve item details panel and vendor service
-- feat: add Alt+Click quick drop/sell for inventory items
-- refactor: migrate chat service to use base SocketService
-- refactor: migrate combat system to Socket.io
-- refactor: migrate crafting system to Socket.io
-- refactor: migrate location/activity system to Socket.io
-- refactor: enhance combat service for Socket.io integration
-- feat: add Socket.io handlers for activities, crafting, and combat
-- feat: add base Socket.io client service
+- chore: add Python script for automated constant migration
+- refactor: update location component to use shared Activity types
+- refactor: migrate frontend models to use @shared/types
+- refactor: migrate backend services to use @shared/types
+- refactor: add backward compatibility layer for backend types
+- refactor: migrate alchemy recipes to use SUBCATEGORY constants
+- refactor: migrate item definitions to use CATEGORY and SUBCATEGORY constants
+- feat: expand item-constants with CATEGORY and SUBCATEGORY values
+- build: configure TypeScript path aliases for @shared/types
+- feat: add shared type system for frontend/backend type sharing
 
 **Known Issues**:
 - None currently identified
@@ -110,8 +112,9 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 - Constants: [ui/src/app/constants/material-colors.constants.ts](ui/src/app/constants/material-colors.constants.ts)
 
 **Game Data (TypeScript):**
+- Shared Types: [shared/types/](shared/types/) - Shared type definitions used by both frontend and backend
 - Item Registry: [be/data/items/ItemRegistry.ts](be/data/items/ItemRegistry.ts) - All items in [definitions/](be/data/items/definitions/)
-- Item Constants: [be/data/constants/item-constants.ts](be/data/constants/item-constants.ts) - Type-safe constants for item definitions
+- Item Constants: [be/data/constants/item-constants.ts](be/data/constants/item-constants.ts) - Type-safe CATEGORY, SUBCATEGORY, RARITY, TIER, and more
 - Location Registry: [be/data/locations/LocationRegistry.ts](be/data/locations/LocationRegistry.ts) - All locations in [definitions/](be/data/locations/definitions/)
 - Activity Registry: [be/data/locations/ActivityRegistry.ts](be/data/locations/ActivityRegistry.ts) - All activities in [activities/](be/data/locations/activities/)
 - Drop Table Registry: [be/data/locations/DropTableRegistry.ts](be/data/locations/DropTableRegistry.ts) - All drop tables in [drop-tables/](be/data/locations/drop-tables/)
@@ -130,24 +133,30 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 - [be/scripts/validate-game-data.ts](be/scripts/validate-game-data.ts) - Validate cross-references (npm run validate)
 - [project/utils/split-svg-paths.js](project/utils/split-svg-paths.js) - Split SVG paths (basic, no normalization)
 - [project/utils/split-svg-paths-normalized.js](project/utils/split-svg-paths-normalized.js) - Split SVG paths with coordinate normalization (recommended)
+- [update-category-constants.py](update-category-constants.py) - Python script to migrate item definitions to use constants
 
 ## Project Structure (Key Files Only)
 
 ```
+shared/
+└── types/           # Shared TypeScript type definitions (Item, Monster, Location, etc.)
+
 be/
-├── controllers/      # inventoryController, locationController, skillsController, attributesController, authController
+├── controllers/     # inventoryController, locationController, skillsController, attributesController, authController
 ├── models/          # Player.js (inventory, skills, equipment), User.js
-├── services/        # itemService, locationService, dropTableService
+├── services/        # itemService, locationService, dropTableService (all use @shared/types)
 ├── data/
-│   ├── items/definitions/    # Item JSON files
-│   └── locations/           # Location, activity, drop table JSON
+│   ├── constants/   # item-constants.ts (CATEGORY, SUBCATEGORY, RARITY, TIER, etc.)
+│   ├── items/definitions/    # Item TypeScript modules (90+ items use constants)
+│   └── locations/   # Location, activity, drop table TypeScript modules
 ├── migrations/      # Database migration scripts
+├── types/           # Compatibility layer (re-exports from @shared/types)
 └── utils/          # Dev tools (add-item.js, content-generator.js, test-xp-scaling.js)
 
 ui/src/app/
 ├── components/game/  # inventory/, location/, skills/, equipment/, attributes/
-├── services/        # *.service.ts (match backend APIs)
-└── models/         # TypeScript interfaces
+├── services/        # *.service.ts (match backend APIs, use @shared/types)
+└── models/         # TypeScript interfaces (import from @shared/types)
 ```
 
 **Full structure**: See detailed tree above or explore with Task agent if needed
@@ -180,14 +189,15 @@ cd be && node utils/add-item.js
 **File**: `be/data/items/definitions/{category}/{ItemId}.ts`
 **Template** (with constants - recommended):
 ```typescript
-import { ResourceItem } from '../../../types';
-import { RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL } from '../../../constants/item-constants';
+import { ResourceItem } from '@shared/types';
+import { CATEGORY, SUBCATEGORY, RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL } from '../../../constants/item-constants';
 
 export const NewItem: ResourceItem = {
   itemId: 'new_item',
   name: 'New Item',
   description: 'Medieval fantasy description...',
-  category: 'resource',
+  category: CATEGORY.RESOURCE,
+  subcategories: [SUBCATEGORY.ORE],
   rarity: RARITY.COMMON,
   baseValue: 10,
   stackable: true,
@@ -205,7 +215,11 @@ export const NewItem: ResourceItem = {
 ```
 **Then register in**: `be/data/items/ItemRegistry.ts`
 
-**Item Constants**: See [be/data/constants/item-constants.ts](be/data/constants/item-constants.ts) and [README](be/data/constants/README.md) for all available constants (RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL, SLOT, WEAPON_SUBTYPE, etc.)
+**Item Constants**: See [be/data/constants/item-constants.ts](be/data/constants/item-constants.ts) and [README](be/data/constants/README.md) for all available constants:
+- **CATEGORY**: CONSUMABLE, EQUIPMENT, RESOURCE
+- **SUBCATEGORY**: 60+ values (HERB, FLOWER, FISH, ORE, INGOT, GEMSTONE, WOOD, WEAPON, ARMOR, TOOL, etc.)
+- **SUBCATEGORY_SETS**: Predefined arrays (ALL_HERBS, ALL_FLOWERS, ALL_GEMSTONES, etc.)
+- **RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL, SLOT, WEAPON_SUBTYPE**
 
 ### Adding New Activity
 **File**: `be/data/locations/activities/{ActivityId}.ts`
@@ -1417,7 +1431,40 @@ See `project/journal.md` for detailed development possibilities including:
 
 ## TypeScript Type System
 
-The backend uses a **comprehensive TypeScript migration** with both type safety and registry-based data loading.
+The project uses a **comprehensive TypeScript type system** with shared types between frontend and backend, eliminating duplicate definitions and ensuring type consistency across the stack.
+
+### Shared Type System (@shared/types)
+
+**IMPORTANT**: Type definitions are now centralized in the `shared/types/` directory and used by both frontend and backend via `@shared/types` path alias. This is the single source of truth for all game data types.
+
+**Benefits**:
+- ✅ Single source of truth - types defined once, used everywhere
+- ✅ Zero type drift between frontend and backend
+- ✅ Compile-time validation across entire stack
+- ✅ Clean imports without complex relative paths
+- ✅ Better refactoring - rename types across all code
+- ✅ IDE autocomplete works consistently everywhere
+
+**Shared Type Files** ([shared/types/](shared/types/)):
+- [common.ts](shared/types/common.ts) - Base types (Rarity, Stats, Skill, IconConfig, ItemInstance)
+- [items.ts](shared/types/items.ts) - Item hierarchy (Item, EquipmentItem, WeaponItem, ArmorItem, ConsumableItem, ResourceItem)
+- [combat.ts](shared/types/combat.ts) - Combat system (Monster, Ability, ActiveCombat, CombatStats)
+- [locations.ts](shared/types/locations.ts) - Locations (Location, Facility, Activity, DropTable, Biome)
+- [crafting.ts](shared/types/crafting.ts) - Crafting (Recipe, Vendor, ActiveCrafting)
+- [guards.ts](shared/types/guards.ts) - Type guard functions (isWeaponItem, isEquipmentItem, etc.)
+- [models.ts](shared/types/models.ts) - Frontend model types
+- [index.ts](shared/types/index.ts) - Central export file
+
+**Usage Pattern**:
+```typescript
+// Both frontend and backend use same import
+import { Item, Monster, Activity, isWeaponItem } from '@shared/types';
+```
+
+**Backend Compatibility Layer**:
+- [be/types/index.ts](be/types/index.ts) re-exports from @shared/types for backward compatibility
+- Existing code using `import { Item } from '../types'` continues to work
+- New code should use `import { Item } from '@shared/types'` directly
 
 ### TypeScript Data Layer Migration
 
@@ -1446,33 +1493,77 @@ Each game system has a central registry that exports all definitions:
 
 **Creating New Content**:
 1. Create TypeScript module in appropriate directory (e.g., `be/data/items/definitions/resources/NewItem.ts`)
-2. Export const with strongly-typed object (e.g., `export const NewItem: ResourceItem = {...}`)
-3. Import and register in appropriate registry (e.g., add to `ItemRegistry.ts`)
-4. TypeScript compiler validates structure at build time
-5. Services automatically load from registries at runtime
+2. Import types from `@shared/types` and constants from `be/data/constants/item-constants`
+3. Export const with strongly-typed object (e.g., `export const NewItem: ResourceItem = {...}`)
+4. Use type-safe constants (CATEGORY, SUBCATEGORY, RARITY, etc.) instead of magic strings
+5. Import and register in appropriate registry (e.g., add to `ItemRegistry.ts`)
+6. TypeScript compiler validates structure at build time
+7. Services automatically load from registries at runtime
+
+### Type-Safe Constants System
+
+**Item Constants** ([be/data/constants/item-constants.ts](be/data/constants/item-constants.ts)):
+All item definitions use type-safe constants to eliminate magic strings and enable autocomplete:
+
+- **CATEGORY**: CONSUMABLE, EQUIPMENT, RESOURCE
+- **SUBCATEGORY**: 60+ values covering all item types
+  - Resources: HERB, FLOWER, FISH, ORE, INGOT, GEMSTONE, WOOD, LOG, ROOT
+  - Equipment: WEAPON, ARMOR, TOOL, HEADGEAR, SWORD, AXE, SHIELD, PICKAXE, ROD
+  - Armor pieces: BODY_ARMOR, FOOTWEAR, HANDWEAR
+  - Weapon traits: MELEE, ONE_HANDED, DEFENSIVE
+  - Tool types: WOODCUTTING, MINING, FISHING, GATHERING
+  - Materials: LEATHER, CLOTH, METAL, BRONZE, IRON
+- **SUBCATEGORY_SETS**: Predefined arrays for common groupings
+  - ALL_HERBS, ALL_FLOWERS, ALL_GEMSTONES, ALL_FISH, etc.
+  - Easy assignment: `subcategories: SUBCATEGORY_SETS.HERBS`
+- **RARITY**: COMMON, UNCOMMON, RARE, EPIC, LEGENDARY
+- **TIER**: T1 through T5
+- **QUALITY_SETS, TRAIT_SETS, MATERIAL, SLOT, WEAPON_SUBTYPE**
+
+**Usage in Item Definitions**:
+```typescript
+import { ResourceItem } from '@shared/types';
+import { CATEGORY, SUBCATEGORY, RARITY, TIER } from '../../../constants/item-constants';
+
+export const CopperOre: ResourceItem = {
+  category: CATEGORY.RESOURCE,           // Type-safe constant
+  subcategories: [SUBCATEGORY.ORE],      // Autocomplete available
+  rarity: RARITY.COMMON,
+  properties: { tier: TIER.T1 }
+};
+```
+
+**Usage in Recipes**:
+```typescript
+import { SUBCATEGORY } from '../../../constants/item-constants';
+
+ingredients: [
+  { subcategory: SUBCATEGORY.HERB, quantity: 2 }  // Type-safe subcategory matching
+]
+```
 
 ### Architecture
 
-**Type Definitions** ([be/types/](be/types/)):
-- [common.ts](be/types/common.ts) - Base types (Rarity, Stats, Skill, IconConfig, ItemInstance)
-- [items.ts](be/types/items.ts) - Item hierarchy (Item, EquipmentItem, WeaponItem, ArmorItem, ConsumableItem, ResourceItem)
-- [combat.ts](be/types/combat.ts) - Combat system (Monster, Ability, ActiveCombat, CombatStats)
-- [locations.ts](be/types/locations.ts) - Locations (Location, Facility, Activity, DropTable, Biome)
-- [crafting.ts](be/types/crafting.ts) - Crafting (Recipe, Vendor, ActiveCrafting)
-- [guards.ts](be/types/guards.ts) - Type guard functions (isWeaponItem, isEquipmentItem, etc.)
-- [index.ts](be/types/index.ts) - Central export file
-
-**Typed Services**:
+**Typed Services** (all use @shared/types):
 - [itemService.ts](be/services/itemService.ts) - Item management with full type annotations
 - [combatService.ts](be/services/combatService.ts) - Combat calculations with typed monsters/abilities
 - [locationService.ts](be/services/locationService.ts) - Location/activity system with type safety
 - [recipeService.ts](be/services/recipeService.ts) - Recipe management with typed ingredients/outputs
 - [vendorService.ts](be/services/vendorService.ts) - Vendor transactions with typed stock
 
+**Frontend Models** (all use @shared/types):
+- [inventory.model.ts](ui/src/app/models/inventory.model.ts) - Imports Item types from shared
+- [location.model.ts](ui/src/app/models/location.model.ts) - Imports Activity/Location types from shared
+- [recipe.model.ts](ui/src/app/models/recipe.model.ts) - Imports Recipe types from shared
+- [vendor.model.ts](ui/src/app/models/vendor.model.ts) - Imports Vendor types from shared
+
 ### Features
 
+✅ **Shared type system** - Single source of truth for frontend/backend types
+✅ **Type-safe constants** - CATEGORY, SUBCATEGORY, RARITY for all 90+ item definitions
 ✅ **70+ TypeScript interfaces** covering all game systems
 ✅ **Type guards** for runtime type narrowing (`isWeaponItem`, `isEquipmentItem`)
+✅ **Path aliases** - Clean imports with `@shared/types`
 ✅ **100% backward compatible** - works alongside existing JavaScript
 ✅ **Compile-time validation** - catches errors before runtime
 ✅ **IDE support** - IntelliSense, autocomplete, jump-to-definition
@@ -1487,16 +1578,40 @@ npm run build:watch    # Watch mode for development
 npm run type-check     # Type check without emitting files
 ```
 
-### Usage Example
+### Usage Examples
 
+**Using Shared Types**:
 ```typescript
-import { Item, isWeaponItem } from '../types';
+// Backend
+import { Item, isWeaponItem } from '@shared/types';
 import itemService from '../services/itemService';
 
-// Type-safe item retrieval
 const item: Item | undefined = itemService.getItemDefinition('iron_sword');
 
-// Type narrowing with guards
+// Frontend
+import { Activity, Monster } from '@shared/types';
+import { locationService } from '../services/location.service';
+
+const activities: Activity[] = locationService.getActivities();
+```
+
+**Using Type-Safe Constants**:
+```typescript
+// Item definition
+import { ResourceItem } from '@shared/types';
+import { CATEGORY, SUBCATEGORY, RARITY } from '../../../constants/item-constants';
+
+export const CopperOre: ResourceItem = {
+  category: CATEGORY.RESOURCE,      // ✅ Autocomplete + validation
+  subcategories: [SUBCATEGORY.ORE], // ✅ No typos possible
+  rarity: RARITY.COMMON
+};
+```
+
+**Type Guards**:
+```typescript
+import { isWeaponItem } from '@shared/types';
+
 if (isWeaponItem(item)) {
   item.properties.damageRoll; // ✅ Autocomplete + type checking
   item.properties.armor;       // ❌ Compile error - weapons don't have armor
@@ -1505,13 +1620,23 @@ if (isWeaponItem(item)) {
 
 ### Configuration
 
-**tsconfig.json**: TypeScript compiler settings
+**Backend tsconfig.json**: TypeScript compiler settings
 - Target: ES2020
 - Module: CommonJS
+- Path aliases: `@shared/*` → `../shared/*`
 - Strict mode: Disabled (gradual migration)
 - Declaration files: Enabled (.d.ts generation)
 - Source maps: Enabled
 - Allows JavaScript: Yes (hybrid codebase)
+- Output: Compiled files in `be/dist/`
 
-**Output**: Compiled files in `be/dist/`
+**Frontend tsconfig.app.json**: Angular TypeScript settings
+- Extends base tsconfig.json
+- Path aliases: `@shared/*` → `../shared/*`
+- Enables clean imports across frontend components
+
+**Shared Types Build**:
+- Compiled to JavaScript with declaration files
+- Source maps for debugging
+- Used as dependency by both frontend and backend
 
