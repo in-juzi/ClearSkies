@@ -98,7 +98,11 @@ async function addItemToPlayer() {
 
     const instances = [];
     for (const { itemId, quantity } of itemsToAdd) {
-      const instance = itemService.createItemInstance(itemId, quantity);
+      // Generate random qualities and traits
+      const qualities = itemService.generateRandomQualities(itemId);
+      const traits = itemService.generateRandomTraits(itemId);
+
+      const instance = itemService.createItemInstance(itemId, quantity, qualities, traits);
       instances.push({ itemId, quantity, instance });
       player.addItem(instance);
     }

@@ -33,6 +33,6 @@ export const ManaPotionMinor: ConsumableItem = {
   ],
   "icon": {
     "path": "item-categories/item_cat_potion_1.svg",
-    "material": "mana_potion_minor"
+    "material": "mana_potion"
   }
 } as const;
