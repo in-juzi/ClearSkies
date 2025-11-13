@@ -6,9 +6,16 @@
     "module": "commonjs",
     "moduleResolution": "node",
 
+    /* Module Resolution */
+    "baseUrl": "./",
+    "rootDir": "../",
+    "paths": {
+      "@shared/*": ["../shared/*"],
+      "@shared/types": ["../shared/types/index"]
+    },
+
     /* Emit */
     "outDir": "./dist",
-    "rootDir": "./",
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,
@@ -44,7 +51,8 @@
   },
   "include": [
     "**/*.ts",
-    "**/*.js"
+    "**/*.js",
+    "../shared/**/*.ts"
   ],
   "exclude": [
     "node_modules",
