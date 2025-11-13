@@ -1,16 +1,18 @@
-import { Component, OnInit, OnDestroy, AfterViewChecked, computed, signal, inject, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewChecked, computed, signal, effect, inject, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CombatService, Combat, Ability, CombatLogEntry } from '../../../services/combat.service';
 import { AuthService } from '../../../services/auth.service';
 import { ConfirmDialogService } from '../../../services/confirm-dialog.service';
 import { InventoryService } from '../../../services/inventory.service';
+import { LocationService } from '../../../services/location.service';
 import { AbilityButtonComponent } from '../../shared/ability-button/ability-button.component';
 import { ItemButtonComponent } from '../../shared/item-button/item-button.component';
+import { ItemMiniComponent } from '../../shared/item-mini/item-mini.component';
 
 @Component({
   selector: 'app-combat',
   standalone: true,
-  imports: [CommonModule, AbilityButtonComponent, ItemButtonComponent],
+  imports: [CommonModule, AbilityButtonComponent, ItemButtonComponent, ItemMiniComponent],
   templateUrl: './combat.component.html',
   styleUrls: ['./combat.component.scss']
 })
@@ -19,6 +21,7 @@ export class CombatComponent implements OnInit, OnDestroy, AfterViewChecked {
   authService = inject(AuthService);
   private confirmDialog = inject(ConfirmDialogService);
   inventoryService = inject(InventoryService);
+  private locationService = inject(LocationService);
 
   @ViewChild('combatLogContent') private combatLogContent?: ElementRef;
 
@@ -35,9 +38,11 @@ export class CombatComponent implements OnInit, OnDestroy, AfterViewChecked {
   selectedAbility = signal<Ability | null>(null);
   isUsingItem = signal<boolean>(false);
 
-  // Track combat log length to detect new entries
-  private previousLogLength = 0;
+  // Smart auto-scroll - only scroll if user is at bottom
   private shouldAutoScroll = true;
+
+  // Floating damage numbers
+  floatingNumbers = signal<Array<{ id: string; value: number; type: 'damage' | 'crit' | 'heal'; target: 'player' | 'monster' }>>([]);
 
   // Filtered consumables for combat
   consumables = computed(() => {
@@ -101,11 +106,33 @@ export class CombatComponent implements OnInit, OnDestroy, AfterViewChecked {
   });
   private timerInterval: any;
 
+  // Watch combat log for new entries and trigger floating numbers
+  private combatLogEffect = effect(() => {
+    const combat = this.activeCombat();
+    const combatLog = combat?.combatLog;
+
+    if (!combatLog || combatLog.length === 0) {
+      return;
+    }
+
+    // Process all entries marked as new
+    combatLog.forEach(entry => {
+      if (entry.isNew) {
+        const floatingNumber = this.parseFloatingNumber(entry);
+        if (floatingNumber) {
+          this.addFloatingNumber(floatingNumber);
+        }
+        // Mark as processed to avoid re-triggering
+        entry.isNew = false;
+      }
+    });
+  });
+
   ngOnInit(): void {
     // Start timer updates
     this.startTimerUpdates();
     // Check combat status on component init
-    this.combatService.getCombatStatus().subscribe();
+    this.combatService.checkCombatStatus();
     // Load inventory for consumables
     this.inventoryService.getInventory().subscribe();
   }
@@ -118,20 +145,10 @@ export class CombatComponent implements OnInit, OnDestroy, AfterViewChecked {
   }
 
   ngAfterViewChecked(): void {
-    // Check if new log entries were added
-    const combat = this.activeCombat();
-    const currentLogLength = combat?.combatLog?.length || 0;
-
-    if (currentLogLength > this.previousLogLength) {
-      // New entry added - scroll to bottom only if user is near bottom
-      if (this.shouldAutoScroll) {
-        this.scrollToBottom();
-      }
-      this.previousLogLength = currentLogLength;
+    // Only auto-scroll if user was already at bottom before new messages arrived
+    if (this.shouldAutoScroll) {
+      this.scrollToBottom();
     }
-
-    // Detect if user has scrolled up manually
-    this.detectUserScroll();
   }
 
   /**
@@ -149,19 +166,62 @@ export class CombatComponent implements OnInit, OnDestroy, AfterViewChecked {
   }
 
   /**
-   * Detect if user has manually scrolled up
+   * Check if user is scrolled near bottom (within 50px)
+   * Called on scroll event to track user's scroll position
    */
-  private detectUserScroll(): void {
+  onCombatLogScroll(): void {
     try {
       if (this.combatLogContent) {
         const element = this.combatLogContent.nativeElement;
-        const threshold = 50; // pixels from bottom
-        const isNearBottom = element.scrollHeight - element.scrollTop - element.clientHeight < threshold;
+        const threshold = 0; // pixels from bottom
+        const isNearBottom = element.scrollHeight - element.scrollTop - element.clientHeight === threshold;
         this.shouldAutoScroll = isNearBottom;
       }
     } catch (err) {
       // Ignore errors during scroll detection
     }
+  }
+
+  /**
+   * Parse a combat log entry to extract floating number data
+   */
+  private parseFloatingNumber(entry: CombatLogEntry): { value: number; type: 'damage' | 'crit' | 'heal'; target: 'player' | 'monster' } | null {
+    // If the entry has damageValue and target from backend, use those directly
+    if (entry.damageValue !== undefined && entry.target) {
+      const type = entry.type === 'crit' ? 'crit' : (entry.type === 'heal' ? 'heal' : 'damage');
+      return {
+        value: entry.damageValue,
+        type,
+        target: entry.target
+      };
+    }
+
+    // Fallback: parse healing from message if not provided by backend
+    const healMatch = entry.message.match(/(?:heal|healed|restores?)\s+(\d+)\s+(?:health|hp)/i);
+    if (healMatch) {
+      return {
+        value: parseInt(healMatch[1]),
+        type: 'heal',
+        target: 'player'
+      };
+    }
+
+    return null;
+  }
+
+  /**
+   * Add a floating number to the display
+   */
+  private addFloatingNumber(data: { value: number; type: 'damage' | 'crit' | 'heal'; target: 'player' | 'monster' }): void {
+    const id = `float-${Date.now()}-${Math.random()}`;
+    const floatingNumber = { id, ...data };
+    // Add to signal
+    this.floatingNumbers.update(numbers => [...numbers, floatingNumber]);
+
+    // Remove after animation completes (1000ms)
+    setTimeout(() => {
+      this.floatingNumbers.update(numbers => numbers.filter(n => n.id !== id));
+    }, 1000);
   }
 
   /**
@@ -240,16 +300,13 @@ export class CombatComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.isExecutingAction.set(true);
     this.selectedAbility.set(fullAbility);
 
-    this.combatService.executeAction('ability', fullAbility.abilityId).subscribe({
-      next: () => {
-        this.isExecutingAction.set(false);
-        this.selectedAbility.set(null);
-      },
-      error: (err) => {
-        console.error('Ability failed:', err);
-        this.isExecutingAction.set(false);
-        this.selectedAbility.set(null);
-      }
+    this.combatService.useAbility(fullAbility.abilityId).then(() => {
+      this.isExecutingAction.set(false);
+      this.selectedAbility.set(null);
+    }).catch((err: any) => {
+      console.error('Ability failed:', err);
+      this.isExecutingAction.set(false);
+      this.selectedAbility.set(null);
     });
   }
 
@@ -287,6 +344,8 @@ export class CombatComponent implements OnInit, OnDestroy, AfterViewChecked {
         return 'log-ability';
       case 'system':
         return 'log-system';
+      case 'loot':
+        return 'log-loot';
       default:
         return '';
     }
@@ -298,17 +357,34 @@ export class CombatComponent implements OnInit, OnDestroy, AfterViewChecked {
   startNewEncounter(): void {
     if (this.isExecutingAction()) return;
 
+    // Get activity ID from current combat or last combat
+    const combat = this.activeCombat();
+    const activityId = combat?.activityId || this.combatService.lastCombatActivityId();
+
+    if (!activityId) {
+      console.error('Cannot restart combat: No activity ID found');
+      return;
+    }
+
+    // Get the facility ID from the location service's last facility
+    const facilityId = this.locationService.getLastFacilityId();
+
+    if (!facilityId) {
+      console.error('Cannot restart combat: No facility ID found');
+      return;
+    }
+
     this.isExecutingAction.set(true);
-    this.combatService.restartCombat().subscribe({
-      next: () => {
-        this.isExecutingAction.set(false);
-      },
-      error: (err) => {
-        console.error('Restart combat failed:', err);
-        this.isExecutingAction.set(false);
-        // Fallback to dismissing combat if restart fails
-        this.combatService.dismissCombat();
-      }
+
+    // Clear combat state first
+    this.combatService.restartCombat();
+
+    // Start the activity again to initiate new combat
+    this.locationService.startActivity(activityId, facilityId).then(() => {
+      this.isExecutingAction.set(false);
+    }).catch((err: any) => {
+      console.error('Failed to restart combat:', err);
+      this.isExecutingAction.set(false);
     });
   }
 
@@ -320,19 +396,12 @@ export class CombatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
     this.isUsingItem.set(true);
 
-    this.inventoryService.useItem(item.instanceId).subscribe({
-      next: (response: any) => {
-        this.isUsingItem.set(false);
-
-        // Update combat state if response includes it
-        if (response.combat) {
-          this.combatService.activeCombat.set(response.combat);
-        }
-      },
-      error: (error: any) => {
-        console.error('Error using item in combat:', error);
-        this.isUsingItem.set(false);
-      }
+    // Use combat service socket method instead of inventory HTTP endpoint
+    this.combatService.useItem(item.instanceId).then(() => {
+      this.isUsingItem.set(false);
+    }).catch((error: any) => {
+      console.error('Error using item in combat:', error);
+      this.isUsingItem.set(false);
     });
   }
 

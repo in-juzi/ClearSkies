@@ -5,6 +5,19 @@
     <div class="combatants">
       <!-- Player Side -->
       <div class="combatant player-side">
+        <!-- Floating Numbers Container -->
+        <div class="floating-numbers-container">
+          @for (floatNum of floatingNumbers(); track floatNum.id) {
+            @if (floatNum.target === 'player') {
+              <div class="floating-number"
+                   [class.damage]="floatNum.type === 'damage'"
+                   [class.crit]="floatNum.type === 'crit'"
+                   [class.heal]="floatNum.type === 'heal'">
+                {{ floatNum.type === 'heal' ? '+' : '-' }}{{ floatNum.value }}
+              </div>
+            }
+          }
+        </div>
         <div class="combatant-info">
           <div class="combatant-name">{{ authService.currentUser()?.username || 'You' }}</div>
           <div class="combatant-level">Level {{ player()?.level || 1 }}</div>
@@ -60,6 +73,19 @@
 
       <!-- Monster Side -->
       <div class="combatant monster-side">
+        <!-- Floating Numbers Container -->
+        <div class="floating-numbers-container">
+          @for (floatNum of floatingNumbers(); track floatNum.id) {
+            @if (floatNum.target === 'monster') {
+              <div class="floating-number"
+                   [class.damage]="floatNum.type === 'damage'"
+                   [class.crit]="floatNum.type === 'crit'"
+                   [class.heal]="floatNum.type === 'heal'">
+                {{ floatNum.type === 'heal' ? '+' : '-' }}{{ floatNum.value }}
+              </div>
+            }
+          }
+        </div>
         <div class="combatant-info">
           <div class="combatant-name">{{ combat.monsterName }}</div>
           <div class="combatant-level">Level {{ combat.monsterLevel }}</div>
@@ -147,11 +173,26 @@
     <!-- Combat Log -->
     <div class="combat-log">
       <div class="combat-log-header">Combat Log</div>
-      <div class="combat-log-content" #combatLogContent>
+      <div class="combat-log-content" #combatLogContent (scroll)="onCombatLogScroll()">
         @for (entry of combat.combatLog; track entry.timestamp) {
           <div class="log-entry" [class]="getLogEntryClass(entry)">
             <span class="log-timestamp">[{{ formatTimestamp(entry.timestamp) }}]</span>
             <span class="log-message">{{ entry.message }}</span>
+            @if (entry.type === 'loot' && entry.items && entry.items.length > 0) {
+              <div class="log-items">
+                @for (item of entry.items; track item.instanceId) {
+                  <app-item-mini
+                    [item]="item"
+                    [showIcon]="true"
+                    [showQuantity]="true"
+                    [showItemId]="true"
+                    [showDisplayName]="true"
+                    [showModifiers]="true"
+                    [iconSize]="20">
+                  </app-item-mini>
+                }
+              </div>
+            }
           </div>
         }
         @if (combat.combatLog.length === 0) {

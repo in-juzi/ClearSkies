@@ -18,7 +18,65 @@
   align-items: center;
 }
 
+// Floating Damage Numbers
+.floating-numbers-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.floating-number {
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  transform: translateX(-50%);
+  font-size: 1.8rem;
+  font-weight: bold;
+  font-family: monospace;
+  opacity: 0;
+  animation: floatUp 1s ease-out forwards;
+  text-shadow: 0 0 8px currentColor, 0 2px 4px rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+
+  // Color based on type
+  &.damage {
+    color: #ef4444;
+  }
+
+  &.crit {
+    color: #fbbf24;
+    font-size: 2.2rem;
+    text-shadow: 0 0 12px currentColor, 0 0 20px rgba(251, 191, 36, 0.6), 0 2px 4px rgba(0, 0, 0, 0.8);
+  }
+
+  &.heal {
+    color: #4ade80;
+  }
+}
+
+@keyframes floatUp {
+  0% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+  20% {
+    transform: translateX(-50%) translateY(-10px) scale(1.1);
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-80px) scale(0.9);
+  }
+}
+
 .combatant {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-self: start;
@@ -331,19 +389,30 @@
   padding: 0.25rem 0;
   border-left: 3px solid transparent;
   padding-left: 0.5rem;
-  display: flex;
-  gap: 0.5rem;
+
+  // First row: timestamp + message
+  > span {
+    display: inline;
+  }
 
   .log-timestamp {
     color: var(--color-text-muted);
     font-size: 0.75rem;
     font-family: monospace;
-    flex-shrink: 0;
+    margin-right: 0.5rem;
     opacity: 0.7;
   }
 
   .log-message {
-    flex: 1;
+    // Inline with timestamp
+  }
+
+  .log-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding-left: 1.5rem;
+    margin-top: 0.25rem;
   }
 
   &.log-crit {
@@ -388,6 +457,14 @@
       color: var(--color-accent-purple);
     }
     border-left-color: var(--color-accent-purple);
+  }
+
+  &.log-loot {
+    .log-message {
+      color: #fbbf24;
+      font-weight: 600;
+    }
+    border-left-color: #fbbf24;
   }
 }
 
