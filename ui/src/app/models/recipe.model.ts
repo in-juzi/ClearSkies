@@ -1,35 +1,8 @@
-export interface Ingredient {
-  itemId?: string;        // Specific item requirement
-  subcategory?: string;   // OR subcategory match (e.g., "herb", "flower")
-  quantity: number;
-}
+// Import types from shared (replaces duplicate definitions)
+import { Recipe } from '@shared/types';
 
-export interface RecipeUnlockConditions {
-  discoveredByDefault?: boolean;
-  requiredRecipes?: string[];
-  requiredItems?: string[];
-  questRequired?: string;
-}
-
-export interface RecipeOutput {
-  itemId: string;
-  quantity: number;
-  qualityModifier: string; // 'inherit', 'fixed', etc.
-}
-
-export interface Recipe {
-  recipeId: string;
-  name: string;
-  description: string;
-  skill: string;
-  requiredLevel: number;
-  duration: number; // seconds
-  ingredients: Ingredient[];
-  output?: RecipeOutput; // Legacy single output (deprecated)
-  outputs?: RecipeOutput[]; // New multi-output schema
-  experience: number;
-  unlockConditions?: RecipeUnlockConditions;
-}
+// Re-export Recipe so components can import it from this file
+export type { Recipe };
 
 export interface ActiveCrafting {
   recipeId: string;

@@ -1,31 +1,8 @@
-export interface ItemIcon {
-  path: string; // Relative path to SVG icon (e.g., "item-categories/item_cat_sword.svg")
-  material: string; // Material name for colorization (e.g., "copper", "iron", "oak")
-}
+// Import Item and IconConfig from shared types (replaces ItemDefinition and ItemIcon)
+import { Item, IconConfig } from '@shared/types';
 
-export interface ItemDefinition {
-  itemId: string;
-  name: string;
-  description: string;
-  category: 'resource' | 'equipment' | 'consumable' | 'crafted';
-  subcategories?: string[]; // Multi-value categorization for alchemy, filtering, etc.
-  equipmentType?: string; // Deprecated: use subcategories instead
-  subtype?: string; // Item subtype (woodcutting-axe, mining-pickaxe, fishing-rod, etc.)
-  consumableType?: string; // Deprecated: use subcategories instead
-  slot?: string; // Equipment slot (head, body, mainHand, etc.)
-  icon?: ItemIcon; // SVG icon configuration with colorization
-  baseValue: number;
-  rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
-  stackable: boolean;
-  properties: {
-    weight: number;
-    material: string;
-    tier: number;
-    [key: string]: any;
-  };
-  allowedQualities: string[];
-  allowedTraits: string[];
-}
+// Re-export IconConfig as ItemIcon for backward compatibility
+export type ItemIcon = IconConfig;
 
 export interface QualityLevelData {
   name: string;
@@ -84,7 +61,7 @@ export interface ItemInstance {
 }
 
 export interface ItemDetails extends ItemInstance {
-  definition: ItemDefinition;
+  definition: Item;
   subcategories?: string[]; // Convenience property from definition
   vendorPrice: number;
   qualityDetails: {
@@ -130,7 +107,7 @@ export interface RemoveItemRequest {
 }
 
 export interface ItemDefinitionsResponse {
-  items: ItemDefinition[];
+  items: Item[];
 }
 
 // Equipment System

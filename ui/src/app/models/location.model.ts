@@ -1,89 +1,56 @@
-export interface Biome {
-  biomeId: string;
-  name: string;
-  description: string;
-  theme: {
-    primaryColor: string;
-    secondaryColor: string;
-    accentColor: string;
-  };
+// Import types from shared (replaces duplicate definitions)
+import {
+  Activity as BaseActivity,
+  GatheringActivity,
+  CombatActivity,
+  ActivityUnion,
+  Biome,
+  BiomeDefinition as SharedBiomeDefinition
+} from '@shared/types';
+
+// Re-export BiomeDefinition from shared
+export type BiomeDefinition = SharedBiomeDefinition;
+
+// Frontend-specific Activity type with populated fields from backend
+// The backend populates duration and monsterLevel fields that exist in GatheringActivity/CombatActivity
+export interface Activity extends BaseActivity {
+  duration?: number; // From GatheringActivity or CombatActivity
+  monsterLevel?: number; // From CombatActivity (populated by backend from monster data)
+  requirementFailures?: string[]; // Frontend validation errors
+  rewards?: any; // Activity rewards
+  available?: boolean; // Frontend availability state (based on requirement validation)
+  stub?: boolean; // Flag for stub/placeholder activities
+  stubMessage?: string; // Message for stub activities
 }
 
-export interface NavigationLink {
-  targetLocationId: string;
-  name: string;
-  description: string;
-  travelTime: number;
-  requirements: {
-    attributes?: { [key: string]: number };
-    items?: string[];
-  };
-  encounters: string[];
-  available?: boolean;
-  requirementFailures?: string[];
-}
-
-export interface EquippedRequirement {
-  subtype: string;
-}
-
-export interface InventoryRequirement {
-  itemId: string;
-  quantity?: number;
-}
-
-export interface Activity {
-  activityId: string;
-  name: string;
-  description: string;
-  type: 'resource-gathering' | 'resource-refinement' | 'combat' | 'npc-interaction' | 'trading';
-  duration: number;
-  requirements: {
-    skills?: { [key: string]: number };
-    attributes?: { [key: string]: number };
-    items?: string[]; // Deprecated: use equipped or inventory instead
-    equipped?: EquippedRequirement[];
-    inventory?: InventoryRequirement[];
-  };
-  rewards: {
-    experience: { [key: string]: number };
-    items: Array<{
-      itemId: string;
-      quantity: { min: number; max: number };
-      chance: number;
-    }>;
-    gold?: { min: number; max: number };
-  };
-  stub?: boolean;
-  stubMessage?: string;
-  available?: boolean;
-  requirementFailures?: string[];
-  monsterLevel?: number; // Level of the monster for combat activities
-}
-
+// Frontend-specific Facility type with populated activity objects
 export interface Facility {
   facilityId: string;
   name: string;
   description: string;
-  type: 'resource-gathering' | 'resource-refinement' | 'combat' | 'trading' | 'npc-interaction' | 'crafting';
+  type: string;
   icon: string;
-  activities: Activity[];
-  vendorId?: string; // Deprecated: use vendorIds instead
-  vendorIds?: string[]; // Array of vendor IDs for multiple vendors
-  craftingSkills?: string[]; // Skills that can be used at this crafting facility
-  stub?: boolean;
-  stubMessage?: string;
+  vendorIds?: string[]; // Array of vendor IDs
+  vendorId?: string; // Legacy single vendor ID (deprecated, for backward compatibility)
+  craftingSkills?: string[];
+  activities: Activity[]; // Backend populates full activity objects (not just IDs)
+  stub?: boolean; // Flag for stub/placeholder facilities
+  stubMessage?: string; // Message for stub facilities
 }
 
+// Frontend-specific Location type with populated biome and facility objects
 export interface Location {
   locationId: string;
   name: string;
   description: string;
-  biome: Biome;
-  facilities: Facility[];
-  navigationLinks: NavigationLink[];
-  isStartingLocation: boolean;
+  biome: BiomeDefinition; // Backend populates full biome object (not just ID)
+  facilities: Facility[]; // Backend populates full facility objects (not just IDs)
+  navigationLinks: any[];
+  isStartingLocation?: boolean;
 }
+
+// Export shared activity types for type guards
+export type { GatheringActivity, CombatActivity, ActivityUnion };
 
 export interface ActiveActivity {
   activityId: string | null;

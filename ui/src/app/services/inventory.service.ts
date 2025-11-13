@@ -1,10 +1,10 @@
 import { Injectable, signal, inject, effect } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
+import { Item } from '@shared/types';
 import {
   InventoryResponse,
   ItemDetails,
-  ItemDefinition,
   ItemDefinitionsResponse,
   AddItemRequest,
   RemoveItemRequest
@@ -25,7 +25,7 @@ export class InventoryService {
   inventorySize = signal<number>(0);
   inventoryValue = signal<number>(0);
   gold = signal<number>(0);
-  itemDefinitions = signal<ItemDefinition[]>([]);
+  itemDefinitions = signal<Item[]>([]);
 
   constructor() {
     // Sync gold from auth service whenever player data changes
@@ -112,8 +112,8 @@ export class InventoryService {
   /**
    * Get single item definition
    */
-  getItemDefinition(itemId: string): Observable<ItemDefinition> {
-    return this.http.get<ItemDefinition>(`${this.apiUrl}/definitions/${itemId}`);
+  getItemDefinition(itemId: string): Observable<Item> {
+    return this.http.get<Item>(`${this.apiUrl}/definitions/${itemId}`);
   }
 
   /**

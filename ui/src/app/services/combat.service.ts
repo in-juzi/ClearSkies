@@ -5,6 +5,10 @@ import { InventoryService } from './inventory.service';
 import { SkillsService } from './skills.service';
 import { AttributesService } from './attributes.service';
 import { SocketService } from './socket.service';
+import { Ability } from '@shared/types';
+
+// Re-export Ability so components can import it
+export type { Ability };
 
 export interface Combat {
   activityId?: string | null;
@@ -40,20 +44,6 @@ export interface CombatLogEntry {
   target?: 'player' | 'monster';
   isNew?: boolean;
   items?: any[]; // Item data for loot entries
-}
-
-export interface Ability {
-  abilityId: string;
-  name: string;
-  description: string;
-  type: 'attack' | 'buff' | 'debuff' | 'heal';
-  powerMultiplier: number;
-  manaCost: number;
-  cooldown: number;
-  icon?: {
-    path: string;
-    material: string;
-  };
 }
 
 export interface CombatRewards {

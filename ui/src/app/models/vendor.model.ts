@@ -3,43 +3,19 @@
  */
 
 import { ItemDetails } from './inventory.model';
+import { Vendor as BaseVendor, VendorStock as BaseVendorStock, Item } from '@shared/types';
 
-export interface Vendor {
-  vendorId: string;
-  name: string;
-  description: string;
-  greeting: string;
-  iconPath: string;
-  acceptsAllItems: boolean;
-  sellPriceMultiplier: number;
-  stock: VendorStockItem[];
+// Extended VendorStock with frontend-specific fields
+export interface VendorStockItem extends BaseVendorStock {
+  itemDefinition?: Item; // Backend populates this when sending vendor data
 }
 
-export interface VendorStockItem {
-  itemId: string;
-  buyPrice: number;
-  stockType: 'infinite' | 'limited';
-  currentStock?: number;
-  itemDefinition?: ItemDefinition;
-}
+// Alias for backward compatibility
+export type VendorStock = VendorStockItem;
 
-export interface ItemIcon {
-  path: string;
-  material: string;
-}
-
-export interface ItemDefinition {
-  itemId: string;
-  name: string;
-  description: string;
-  category: string;
-  rarity: string;
-  tier: number;
-  baseValue: number;
-  icon?: ItemIcon;
-  slot?: string;
-  subtype?: string;
-  stackable: boolean;
+// Frontend-specific Vendor type with populated itemDefinition in stock
+export interface Vendor extends Omit<BaseVendor, 'stock'> {
+  stock: VendorStockItem[]; // Backend populates itemDefinition for each stock item
 }
 
 export interface BuyItemRequest {
