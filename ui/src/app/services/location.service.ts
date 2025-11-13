@@ -1,10 +1,9 @@
-import { Injectable, signal, inject } from '@angular/core';
+import { Injectable, signal, inject, effect } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, interval, tap, Subject } from 'rxjs';
+import { Observable, tap, Subject } from 'rxjs';
 import {
   Location,
   Facility,
-  Activity,
   ActiveActivity,
   TravelState,
   ActivityRewards,
@@ -13,6 +12,7 @@ import {
 import { SkillsService } from './skills.service';
 import { AttributesService } from './attributes.service';
 import { InventoryService } from './inventory.service';
+import { SocketService } from './socket.service';
 
 @Injectable({
   providedIn: 'root'
@@ -22,6 +22,7 @@ export class LocationService {
   private skillsService = inject(SkillsService);
   private attributesService = inject(AttributesService);
   private inventoryService = inject(InventoryService);
+  private socketService = inject(SocketService);
 
   // Signals for reactive state
   currentLocation = signal<Location | null>(null);
@@ -37,12 +38,272 @@ export class LocationService {
   // Observable for activity errors
   activityError$ = new Subject<{ error: string; message: string }>();
 
-  // Polling interval for checking activity/travel status (in milliseconds)
-  private pollingInterval = 1000; // 1 second
-  private activityPoll$: any;
-  private travelPoll$: any;
+  // Progress update timer
+  private progressTimer: any = null;
 
-  constructor(private http: HttpClient) {}
+  // Travel progress timer
+  private travelTimer: any = null;
+
+  // Store last activity for auto-restart
+  private lastActivityId: string | null = null;
+  private lastFacilityId: string | null = null;
+
+  /**
+   * Get last facility ID (for combat restart)
+   */
+  getLastFacilityId(): string | null {
+    return this.lastFacilityId;
+  }
+
+  constructor(private http: HttpClient) {
+    // Set up socket event listeners when connected
+    effect(() => {
+      if (this.socketService.isConnected()) {
+        this.setupSocketListeners();
+      }
+    });
+  }
+
+  /**
+   * Start progress timer to update remaining time
+   */
+  private startProgressTimer(endTime: Date): void {
+    // Clear any existing timer
+    this.stopProgressTimer();
+
+    // Update progress every second
+    this.progressTimer = setInterval(() => {
+      const remainingTime = Math.max(0, Math.floor((endTime.getTime() - Date.now()) / 1000));
+
+      const currentProgress = this.activityProgress();
+      if (currentProgress) {
+        this.activityProgress.set({
+          ...currentProgress,
+          remainingTime: remainingTime
+        });
+
+        // Stop timer when time is up
+        if (remainingTime <= 0) {
+          this.stopProgressTimer();
+        }
+      } else {
+        this.stopProgressTimer();
+      }
+    }, 1000);
+  }
+
+  /**
+   * Stop progress timer
+   */
+  private stopProgressTimer(): void {
+    if (this.progressTimer) {
+      clearInterval(this.progressTimer);
+      this.progressTimer = null;
+    }
+  }
+
+  /**
+   * Start travel timer to update remaining time
+   */
+  private startTravelTimer(endTime: Date): void {
+    // Clear any existing timer
+    this.stopTravelTimer();
+
+    // Update travel progress every second
+    this.travelTimer = setInterval(() => {
+      const remainingTime = Math.max(0, Math.floor((endTime.getTime() - Date.now()) / 1000));
+
+      const currentTravel = this.travelState();
+      if (currentTravel && currentTravel.isTravel) {
+        this.travelState.set({
+          ...currentTravel,
+          remainingTime: remainingTime
+        });
+
+        // Stop timer when time is up
+        if (remainingTime <= 0) {
+          this.stopTravelTimer();
+        }
+      } else {
+        this.stopTravelTimer();
+      }
+    }, 1000);
+  }
+
+  /**
+   * Stop travel timer
+   */
+  private stopTravelTimer(): void {
+    if (this.travelTimer) {
+      clearInterval(this.travelTimer);
+      this.travelTimer = null;
+    }
+  }
+
+  /**
+   * Set up socket event listeners for activities and travel
+   */
+  private setupSocketListeners(): void {
+    // Activity events
+    this.socketService.on('activity:started', (data: any) => {
+      console.log('Activity started event:', data);
+      const endTime = new Date(data.endTime);
+      const remainingTime = Math.max(0, Math.floor((endTime.getTime() - Date.now()) / 1000));
+
+      this.activeActivity.set({
+        activityId: data.activityId,
+        facilityId: this.activeActivity()?.facilityId || '',
+        locationId: this.currentLocation()?.locationId || null,
+        startTime: new Date(data.startTime || Date.now()),
+        endTime: endTime
+      });
+
+      // Set activity progress so UI knows activity is active
+      this.activityProgress.set({
+        active: true,
+        completed: false,
+        remainingTime: remainingTime
+      });
+
+      // Start timer to update progress
+      this.startProgressTimer(endTime);
+    });
+
+    this.socketService.on('activity:completed', (data: any) => {
+      console.log('Activity completed event:', data);
+
+      // Stop progress timer
+      this.stopProgressTimer();
+
+      // Refresh player data
+      this.skillsService.getSkills().subscribe();
+      this.attributesService.getAllAttributes().subscribe();
+      this.inventoryService.getInventory().subscribe();
+
+      // Emit completion event for UI notifications
+      this.activityCompleted$.next({
+        rewards: data.rewards,
+        activityName: data.activity
+      });
+
+      // Auto-restart if we have stored activity details
+      if (this.lastActivityId && this.lastFacilityId) {
+        // Don't clear active activity yet - keep it visible during auto-restart
+        this.startActivity(this.lastActivityId, this.lastFacilityId).catch((error) => {
+          console.error('Failed to auto-restart activity:', error);
+          // Clear stored activity on error
+          this.lastActivityId = null;
+          this.lastFacilityId = null;
+          // Only clear activity state if auto-restart failed
+          this.activeActivity.set(null);
+          this.activityProgress.set(null);
+        });
+      } else {
+        // No auto-restart, clear active activity immediately
+        this.activeActivity.set(null);
+        this.activityProgress.set(null);
+      }
+    });
+
+    this.socketService.on('activity:cancelled', (data: any) => {
+      console.log('Activity cancelled event:', data);
+
+      // Stop progress timer
+      this.stopProgressTimer();
+
+      // Clear stored activity (don't auto-restart cancelled activities)
+      this.lastActivityId = null;
+      this.lastFacilityId = null;
+
+      this.activeActivity.set(null);
+      this.activityProgress.set(null);
+    });
+
+    this.socketService.on('activity:error', (data: any) => {
+      console.error('Activity error event:', data);
+
+      // Stop progress timer
+      this.stopProgressTimer();
+
+      // Clear stored activity on error
+      this.lastActivityId = null;
+      this.lastFacilityId = null;
+
+      this.activityError$.next({
+        error: data.message,
+        message: data.message
+      });
+      this.activeActivity.set(null);
+      this.activityProgress.set(null);
+    });
+
+    // Travel events
+    this.socketService.on('travel:started', (data: any) => {
+      console.log('Travel started event:', data);
+      const endTime = new Date(data.endTime);
+      const remainingTime = Math.max(0, Math.floor((endTime.getTime() - Date.now()) / 1000));
+
+      this.travelState.set({
+        isTravel: true,
+        targetLocationId: data.destination,
+        startTime: new Date(data.startTime || Date.now()),
+        endTime: endTime,
+        remainingTime: remainingTime
+      });
+
+      // Start timer to update travel progress
+      this.startTravelTimer(endTime);
+    });
+
+    this.socketService.on('travel:completed', (data: any) => {
+      console.log('Travel completed event:', data);
+
+      // Stop travel timer
+      this.stopTravelTimer();
+
+      // Update current location
+      this.getCurrentLocation().subscribe();
+
+      // Clear travel state
+      this.travelState.set({
+        isTravel: false,
+        targetLocationId: null,
+        startTime: null,
+        endTime: null,
+        remainingTime: 0
+      });
+    });
+
+    this.socketService.on('travel:cancelled', (data: any) => {
+      console.log('Travel cancelled event:', data);
+
+      // Stop travel timer
+      this.stopTravelTimer();
+
+      this.travelState.set({
+        isTravel: false,
+        targetLocationId: null,
+        startTime: null,
+        endTime: null,
+        remainingTime: 0
+      });
+    });
+
+    this.socketService.on('travel:error', (data: any) => {
+      console.error('Travel error event:', data);
+
+      // Stop travel timer
+      this.stopTravelTimer();
+
+      this.travelState.set({
+        isTravel: false,
+        targetLocationId: null,
+        startTime: null,
+        endTime: null,
+        remainingTime: 0
+      });
+    });
+  }
 
   /**
    * Get all discovered locations
@@ -65,14 +326,24 @@ export class LocationService {
         this.activeActivity.set(response.currentActivity);
         this.travelState.set(response.travelState);
 
-        // Start polling if activity is active
+        // Check status on reconnect/page load
         if (response.currentActivity?.activityId) {
-          this.startActivityPolling();
+          this.checkActivityStatus();
         }
 
-        // Start polling if traveling
-        if (response.travelState?.isTravel) {
-          this.startTravelPolling();
+        if (response.travelState?.isTravel && response.travelState.endTime) {
+          // Start travel timer to update remaining time
+          const endTime = new Date(response.travelState.endTime);
+          const remainingTime = Math.max(0, Math.floor((endTime.getTime() - Date.now()) / 1000));
+
+          // Update travel state with remaining time
+          this.travelState.set({
+            ...response.travelState,
+            remainingTime: remainingTime
+          });
+
+          // Start timer
+          this.startTravelTimer(endTime);
         }
       })
     );
@@ -88,34 +359,32 @@ export class LocationService {
   /**
    * Start traveling to a new location
    */
-  startTravel(targetLocationId: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/travel`, { targetLocationId }).pipe(
-      tap((response: any) => {
-        this.travelState.set(response.travelState);
-        this.startTravelPolling();
-      })
-    );
+  async startTravel(targetLocationId: string): Promise<any> {
+    try {
+      const response = await this.socketService.emit('travel:start', { locationId: targetLocationId });
+
+      if (!response.success) {
+        throw new Error(response.message || 'Failed to start travel');
+      }
+
+      return response;
+    } catch (error: any) {
+      console.error('Error starting travel:', error);
+      throw error;
+    }
   }
 
   /**
-   * Check travel status
+   * Cancel travel
    */
-  getTravelStatus(): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/travel/status`).pipe(
-      tap((response: any) => {
-        if (response.completed) {
-          this.stopTravelPolling();
-          this.currentLocation.set(response.newLocation);
-          this.travelState.set({ isTravel: false, targetLocationId: null, startTime: null, endTime: null });
-        } else if (response.isTravel) {
-          // Update travel state with remaining time
-          this.travelState.set({
-            ...response.travelState,
-            remainingTime: response.remainingTime || 0
-          });
-        }
-      })
-    );
+  async cancelTravel(): Promise<any> {
+    try {
+      const response = await this.socketService.emit('travel:cancel', {});
+      return response;
+    } catch (error) {
+      console.error('Error cancelling travel:', error);
+      throw error;
+    }
   }
 
   /**
@@ -130,257 +399,108 @@ export class LocationService {
   /**
    * Start an activity
    */
-  startActivity(activityId: string, facilityId: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/activities/start`, { activityId, facilityId }).pipe(
-      tap((response: any) => {
+  async startActivity(activityId: string, facilityId: string): Promise<any> {
+    try {
+      const response = await this.socketService.emit('activity:start', { activityId, facilityId });
+
+      if (!response.success) {
+        throw new Error(response.message || 'Failed to start activity');
+      }
+
+      // Store for auto-restart
+      this.lastActivityId = activityId;
+      this.lastFacilityId = facilityId;
+
+      // Set active activity immediately (will be updated by socket event)
+      // Note: Combat activities return 'combat' instead of 'activity' in the response
+      if (response.activity) {
         this.activeActivity.set({
           activityId,
           facilityId,
           locationId: this.currentLocation()?.locationId || null,
+          startTime: new Date(response.activity.startTime || Date.now()),
+          endTime: new Date(response.activity.endTime)
+        });
+      } else if (response.combat) {
+        // Combat activities don't set activeActivity - combat service handles this
+        console.log('Combat started, combat service will handle state');
+      }
+
+      return response;
+    } catch (error: any) {
+      console.error('Error starting activity:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Cancel activity
+   */
+  async cancelActivity(): Promise<any> {
+    try {
+      const response = await this.socketService.emit('activity:cancel', {});
+
+      if (response.success) {
+        this.activeActivity.set(null);
+        this.activityProgress.set(null);
+      }
+
+      return response;
+    } catch (error) {
+      console.error('Error cancelling activity:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Check activity status (for reconnection)
+   */
+  async checkActivityStatus(): Promise<void> {
+    try {
+      const response = await this.socketService.emit('activity:getStatus', {});
+
+      if (response.success && response.active) {
+        // Update activity state from server
+        this.activeActivity.set({
+          activityId: response.activity.activityId,
+          facilityId: this.activeActivity()?.facilityId || '',
+          locationId: this.currentLocation()?.locationId || null,
           startTime: new Date(response.activity.startTime),
           endTime: new Date(response.activity.endTime)
         });
-        this.startActivityPolling();
-      })
-    );
-  }
-
-  /**
-   * Get current activity status
-   */
-  getActivityStatus(): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/activities/status`).pipe(
-      tap((response: any) => {
-        this.activityProgress.set({
-          active: response.active,
-          completed: response.completed,
-          remainingTime: response.remainingTime || 0
-        });
-
-        // Automatically claim rewards and restart when completed
-        if (response.completed) {
-          this.completeActivity().subscribe({
-            error: (err) => {
-              // Emit error event for UI notification
-              const errorMessage = err.error?.error || err.error?.message || 'Failed to complete activity';
-              this.activityError$.next({
-                error: errorMessage,
-                message: err.error?.message || 'Activity stopped due to error'
-              });
-
-              // Cancel the activity on the server to ensure state is cleared
-              this.http.post(`${this.apiUrl}/activities/cancel`, {}).subscribe({
-                error: (cancelErr) => {
-                  console.error('Error cancelling activity after error:', cancelErr);
-                }
-              });
-            }
-          });
-        }
-      })
-    );
-  }
-
-  /**
-   * Complete activity and claim rewards
-   */
-  completeActivity(): Observable<{ message: string; rewards?: ActivityRewards; stub?: boolean; activityRestarted?: boolean; newActivity?: any }> {
-    return this.http.post<{ message: string; rewards?: ActivityRewards; stub?: boolean; activityRestarted?: boolean; newActivity?: any }>(
-      `${this.apiUrl}/activities/complete`,
-      {}
-    ).pipe(
-      tap({
-        next: (response) => {
-          // Refresh skills, attributes, and inventory after claiming rewards
-          this.skillsService.getSkills().subscribe();
-          this.attributesService.getAllAttributes().subscribe();
-          this.inventoryService.getInventory().subscribe();
-
-          // Emit completion event with rewards if available
-          if (response.rewards && response.newActivity) {
-            this.activityCompleted$.next({
-              rewards: response.rewards,
-              activityName: response.newActivity.name || 'Unknown Activity'
-            });
-          }
-
-          // If activity was restarted, update the active activity with new times
-          if (response.activityRestarted && response.newActivity) {
-            this.activeActivity.set({
-              activityId: response.newActivity.activityId,
-              facilityId: this.activeActivity()?.facilityId || null,
-              locationId: this.currentLocation()?.locationId || null,
-              startTime: new Date(response.newActivity.startTime),
-              endTime: new Date(response.newActivity.endTime)
-            });
-            // Reset progress to show it's in progress again
-            this.activityProgress.set({
-              active: true,
-              completed: false,
-              remainingTime: response.newActivity.duration || 0
-            });
-            // Continue polling
-            this.startActivityPolling();
-          } else {
-            // Activity not restarted (stub or error), clear state
-            this.stopActivityPolling();
-            this.activeActivity.set({
-              activityId: null,
-              facilityId: null,
-              locationId: null,
-              startTime: null,
-              endTime: null
-            });
-            this.activityProgress.set(null);
-          }
-        },
-        error: (error) => {
-          // Handle errors (e.g., inventory full)
-          console.error('Error completing activity:', error);
-
-          // Stop the activity loop
-          this.stopActivityPolling();
-          this.activeActivity.set({
-            activityId: null,
-            facilityId: null,
-            locationId: null,
-            startTime: null,
-            endTime: null
-          });
-          this.activityProgress.set(null);
-
-          // Re-throw error so component can handle notification
-          throw error;
-        }
-      })
-    );
-  }
-
-  /**
-   * Cancel current activity
-   */
-  cancelActivity(): Observable<{ message: string }> {
-    return this.http.post<{ message: string }>(`${this.apiUrl}/activities/cancel`, {}).pipe(
-      tap(() => {
-        this.stopActivityPolling();
-        this.activeActivity.set({
-          activityId: null,
-          facilityId: null,
-          locationId: null,
-          startTime: null,
-          endTime: null
-        });
+      } else if (response.success && !response.active) {
+        // No active activity
+        this.activeActivity.set(null);
         this.activityProgress.set(null);
-      })
-    );
-  }
-
-  /**
-   * Cancel current travel
-   */
-  cancelTravel(): Observable<{ message: string }> {
-    return this.http.post<{ message: string }>(`${this.apiUrl}/travel/cancel`, {}).pipe(
-      tap(() => {
-        this.stopTravelPolling();
-        this.travelState.set({
-          isTravel: false,
-          targetLocationId: null,
-          startTime: null,
-          endTime: null
-        });
-      })
-    );
-  }
-
-  /**
-   * Skip travel (dev feature - sets endTime to 1 second from now)
-   */
-  skipTravel(): Observable<{ message: string }> {
-    return this.http.post<{ message: string }>(`${this.apiUrl}/travel/skip`, {}).pipe(
-      tap((response: any) => {
-        // Travel state will be updated by the polling
-      })
-    );
-  }
-
-  /**
-   * Get all location definitions (admin/debug)
-   */
-  getAllDefinitions(): Observable<{ locations: Location[] }> {
-    return this.http.get<{ locations: Location[] }>(`${this.apiUrl}/definitions/all`);
-  }
-
-  /**
-   * Reload location data (admin/debug)
-   */
-  reloadDefinitions(): Observable<{ message: string }> {
-    return this.http.post<{ message: string }>(`${this.apiUrl}/definitions/reload`, {});
-  }
-
-  /**
-   * Start polling for activity status
-   */
-  private startActivityPolling() {
-    if (this.activityPoll$) {
-      return; // Already polling
-    }
-
-    this.activityPoll$ = interval(this.pollingInterval).subscribe(() => {
-      this.getActivityStatus().subscribe();
-    });
-  }
-
-  /**
-   * Stop polling for activity status
-   */
-  private stopActivityPolling() {
-    if (this.activityPoll$) {
-      this.activityPoll$.unsubscribe();
-      this.activityPoll$ = null;
+      }
+    } catch (error) {
+      console.error('Error checking activity status:', error);
     }
   }
 
   /**
-   * Start polling for travel status
+   * Get location state (for LocationComponent)
    */
-  private startTravelPolling() {
-    if (this.travelPoll$) {
-      return; // Already polling
-    }
-
-    this.travelPoll$ = interval(this.pollingInterval).subscribe(() => {
-      this.getTravelStatus().subscribe();
-    });
+  getLocationState(): Observable<LocationState> {
+    return this.http.get<LocationState>(`${this.apiUrl}/state`);
   }
 
   /**
-   * Stop polling for travel status
+   * Cleanup on destroy
    */
-  private stopTravelPolling() {
-    if (this.travelPoll$) {
-      this.travelPoll$.unsubscribe();
-      this.travelPoll$ = null;
-    }
-  }
+  ngOnDestroy(): void {
+    // Stop timers
+    this.stopProgressTimer();
+    this.stopTravelTimer();
 
-  /**
-   * Format XP display with scaling information
-   * @param rawXP - Raw XP value from activity definition
-   * @param scaledXP - Scaled XP value actually awarded
-   * @returns Formatted string for UI display
-   */
-  formatXPDisplay(rawXP: number, scaledXP: number): string {
-    if (rawXP === scaledXP) {
-      return `${rawXP} XP`;
-    }
-    return `${rawXP} XP → ${scaledXP} XP`;
-  }
-
-  /**
-   * Clean up when service is destroyed
-   */
-  ngOnDestroy() {
-    this.stopActivityPolling();
-    this.stopTravelPolling();
+    // Remove socket listeners
+    this.socketService.off('activity:started');
+    this.socketService.off('activity:completed');
+    this.socketService.off('activity:cancelled');
+    this.socketService.off('activity:error');
+    this.socketService.off('travel:started');
+    this.socketService.off('travel:completed');
+    this.socketService.off('travel:cancelled');
+    this.socketService.off('travel:error');
   }
 }

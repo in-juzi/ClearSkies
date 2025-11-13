@@ -106,6 +106,8 @@ export class LocationComponent implements OnInit, OnDestroy {
 
   // Local state
   selectedActivityId = signal<string | null>(null); // Store activityId instead of full Activity object
+  startingActivity = signal<boolean>(false); // Track when activity start is pending
+  cachedActivityForStarting = signal<Activity | null>(null); // Cache activity data during start transition
   lastRewards: ActivityRewards | null = null;
   activityLog: Array<{ timestamp: Date; rewards: ActivityRewards; activityName: string }> = [];
   facilityVendors: Map<string, Vendor> = new Map(); // Cache vendor data by vendorId
@@ -116,6 +118,13 @@ export class LocationComponent implements OnInit, OnDestroy {
   selectedActivity = computed<Activity | null>(() => {
     const facility = this.selectedFacility();
     const activityId = this.selectedActivityId(); // Read from signal
+    const isStarting = this.startingActivity();
+    const cached = this.cachedActivityForStarting();
+
+    // If we're starting and have cached data, use that
+    if (isStarting && cached) {
+      return cached;
+    }
 
     if (!facility || !activityId || !facility.activities) {
       return null;
@@ -149,6 +158,38 @@ export class LocationComponent implements OnInit, OnDestroy {
         this.refreshTimeout = setTimeout(() => {
           this.refreshFacilityRequirements(currentFacility.facilityId);
         }, 500);
+      }
+    });
+
+    // Use effect to clean up when activity/combat actually starts
+    effect(() => {
+      const activeActivityState = this.activeActivity();
+      const inCombatState = this.inCombat();
+      const isStarting = this.startingActivity();
+      const hasProgress = this.activityProgress();
+
+      // If we're in "starting" state and activity has actually started with progress data, clean up
+      // We wait for activityProgress to ensure the active activity view can render properly
+      if (isStarting && activeActivityState?.activityId && hasProgress) {
+        // Clear selections first, keep startingActivity true momentarily
+        this.selectedActivityId.set(null);
+        this.locationService.selectedFacility.set(null);
+
+        // Clear startingActivity and cached data after a brief delay to ensure smooth transition
+        setTimeout(() => {
+          this.startingActivity.set(false);
+          this.cachedActivityForStarting.set(null);
+        }, 50);
+      }
+
+      // For combat, clear immediately when combat state is active
+      if (isStarting && inCombatState) {
+        this.selectedActivityId.set(null);
+        this.locationService.selectedFacility.set(null);
+        setTimeout(() => {
+          this.startingActivity.set(false);
+          this.cachedActivityForStarting.set(null);
+        }, 50);
       }
     });
   }
@@ -407,62 +448,37 @@ export class LocationComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Check if this is a combat activity
-    if (activity.type === 'combat') {
-      // Get monster ID from activity's combatConfig
-      const monsterId = (activity as any).combatConfig?.monsterId;
+    // Cache activity data for display during transition
+    this.cachedActivityForStarting.set(activity);
 
-      if (!monsterId) {
-        this.logToChat('Combat activity configuration error', 'error');
-        return;
-      }
+    // Set starting state to prevent UI flash
+    this.startingActivity.set(true);
 
-      // Start combat instead of regular activity
-      this.combatService.startCombat(monsterId, activity.activityId).subscribe({
-        next: (response) => {
-          this.logToChat(response.message || 'Combat started!', 'success');
-          this.selectedActivityId.set(null);
-          this.locationService.selectedFacility.set(null);
-        },
-        error: (err) => {
-          this.logToChat(err.error?.message || 'Failed to start combat', 'error');
-        }
-      });
-      return;
-    }
-
-    // Regular activity
+    // All activities (including combat) now go through the activity system
+    // Combat activities are detected server-side and delegated to combat service
     this.locationService.startActivity(
       activity.activityId,
       this.selectedFacility()!.facilityId
-    ).subscribe({
-      next: (response) => {
-        this.logToChat(response.message, 'success');
-        this.selectedActivityId.set(null);
-        this.locationService.selectedFacility.set(null);
-      },
-      error: (err) => {
-        this.logToChat(err.error?.message || 'Failed to start activity', 'error');
-      }
+    ).then((response) => {
+      this.logToChat(response.message, 'success');
+      // Don't clear selections here - wait for activeActivity/inCombat signal to update
+      // The effect in constructor will handle cleanup when activity/combat actually starts
+    }).catch((err) => {
+      this.logToChat(err.message || 'Failed to start activity', 'error');
+      this.startingActivity.set(false);
+      this.cachedActivityForStarting.set(null);
     });
   }
 
   /**
    * Complete the current activity
+   * NOTE: With Socket.io, activities complete automatically via events
+   * This method is no longer needed but kept for reference
    */
   completeActivity() {
-    this.locationService.completeActivity().subscribe({
-      next: (response) => {
-        this.logToChat(response.message, 'success');
-        this.lastRewards = response.rewards || null;
-        setTimeout(() => {
-          this.lastRewards = null;
-        }, 5000);
-      },
-      error: (err) => {
-        this.logToChat(err.error?.message || 'Failed to complete activity', 'error');
-      }
-    });
+    // Activities now complete automatically via socket events
+    // The activityCompleted$ observable in locationService handles rewards display
+    console.log('completeActivity() called but activities now auto-complete via sockets');
   }
 
   /**
@@ -480,13 +496,10 @@ export class LocationComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.locationService.cancelActivity().subscribe({
-      next: (response) => {
-        this.logToChat(response.message, 'success');
-      },
-      error: (err) => {
-        this.logToChat(err.error?.message || 'Failed to cancel activity', 'error');
-      }
+    this.locationService.cancelActivity().then((response) => {
+      this.logToChat(response.message, 'success');
+    }).catch((err) => {
+      this.logToChat(err.message || 'Failed to cancel activity', 'error');
     });
   }
 
@@ -512,13 +525,10 @@ export class LocationComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.combatService.flee().subscribe({
-      next: (response) => {
-        this.logToChat(response.message || 'You fled from combat!', 'success');
-      },
-      error: (err) => {
-        this.logToChat(err.error?.message || 'Failed to flee from combat', 'error');
-      }
+    this.combatService.flee().then((response: any) => {
+      this.logToChat(response.message || 'You fled from combat!', 'success');
+    }).catch((err: any) => {
+      this.logToChat(err.message || 'Failed to flee from combat', 'error');
     });
   }
 
@@ -537,42 +547,24 @@ export class LocationComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.locationService.cancelTravel().subscribe({
-      next: (response) => {
+    this.locationService.cancelTravel()
+      .then((response: any) => {
         this.logToChat(response.message, 'success');
         this.locationService.getCurrentLocation().subscribe(); // Refresh location
-      },
-      error: (err) => {
+      })
+      .catch((err: any) => {
         this.logToChat(err.error?.message || 'Failed to cancel travel', 'error');
-      }
-    });
+      });
   }
 
   /**
    * Start traveling to a location
    */
   travel(targetLocationId: string) {
-    this.locationService.startTravel(targetLocationId).subscribe({
-      next: (response) => {
-        this.logToChat(response.message, 'success');
-      },
-      error: (err) => {
-        this.logToChat(err.error?.message || 'Failed to start travel', 'error');
-      }
-    });
-  }
-
-  /**
-   * Skip travel (dev feature)
-   */
-  skipTravel() {
-    this.locationService.skipTravel().subscribe({
-      next: (response) => {
-        this.logToChat(response.message || 'Travel skipped to near completion', 'success');
-      },
-      error: (err) => {
-        this.logToChat(err.error?.message || 'Failed to skip travel', 'error');
-      }
+    this.locationService.startTravel(targetLocationId).then((response) => {
+      this.logToChat(response.message, 'success');
+    }).catch((err) => {
+      this.logToChat(err.message || 'Failed to start travel', 'error');
     });
   }
 

@@ -610,8 +610,8 @@
 
 // Navigation
 .navigation-section {
-  margin-top: var(--spacing-4xl);
-  padding-top: var(--spacing-4xl);
+  margin-top: var(--spacing-l);
+  padding-top: var(--spacing-l);
   border-top: var(--border-width-medium) solid var(--color-surface-border);
 
   h2 {
@@ -746,5 +746,27 @@
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(255, 165, 0, 0.4);
+  }
+}
+
+// Skill icons in requirements and rewards
+.requirement-skill,
+.reward-skill {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-s);
+
+  .skill-icon-small {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    flex-shrink: 0;
+  }
+
+  .skill-icon-large {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    flex-shrink: 0;
   }
 }

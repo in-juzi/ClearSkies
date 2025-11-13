@@ -1,4 +1,5 @@
 <div class="location-container">
+
   <!-- Traveling State -->
   <div class="traveling-view" *ngIf="travelState()?.isTravel">
     <h2>Traveling...</h2>
@@ -10,9 +11,6 @@
       <p>Time remaining: {{ formatTime(travelState()?.remainingTime || 0) }}</p>
     </div>
     <div class="travel-actions">
-      <button (click)="skipTravel()" class="btn-warning" title="Skip to 1 second before arrival (Dev feature)">
-        Skip
-      </button>
       <button (click)="cancelTravel()" class="btn-danger">
         Cancel
       </button>
@@ -30,7 +28,7 @@
       </span>
     </div>
 
-    @if (activeActivity()?.activityId && activityProgress()) {
+    @if (activeActivity()?.activityId && activityProgress() && !startingActivity()) {
 
     <button (click)="cancelActivity()" class="btn-back">← Back to Activities</button>
 
@@ -83,11 +81,11 @@
                 <app-item-mini [item]="item"></app-item-mini>
                 }
                 @for (exp of entry.rewards.experience | keyvalue; track exp.key) {
-                <app-xp-mini [skillName]="exp.key" [xp]="exp.value.skill?.experience || exp.value.experience"
+                <app-xp-mini [skillName]="exp.key" [xp]="exp.value.experience"
                   [rawXp]="entry.rewards.rawExperience?.[exp.key]" [showIcon]="true" [showSkillName]="true"
                   [showScaling]="true">
                 </app-xp-mini>
-                @if (exp.value.leveledUp || exp.value.skill?.leveledUp) {
+                @if (exp.value.leveledUp) {
                 <span class="level-up-mini">↑</span>
                 }
                 }
@@ -123,8 +121,10 @@
     @else {
 
     <!-- Activity Detail View -->
-    <div class="activity-detail" *ngIf="selectedActivity()">
-      <button (click)="backToActivities()" class="btn-back">← Back to Activities</button>
+    <div class="activity-detail"
+      *ngIf="(selectedActivity() || startingActivity()) && !inCombat() && !combatService.combatEnded()">
+      <button (click)="backToActivities()" class="btn-back" [disabled]="startingActivity()">← Back to
+        Activities</button>
       <h2>{{ selectedActivity()!.name }}</h2>
       <p>{{ selectedActivity()!.description }}</p>
 
@@ -143,8 +143,10 @@
       <div class="requirements" *ngIf="hasRequirements(selectedActivity())">
         <h3>Requirements</h3>
         <ul>
-          <li *ngFor="let skill of selectedActivity()!.requirements.skills | keyvalue">
-            {{ skill.key }} Level {{ skill.value }}
+          <li *ngFor="let skill of selectedActivity()!.requirements.skills | keyvalue" class="requirement-skill">
+            <img [src]="getSkillIcon(skill.key)" [alt]="getSkillDisplayName(skill.key)" class="skill-icon-large"
+              loading="lazy">
+            {{ getSkillDisplayName(skill.key) }} Level {{ skill.value }}
           </li>
           <li *ngFor="let attr of selectedActivity()!.requirements.attributes | keyvalue">
             {{ attr.key }} Level {{ attr.value }}
@@ -168,8 +170,10 @@
       <div class="rewards" *ngIf="selectedActivity()!.rewards">
         <h3>Rewards</h3>
         <ul>
-          <li *ngFor="let exp of selectedActivity()!.rewards.experience | keyvalue">
-            {{ exp.key }}: +{{ exp.value }} XP
+          <li *ngFor="let exp of selectedActivity()!.rewards.experience | keyvalue" class="reward-skill">
+            <img [src]="getSkillIcon(exp.key)" [alt]="getSkillDisplayName(exp.key)" class="skill-icon-large"
+              loading="lazy">
+            {{ getSkillDisplayName(exp.key) }}: +{{ exp.value }} XP
           </li>
           <li *ngFor="let item of selectedActivity()!.rewards.items">
             {{ item.itemId }} ({{ item.quantity.min }}-{{ item.quantity.max }}) - {{ (item.chance * 100).toFixed(0) }}%
@@ -181,9 +185,10 @@
         </ul>
       </div>
 
-      <button (click)="startActivity()" [disabled]="!selectedActivity()!.available"
-        [class.btn-disabled]="!selectedActivity()!.available" class="btn-primary">
-        {{ selectedActivity()!.available ? 'Start Activity' : 'Requirements Not Met' }}
+      <button (click)="startActivity()" [disabled]="!selectedActivity()?.available || startingActivity()"
+        [class.btn-disabled]="!selectedActivity()?.available || startingActivity()" class="btn-primary">
+        {{ startingActivity() ? 'Starting...' : (selectedActivity()?.available ? 'Start Activity' : 'Requirements Not
+        Met') }}
       </button>
     </div>
 
@@ -201,7 +206,8 @@
     </div>
 
     <!-- Facility Detail View (shown when facility is selected but vendor is not open and not in combat) -->
-    <div class="facility-detail" *ngIf="selectedFacility() && !selectedActivity() && !vendorService.isVendorOpen() && !inCombat() && !combatService.combatEnded()">
+    <div class="facility-detail"
+      *ngIf="selectedFacility() && !selectedActivity() && !vendorService.isVendorOpen() && !inCombat() && !combatService.combatEnded() && !startingActivity()">
       <button (click)="backToFacilities()" class="btn-back">← Back to Facilities</button>
       <h2>{{ selectedFacility()?.name }}</h2>
       <p>{{ selectedFacility()?.description }}</p>
@@ -241,7 +247,8 @@
           <p>{{ activity.description }}</p>
           <div class="activity-meta">
             <span *ngIf="activity.duration !== undefined && activity.duration > 0">⏱️ {{ activity.duration }}s</span>
-            <span *ngIf="activity.type === 'combat' && activity.monsterLevel">⚔️ Level {{ activity.monsterLevel }}</span>
+            <span *ngIf="activity.type === 'combat' && activity.monsterLevel">⚔️ Level {{ activity.monsterLevel
+              }}</span>
             <span *ngIf="!activity.available" class="unavailable-badge">Requirements Not Met</span>
           </div>
         </div>
@@ -249,7 +256,8 @@
     </div>
 
     <!-- Facility List View (shown when no facility is selected and not in combat) -->
-    <div class="facilities-view" *ngIf="!selectedFacility() && !vendorService.isVendorOpen() && !inCombat() && !combatService.combatEnded()">
+    <div class="facilities-view"
+      *ngIf="!selectedFacility() && !vendorService.isVendorOpen() && !inCombat() && !combatService.combatEnded() && !startingActivity()">
       <h2>Facilities</h2>
       <div class="facilities-list">
         <div *ngFor="let facility of currentLocation()?.facilities" class="facility-card"
