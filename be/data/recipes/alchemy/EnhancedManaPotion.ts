@@ -7,6 +7,7 @@
  */
 
 import { Recipe } from '../../../types';
+import { SUBCATEGORY } from '../../constants/item-constants';
 
 export const EnhancedManaPotion: Recipe = {
   recipeId: 'enhanced_mana_potion',
@@ -17,7 +18,7 @@ export const EnhancedManaPotion: Recipe = {
   duration: 10,
   ingredients: [
     { itemId: 'sage', quantity: 2 },          // Specific: clarity properties
-    { subcategory: 'herb', quantity: 1 }      // Any additional herb for potency
+    { subcategory: SUBCATEGORY.HERB, quantity: 1 }      // Any additional herb for potency
   ],
   outputs: [
     { itemId: 'mana_potion', quantity: 1, qualityModifier: 'inherit' }

@@ -7,6 +7,7 @@
  */
 
 import { Recipe } from '../../../types';
+import { SUBCATEGORY } from '../../constants/item-constants';
 
 export const ConcentratedVitalityElixir: Recipe = {
   recipeId: 'concentrated_vitality_elixir',
@@ -16,7 +17,7 @@ export const ConcentratedVitalityElixir: Recipe = {
   requiredLevel: 10,
   duration: 12,
   ingredients: [
-    { subcategory: 'herb', quantity: 3 }  // Any 3 herbs - choose wisely!
+    { subcategory: SUBCATEGORY.HERB, quantity: 3 }  // Any 3 herbs - choose wisely!
   ],
   outputs: [
     { itemId: 'strong_health_potion', quantity: 1, qualityModifier: 'inherit' }

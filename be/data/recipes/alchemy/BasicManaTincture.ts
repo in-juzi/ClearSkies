@@ -6,6 +6,7 @@
  */
 
 import { Recipe } from '../../../types';
+import { SUBCATEGORY } from '../../constants/item-constants';
 
 export const BasicManaTincture: Recipe = {
   recipeId: 'basic_mana_tincture',
@@ -15,7 +16,7 @@ export const BasicManaTincture: Recipe = {
   requiredLevel: 1,
   duration: 8,
   ingredients: [
-    { subcategory: 'herb', quantity: 2 }  // Any 2 herbs!
+    { subcategory: SUBCATEGORY.HERB, quantity: 2 }  // Any 2 herbs!
   ],
   outputs: [
     { itemId: 'weak_mana_potion', quantity: 1, qualityModifier: 'inherit' }

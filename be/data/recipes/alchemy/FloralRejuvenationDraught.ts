@@ -7,6 +7,7 @@
  */
 
 import { Recipe } from '../../../types';
+import { SUBCATEGORY } from '../../constants/item-constants';
 
 export const FloralRejuvenationDraught: Recipe = {
   recipeId: 'floral_rejuvenation_draught',
@@ -16,8 +17,8 @@ export const FloralRejuvenationDraught: Recipe = {
   requiredLevel: 15,
   duration: 14,
   ingredients: [
-    { subcategory: 'flower', quantity: 2 },   // Any flowers - different from herbs!
-    { subcategory: 'herb', quantity: 1 }      // Base herb for stability
+    { subcategory: SUBCATEGORY.FLOWER, quantity: 2 },   // Any flowers - different from herbs!
+    { subcategory: SUBCATEGORY.HERB, quantity: 1 }      // Base herb for stability
   ],
   outputs: [
     { itemId: 'strong_health_potion', quantity: 1, qualityModifier: 'inherit' },

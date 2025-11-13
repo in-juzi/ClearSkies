@@ -7,6 +7,7 @@
  */
 
 import { Recipe } from '../../../types';
+import { SUBCATEGORY } from '../../constants/item-constants';
 
 export const EnhancedHealthPotion: Recipe = {
   recipeId: 'enhanced_health_potion',
@@ -17,7 +18,7 @@ export const EnhancedHealthPotion: Recipe = {
   duration: 10,
   ingredients: [
     { itemId: 'chamomile', quantity: 2 },     // Specific: calming properties
-    { subcategory: 'herb', quantity: 1 }      // Any additional herb for potency
+    { subcategory: SUBCATEGORY.HERB, quantity: 1 }      // Any additional herb for potency
   ],
   outputs: [
     { itemId: 'health_potion', quantity: 1, qualityModifier: 'inherit' }
