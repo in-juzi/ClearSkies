@@ -21,6 +21,8 @@ import {
   CombatActivity
 } from './locations';
 
+import { SUBCATEGORY } from '../data/constants/item-constants';
+
 // ===== ITEM TYPE GUARDS =====
 
 /**
@@ -36,7 +38,7 @@ export function isEquipmentItem(item: Item): item is EquipmentItem {
 export function isWeaponItem(item: Item): item is WeaponItem {
   return (
     isEquipmentItem(item) &&
-    item.subcategories?.includes('weapon') === true
+    item.subcategories?.includes(SUBCATEGORY.WEAPON) === true
   );
 }
 
@@ -46,7 +48,7 @@ export function isWeaponItem(item: Item): item is WeaponItem {
 export function isArmorItem(item: Item): item is ArmorItem {
   return (
     isEquipmentItem(item) &&
-    item.subcategories?.includes('armor') === true
+    item.subcategories?.includes(SUBCATEGORY.ARMOR) === true
   );
 }
 
@@ -56,7 +58,7 @@ export function isArmorItem(item: Item): item is ArmorItem {
 export function isToolItem(item: Item): item is ToolItem {
   return (
     isEquipmentItem(item) &&
-    item.subcategories?.includes('tool') === true
+    item.subcategories?.includes(SUBCATEGORY.TOOL) === true
   );
 }
 

@@ -1,27 +1,11 @@
 /**
- * Central exports for all game type definitions
+ * DEPRECATED: This file re-exports from @shared/types for backward compatibility.
  *
- * Import from here to get all types:
- * import { Item, Monster, Location } from '../types';
+ * New code should import directly from '@shared/types':
+ * import { Item, Monster, Location } from '@shared/types';
+ *
+ * This compatibility layer will be removed in a future version.
  */
 
-// ===== COMMON TYPES =====
-export * from './common';
-
-// ===== ITEM TYPES =====
-export * from './items';
-
-// ===== COMBAT TYPES =====
-export * from './combat';
-
-// ===== LOCATION TYPES =====
-export * from './locations';
-
-// ===== CRAFTING & VENDOR TYPES =====
-export * from './crafting';
-
-// ===== TYPE GUARDS =====
-export * from './guards';
-
-// ===== SHARED MODEL TYPES (FOR FRONTEND) =====
-export * from './models';
+// Re-export everything from shared types
+export * from '@shared/types';
