@@ -8,7 +8,10 @@ import {
   QualityMap,
   TraitMap,
   EquipmentSlot,
-  CombatLogType
+  CombatLogType,
+  ActiveCombat,
+  CombatLogEntry,
+  CombatStats
 } from '@shared/types';
 
 // ============================================================================
@@ -47,37 +50,7 @@ export interface ActiveCrafting {
   selectedIngredients?: Map<string, string[]>;
 }
 
-export interface CombatLogEntry {
-  timestamp: Date;
-  message: string;
-  type: CombatLogType;
-  damageValue?: number;
-  target?: 'player' | 'monster';
-  isNew?: boolean;
-}
-
-export interface ActiveCombat {
-  activityId?: string;
-  monsterId?: string;
-  monsterInstance?: Map<string, any>;
-  playerLastAttackTime?: Date;
-  monsterLastAttackTime?: Date;
-  playerNextAttackTime?: Date;
-  monsterNextAttackTime?: Date;
-  turnCount: number;
-  abilityCooldowns?: Map<string, number>;
-  combatLog: CombatLogEntry[];
-  startTime?: Date;
-}
-
-export interface CombatStats {
-  monstersDefeated: number;
-  totalDamageDealt: number;
-  totalDamageTaken: number;
-  deaths: number;
-  criticalHits: number;
-  dodges: number;
-}
+// CombatLogEntry, ActiveCombat, and CombatStats imported from @shared/types
 
 export interface QuestProgress {
   questId: mongoose.Types.ObjectId;
@@ -186,6 +159,10 @@ export interface IPlayer extends Document {
   isAbilityOnCooldown(abilityId: string): boolean;
   setAbilityCooldown(abilityId: string, cooldownTurns: number): void;
   getAbilityCooldownRemaining(abilityId: string): number;
+  addActiveBuff(buffData: any): void;
+  removeActiveBuff(buffId: string): boolean;
+  getActiveBuffs(): any[];
+  getActiveBuffsForTarget(target: 'player' | 'monster'): any[];
 }
 
 // ============================================================================
@@ -314,10 +291,11 @@ const playerSchema = new Schema<IPlayer>({
     monsterNextAttackTime: { type: Date },
     turnCount: { type: Number, default: 0 },
     abilityCooldowns: { type: Map, of: Number },
+    activeBuffs: { type: Map, of: Schema.Types.Mixed, default: () => new Map() },
     combatLog: [{
       timestamp: { type: Date, default: Date.now },
       message: { type: String },
-      type: { type: String, enum: ['damage', 'heal', 'dodge', 'miss', 'crit', 'ability', 'system'] },
+      type: { type: String, enum: ['damage', 'heal', 'dodge', 'miss', 'crit', 'ability', 'system', 'buff', 'debuff'] },
       damageValue: { type: Number },
       target: { type: String, enum: ['player', 'monster'] },
       isNew: { type: Boolean, default: true }
@@ -987,27 +965,28 @@ playerSchema.methods.addCombatLog = function(this: IPlayer, message: string, typ
     throw new Error('Player is not in combat');
   }
 
-  const logEntry: CombatLogEntry = {
+  const logEntry = {
     timestamp: new Date(),
     message,
     type,
     damageValue,
     target,
     isNew: true
-  };
+  } as CombatLogEntry;
 
   // Keep only last 50 entries to prevent bloat
   if (this.activeCombat.combatLog.length >= 50) {
     this.activeCombat.combatLog.shift();
   }
 
-  this.activeCombat.combatLog.push(logEntry);
+  (this.activeCombat.combatLog as any).push(logEntry);
 };
 
 // Clear active combat (used when combat ends)
 playerSchema.methods.clearCombat = function(this: IPlayer): void {
   this.activeCombat = {
-    monsterId: undefined,
+    activityId: '',
+    monsterId: '',
     monsterInstance: new Map(),
     playerLastAttackTime: undefined,
     monsterLastAttackTime: undefined,
@@ -1015,6 +994,7 @@ playerSchema.methods.clearCombat = function(this: IPlayer): void {
     monsterNextAttackTime: undefined,
     turnCount: 0,
     abilityCooldowns: new Map(),
+    activeBuffs: new Map(),
     combatLog: [],
     startTime: undefined
   };
@@ -1057,6 +1037,48 @@ playerSchema.methods.getAbilityCooldownRemaining = function(this: IPlayer, abili
 
   const remaining = availableTurn - this.activeCombat.turnCount;
   return Math.max(0, remaining);
+};
+
+// Add active buff
+playerSchema.methods.addActiveBuff = function(this: IPlayer, buffData: any): void {
+  if (!this.activeCombat) {
+    throw new Error('Player is not in combat');
+  }
+
+  if (!this.activeCombat.activeBuffs) {
+    this.activeCombat.activeBuffs = new Map();
+  }
+
+  this.activeCombat.activeBuffs.set(buffData.buffId, buffData);
+};
+
+// Remove active buff
+playerSchema.methods.removeActiveBuff = function(this: IPlayer, buffId: string): boolean {
+  if (!this.activeCombat || !this.activeCombat.activeBuffs) {
+    return false;
+  }
+
+  return this.activeCombat.activeBuffs.delete(buffId);
+};
+
+// Get all active buffs
+playerSchema.methods.getActiveBuffs = function(this: IPlayer): any[] {
+  if (!this.activeCombat || !this.activeCombat.activeBuffs) {
+    return [];
+  }
+
+  return Array.from(this.activeCombat.activeBuffs.values());
+};
+
+// Get active buffs for a specific target
+playerSchema.methods.getActiveBuffsForTarget = function(this: IPlayer, target: 'player' | 'monster'): any[] {
+  if (!this.activeCombat || !this.activeCombat.activeBuffs) {
+    return [];
+  }
+
+  return Array.from(this.activeCombat.activeBuffs.values()).filter(
+    (buff: any) => buff.target === target
+  );
 };
 
 // ============================================================================

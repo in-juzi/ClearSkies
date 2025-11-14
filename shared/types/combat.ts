@@ -12,7 +12,11 @@ export type TargetType = 'single' | 'aoe' | 'self';
 
 export type DamageType = 'physical' | 'magical';
 
-export type CombatLogType = 'damage' | 'heal' | 'dodge' | 'miss' | 'crit' | 'ability' | 'system';
+export type CombatLogType = 'damage' | 'heal' | 'dodge' | 'miss' | 'crit' | 'ability' | 'system' | 'buff' | 'debuff';
+
+export type BuffTarget = 'player' | 'monster';
+
+export type StatModifierType = 'flat' | 'percentage';
 
 // ===== MONSTER DEFINITIONS =====
 
@@ -121,15 +125,56 @@ export interface AbilityEffects {
   heal?: {
     multiplier: number;
   };
-  buff?: {
-    stat: string;
-    amount: number;
-    duration: number;
-  };
+  applyBuff?: BuffApplication; // Apply buff/debuff
   critChanceBonus?: number; // Bonus critical hit chance
 }
 
+/**
+ * Buff application configuration for abilities
+ */
+export interface BuffApplication {
+  target: 'self' | 'enemy'; // Who receives the buff/debuff
+  name: string; // Display name
+  description: string; // Description of the buff
+  duration: number; // Turns
+  icon?: IconConfig; // Visual icon
+  statModifiers?: StatModifier[]; // Stat modifications
+  damageOverTime?: number; // Damage per turn
+  healOverTime?: number; // Healing per turn
+  manaRegen?: number; // Mana per turn
+  manaDrain?: number; // Mana drain per turn
+}
+
+/**
+ * Stat modifier for buffs/debuffs
+ */
+export interface StatModifier {
+  stat: string; // e.g., 'damage', 'armor', 'evasion', 'critChance'
+  type: StatModifierType; // 'flat' or 'percentage'
+  value: number; // e.g., 10 for +10 armor, or 0.15 for +15% damage
+}
+
 // ===== COMBAT STATE =====
+
+/**
+ * Active buff/debuff instance
+ */
+export interface ActiveBuff {
+  buffId: string; // Unique instance ID (UUID)
+  abilityId: string; // Reference to ability that created it
+  name: string; // Display name
+  description: string; // Description
+  target: BuffTarget; // 'player' or 'monster'
+  appliedAt: number; // Turn number when applied
+  duration: number; // Turns remaining
+  icon?: IconConfig; // Visual icon
+  statModifiers?: StatModifier[]; // Stat modifications
+  damageOverTime?: number; // Damage per turn
+  healOverTime?: number; // Healing per turn
+  manaRegen?: number; // Mana per turn
+  manaDrain?: number; // Mana drain per turn
+  stackCount?: number; // For stackable buffs (default 1)
+}
 
 /**
  * Active combat state (stored in Player.activeCombat)
@@ -145,6 +190,7 @@ export interface ActiveCombat {
   monsterNextAttackTime?: Date;
   turnCount: number;
   abilityCooldowns: Map<string, number>; // abilityId -> cooldown timestamp
+  activeBuffs: Map<string, ActiveBuff>; // buffId -> active buff instance
   combatLog: CombatLogEntry[];
   startTime?: Date;
 }
