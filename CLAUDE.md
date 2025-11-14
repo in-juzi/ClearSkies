@@ -37,17 +37,21 @@
 - ✅ AWS deployment configuration (completed - S3 static hosting for frontend, EC2 for backend API)
 - ✅ Cloudflare custom domain setup (completed - clearskies.juzi.dev with SSL/TLS via Cloudflare proxy)
 - ✅ Combat buff/debuff system (completed - stat modifiers, DoT/HoT, 4 new abilities, UI display)
+- ✅ Combat constants system (completed - centralized combat formulas, type-safe enums)
+- ✅ Shared constants architecture (completed - item/combat constants accessible to frontend/backend)
+- ✅ TypeScript path aliases (completed - tsconfig-paths for clean @shared/* imports)
 
 **Recent Changes** (Last 10 commits):
-- feat: add buff/debuff system foundation to combat
-- feat: add 4 new buff/debuff combat abilities
-- feat: implement buff/debuff mechanics in combat service
-- feat: add buff/debuff UI display to combat interface
-- refactor: minor UI improvements to crafting and chat
-- chore: add week percentage calculator utility script
-- fix: improve migration system compatibility with TypeScript
-- docs: update CLAUDE.md with production fixes and deployment tools
-- docs: add architecture diagram and update deployment guide
+- docs: add combat service refactoring documentation
+- feat: add tsconfig-paths for runtime module resolution
+- refactor: replace magic numbers with combat constants
+- feat: add combat constants and type-safe enums
+- refactor: move item constants to shared location
+- chore: remove compiled TypeScript files from shared types
+- refactor: enhance combat log processing to prevent duplicate floating numbers
+- refactor: update ability materials and combat log handling for buffs and debuffs
+- refactor: remove dead code from combat system
+- docs: update CLAUDE.md with buff/debuff system documentation
 - feat: add automated deployment and CloudFront invalidation scripts
 
 **Known Issues**:
@@ -119,8 +123,11 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 
 **Game Data (TypeScript):**
 - Shared Types: [shared/types/](shared/types/) - Shared type definitions used by both frontend and backend
+- Shared Constants: [shared/constants/item-constants.ts](shared/constants/item-constants.ts) - Type-safe CATEGORY, SUBCATEGORY, RARITY, TIER (source of truth)
 - Item Registry: [be/data/items/ItemRegistry.ts](be/data/items/ItemRegistry.ts) - All items in [definitions/](be/data/items/definitions/)
-- Item Constants: [be/data/constants/item-constants.ts](be/data/constants/item-constants.ts) - Type-safe CATEGORY, SUBCATEGORY, RARITY, TIER, and more
+- Item Constants (BE): [be/data/constants/item-constants.ts](be/data/constants/item-constants.ts) - Re-exports from shared/constants
+- Combat Constants: [be/data/constants/combat-constants.ts](be/data/constants/combat-constants.ts) - Combat formulas and balance tuning
+- Combat Enums: [shared/types/combat-enums.ts](shared/types/combat-enums.ts) - Type-safe BuffableStat, ModifierType, PassiveTrigger
 - Location Registry: [be/data/locations/LocationRegistry.ts](be/data/locations/LocationRegistry.ts) - All locations in [definitions/](be/data/locations/definitions/)
 - Activity Registry: [be/data/locations/ActivityRegistry.ts](be/data/locations/ActivityRegistry.ts) - All activities in [activities/](be/data/locations/activities/)
 - Drop Table Registry: [be/data/locations/DropTableRegistry.ts](be/data/locations/DropTableRegistry.ts) - All drop tables in [drop-tables/](be/data/locations/drop-tables/)
@@ -145,19 +152,23 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 
 ```
 shared/
-└── types/           # Shared TypeScript type definitions (Item, Monster, Location, etc.)
+├── types/           # Shared TypeScript type definitions (Item, Monster, Location, etc.)
+└── constants/       # Shared constants (item-constants.ts - source of truth)
 
 be/
 ├── controllers/     # inventoryController, locationController, skillsController, attributesController, authController
 ├── models/          # Player.js (inventory, skills, equipment), User.js
-├── services/        # itemService, locationService, dropTableService (all use @shared/types)
+├── services/        # itemService, locationService, dropTableService, combatService (all use @shared/types)
+│   └── combat/      # CombatEntity.ts (base class for future refactoring)
 ├── data/
-│   ├── constants/   # item-constants.ts (CATEGORY, SUBCATEGORY, RARITY, TIER, etc.)
+│   ├── constants/   # combat-constants.ts (formulas), item-constants.ts (re-exports from shared)
 │   ├── items/definitions/    # Item TypeScript modules (90+ items use constants)
 │   └── locations/   # Location, activity, drop table TypeScript modules
 ├── migrations/      # Database migration scripts
 ├── types/           # Compatibility layer (re-exports from @shared/types)
 └── utils/          # Dev tools (add-item.js, content-generator.js, test-xp-scaling.js)
+
+project/docs/        # Combat refactoring roadmap, shared types guidelines
 
 ui/src/app/
 ├── components/game/  # inventory/, location/, skills/, equipment/, attributes/
@@ -1512,7 +1523,10 @@ Each game system has a central registry that exports all definitions:
 
 ### Type-Safe Constants System
 
-**Item Constants** ([be/data/constants/item-constants.ts](be/data/constants/item-constants.ts)):
+**Shared Constants Architecture**:
+Constants are now centralized in `shared/constants/` for use by both frontend and backend. Backend files in `be/data/constants/` re-export from shared for backward compatibility.
+
+**Item Constants** ([shared/constants/item-constants.ts](shared/constants/item-constants.ts)):
 All item definitions use type-safe constants to eliminate magic strings and enable autocomplete:
 
 - **CATEGORY**: CONSUMABLE, EQUIPMENT, RESOURCE
@@ -1550,6 +1564,73 @@ import { SUBCATEGORY } from '../../../constants/item-constants';
 ingredients: [
   { subcategory: SUBCATEGORY.HERB, quantity: 2 }  // Type-safe subcategory matching
 ]
+```
+
+**Combat Constants** ([be/data/constants/combat-constants.ts](be/data/constants/combat-constants.ts)):
+Centralized combat formulas and balance tuning constants:
+
+```typescript
+export const COMBAT_FORMULAS = {
+  // Armor System
+  ARMOR_SCALING_FACTOR: 1000,        // armor / (armor + X)
+
+  // Evasion System
+  EVASION_SCALING_FACTOR: 1000,
+  EVASION_CAP: 0.75,                 // 75% max dodge
+
+  // Damage System
+  CRIT_MULTIPLIER: 2.0,              // 2x damage on crit
+  MIN_DAMAGE: 1,
+
+  // Level Scaling
+  SKILL_BONUS_PER_LEVELS: 10,        // +1 damage per 10 levels
+  SKILL_BONUS_MAX: 2,
+  ATTR_BONUS_PER_LEVELS: 10,
+  ATTR_BONUS_MAX: 2,
+
+  // Attack Speed
+  ATTACK_SPEED_TO_MS: 1000,          // seconds to milliseconds
+
+  // Passive Triggers
+  BATTLE_FRENZY_HP_THRESHOLD: 0.5    // 50% HP
+} as const;
+```
+
+**Combat Enums** ([shared/types/combat-enums.ts](shared/types/combat-enums.ts)):
+Type-safe enums for combat properties:
+
+```typescript
+export enum BuffableStat {
+  ARMOR = 'armor',
+  EVASION = 'evasion',
+  DAMAGE = 'damage',
+  CRIT_CHANCE = 'critChance',
+  ATTACK_SPEED = 'attackSpeed',
+  HEALTH_REGEN = 'healthRegen',
+  MANA_REGEN = 'manaRegen'
+}
+
+export enum ModifierType {
+  FLAT = 'flat',           // +10 armor
+  PERCENTAGE = 'percentage', // +20% damage
+  MULTIPLIER = 'multiplier'  // 2x damage
+}
+```
+
+**Benefits**:
+- ✅ Single file to tune all combat formulas
+- ✅ Self-documenting game mechanics
+- ✅ Autocomplete for stat names (prevents typos)
+- ✅ Easy balance changes without code hunting
+- ✅ Type-safe modifier types and passive triggers
+
+**Usage in Combat Service**:
+```typescript
+import { COMBAT_FORMULAS } from '../data/constants/combat-constants';
+
+// Before: return armor / (armor + 1000);
+// After:
+return armor / (armor + COMBAT_FORMULAS.ARMOR_SCALING_FACTOR);
 ```
 
 ### Architecture
@@ -1633,12 +1714,19 @@ if (isWeaponItem(item)) {
 **Backend tsconfig.json**: TypeScript compiler settings
 - Target: ES2020
 - Module: CommonJS
-- Path aliases: `@shared/*` → `../shared/*`
+- Path aliases: `@shared/*` → `../shared/*`, `@shared/types` → `../shared/types/index`, `@shared/constants/*` → `../shared/constants/*`
+- Runtime resolution: tsconfig-paths package (registered in be/index.ts)
 - Strict mode: Disabled (gradual migration)
 - Declaration files: Enabled (.d.ts generation)
 - Source maps: Enabled
 - Allows JavaScript: Yes (hybrid codebase)
 - Output: Compiled files in `be/dist/`
+
+**tsconfig-paths Setup**:
+- Package: tsconfig-paths@4.2.0 (dev dependency)
+- Registered in be/index.ts before other imports
+- Enables clean imports: `import { COMBAT_FORMULAS } from '@shared/constants/combat-constants'`
+- All npm scripts use `-r tsconfig-paths/register` flag for ts-node
 
 **Frontend tsconfig.app.json**: Angular TypeScript settings
 - Extends base tsconfig.json
