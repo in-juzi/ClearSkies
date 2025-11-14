@@ -13,12 +13,13 @@ import { SkillsService } from './skills.service';
 import { AttributesService } from './attributes.service';
 import { InventoryService } from './inventory.service';
 import { SocketService } from './socket.service';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LocationService {
-  private apiUrl = 'http://localhost:3000/api/locations';
+  private apiUrl = `${environment.apiUrl}/locations`;
   private skillsService = inject(SkillsService);
   private attributesService = inject(AttributesService);
   private inventoryService = inject(InventoryService);

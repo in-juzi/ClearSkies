@@ -10,12 +10,13 @@ import {
   RemoveItemRequest
 } from '../models/inventory.model';
 import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class InventoryService {
-  private apiUrl = 'http://localhost:3000/api/inventory';
+  private apiUrl = `${environment.apiUrl}/inventory`;
   private authService = inject(AuthService);
   private http = inject(HttpClient);
 

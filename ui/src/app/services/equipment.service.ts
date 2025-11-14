@@ -8,13 +8,14 @@ import {
   EquipmentResponse,
   ItemDetails
 } from '../models/inventory.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EquipmentService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:3000/api/inventory/equipment';
+  private apiUrl = `${environment.apiUrl}/inventory/equipment`;
 
   // Signals for reactive state
   equippedItems = signal<{ [slotName: string]: ItemDetails }>({});
