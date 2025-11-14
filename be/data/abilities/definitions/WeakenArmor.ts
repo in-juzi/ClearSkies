@@ -33,7 +33,7 @@ export const WeakenArmor: Ability = {
       duration: 2,
       icon: {
         path: 'abilities/weaken-armor.svg',
-        material: 'generic'
+        material: 'iron'
       },
       statModifiers: [
         {

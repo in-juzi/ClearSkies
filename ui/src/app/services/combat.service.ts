@@ -162,18 +162,13 @@ export class CombatService {
         combat.playerNextAttackTime = new Date(data.playerNextAttackTime);
       }
 
-      // Add combat log entry from attack result
-      if (data.result) {
-        const message = this.formatAttackMessage('player', data.result);
-        const logEntry: CombatLogEntry = {
-          timestamp: new Date(),
-          message,
-          type: data.result.isCrit ? 'crit' : (data.result.isDodge ? 'dodge' : 'damage'),
-          damageValue: data.result.damage,
-          target: 'monster',
+      // Use the combat log from the server (includes DoT, buffs, debuffs, weapon names)
+      if (data.combatLog) {
+        combat.combatLog = data.combatLog.map((entry: any) => ({
+          ...entry,
+          timestamp: new Date(entry.timestamp),
           isNew: true
-        };
-        combat.combatLog.push(logEntry);
+        }));
       }
 
       // Update active buffs if provided
@@ -201,18 +196,13 @@ export class CombatService {
         combat.monsterNextAttackTime = new Date(data.monsterNextAttackTime);
       }
 
-      // Add combat log entry from attack result
-      if (data.result) {
-        const message = this.formatAttackMessage('monster', data.result, combat.monsterName);
-        const logEntry: CombatLogEntry = {
-          timestamp: new Date(),
-          message,
-          type: data.result.isCrit ? 'crit' : (data.result.isDodge ? 'dodge' : 'damage'),
-          damageValue: data.result.damage,
-          target: 'player',
+      // Use the combat log from the server (includes DoT, buffs, debuffs, weapon names)
+      if (data.combatLog) {
+        combat.combatLog = data.combatLog.map((entry: any) => ({
+          ...entry,
+          timestamp: new Date(entry.timestamp),
           isNew: true
-        };
-        combat.combatLog.push(logEntry);
+        }));
       }
 
       // Update active buffs if provided
@@ -246,19 +236,13 @@ export class CombatService {
         combat.abilityCooldowns = data.abilityCooldowns;
       }
 
-      // Add combat log entry for ability usage
-      if (data.result) {
-        const abilityName = data.abilityName || 'Ability';
-        const message = this.formatAbilityMessage(abilityName, data.result);
-        const logEntry: CombatLogEntry = {
-          timestamp: new Date(),
-          message,
-          type: data.result.isCrit ? 'crit' : (data.result.isDodge ? 'miss' : 'ability'),
-          damageValue: data.result.damage,
-          target: 'monster',
+      // Use the combat log from the server (includes DoT, buffs, debuffs)
+      if (data.combatLog) {
+        combat.combatLog = data.combatLog.map((entry: any) => ({
+          ...entry,
+          timestamp: new Date(entry.timestamp),
           isNew: true
-        };
-        combat.combatLog.push(logEntry);
+        }));
       }
 
       // Update active buffs if provided
@@ -286,54 +270,13 @@ export class CombatService {
         this.inventoryService.getInventory().subscribe();
       }
 
-      // Add combat log entries for item usage
-      if (data.result) {
-        const itemName = data.result.itemName || 'Item';
-        const healAmount = data.result.healAmount || 0;
-        const manaAmount = data.result.manaAmount || 0;
-
-        let message = `You use ${itemName}`;
-        if (healAmount > 0 && manaAmount > 0) {
-          message += ` (restored ${healAmount} HP and ${manaAmount} mana)`;
-        } else if (healAmount > 0) {
-          message += ` (restored ${healAmount} HP)`;
-        } else if (manaAmount > 0) {
-          message += ` (restored ${manaAmount} mana)`;
-        }
-
-        // Main log entry for the item use
-        const logEntry: CombatLogEntry = {
-          timestamp: new Date(),
-          message,
-          type: 'heal',
+      // Use the combat log from the server
+      if (data.combatLog) {
+        combat.combatLog = data.combatLog.map((entry: any) => ({
+          ...entry,
+          timestamp: new Date(entry.timestamp),
           isNew: true
-        };
-        combat.combatLog.push(logEntry);
-
-        // Add separate floating number entries for heal and mana
-        if (healAmount > 0) {
-          const healEntry: CombatLogEntry = {
-            timestamp: new Date(),
-            message: '',
-            type: 'heal',
-            damageValue: healAmount,
-            target: 'player',
-            isNew: true
-          };
-          combat.combatLog.push(healEntry);
-        }
-
-        if (manaAmount > 0) {
-          const manaEntry: CombatLogEntry = {
-            timestamp: new Date(),
-            message: '',
-            type: 'mana' as any, // Add 'mana' type for floating numbers
-            damageValue: manaAmount,
-            target: 'player',
-            isNew: true
-          };
-          combat.combatLog.push(manaEntry);
-        }
+        }));
       }
 
       // Update active buffs if provided

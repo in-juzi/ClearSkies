@@ -344,6 +344,10 @@ export class CombatComponent implements OnInit, OnDestroy, AfterViewChecked {
         return 'log-miss';
       case 'ability':
         return 'log-ability';
+      case 'buff':
+        return 'log-buff';
+      case 'debuff':
+        return 'log-debuff';
       case 'system':
         return 'log-system';
       case 'loot':

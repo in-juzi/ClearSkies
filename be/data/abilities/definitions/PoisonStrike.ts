@@ -28,18 +28,18 @@ export const PoisonStrike: Ability = {
     },
     applyBuff: {
       target: 'enemy',
-      name: 'Poisoned',
-      description: '5 damage per turn',
+      name: 'Poison',
+      description: '5 poison damage per turn',
       duration: 4,
       icon: {
-        path: 'abilities/poison.svg',
-        material: 'generic'
+        path: 'status/status_wet.svg',
+        material: 'herb_magical'
       },
       damageOverTime: 5 // 5 damage per turn
     }
   },
   icon: {
-    path: 'abilities/poison.svg',
-    material: 'generic'
+    path: 'abilities/ability_slaughter.svg',
+    material: 'herb_magical'
   }
 };

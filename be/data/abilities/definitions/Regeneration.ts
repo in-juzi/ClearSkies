@@ -29,7 +29,7 @@ export const Regeneration: Ability = {
       duration: 3,
       icon: {
         path: 'abilities/ability_regeneration.svg',
-        material: 'generic'
+        material: 'herb_rare'
       },
       healOverTime: 8 // 8 HP per turn
     }

@@ -28,7 +28,7 @@ export const BattleFury: Ability = {
       duration: 3,
       icon: {
         path: 'status/status_battle_high.svg',
-        material: 'generic'
+        material: 'gem_ruby'
       },
       statModifiers: [
         {
