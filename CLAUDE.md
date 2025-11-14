@@ -34,8 +34,12 @@
 - ✅ Socket.io migration (completed - activities, crafting, and combat migrated from HTTP polling to real-time events)
 - ✅ Shared type system (completed - @shared/types package eliminates duplicate type definitions)
 - ✅ CATEGORY/SUBCATEGORY constants (completed - type-safe constants for all 90+ item definitions)
+- ✅ AWS deployment configuration (completed - S3 static hosting for frontend, EC2 for backend API)
 
 **Recent Changes** (Last 10 commits):
+- feat: configure production API endpoint for EC2 backend
+- feat: configure CORS for S3 static hosting deployment
+- chore: add EC2 SSH key to .gitignore
 - chore: add Python script for automated constant migration
 - refactor: update location component to use shared Activity types
 - refactor: migrate frontend models to use @shared/types
@@ -43,15 +47,14 @@
 - refactor: add backward compatibility layer for backend types
 - refactor: migrate alchemy recipes to use SUBCATEGORY constants
 - refactor: migrate item definitions to use CATEGORY and SUBCATEGORY constants
-- feat: expand item-constants with CATEGORY and SUBCATEGORY values
-- build: configure TypeScript path aliases for @shared/types
-- feat: add shared type system for frontend/backend type sharing
 
 **Known Issues**:
 - None currently identified
 
 **Next Priorities**:
+- Complete AWS deployment (database migrations, PM2 setup, security group configuration)
 - Equipment stat application (apply armor/damage/evasion bonuses to combat calculations)
+- SSL/HTTPS setup with CloudFront CDN for production
 - Steel tier equipment (requires steel ingots from iron + coal)
 - More alchemy recipes (buff potions, debuff potions, transmutation)
 - Combat system enhancements (more monsters, abilities, boss fights)
@@ -68,6 +71,7 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 - **Backend**: Node.js + Express + MongoDB
 - **Frontend**: Angular 20 (standalone components)
 - **Authentication**: JWT-based with bcrypt password hashing
+- **Deployment**: AWS S3 (frontend static hosting) + EC2 (backend API)
 
 ## Quick Task Guide
 
@@ -1639,4 +1643,74 @@ if (isWeaponItem(item)) {
 - Compiled to JavaScript with declaration files
 - Source maps for debugging
 - Used as dependency by both frontend and backend
+
+## AWS Deployment Architecture
+
+The game is deployed using a split architecture for optimal performance and scalability:
+
+### Frontend (S3 Static Hosting)
+- **S3 Bucket**: `clearskies-frontend-dev` (US East 1)
+- **Hosting Type**: Static website hosting
+- **Content**: Angular production build (`ui/dist/ui/browser/*`)
+- **Public Access**: Enabled with bucket policy for public read
+- **URL**: `http://clearskies-frontend-dev.s3-website-us-east-1.amazonaws.com`
+
+**Deployment Process**:
+1. Update API endpoint in `ui/src/environments/environment.prod.ts`
+2. Build locally: `cd ui && npm run build`
+3. Upload to S3: Upload all files from `ui/dist/ui/browser/` to bucket root
+4. Files are immediately available at S3 website endpoint
+
+### Backend (EC2 Instance)
+- **Instance Type**: Amazon Linux 2023 on EC2
+- **Services**: Node.js 20.x, MongoDB, PM2 process manager
+- **API Port**: 3000 (exposed via security group)
+- **Public IP**: 54.172.211.85 (configured in frontend environment)
+
+**CORS Configuration** ([be/index.ts](be/index.ts)):
+```typescript
+app.use(cors({
+  origin: ['http://localhost:4200', 'http://clearskies-frontend-dev.s3-website-us-east-1.amazonaws.com'],
+  credentials: true
+}));
+
+// Socket.io CORS
+const io = new Server(server, {
+  cors: {
+    origin: ['http://localhost:4200', 'http://clearskies-frontend-dev.s3-website-us-east-1.amazonaws.com'],
+    credentials: true
+  }
+});
+```
+
+**Deployment Process**:
+1. Commit and push backend changes to Git
+2. SSH into EC2: `ssh -i "clearskies-dev-ec2.pem" ec2-user@54.172.211.85`
+3. Pull updates: `cd ClearSkies && git pull`
+4. Build backend: `cd be && npm run build`
+5. Run migrations: `npm run migrate`
+6. Start with PM2: `pm2 start npm --name "clearskies-backend" -- run dev`
+
+### Security Groups
+**Required Inbound Rules**:
+- Port 22 (SSH) - For admin access
+- Port 3000 (Custom TCP) - For backend API and Socket.io connections
+- Port 80 (HTTP) - Optional, for future Nginx reverse proxy
+
+### Environment Variables
+Backend `.env` file on EC2:
+```
+PORT=3000
+MONGODB_URI=mongodb://localhost:27017/clearskies
+JWT_SECRET=<production-secret>
+JWT_EXPIRE=7d
+NODE_ENV=production
+```
+
+### Future Enhancements
+- **CloudFront CDN**: Add CloudFront distribution for S3 bucket (faster global delivery, HTTPS support)
+- **SSL/HTTPS**: Configure SSL certificate via AWS Certificate Manager
+- **Nginx Reverse Proxy**: Add Nginx on EC2 for better routing and SSL termination
+- **Auto-scaling**: Configure EC2 auto-scaling groups for high traffic
+- **Monitoring**: CloudWatch metrics for API performance and error tracking
 
