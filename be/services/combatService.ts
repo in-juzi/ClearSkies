@@ -445,7 +445,7 @@ class CombatService {
   /**
    * Process buff/debuff tick effects (DoT, HoT, durations)
    */
-  processBuffTick(player: any, monsterInstance: any, username?: string, tickingEntity?: 'player' | 'monster'): any {
+  processBuffTick(player: any, monsterInstance: any, tickingEntity?: 'player' | 'monster'): any {
     if (!player.activeCombat || !player.activeCombat.activeBuffs) {
       return { playerDamage: 0, monsterDamage: 0, expiredBuffs: [] };
     }
@@ -465,7 +465,7 @@ class CombatService {
         } else {
           const damageDealt = player.takeDamage(buff.damageOverTime);
           playerDamage += buff.damageOverTime;
-          player.addCombatLog(`${buff.name} deals ${buff.damageOverTime} damage to ${username || 'you'}.`, 'debuff', buff.damageOverTime, 'player');
+          player.addCombatLog(`${buff.name} deals ${buff.damageOverTime} damage to you.`, 'debuff', buff.damageOverTime, 'player');
         }
       }
 
@@ -473,7 +473,7 @@ class CombatService {
       if (buff.healOverTime) {
         if (buff.target === 'player') {
           player.heal(buff.healOverTime);
-          player.addCombatLog(`${buff.name} heals ${username || 'you'} for ${buff.healOverTime} HP.`, 'buff', buff.healOverTime, 'player');
+          player.addCombatLog(`${buff.name} heals you for ${buff.healOverTime} HP.`, 'buff', buff.healOverTime, 'player');
         } else {
           monsterInstance.stats.health.current = Math.min(
             monsterInstance.stats.health.max,
@@ -519,7 +519,7 @@ class CombatService {
         // Mark expired buffs
         if (buff.duration <= 0) {
           expiredBuffs.push(buffId);
-          const targetName = buff.target === 'player' ? (username || 'you') : monsterInstance.name;
+          const targetName = buff.target === 'player' ? 'you' : monsterInstance.name;
           player.addCombatLog(`${buff.name} fades from ${targetName}.`, 'system');
         }
       }
@@ -670,125 +670,9 @@ class CombatService {
   }
 
   /**
-   * Process combat turn (auto-attacks)
-   */
-  processCombatTurn(player: any, itemService: any, username?: string): any {
-    if (!player.isInCombat()) {
-      throw new Error('Player is not in combat');
-    }
-
-    const now = new Date();
-    const combat = player.activeCombat;
-
-    // Convert monster instance Map back to object
-    const monsterInstance = Object.fromEntries(combat.monsterInstance);
-
-    const results = {
-      playerAttacked: false,
-      monsterAttacked: false,
-      playerDamage: 0,
-      monsterDamage: 0,
-      playerDefeated: false,
-      monsterDefeated: false,
-      combatLog: []
-    };
-
-    // Check if player's attack is ready
-    if (combat.playerNextAttackTime && now >= combat.playerNextAttackTime) {
-      const attackResult = this.calculateDamage(player, monsterInstance, itemService, player);
-
-      // Apply damage to monster
-      monsterInstance.stats.health.current = Math.max(0, monsterInstance.stats.health.current - attackResult.damage);
-
-      // Update combat state
-      combat.playerLastAttackTime = now;
-      const playerWeapon = this.getEquippedWeapon(player, itemService);
-      const playerAttackSpeed = (playerWeapon ? playerWeapon.attackSpeed : 3.0) * 1000;
-      combat.playerNextAttackTime = new Date(now.getTime() + playerAttackSpeed);
-      combat.turnCount++;
-
-      // Track damage dealt
-      player.combatStats.totalDamageDealt += attackResult.damage;
-      if (attackResult.isCrit) {
-        player.combatStats.criticalHits++;
-      }
-
-      // Log attack
-      const playerName = username || 'You';
-      if (attackResult.isDodge) {
-        player.addCombatLog(`${playerName}'s attack missed - ${monsterInstance.name} dodged!`, 'miss');
-      } else if (attackResult.isCrit) {
-        player.addCombatLog(`CRITICAL HIT! ${playerName} deals ${attackResult.damage} damage with ${attackResult.weaponName}!`, 'crit', attackResult.damage, 'monster');
-      } else {
-        player.addCombatLog(`${playerName} deals ${attackResult.damage} damage with ${attackResult.weaponName}.`, 'damage', attackResult.damage, 'monster');
-      }
-
-      results.playerAttacked = true;
-      results.monsterDamage = attackResult.damage;
-
-      // Check if monster is defeated
-      if (monsterInstance.stats.health.current <= 0) {
-        results.monsterDefeated = true;
-        player.addCombatLog(`${playerName} defeated ${monsterInstance.name}!`, 'system');
-        combat.monsterInstance = new Map(Object.entries(monsterInstance));
-        return results;
-      }
-    }
-
-    // Check if monster's attack is ready
-    if (combat.monsterNextAttackTime && now >= combat.monsterNextAttackTime) {
-      const attackResult = this.calculateDamage(monsterInstance, player, itemService, player);
-
-      // Apply damage to player
-      const playerDefeated = player.takeDamage(attackResult.damage);
-
-      // Update combat state
-      combat.monsterLastAttackTime = now;
-      const monsterWeapon = this.getEquippedWeapon(monsterInstance, itemService);
-      const monsterAttackSpeed = (monsterWeapon ? monsterWeapon.attackSpeed : 3.0) * 1000;
-      combat.monsterNextAttackTime = new Date(now.getTime() + monsterAttackSpeed);
-
-      // Track dodges
-      if (attackResult.isDodge) {
-        player.combatStats.dodges++;
-      }
-
-      // Log attack
-      const playerName = username || 'You';
-      if (attackResult.isDodge) {
-        player.addCombatLog(`${monsterInstance.name}'s attack missed - ${playerName} dodged!`, 'dodge');
-      } else if (attackResult.isCrit) {
-        player.addCombatLog(`${monsterInstance.name} CRITICALLY HITS ${playerName} for ${attackResult.damage} damage!`, 'crit', attackResult.damage, 'player');
-      } else {
-        player.addCombatLog(`${monsterInstance.name} deals ${attackResult.damage} damage.`, 'damage', attackResult.damage, 'player');
-      }
-
-      results.monsterAttacked = true;
-      results.playerDamage = attackResult.damage;
-      results.playerDefeated = playerDefeated;
-    }
-
-    // Process buff/debuff tick effects (DoT, HoT, durations)
-    const buffTickResults = this.processBuffTick(player, monsterInstance, username);
-    results.playerDamage += buffTickResults.playerDamage;
-    results.monsterDamage += buffTickResults.monsterDamage;
-
-    // Check if monster was defeated by DoT
-    if (monsterInstance.stats.health.current <= 0 && !results.monsterDefeated) {
-      results.monsterDefeated = true;
-      player.addCombatLog(`${username || 'You'} defeated ${monsterInstance.name}!`, 'system');
-    }
-
-    // Update monster instance in combat state
-    combat.monsterInstance = new Map(Object.entries(monsterInstance));
-
-    return results;
-  }
-
-  /**
    * Use ability in combat
    */
-  useAbility(player: any, abilityId: string, itemService: any, username?: string): any {
+  useAbility(player: any, abilityId: string, itemService: any): any {
     if (!player.isInCombat()) {
       throw new Error('Player is not in combat');
     }
@@ -837,13 +721,12 @@ class CombatService {
     }
 
     // Log ability use
-    const playerName = username || 'You';
     if (attackResult.isDodge) {
       player.addCombatLog(`${ability.name} missed - ${monsterInstance.name} dodged!`, 'miss');
     } else if (attackResult.isCrit) {
-      player.addCombatLog(`CRITICAL ${ability.name}! ${playerName} deals ${attackResult.damage} damage!`, 'ability', attackResult.damage, 'monster');
+      player.addCombatLog(`CRITICAL ${ability.name}! You deal ${attackResult.damage} damage!`, 'ability', attackResult.damage, 'monster');
     } else {
-      player.addCombatLog(`${playerName} uses ${ability.name} for ${attackResult.damage} damage!`, 'ability', attackResult.damage, 'monster');
+      player.addCombatLog(`You use ${ability.name} for ${attackResult.damage} damage!`, 'ability', attackResult.damage, 'monster');
     }
 
     // Set cooldown
@@ -854,7 +737,7 @@ class CombatService {
 
     // Process buff/debuff tick effects (DoT, HoT, durations) BEFORE applying new buffs
     // Only decrement player buffs since the player is using the ability
-    const buffTickResults = this.processBuffTick(player, monsterInstance, playerName, 'player');
+    const buffTickResults = this.processBuffTick(player, monsterInstance, 'player');
 
     // Apply DoT/HoT damage from buffs
     if (buffTickResults.playerDamage > 0) {
@@ -868,7 +751,7 @@ class CombatService {
     let appliedBuff: ActiveBuff | null = null;
     if (ability.effects && ability.effects.applyBuff) {
       appliedBuff = this.applyBuff(player, abilityId, ability.effects.applyBuff, combat.turnCount);
-      const targetName = appliedBuff.target === 'player' ? playerName : monsterInstance.name;
+      const targetName = appliedBuff.target === 'player' ? 'you' : monsterInstance.name;
       player.addCombatLog(`${appliedBuff.name} applied to ${targetName}!`, appliedBuff.target === 'player' ? 'buff' : 'debuff');
     }
 
@@ -878,7 +761,7 @@ class CombatService {
     // Check if monster is defeated
     const monsterDefeated = monsterInstance.stats.health.current <= 0;
     if (monsterDefeated) {
-      player.addCombatLog(`${playerName} defeated ${monsterInstance.name}!`, 'system');
+      player.addCombatLog(`You defeated ${monsterInstance.name}!`, 'system');
     }
 
     return {

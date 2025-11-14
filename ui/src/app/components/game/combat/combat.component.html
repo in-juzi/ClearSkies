@@ -12,8 +12,9 @@
               <div class="floating-number"
                    [class.damage]="floatNum.type === 'damage'"
                    [class.crit]="floatNum.type === 'crit'"
-                   [class.heal]="floatNum.type === 'heal'">
-                {{ floatNum.type === 'heal' ? '+' : '-' }}{{ floatNum.value }}
+                   [class.heal]="floatNum.type === 'heal'"
+                   [class.mana]="floatNum.type === 'mana'">
+                {{ floatNum.type === 'heal' || floatNum.type === 'mana' ? '+' : '-' }}{{ floatNum.value }}
               </div>
             }
           }
@@ -91,8 +92,9 @@
               <div class="floating-number"
                    [class.damage]="floatNum.type === 'damage'"
                    [class.crit]="floatNum.type === 'crit'"
-                   [class.heal]="floatNum.type === 'heal'">
-                {{ floatNum.type === 'heal' ? '+' : '-' }}{{ floatNum.value }}
+                   [class.heal]="floatNum.type === 'heal'"
+                   [class.mana]="floatNum.type === 'mana'">
+                {{ floatNum.type === 'heal' || floatNum.type === 'mana' ? '+' : '-' }}{{ floatNum.value }}
               </div>
             }
           }

@@ -286,7 +286,7 @@ export class CombatService {
         this.inventoryService.getInventory().subscribe();
       }
 
-      // Add combat log entry for item usage
+      // Add combat log entries for item usage
       if (data.result) {
         const itemName = data.result.itemName || 'Item';
         const healAmount = data.result.healAmount || 0;
@@ -301,15 +301,39 @@ export class CombatService {
           message += ` (restored ${manaAmount} mana)`;
         }
 
+        // Main log entry for the item use
         const logEntry: CombatLogEntry = {
           timestamp: new Date(),
           message,
           type: 'heal',
-          damageValue: healAmount,
-          target: 'player',
           isNew: true
         };
         combat.combatLog.push(logEntry);
+
+        // Add separate floating number entries for heal and mana
+        if (healAmount > 0) {
+          const healEntry: CombatLogEntry = {
+            timestamp: new Date(),
+            message: '',
+            type: 'heal',
+            damageValue: healAmount,
+            target: 'player',
+            isNew: true
+          };
+          combat.combatLog.push(healEntry);
+        }
+
+        if (manaAmount > 0) {
+          const manaEntry: CombatLogEntry = {
+            timestamp: new Date(),
+            message: '',
+            type: 'mana' as any, // Add 'mana' type for floating numbers
+            damageValue: manaAmount,
+            target: 'player',
+            isNew: true
+          };
+          combat.combatLog.push(manaEntry);
+        }
       }
 
       // Update active buffs if provided

@@ -24,7 +24,6 @@ import locationRoutes from './routes/locations';
 import manualRoutes from './routes/manual';
 import vendorRoutes from './routes/vendors';
 import craftingRoutes from './routes/crafting';
-import combatRoutes from './routes/combat';
 
 const app = express();
 const server = http.createServer(app);
@@ -93,7 +92,6 @@ app.use('/api/locations', locationRoutes);
 app.use('/api/manual', manualRoutes); // Public routes (no auth required)
 app.use('/api/vendors', vendorRoutes);
 app.use('/api/crafting', craftingRoutes);
-app.use('/api/combat', combatRoutes);
 
 // Error handling middleware
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {

@@ -12,8 +12,8 @@ export const BanditThug: Monster = {
   "level": 5,
   "stats": {
     "health": {
-      "current": 120,
-      "max": 120
+      "current": 75,
+      "max": 75
     },
     "mana": {
       "current": 30,
@@ -85,7 +85,7 @@ export const BanditThug: Monster = {
   "equipment": {
     "weapon": {
       "name": "Rusty Sword",
-      "damageRoll": "1d5",
+      "damageRoll": "1d3",
       "attackSpeed": 2.6,
       "critChance": 0.05,
       "skillScalar": "oneHanded"

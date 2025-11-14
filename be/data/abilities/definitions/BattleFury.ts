@@ -27,7 +27,7 @@ export const BattleFury: Ability = {
       description: '+20% damage',
       duration: 3,
       icon: {
-        path: 'abilities/battle-fury.svg',
+        path: 'status/status_battle_high.svg',
         material: 'generic'
       },
       statModifiers: [
@@ -40,7 +40,7 @@ export const BattleFury: Ability = {
     }
   },
   icon: {
-    path: 'abilities/battle-fury.svg',
+    path: 'status/status_battle_high.svg',
     material: 'generic'
   }
 };

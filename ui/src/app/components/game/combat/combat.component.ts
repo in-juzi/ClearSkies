@@ -43,7 +43,7 @@ export class CombatComponent implements OnInit, OnDestroy, AfterViewChecked {
   private shouldAutoScroll = true;
 
   // Floating damage numbers
-  floatingNumbers = signal<Array<{ id: string; value: number; type: 'damage' | 'crit' | 'heal'; target: 'player' | 'monster' }>>([]);
+  floatingNumbers = signal<Array<{ id: string; value: number; type: 'damage' | 'crit' | 'heal' | 'mana'; target: 'player' | 'monster' }>>([]);
 
   // Filtered consumables for combat
   consumables = computed(() => {
@@ -186,24 +186,25 @@ export class CombatComponent implements OnInit, OnDestroy, AfterViewChecked {
   /**
    * Parse a combat log entry to extract floating number data
    */
-  private parseFloatingNumber(entry: CombatLogEntry): { value: number; type: 'damage' | 'crit' | 'heal'; target: 'player' | 'monster' } | null {
+  private parseFloatingNumber(entry: CombatLogEntry): { value: number; type: 'damage' | 'crit' | 'heal' | 'mana'; target: 'player' | 'monster' } | null {
     // If the entry has damageValue and target from backend, use those directly
     if (entry.damageValue !== undefined && entry.target) {
-      const type = entry.type === 'crit' ? 'crit' : (entry.type === 'heal' ? 'heal' : 'damage');
+      // Map entry type to floating number type
+      let type: 'damage' | 'crit' | 'heal' | 'mana';
+      if (entry.type === 'crit') {
+        type = 'crit';
+      } else if (entry.type === 'heal') {
+        type = 'heal';
+      } else if ((entry.type as any) === 'mana') {
+        type = 'mana';
+      } else {
+        type = 'damage';
+      }
+
       return {
         value: entry.damageValue,
         type,
         target: entry.target
-      };
-    }
-
-    // Fallback: parse healing from message if not provided by backend
-    const healMatch = entry.message.match(/(?:heal|healed|restores?)\s+(\d+)\s+(?:health|hp)/i);
-    if (healMatch) {
-      return {
-        value: parseInt(healMatch[1]),
-        type: 'heal',
-        target: 'player'
       };
     }
 
@@ -213,7 +214,7 @@ export class CombatComponent implements OnInit, OnDestroy, AfterViewChecked {
   /**
    * Add a floating number to the display
    */
-  private addFloatingNumber(data: { value: number; type: 'damage' | 'crit' | 'heal'; target: 'player' | 'monster' }): void {
+  private addFloatingNumber(data: { value: number; type: 'damage' | 'crit' | 'heal' | 'mana'; target: 'player' | 'monster' }): void {
     const id = `float-${Date.now()}-${Math.random()}`;
     const floatingNumber = { id, ...data };
     // Add to signal

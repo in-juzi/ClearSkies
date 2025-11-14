@@ -585,7 +585,7 @@ async function performPlayerTurn(userId: string, io: Server): Promise<void> {
 
     // Process buff/debuff tick effects (DoT, HoT, durations)
     // Only decrement player buffs on player turn
-    const buffTickResults = combatService.processBuffTick(player, monsterInstance, undefined, 'player');
+    const buffTickResults = combatService.processBuffTick(player, monsterInstance, 'player');
 
     // Apply DoT/HoT damage from buffs
     if (buffTickResults.playerDamage > 0) {
@@ -672,7 +672,7 @@ async function performMonsterTurn(userId: string, io: Server): Promise<void> {
 
     // Process buff/debuff tick effects (DoT, HoT, durations)
     // Only decrement monster buffs on monster turn
-    const buffTickResults = combatService.processBuffTick(player, monsterInstance, undefined, 'monster');
+    const buffTickResults = combatService.processBuffTick(player, monsterInstance, 'monster');
 
     // Apply DoT/HoT damage from buffs
     if (buffTickResults.playerDamage > 0) {

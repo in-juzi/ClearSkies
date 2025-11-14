@@ -99,7 +99,7 @@ export class ChatService {
    */
   async getOnlineCount(): Promise<void> {
     try {
-      const response = await this.socketService.emit<{ success: boolean; count?: number; message?: string }>('chat:getOnlineCount');
+      const response = await this.socketService.emit<{ success: boolean; count?: number; message?: string }>('chat:getOnlineCount', {});
 
       if (response.success && response.count !== undefined) {
         const count = response.count;

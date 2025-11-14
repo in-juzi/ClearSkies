@@ -28,14 +28,14 @@ export const Regeneration: Ability = {
       description: '8 HP per turn',
       duration: 3,
       icon: {
-        path: 'abilities/regeneration.svg',
+        path: 'abilities/ability_regeneration.svg',
         material: 'generic'
       },
       healOverTime: 8 // 8 HP per turn
     }
   },
   icon: {
-    path: 'abilities/regeneration.svg',
+    path: 'abilities/ability_regeneration.svg',
     material: 'generic'
   }
 };
