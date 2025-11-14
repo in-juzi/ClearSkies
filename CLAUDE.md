@@ -38,6 +38,8 @@
 - ✅ Cloudflare custom domain setup (completed - clearskies.juzi.dev with SSL/TLS via Cloudflare proxy)
 
 **Recent Changes** (Last 10 commits):
+- fix: improve migration system compatibility with TypeScript
+- docs: update CLAUDE.md with production fixes and deployment tools
 - docs: add architecture diagram and update deployment guide
 - feat: add automated deployment and CloudFront invalidation scripts
 - fix: improve Socket.io connection reliability for production
@@ -46,8 +48,6 @@
 - docs: add comprehensive deployment guides for AWS and Cloudflare
 - feat: add Cloudflare environment configuration and build target
 - feat: add Cloudflare custom domain CORS support
-- docs: update CLAUDE.md with new EC2 instance IP address
-- chore: update production API endpoint to new EC2 instance
 
 **Known Issues**:
 - None currently identified
