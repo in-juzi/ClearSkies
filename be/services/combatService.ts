@@ -4,7 +4,10 @@ import {
   Ability,
   MonsterInstance,
   DamageResult,
-  AttackResult
+  AttackResult,
+  ActiveBuff,
+  BuffApplication,
+  StatModifier
 } from '@shared/types';
 import { MonsterRegistry } from '../data/monsters/MonsterRegistry';
 import { AbilityRegistry } from '../data/abilities/AbilityRegistry';
@@ -103,9 +106,9 @@ class CombatService {
   }
 
   /**
-   * Calculate total armor from equipment
+   * Calculate total armor from equipment and active buffs
    */
-  calculateTotalArmor(entity: any, itemService: any): number {
+  calculateTotalArmor(entity: any, itemService: any, player?: any): number {
     let totalArmor = 0;
 
     // Add base armor from combatStats
@@ -142,13 +145,27 @@ class CombatService {
       }
     }
 
-    return totalArmor;
+    // Add armor from active buffs/debuffs
+    if (player && player.activeCombat && player.activeCombat.activeBuffs) {
+      const target = entity.monsterId ? 'monster' : 'player';
+      const modifiers = this.getActiveBuffModifiers(player, target, 'armor');
+
+      // Apply flat modifiers
+      totalArmor += modifiers.flat;
+
+      // Apply percentage modifiers
+      if (modifiers.percentage !== 0) {
+        totalArmor = Math.floor(totalArmor * (1 + modifiers.percentage));
+      }
+    }
+
+    return Math.max(0, totalArmor); // Ensure non-negative
   }
 
   /**
-   * Calculate total evasion from equipment
+   * Calculate total evasion from equipment and active buffs
    */
-  calculateTotalEvasion(entity: any, itemService: any): number {
+  calculateTotalEvasion(entity: any, itemService: any, player?: any): number {
     let totalEvasion = 0;
 
     // Add base evasion from combatStats
@@ -185,7 +202,21 @@ class CombatService {
       }
     }
 
-    return totalEvasion;
+    // Add evasion from active buffs/debuffs
+    if (player && player.activeCombat && player.activeCombat.activeBuffs) {
+      const target = entity.monsterId ? 'monster' : 'player';
+      const modifiers = this.getActiveBuffModifiers(player, target, 'evasion');
+
+      // Apply flat modifiers
+      totalEvasion += modifiers.flat;
+
+      // Apply percentage modifiers
+      if (modifiers.percentage !== 0) {
+        totalEvasion = Math.floor(totalEvasion * (1 + modifiers.percentage));
+      }
+    }
+
+    return Math.max(0, totalEvasion); // Ensure non-negative
   }
 
   /**
@@ -252,12 +283,13 @@ class CombatService {
   }
 
   /**
-   * Calculate damage with skill/attribute scaling
+   * Calculate damage with skill/attribute scaling and buff modifiers
    */
   calculateDamage(
     attacker: any,
     defender: any,
     itemService: any,
+    player: any,
     isAbility: boolean = false,
     abilityPower: number = 1.0,
     critBonus: number = 0
@@ -338,8 +370,22 @@ class CombatService {
       }
     }
 
+    // Apply damage modifiers from active buffs
+    if (player && player.activeCombat && player.activeCombat.activeBuffs) {
+      const attackerTarget = attacker.monsterId ? 'monster' : 'player';
+      const damageModifiers = this.getActiveBuffModifiers(player, attackerTarget, 'damage');
+
+      // Apply flat damage modifiers
+      finalDamage += damageModifiers.flat;
+
+      // Apply percentage damage modifiers
+      if (damageModifiers.percentage !== 0) {
+        finalDamage = Math.floor(finalDamage * (1 + damageModifiers.percentage));
+      }
+    }
+
     // Check for dodge
-    const defenderEvasion = this.calculateTotalEvasion(defender, itemService);
+    const defenderEvasion = this.calculateTotalEvasion(defender, itemService, player);
     const dodgeChance = this.calculateEvasionChance(defenderEvasion);
     const isDodge = Math.random() < dodgeChance;
 
@@ -353,7 +399,7 @@ class CombatService {
     }
 
     // Apply armor reduction
-    const defenderArmor = this.calculateTotalArmor(defender, itemService);
+    const defenderArmor = this.calculateTotalArmor(defender, itemService, player);
     const armorReduction = this.calculateArmorReduction(defenderArmor);
     finalDamage = Math.floor(finalDamage * (1 - armorReduction));
 
@@ -366,6 +412,160 @@ class CombatService {
       isDodge: false,
       weaponName: weapon.name
     };
+  }
+
+  /**
+   * Apply a buff/debuff to an entity
+   */
+  applyBuff(player: any, abilityId: string, buffConfig: BuffApplication, turnCount: number): ActiveBuff {
+    const buffId = uuidv4();
+
+    const buff: ActiveBuff = {
+      buffId,
+      abilityId,
+      name: buffConfig.name,
+      description: buffConfig.description,
+      target: buffConfig.target === 'self' ? 'player' : 'monster',
+      appliedAt: turnCount,
+      duration: buffConfig.duration,
+      icon: buffConfig.icon,
+      statModifiers: buffConfig.statModifiers,
+      damageOverTime: buffConfig.damageOverTime,
+      healOverTime: buffConfig.healOverTime,
+      manaRegen: buffConfig.manaRegen,
+      manaDrain: buffConfig.manaDrain,
+      stackCount: 1
+    };
+
+    player.addActiveBuff(buff);
+
+    return buff;
+  }
+
+  /**
+   * Process buff/debuff tick effects (DoT, HoT, durations)
+   */
+  processBuffTick(player: any, monsterInstance: any, username?: string, tickingEntity?: 'player' | 'monster'): any {
+    if (!player.activeCombat || !player.activeCombat.activeBuffs) {
+      return { playerDamage: 0, monsterDamage: 0, expiredBuffs: [] };
+    }
+
+    let playerDamage = 0;
+    let monsterDamage = 0;
+    const expiredBuffs: string[] = [];
+
+    // Process each active buff
+    for (const [buffId, buff] of player.activeCombat.activeBuffs.entries()) {
+      // Apply damage over time
+      if (buff.damageOverTime) {
+        if (buff.target === 'monster') {
+          monsterInstance.stats.health.current = Math.max(0, monsterInstance.stats.health.current - buff.damageOverTime);
+          monsterDamage += buff.damageOverTime;
+          player.addCombatLog(`${buff.name} deals ${buff.damageOverTime} damage to ${monsterInstance.name}.`, 'debuff', buff.damageOverTime, 'monster');
+        } else {
+          const damageDealt = player.takeDamage(buff.damageOverTime);
+          playerDamage += buff.damageOverTime;
+          player.addCombatLog(`${buff.name} deals ${buff.damageOverTime} damage to ${username || 'you'}.`, 'debuff', buff.damageOverTime, 'player');
+        }
+      }
+
+      // Apply heal over time
+      if (buff.healOverTime) {
+        if (buff.target === 'player') {
+          player.heal(buff.healOverTime);
+          player.addCombatLog(`${buff.name} heals ${username || 'you'} for ${buff.healOverTime} HP.`, 'buff', buff.healOverTime, 'player');
+        } else {
+          monsterInstance.stats.health.current = Math.min(
+            monsterInstance.stats.health.max,
+            monsterInstance.stats.health.current + buff.healOverTime
+          );
+          player.addCombatLog(`${buff.name} heals ${monsterInstance.name} for ${buff.healOverTime} HP.`, 'buff', buff.healOverTime, 'monster');
+        }
+      }
+
+      // Apply mana regen
+      if (buff.manaRegen) {
+        if (buff.target === 'player') {
+          player.stats.mana.current = Math.min(
+            player.stats.mana.max,
+            player.stats.mana.current + buff.manaRegen
+          );
+          player.addCombatLog(`${buff.name} restores ${buff.manaRegen} mana.`, 'buff');
+        }
+      }
+
+      // Apply mana drain
+      if (buff.manaDrain) {
+        if (buff.target === 'monster') {
+          monsterInstance.stats.mana.current = Math.max(0, monsterInstance.stats.mana.current - buff.manaDrain);
+        } else {
+          player.useMana(buff.manaDrain);
+        }
+      }
+
+      // Decrement duration only if this buff belongs to the entity whose turn it is
+      // If tickingEntity is not specified, decrement all buffs (backward compatibility)
+      const shouldDecrementDuration = !tickingEntity || buff.target === tickingEntity;
+
+      if (shouldDecrementDuration) {
+        buff.duration--;
+
+        // Update the Map entry (Mongoose Maps need explicit .set() to detect changes)
+        player.activeCombat.activeBuffs.set(buffId, buff);
+
+        // Force Mongoose to detect the Map change for persistence
+        player.markModified('activeCombat.activeBuffs');
+
+        // Mark expired buffs
+        if (buff.duration <= 0) {
+          expiredBuffs.push(buffId);
+          const targetName = buff.target === 'player' ? (username || 'you') : monsterInstance.name;
+          player.addCombatLog(`${buff.name} fades from ${targetName}.`, 'system');
+        }
+      }
+    }
+
+    // Remove expired buffs
+    for (const buffId of expiredBuffs) {
+      player.removeActiveBuff(buffId);
+    }
+
+    return {
+      playerDamage,
+      monsterDamage,
+      expiredBuffs
+    };
+  }
+
+  /**
+   * Get total stat modifier from active buffs
+   */
+  getActiveBuffModifiers(player: any, target: 'player' | 'monster', statName: string): { flat: number; percentage: number } {
+    if (!player.activeCombat || !player.activeCombat.activeBuffs) {
+      return { flat: 0, percentage: 0 };
+    }
+
+    let totalFlat = 0;
+    let totalPercentage = 0;
+
+    for (const buff of player.activeCombat.activeBuffs.values()) {
+      if (buff.target !== target || !buff.statModifiers) {
+        continue;
+      }
+
+      for (const modifier of buff.statModifiers) {
+        if (modifier.stat === statName) {
+          if (modifier.type === 'flat') {
+            totalFlat += modifier.value;
+          } else if (modifier.type === 'percentage') {
+            totalPercentage += modifier.value;
+          }
+        }
+      }
+    }
+
+    // Return combined modifier (flat is added directly, percentage is multiplier)
+    return { flat: totalFlat, percentage: totalPercentage };
   }
 
   /**
@@ -393,6 +593,7 @@ class CombatService {
       monsterNextAttackTime: new Date(now.getTime() + monsterAttackSpeed),
       turnCount: 0,
       abilityCooldowns: new Map(),
+      activeBuffs: new Map(),
       combatLog: [],
       startTime: now
     };
@@ -494,7 +695,7 @@ class CombatService {
 
     // Check if player's attack is ready
     if (combat.playerNextAttackTime && now >= combat.playerNextAttackTime) {
-      const attackResult = this.calculateDamage(player, monsterInstance, itemService);
+      const attackResult = this.calculateDamage(player, monsterInstance, itemService, player);
 
       // Apply damage to monster
       monsterInstance.stats.health.current = Math.max(0, monsterInstance.stats.health.current - attackResult.damage);
@@ -536,7 +737,7 @@ class CombatService {
 
     // Check if monster's attack is ready
     if (combat.monsterNextAttackTime && now >= combat.monsterNextAttackTime) {
-      const attackResult = this.calculateDamage(monsterInstance, player, itemService);
+      const attackResult = this.calculateDamage(monsterInstance, player, itemService, player);
 
       // Apply damage to player
       const playerDefeated = player.takeDamage(attackResult.damage);
@@ -565,6 +766,17 @@ class CombatService {
       results.monsterAttacked = true;
       results.playerDamage = attackResult.damage;
       results.playerDefeated = playerDefeated;
+    }
+
+    // Process buff/debuff tick effects (DoT, HoT, durations)
+    const buffTickResults = this.processBuffTick(player, monsterInstance, username);
+    results.playerDamage += buffTickResults.playerDamage;
+    results.monsterDamage += buffTickResults.monsterDamage;
+
+    // Check if monster was defeated by DoT
+    if (monsterInstance.stats.health.current <= 0 && !results.monsterDefeated) {
+      results.monsterDefeated = true;
+      player.addCombatLog(`${username || 'You'} defeated ${monsterInstance.name}!`, 'system');
     }
 
     // Update monster instance in combat state
@@ -609,6 +821,7 @@ class CombatService {
       player,
       monsterInstance,
       itemService,
+      player,
       true,
       ability.powerMultiplier,
       critBonus
@@ -635,6 +848,29 @@ class CombatService {
 
     // Set cooldown
     player.setAbilityCooldown(abilityId, ability.cooldown);
+
+    // Increment turn counter (using an ability counts as a turn)
+    combat.turnCount++;
+
+    // Process buff/debuff tick effects (DoT, HoT, durations) BEFORE applying new buffs
+    // Only decrement player buffs since the player is using the ability
+    const buffTickResults = this.processBuffTick(player, monsterInstance, playerName, 'player');
+
+    // Apply DoT/HoT damage from buffs
+    if (buffTickResults.playerDamage > 0) {
+      player.takeDamage(buffTickResults.playerDamage);
+    }
+    if (buffTickResults.monsterDamage > 0) {
+      monsterInstance.stats.health.current = Math.max(0, monsterInstance.stats.health.current - buffTickResults.monsterDamage);
+    }
+
+    // Apply buff/debuff if ability has one
+    let appliedBuff: ActiveBuff | null = null;
+    if (ability.effects && ability.effects.applyBuff) {
+      appliedBuff = this.applyBuff(player, abilityId, ability.effects.applyBuff, combat.turnCount);
+      const targetName = appliedBuff.target === 'player' ? playerName : monsterInstance.name;
+      player.addCombatLog(`${appliedBuff.name} applied to ${targetName}!`, appliedBuff.target === 'player' ? 'buff' : 'debuff');
+    }
 
     // Update monster instance
     combat.monsterInstance = new Map(Object.entries(monsterInstance));

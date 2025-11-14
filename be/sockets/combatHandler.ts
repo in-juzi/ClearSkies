@@ -9,6 +9,54 @@ const playerTurnTimers = new Map<string, NodeJS.Timeout>();
 const monsterTurnTimers = new Map<string, NodeJS.Timeout>();
 
 /**
+ * Helper: Save player with version conflict handling
+ * Silently ignores version conflicts (next turn will pick up changes)
+ */
+async function savePlayerSafely(player: any): Promise<boolean> {
+  try {
+    await player.save();
+    return true;
+  } catch (error: any) {
+    if (error.name === 'VersionError') {
+      console.log(`Version conflict detected - changes will be applied on next turn`);
+      return false; // Version conflict, but not fatal
+    }
+    throw error; // Re-throw other errors
+  }
+}
+
+/**
+ * Helper: Serialize active buffs Map to array for frontend
+ */
+function serializeActiveBuffs(player: any): any[] {
+  if (!player.activeCombat || !player.activeCombat.activeBuffs) {
+    return [];
+  }
+
+  const buffs = [];
+  for (const [buffId, buff] of player.activeCombat.activeBuffs.entries()) {
+    buffs.push({
+      buffId: buff.buffId,
+      abilityId: buff.abilityId,
+      name: buff.name,
+      description: buff.description,
+      target: buff.target,
+      appliedAt: buff.appliedAt,
+      duration: buff.duration,
+      icon: buff.icon,
+      statModifiers: buff.statModifiers,
+      damageOverTime: buff.damageOverTime,
+      healOverTime: buff.healOverTime,
+      manaRegen: buff.manaRegen,
+      manaDrain: buff.manaDrain,
+      stackCount: buff.stackCount
+    });
+  }
+
+  return buffs;
+}
+
+/**
  * Combat Socket Handler
  * Handles real-time turn-based combat events
  */
@@ -65,7 +113,10 @@ export default function (io: Server): void {
           return;
         }
 
-        // Get ability
+        // Use combat service to handle ability (includes buff application)
+        const result = combatService.useAbility(player, abilityId, itemService);
+
+        // Get ability for emit data
         const ability = combatService.getAbility(abilityId);
         if (!ability) {
           if (typeof callback === 'function') {
@@ -74,65 +125,18 @@ export default function (io: Server): void {
           return;
         }
 
-        // Check mana cost
-        if (player.stats.mana.current < ability.manaCost) {
-          if (typeof callback === 'function') {
-            callback({
-              success: false,
-              message: `Insufficient mana. Need ${ability.manaCost}, have ${player.stats.mana.current}`
-            });
-          }
-          return;
-        }
-
-        // Use mana
-        player.useMana(ability.manaCost);
-
-        // Get monster instance from Map
+        // Get updated monster instance
         const monsterInstance = Object.fromEntries(player.activeCombat!.monsterInstance);
 
-        // Calculate ability damage
-        const attackResult = combatService.calculateDamage(
-          player,
-          monsterInstance,
-          itemService,
-          true,
-          ability.powerMultiplier,
-          ability.effects?.critChanceBonus || 0
-        );
-
-        // Apply damage to monster
-        monsterInstance.stats.health.current = Math.max(0, monsterInstance.stats.health.current - attackResult.damage);
-
-        // Track damage dealt
-        player.combatStats.totalDamageDealt += attackResult.damage;
-        if (attackResult.isCrit) {
-          player.combatStats.criticalHits++;
-        }
-
-        // Log ability use
-        if (attackResult.isDodge) {
-          player.addCombatLog(`${ability.name} missed - ${monsterInstance.name} dodged!`, 'miss');
-        } else if (attackResult.isCrit) {
-          player.addCombatLog(`CRITICAL ${ability.name}! You deal ${attackResult.damage} damage!`, 'ability', attackResult.damage, 'monster');
-        } else {
-          player.addCombatLog(`You use ${ability.name} for ${attackResult.damage} damage!`, 'ability', attackResult.damage, 'monster');
-        }
-
-        // Set cooldown (timestamp in future)
-        const cooldownEnd = Date.now() + (ability.cooldown * 1000);
-        if (player.activeCombat!.abilityCooldowns.set) {
-          player.activeCombat!.abilityCooldowns.set(abilityId, cooldownEnd);
-        } else {
-          (player.activeCombat!.abilityCooldowns as any)[abilityId] = cooldownEnd;
-        }
-
-        // Update monster instance in combat
-        player.activeCombat!.monsterInstance = new Map(Object.entries(monsterInstance));
+        // Build attack result for client
+        const attackResult = {
+          damage: result.damage,
+          isCrit: result.isCrit,
+          isDodge: result.isDodge
+        };
 
         // Check if monster defeated
-        if (monsterInstance.stats.health.current <= 0) {
-          player.addCombatLog(`You defeated ${monsterInstance.name}!`, 'system');
+        if (result.monsterDefeated) {
           await player.save();
 
           await handleCombatVictory(player, io, userId);
@@ -168,7 +172,8 @@ export default function (io: Server): void {
             currentMana: player.stats.mana.current
           },
           abilityCooldowns: Object.fromEntries(player.activeCombat!.abilityCooldowns),
-          combatLog: player.activeCombat!.combatLog
+          combatLog: player.activeCombat!.combatLog,
+          activeBuffs: serializeActiveBuffs(player)
         });
 
         // Schedule monster turn
@@ -299,7 +304,8 @@ export default function (io: Server): void {
             currentMana: player.stats.mana.current
           },
           inventory,
-          combatLog: player.activeCombat!.combatLog
+          combatLog: player.activeCombat!.combatLog,
+          activeBuffs: serializeActiveBuffs(player)
         });
 
       } catch (error) {
@@ -430,7 +436,8 @@ export default function (io: Server): void {
                 icon: ability.icon
               })),
               combatLog,
-              activityId: player.activeCombat!.activityId
+              activityId: player.activeCombat!.activityId,
+              activeBuffs: serializeActiveBuffs(player)
             }
           });
         }
@@ -549,7 +556,7 @@ async function performPlayerTurn(userId: string, io: Server): Promise<void> {
     const monsterInstance = Object.fromEntries(player.activeCombat!.monsterInstance);
 
     // Player auto-attacks
-    const attackResult = combatService.calculateDamage(player, monsterInstance, itemService);
+    const attackResult = combatService.calculateDamage(player, monsterInstance, itemService, player);
 
     // Apply damage to monster
     monsterInstance.stats.health.current = Math.max(0, monsterInstance.stats.health.current - attackResult.damage);
@@ -576,10 +583,22 @@ async function performPlayerTurn(userId: string, io: Server): Promise<void> {
       player.addCombatLog(`You deal ${attackResult.damage} damage with ${attackResult.weaponName}.`, 'damage', attackResult.damage, 'monster');
     }
 
+    // Process buff/debuff tick effects (DoT, HoT, durations)
+    // Only decrement player buffs on player turn
+    const buffTickResults = combatService.processBuffTick(player, monsterInstance, undefined, 'player');
+
+    // Apply DoT/HoT damage from buffs
+    if (buffTickResults.playerDamage > 0) {
+      player.takeDamage(buffTickResults.playerDamage);
+    }
+    if (buffTickResults.monsterDamage > 0) {
+      monsterInstance.stats.health.current = Math.max(0, monsterInstance.stats.health.current - buffTickResults.monsterDamage);
+    }
+
     // Update monster instance in combat
     player.activeCombat!.monsterInstance = new Map(Object.entries(monsterInstance));
 
-    await player.save();
+    await savePlayerSafely(player);
 
     // Broadcast player auto-attack
     io.to(`user:${userId}`).emit('combat:playerAttack', {
@@ -589,13 +608,14 @@ async function performPlayerTurn(userId: string, io: Server): Promise<void> {
         maxHp: monsterInstance.stats.health.max
       },
       playerNextAttackTime: player.activeCombat!.playerNextAttackTime,
-      combatLog: player.activeCombat!.combatLog
+      combatLog: player.activeCombat!.combatLog,
+      activeBuffs: serializeActiveBuffs(player)
     });
 
     // Check if monster defeated
     if (monsterInstance.stats.health.current <= 0) {
       player.addCombatLog(`You defeated ${monsterInstance.name}!`, 'system');
-      await player.save();
+      await savePlayerSafely(player);
 
       await handleCombatVictory(player, io, userId);
       return;
@@ -625,7 +645,7 @@ async function performMonsterTurn(userId: string, io: Server): Promise<void> {
     const monsterInstance = Object.fromEntries(player.activeCombat!.monsterInstance);
 
     // Monster attacks
-    const attackResult = combatService.calculateDamage(monsterInstance, player, itemService);
+    const attackResult = combatService.calculateDamage(monsterInstance, player, itemService, player);
 
     // Apply damage to player
     const playerDefeated = player.takeDamage(attackResult.damage);
@@ -650,7 +670,22 @@ async function performMonsterTurn(userId: string, io: Server): Promise<void> {
       player.addCombatLog(`${monsterInstance.name} deals ${attackResult.damage} damage.`, 'damage', attackResult.damage, 'player');
     }
 
-    await player.save();
+    // Process buff/debuff tick effects (DoT, HoT, durations)
+    // Only decrement monster buffs on monster turn
+    const buffTickResults = combatService.processBuffTick(player, monsterInstance, undefined, 'monster');
+
+    // Apply DoT/HoT damage from buffs
+    if (buffTickResults.playerDamage > 0) {
+      player.takeDamage(buffTickResults.playerDamage);
+    }
+    if (buffTickResults.monsterDamage > 0) {
+      monsterInstance.stats.health.current = Math.max(0, monsterInstance.stats.health.current - buffTickResults.monsterDamage);
+    }
+
+    // Update monster instance in combat (in case buffs changed HP)
+    player.activeCombat!.monsterInstance = new Map(Object.entries(monsterInstance));
+
+    await savePlayerSafely(player);
 
     // Broadcast monster attack
     io.to(`user:${userId}`).emit('combat:monsterAttack', {
@@ -660,7 +695,8 @@ async function performMonsterTurn(userId: string, io: Server): Promise<void> {
         maxHp: player.stats.health.max
       },
       monsterNextAttackTime: player.activeCombat!.monsterNextAttackTime,
-      combatLog: player.activeCombat!.combatLog
+      combatLog: player.activeCombat!.combatLog,
+      activeBuffs: serializeActiveBuffs(player)
     });
 
     // Check if player defeated

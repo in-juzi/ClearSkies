@@ -454,17 +454,18 @@ export const restartCombat = async (req: Request, res: Response): Promise<void> 
 
     // Clear previous combat state
     player.activeCombat = {
-      activityId: null,
-      monsterId: null,
-      monsterInstance: null,
-      playerLastAttackTime: null,
-      monsterLastAttackTime: null,
-      playerNextAttackTime: null,
-      monsterNextAttackTime: null,
+      activityId: '',
+      monsterId: '',
+      monsterInstance: new Map(),
+      playerLastAttackTime: undefined,
+      monsterLastAttackTime: undefined,
+      playerNextAttackTime: undefined,
+      monsterNextAttackTime: undefined,
       turnCount: 0,
       abilityCooldowns: new Map(),
+      activeBuffs: new Map(),
       combatLog: [],
-      startTime: null
+      startTime: undefined
     };
 
     // Initialize new combat with same monster
