@@ -485,11 +485,19 @@ playerSchema.methods.addExperience = async function(this: IPlayer, amount: numbe
 
 // Add gold
 playerSchema.methods.addGold = function(this: IPlayer, amount: number): void {
+  // Ensure gold is a valid number (handle undefined or NaN)
+  if (typeof this.gold !== 'number' || isNaN(this.gold)) {
+    this.gold = 0;
+  }
   this.gold += amount;
 };
 
 // Remove gold (with validation)
 playerSchema.methods.removeGold = function(this: IPlayer, amount: number): void {
+  // Ensure gold is a valid number (handle undefined or NaN)
+  if (typeof this.gold !== 'number' || isNaN(this.gold)) {
+    this.gold = 0;
+  }
   if (this.gold < amount) {
     throw new Error('Insufficient gold');
   }
