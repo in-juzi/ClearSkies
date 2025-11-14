@@ -38,16 +38,16 @@
 - ✅ Cloudflare custom domain setup (completed - clearskies.juzi.dev with SSL/TLS via Cloudflare proxy)
 
 **Recent Changes** (Last 10 commits):
+- docs: add architecture diagram and update deployment guide
+- feat: add automated deployment and CloudFront invalidation scripts
+- fix: improve Socket.io connection reliability for production
+- fix: add NaN gold validation and migration script
+- docs: update CLAUDE.md with Cloudflare deployment configuration
 - docs: add comprehensive deployment guides for AWS and Cloudflare
 - feat: add Cloudflare environment configuration and build target
 - feat: add Cloudflare custom domain CORS support
 - docs: update CLAUDE.md with new EC2 instance IP address
 - chore: update production API endpoint to new EC2 instance
-- refactor: improve server binding configuration with explicit HOST constant
-- docs: update CLAUDE.md with completed deployment configuration
-- refactor: migrate frontend services to use environment configuration
-- fix: configure production environment and build scripts
-- feat: configure backend server to bind to 0.0.0.0 for EC2 deployment
 
 **Known Issues**:
 - None currently identified
@@ -84,6 +84,7 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 **Make migration:** Template in Database Migrations section → `be/migrations/NNN-description.js`
 **Hot-reload data:** Restart backend server - data layer now uses TypeScript registries
 **API endpoints:** See route files in `be/routes/` - all require JWT except auth register/login
+**Deploy to production:** `cd ui && npm run deploy` - builds and uploads to S3 with CloudFront invalidation
 
 > **IMPORTANT**: **NEVER start backend/frontend servers** - they are always running during development. Only rebuild with `npm run build` if code changes require it. If you need to restart servers, ask the user first.
 
@@ -607,6 +608,7 @@ npm run migrate:down     # Rollback last migration
 7. `007-add-combat-system.js` - Adds combat fields (activeCombat state, combatStats tracking) to all players
 8. `008-rename-herbalism-to-gathering.js` - Renames herbalism skill to gathering (more thematic for barehanded foraging)
 9. `009-add-alchemy-skill.js` - Adds alchemy skill to all players (level 1, linked to Will attribute)
+10. `010-fix-nan-gold-values.js` - Fixes players with NaN or undefined gold values (sets to default 100)
 
 **Creating a New Migration:**
 1. Create a file in `be/migrations/` with format: `NNN-description.js`
@@ -1716,8 +1718,10 @@ NODE_ENV=production
 - **Detailed Setup**: See [project/docs/cloudflare-custom-domain-setup.md](project/docs/cloudflare-custom-domain-setup.md)
 
 ### Deployment Guides
+- **Architecture Diagram**: [project/docs/architecture-diagram.md](project/docs/architecture-diagram.md) - Visual infrastructure overview
 - **AWS Setup**: [project/docs/aws-deployment-guide.md](project/docs/aws-deployment-guide.md) - Complete EC2 and S3 deployment
 - **Cloudflare Setup**: [project/docs/cloudflare-custom-domain-setup.md](project/docs/cloudflare-custom-domain-setup.md) - Custom domain with SSL/TLS
+- **Quick Deploy**: `cd ui && npm run deploy` - Automated build and S3 upload with cache invalidation
 
 ### Future Enhancements
 - **Auto-scaling**: Configure EC2 auto-scaling groups for high traffic
