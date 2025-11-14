@@ -50,7 +50,10 @@ console.log(`✓ Loaded ${require('./data/vendors/VendorRegistry').VendorRegistr
 console.log(`✓ Loaded ${require('./data/recipes/RecipeRegistry').RecipeRegistry.size} recipes from RecipeRegistry (compile-time)`);
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:4200', 'http://clearskies-frontend-dev.s3-website-us-east-1.amazonaws.com'],
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -100,7 +103,7 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
 // Initialize Socket.io
 const io = new Server(server, {
   cors: {
-    origin: ['http://localhost:4200', 'http://localhost:3000'],
+    origin: ['http://localhost:4200', 'http://clearskies-frontend-dev.s3-website-us-east-1.amazonaws.com'],
     credentials: true
   }
 });
