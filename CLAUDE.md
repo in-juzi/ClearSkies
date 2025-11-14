@@ -600,55 +600,13 @@ All endpoints require JWT authentication except `/api/auth/register` and `/api/a
 
 ## Database Migrations
 
-When modifying database schemas (Player, User models), create a migration to update existing records:
+Schema changes require migrations to update existing records
 
-**Running Migrations:**
-```bash
-cd be
-npm run migrate          # Run all pending migrations
-npm run migrate:status   # Check migration status
-npm run migrate:down     # Rollback last migration
-```
+**Commands:** `npm run migrate` | `npm run migrate:status` | `npm run migrate:down`
 
-**Existing Migrations:**
-1. `001-add-skills-to-players.js` - Adds skills to existing player documents
-2. `002-add-attributes-and-skill-main-attributes.js` - Adds attributes and mainAttribute field to skills
-3. `003-add-location-system.js` - Adds location fields (currentLocation, discoveredLocations, activeActivity, travelState)
-4. `004-add-equipment-slots.js` - Adds equipment slot system to all players with 10 default slots
-5. `005-convert-quality-trait-to-levels.js` - Converts quality/trait system from decimal values to integer levels
-6. `006-add-herbalism-skill.js` - Adds herbalism gathering skill to all players (linked to Will attribute)
-7. `007-add-combat-system.js` - Adds combat fields (activeCombat state, combatStats tracking) to all players
-8. `008-rename-herbalism-to-gathering.js` - Renames herbalism skill to gathering (more thematic for barehanded foraging)
-9. `009-add-alchemy-skill.js` - Adds alchemy skill to all players (level 1, linked to Will attribute)
-10. `010-fix-nan-gold-values.js` - Fixes players with NaN or undefined gold values (sets to default 100)
-11. `011-add-active-buffs.js` - Adds activeBuffs Map to activeCombat for buff/debuff system
+**Location:** `be/migrations/NNN-description.js` (11 existing migrations)
 
-**Creating a New Migration:**
-1. Create a file in `be/migrations/` with format: `NNN-description.js`
-2. Export `up()` and `down()` functions
-3. Include name and description
-
-**Migration Template:**
-```javascript
-async function up() {
-  const Model = mongoose.model('ModelName');
-  // Update logic here
-  return { modified: count, message: 'Success message' };
-}
-
-async function down() {
-  const Model = mongoose.model('ModelName');
-  // Rollback logic here
-  return { modified: count, message: 'Rollback message' };
-}
-
-module.exports = {
-  up,
-  down,
-  name: '001-migration-name',
-  description: 'What this migration does'
-};
-```
+**Full Documentation:** [project/docs/database-migrations.md](project/docs/database-migrations.md)
 
 ## Custom Commands
 
@@ -668,345 +626,87 @@ Backend requires `.env` file with:
 
 ## Inventory System
 
-The inventory system uses a three-tier architecture for flexibility and easy balancing:
+Three-tier architecture: Item Definitions → Quality/Trait Definitions → Item Instances
 
-1. **Item Definitions** (TypeScript modules in `be/data/items/definitions/`)
-   - **Registry-Based**: Organized into category subdirectories with centralized ItemRegistry
-     - `consumables/` - Individual .ts files for each food item and potion
-     - `equipment/` - Individual .ts files for each weapon, armor, and tool
-     - `resources/` - Individual .ts files for each resource (wood, ore, fish, herbs, gemstones, ingots)
-   - **Type-Safe Loading**: ItemService loads from ItemRegistry.ts with compile-time validation
-   - 68+ items total (expanded from 40):
-     - Resources: logs, ore (copper, tin, iron, silver), fish, herbs, gemstones, ingots (bronze, iron)
-     - Equipment:
-       - Weapons: copper_sword, bronze_sword, iron_sword
-       - Armor: Bronze tier (helm, plate, gloves, boots), Iron tier (helm, plate, gloves, boots)
-       - Tools: Bronze/Iron axes, pickaxes, fishing rods
-     - Consumables: cooked food, potions
-   - Define base properties, allowed qualities, traits, equipment slots, and subtypes
-   - All items include `icon` field with path and material for multi-channel colorization
-   - Equipment items include `subtype` field for activity requirement matching
+**Quick Facts:**
+- 68+ items (resources, equipment, consumables) in TypeScript registries
+- 5-level quality system (1-5 integer levels) with escalating bonuses
+- 3-level trait system (Map<traitId, level>) for special modifiers
+- Probabilistic generation: 35% plain, 45% one quality, 15% two qualities
+- Items stack if same itemId + quality levels + trait levels
+- Multi-channel SVG icon colorization (40+ materials)
 
-2. **Quality & Trait Definitions** (TypeScript modules)
-   - **Qualities**: woodGrain, moisture, age, purity, sheen (integer levels 1-5)
-     - QualityRegistry.ts exports all quality definitions
-     - Each level has explicit name, description, and effects
-     - Example: woodGrain L1 (Fine Grain, 1.1x) → L5 (Mythical Grain, 1.5x)
-     - Example: purity L1 (High Purity, 1.1x) → L5 (Transcendent, 1.5x)
-     - Escalating effects: 8-10% per level depending on quality type
-   - **Traits**: fragrant, knotted, weathered, pristine, cursed, blessed, masterwork (integer levels 1-3)
-     - TraitRegistry.ts exports all trait definitions
-     - Stored as Map<traitId, level> instead of array
-     - Each level has escalating effects
-   - Define effects on vendor pricing, crafting, alchemy, combat
-   - 5-level quality system provides granular progression, 3-level traits for special modifiers
+**Key Files:**
+- Item Registry: [ItemRegistry.ts](be/data/items/ItemRegistry.ts)
+- Quality Registry: [QualityRegistry.ts](be/data/items/qualities/QualityRegistry.ts)
+- Trait Registry: [TraitRegistry.ts](be/data/items/traits/TraitRegistry.ts)
+- Item Service: [itemService.ts](be/services/itemService.ts)
 
-3. **Item Instances** (Player inventory in MongoDB)
-   - References to base items
-   - Quality levels (1-5 integers) and trait levels (1-3 integers)
-   - Automatic stacking for items with identical levels
-   - Calculated vendor prices based on level modifiers
-
-**Key Features:**
-- Items have discrete quality levels (1-5) with descriptive names and escalating bonuses
-- Traits stored as Map with levels (1-3) for escalating effects
-- Better stacking: items with identical levels stack together
-- Easy balancing by editing TypeScript definitions with compile-time validation
-- TypeScript registries provide centralized data management
-- **Probabilistic generation**: Most items have 0-1 qualities (config: 35% plain, 45% one quality, 15% two, 5% three+)
-- **Selective traits**: Reduced appearance rates (common: 2%, uncommon: 8%, rare: 15%, epic: 30%)
-- **Level damping**: Quality levels biased toward L1-L2 (0.6 damping reduces avg by ~0.2 levels)
-- Tier-independent quality count with tier-based level distribution
-- Configuration via `be/data/items/generation-config.json` for easy balancing
-- Category-based organization improves scalability for growing item catalog
-- Multi-channel icon colorization with 40+ material definitions
-- **Alt+Click quick actions**: Drop 1 item (or sell entire stack if vendor open) without confirmation
-- Full documentation in `project/docs/inventory-system.md` and `project/docs/level-based-quality-trait-system.md`
+**Full Documentation:** [project/docs/inventory-system.md](project/docs/inventory-system.md), [project/docs/level-based-quality-trait-system.md](project/docs/level-based-quality-trait-system.md)
 
 ## Location System
 
-The location system provides a rich world exploration and activity framework:
+Four-tier hierarchy: Locations → Facilities → Activities → Drop Tables
 
-1. **Location Definitions** (TypeScript modules in `be/data/locations/definitions/`)
-   - LocationRegistry.ts exports all location definitions
-   - Define locations with name, description, biome type
-   - List of facilities available at each location
-   - Travel requirements and discovery conditions
-   - Examples: Kennik (starting town), Forest Clearing, Mountain Pass
+**Quick Facts:**
+- Real-time Socket.io (no HTTP polling, server-authoritative timing)
+- Activities award XP (with scaling) and loot from weighted drop tables
+- Client-driven auto-restart (requires active player, prevents AFK grinding)
+- Item requirements: skills, equipped items (by subtype), inventory items
+- TypeScript registries with compile-time validation
 
-2. **Biomes** (TypeScript modules in `be/data/locations/biomes/`)
-   - BiomeRegistry.ts exports all biome definitions
-   - Define environmental types (forest, mountain, sea)
-   - Ambient descriptions and characteristics
-   - Affect available resources and activities
+**Key Files:**
+- Location Registry: [LocationRegistry.ts](be/data/locations/LocationRegistry.ts)
+- Activity Registry: [ActivityRegistry.ts](be/data/locations/ActivityRegistry.ts)
+- Drop Table Registry: [DropTableRegistry.ts](be/data/locations/DropTableRegistry.ts)
+- Location Service: [locationService.ts](be/services/locationService.ts)
+- Activity Handler: [activityHandler.ts](be/sockets/activityHandler.ts)
 
-3. **Facilities** (TypeScript modules in `be/data/locations/facilities/`)
-   - FacilityRegistry.ts exports all facility definitions
-   - Specific buildings or areas within locations
-   - Each facility offers different activities
-   - Examples: Market, Fishing Dock, Logging Camp, Mine
+**Socket Events:** `activity:start`, `activity:started`, `activity:completed`, `activity:cancelled`, `activity:getStatus`
 
-4. **Activities** (TypeScript modules in `be/data/locations/activities/`)
-   - ActivityRegistry.ts exports all activity definitions
-   - Actions players can perform at facilities
-   - Requirements: skills, attributes, equipped items (by subtype), inventory items (with quantity)
-   - Time-based completion (duration in seconds)
-   - Rewards: XP, items via drop tables
-   - Examples: Chop Oak (requires woodcutting-axe equipped), Fish Salmon (requires fishing-rod equipped), Mine Iron (requires mining-pickaxe equipped)
-
-5. **Drop Tables** (TypeScript modules in `be/data/locations/drop-tables/`)
-   - DropTableRegistry.ts exports all drop table definitions
-   - Weighted loot pools for activity rewards
-   - Define relative drop rates using weight system
-   - Reusable across multiple activities
-   - Support for quality bonuses and rare drops
-   - Examples: woodcutting-oak, rare-woodcutting, fishing-salmon, rare-fishing
-
-**Key Features:**
-- **Real-time Socket.io**: Activity system uses Socket.io for instant completion events (no HTTP polling)
-- **Server-authoritative timing**: Activity durations enforced server-side using setTimeout
-- **Client-driven auto-restart**: Activities automatically restart on completion (requires active player)
-- Players start in Kennik and can discover new locations
-- Travel between locations takes time
-- Activities award skill XP and items to inventory via drop tables
-- Activity completion is time-based (tracked server-side)
-- Rich location descriptions and lore through biomes
-- Flexible drop table system for easy loot balancing
-- Item requirements system for activities (equipped tools and inventory items)
-- Easy content expansion by creating new TypeScript modules and registering in registries
-- Compile-time validation of all references (itemIds, skillIds, etc.)
-- Reconnection support restores in-progress activities
-- Full documentation in `project/docs/drop-table-system.md` and `project/docs/item-requirements-system.md`
-
-**Backend Socket Handler:**
-- [activityHandler.ts](be/sockets/activityHandler.ts) - Real-time activity events, reward processing
-- Events: `activity:start`, `activity:started`, `activity:completed`, `activity:cancelled`, `activity:getStatus`
-
-**Frontend Socket Service:**
-- [location.service.ts](ui/src/app/services/location.service.ts) - Activity state management with Socket.io
+**Full Documentation:** [project/docs/location-system.md](project/docs/location-system.md), [project/docs/drop-table-system.md](project/docs/drop-table-system.md)
 
 ## Equipment System
 
-The equipment system allows players to equip items to specific body slots for stat bonuses and character progression:
+10-slot equipment system with drag-and-drop UI
 
-1. **Equipment Slots** (Player.equipmentSlots Map)
-   - 10 default slots: head, body, mainHand, offHand, belt, gloves, boots, necklace, ringRight, ringLeft
-   - Stored as `Map<string, string|null>` (slot name → instanceId or null)
-   - Extensible architecture: new slots can be added via `addEquipmentSlot()` method
-   - Each slot can hold one item at a time
-
-2. **Equipment Items** (Item definitions with `slot` field)
-   - Must include `slot` field indicating which slot they can be equipped to
-   - Examples: iron_helm (head), leather_tunic (body), copper_sword (mainHand), wooden_shield (offHand)
-   - Properties include armor, evasion, damage, required level
-   - Equipment items are non-stackable (stackable: false)
-
-3. **Equipment UI** (3x4 grid with square slots)
-   - Drag-and-drop from inventory to equipment slots
-   - Visual feedback: purple border and sword emoji for equipped items
-   - Right-click to unequip items
-   - Rarity-based coloring for equipped items
-   - Square slots using grid pseudo-element technique (aspect-ratio: 1)
-
-4. **Equipment Methods** (Player model)
-   - `equipItem(instanceId, slotName)` - Equip item with validation and auto-unequip
-   - `unequipItem(slotName)` - Unequip and return item to inventory
-   - `getEquippedItems()` - Get all currently equipped items
-   - `isSlotAvailable(slotName)` - Check if slot is empty
-   - `addEquipmentSlot(slotName)` - Add new equipment slot for future expansion
-
-**Key Features:**
-- Slot-based equipment validation (items can only go in designated slots)
+**Quick Facts:**
+- Slots: head, body, mainHand, offHand, belt, gloves, boots, necklace, ringRight, ringLeft
+- Slot-based validation (items can only go in designated slots)
 - Auto-unequip when equipping to occupied slot
 - Items marked with `equipped: true` flag in inventory
-- Full API support for equip/unequip operations
-- Visual feedback throughout UI (inventory and equipment panels)
-- Extensible for future slots (rings, accessories, etc.)
-- Full documentation in `project/docs/equipment-system.md`
 
-## Item Requirements System
+**Key Methods** (Player model):
+- `equipItem(instanceId, slotName)`, `unequipItem(slotName)`, `getEquippedItems()`
 
-The item requirements system enables activities to require specific tools and consumables:
-
-1. **Equipment Requirements** (by subtype)
-   - Activities can require items with specific subtypes to be equipped
-   - Checks all equipment slots (mainHand, offHand, etc.) for matching subtype
-   - Supports tier progression (bronze, iron, steel axes all satisfy "woodcutting-axe")
-   - Example: `"equipped": [{ "subtype": "woodcutting-axe" }]`
-
-2. **Inventory Requirements** (by itemId)
-   - Activities can require specific items in inventory with minimum quantities
-   - Items can be equipped or unequipped, just needs to be in inventory
-   - Example: `"inventory": [{ "itemId": "torch", "quantity": 3 }]`
-
-3. **Item Subtypes**
-   - Equipment items include optional `subtype` field for categorization
-   - Current subtypes: woodcutting-axe, mining-pickaxe, fishing-rod, sword, shield, helm, coif, tunic
-   - Multiple items can share same subtype for progression tiers
-   - Enables flexible requirement matching
-
-**Activity Requirement Schema:**
-```json
-{
-  "requirements": {
-    "skills": { "woodcutting": 1 },
-    "equipped": [
-      { "subtype": "woodcutting-axe" }
-    ],
-    "inventory": [
-      { "itemId": "torch", "quantity": 2 }
-    ]
-  }
-}
-```
-
-**Tool Items:**
-- Woodcutting: bronze_woodcutting_axe, iron_woodcutting_axe
-- Mining: bronze_mining_pickaxe, iron_mining_pickaxe, rare_iron_mining_pickaxe_offhand
-- Fishing: bamboo_fishing_rod, willow_fishing_rod
-
-**Player Methods:**
-- `hasEquippedSubtype(subtype, itemService)` - Check if subtype equipped in any slot
-- `hasInventoryItem(itemId, minQuantity)` - Check if item in inventory with quantity
-- `getInventoryItemQuantity(itemId)` - Get total item quantity
-
-**Validation:**
-- LocationService checks requirements before allowing activity start
-- User-friendly error messages: "Requires woodcutting-axe equipped"
-- Frontend displays requirements in activity detail view
-
-**Full documentation:** `project/docs/item-requirements-system.md`
-
-## Icon System
-
-Multi-channel SVG colorization for visual distinction between material tiers (copper vs iron vs steel).
-
-**Key Files:**
-- IconService: [ui/src/app/services/icon.service.ts](ui/src/app/services/icon.service.ts) - HTTP fetch, parsing, CSS injection
-- IconComponent: [ui/src/app/components/shared/icon/icon.component.ts](ui/src/app/components/shared/icon/icon.component.ts) - Renders colorized SVGs
-- Material Colors: [ui/src/app/constants/material-colors.constants.ts](ui/src/app/constants/material-colors.constants.ts) - 40+ materials with 6 color channels each
-
-**How It Works:**
-- SVG paths tagged with `data-channel` attributes (blade, handle, edge, detail, etc.)
-- Material definitions provide colors for each channel (e.g., bronze: handle=#6B4423, blade=#CD853F)
-- IconService fetches SVG, generates CSS rules, injects styles, returns SafeHtml
-- Result: Same SVG, different colors per material
-
-**Usage in Item Definitions:**
-```json
-{ "icon": { "path": "item-categories/item_cat_axe_SPLIT.svg", "material": "bronze" } }
-```
-
-**SVG Preparation:**
-- Split single-path SVGs: `node project/utils/split-svg-paths-normalized.js path/to/icon.svg`
-- Add `data-channel` attributes manually to each path
-- See [project/docs/svg-path-splitting-process.md](project/docs/svg-path-splitting-process.md)
+**Full Documentation:** [project/docs/equipment-system.md](project/docs/equipment-system.md)
 
 ## XP System
 
-Three-tier architecture: Skills → Attributes with intelligent scaling to encourage progression.
+Skills → Attributes with 50% XP passthrough and progressive scaling
 
-**Key Mechanics:**
-- **1000 XP per level** for both skills and attributes
-- **50% XP passthrough**: Skill XP automatically awards 50% to linked attribute (e.g., woodcutting → strength)
-- **Scaling formula**: `1 / (1 + 0.3 * (playerLevel - activityLevel - 1))` with grace range (0-1 levels = full XP)
-- **Minimum floor**: Always awards at least 1 XP
+**Key Facts:**
+- 1000 XP per level (flat, no exponential curve)
+- 50% of skill XP awarded to linked attribute (woodcutting → strength)
+- Scaling formula: `1 / (1 + 0.3 * (levelDiff - 1))` with 0-1 level grace range
+- Minimum 1 XP floor (no hard blocks)
 
-**Scaling Examples** (L5 activity, 45 raw XP):
-- L5-6: 45 XP (100%, grace range)
-- L7: 34 XP (75%, starts scaling)
-- L10: 20 XP (44%)
-- L15: 12 XP (26%)
+**Scaling Example** (L5 activity, 45 base XP):
+- L5-6: 45 XP (100%) | L7: 34 XP (75%) | L10: 20 XP (44%) | L15: 12 XP (26%)
 
-**Key Files:**
-- LocationService: [be/services/locationService.ts](be/services/locationService.ts) - `calculateScaledXP()` formula
-- Player ~L145-165: [be/models/Player.js](be/models/Player.js) - `addSkillExperience()` with attribute linking
-- Test script: [be/utils/test-xp-scaling.js](be/utils/test-xp-scaling.js)
-
-**Balance:** 20-50 XP per activity, 5-50 second durations, encourages level-appropriate content without hard forcing.
+**Full Documentation:** [project/docs/xp-system.md](project/docs/xp-system.md)
 
 ## Content Generator Agent
 
-The Content Generator Agent (`.claude/agents/content-generator.md`) is an AI-powered autonomous agent for creating game content. It works in the background while you continue development.
+AI-powered autonomous agent for creating game content (locations, facilities, activities, drop tables)
 
-**Purpose:**
-- Creates locations, facilities, activities, and drop tables from natural language requests
-- Works autonomously while you focus on development
-- Comprehensive validation ensures all references exist
-- AI-powered suggestions for balance and design
+**Usage:** Describe content in natural language
+- "Add salmon fishing at deep water dock, level 12 fishing"
+- "Create mountain mine with copper ore, level 8 mining"
 
-**How to Use:**
+**What It Does:** Reads existing data, validates references, creates TypeScript modules, balances rewards
 
-Simply describe what content you want in natural language:
-
-```
-"Add a mountain mine where players can mine copper ore"
-
-"Create salmon fishing at Kennik dock with level 10 requirement"
-
-"I need a forest clearing with birch logging for level 5 woodcutters"
-```
-
-**What It Does:**
-
-The agent autonomously:
-1. Reads existing game data for context
-2. Validates all item/skill/biome references
-3. Creates drop tables with balanced weights
-4. Creates activities with appropriate requirements
-5. Creates facilities grouping related activities
-6. Creates locations with medieval fantasy descriptions
-7. Reports back with summary and design decisions
-
-**What It Creates:**
-1. **Drop Tables** - Weighted loot pools (validates items exist)
-2. **Activities** - Actions with requirements/rewards/XP
-3. **Facilities** - Buildings housing activities
-4. **Locations** - Areas with facilities and navigation links
-
-**AI-Powered Features:**
-- Medieval fantasy description writing
-- Balance suggestions (drop rates, XP, requirements)
-- Context-aware consistency checking
-- Error prevention and validation
-- Explains design decisions
-- Works without interrupting your development flow
-
-**Example Workflow:**
-
-Traditional: ~27 minutes + context switching
-```
-1. Research items → 5 min
-2. Create drop table JSON → 3 min
-3. Validate items → 2 min
-4. Create activity JSON → 5 min
-5. Create facility JSON → 3 min
-6. Create location JSON → 2 min
-7. Add navigation → 2 min
-8. Test → 5 min
-```
-
-With Agent: ~30 seconds of your time
-```
-You: "Add tuna fishing at deep water dock, level 12 fishing"
-Agent: *works autonomously in background*
-Agent: "Created tuna fishing with drop table, activity at deep-water-dock..."
-You: *continue coding*
-```
-
-**Validation:**
-- ✓ All item IDs must exist in item definitions
-- ✓ Skills validated (woodcutting, mining, fishing, smithing, cooking)
-- ✓ Biomes validated (forest, mountain, sea)
-- ✓ Drop tables created before activities reference them
-- ✓ Balanced weights, XP, durations, requirements
-- ✓ Quantity ranges valid (min ≤ max)
-
-**Invoking the Agent:**
-
-When the user asks to create game content, invoke the content generator agent using the Task tool with `subagent_type="general-purpose"` and provide the user's request in the prompt. The agent will handle all validation, file creation, and reporting autonomously.
-
-**Full documentation:** `project/docs/content-generator-agent.md`
+**Full Documentation:** [project/docs/content-generator-agent.md](project/docs/content-generator-agent.md)
 
 ## Fast Paths (Zero Exploration Needed)
 
@@ -1058,383 +758,74 @@ When the user asks to create game content, invoke the content generator agent us
 
 ## Chat System
 
-The chat system provides real-time communication between players using Socket.io for bidirectional messaging.
+Real-time Socket.io player communication with commands and autocomplete
 
-### Architecture
+**Quick Facts:**
+- Global chat room with message persistence (ChatMessage model)
+- Commands: `/help`, `/online`, `/clear` with autocomplete dropdown
+- Rate limiting: 5 messages per 10 seconds
+- JWT authentication, XSS protection
 
-**Backend** ([be/sockets/chatHandler.js](be/sockets/chatHandler.js)):
-- Socket.io server integrated with Express
-- JWT authentication middleware for socket connections
-- Global chat room ('global') for all players
-- Message persistence using ChatMessage model
-- Rate limiting (5 messages per 10 seconds per user)
-- Online user counting via room socket tracking
-
-**Frontend** ([ui/src/app/services/chat.service.ts](ui/src/app/services/chat.service.ts), [ui/src/app/components/game/chat/](ui/src/app/components/game/chat/)):
-- Socket.io client service with Angular signals
-- Collapsible fixed-position chat window (bottom-right)
-- Auto-connects when user authenticates
-- Single-line message format: `timestamp username: message`
-- Command system with autocomplete dropdown
-- Keyboard navigation (Arrow Up/Down, Tab, Enter, Escape)
-
-### Features
-
-**Socket Events**:
-- `chat:sendMessage` - Send message to global chat
-- `chat:message` - Receive broadcasted message
-- `chat:getHistory` - Load chat history (up to 100 messages)
-- `chat:getOnlineCount` - Get number of connected users
-
-**Chat Commands**:
-- `/help` - Show available commands
-- `/online` - Show online user count
-- `/clear` - Clear local chat history (client-side only)
-
-**Command System**:
-```typescript
-// Command registry pattern for extensibility
-interface ChatCommand {
-  name: string;
-  description: string;
-  syntax?: string;
-  execute: (args: string[]) => void;
-}
-```
-
-**Autocomplete**:
-- Dropdown appears when typing `/`
-- Filters commands in real-time
-- Keyboard navigation with visual feedback
-- Click or Tab to autocomplete
-
-### Configuration
-
-**Connection**:
-```typescript
-// Frontend connects to Socket.io server (not /api path)
-const baseUrl = environment.apiUrl.replace('/api', '');
-const socket = io(baseUrl, { auth: { token } });
-```
-
-**Rate Limiting**:
-```javascript
-// Backend rate limiter
-const RATE_LIMIT_WINDOW = 10000; // 10 seconds
-const RATE_LIMIT_MAX = 5; // 5 messages per window
-```
-
-### UI Styling
-
-The chat component uses medieval fantasy theme matching the game design:
-- Purple accent colors for interactive elements
-- Gold text for usernames
-- Dark background with semi-transparency
-- Compact single-line message format for efficient space usage
-- Custom scrollbar styling
-
-### Security
-
-- JWT authentication required for socket connections
-- Username from User model (not player-provided)
-- Message length validation (max 500 characters)
-- Rate limiting to prevent spam
-- XSS protection via Angular's built-in sanitization
+**Key Files:** [chatHandler.js](be/sockets/chatHandler.js), [chat.service.ts](ui/src/app/services/chat.service.ts)
+**Socket Events:** `chat:sendMessage`, `chat:message`, `chat:getHistory`, `chat:getOnlineCount`
 
 ## Socket.io Real-Time Architecture
 
-The game uses Socket.io for real-time bidirectional communication between client and server, replacing HTTP polling for activities, crafting, and combat systems.
+Bidirectional real-time communication replacing HTTP polling for activities, crafting, and combat
 
-### Architecture Overview
+**Key Features:**
+- Server-authoritative timing (prevents client manipulation)
+- Client-driven auto-restart (requires active player, prevents AFK grinding)  
+- Reconnection handling (restores state after disconnect)
+- Performance: 99% reduction in network operations (eliminated 1000+ requests/min)
 
-**Backend Socket Handlers** ([be/sockets/](be/sockets/)):
-- [activityHandler.ts](be/sockets/activityHandler.ts) - Activity system (gathering, combat encounters)
-- [craftingHandler.ts](be/sockets/craftingHandler.ts) - Crafting system (recipes, quality inheritance)
-- [combatHandler.ts](be/sockets/combatHandler.ts) - Combat system (turn-based combat, abilities)
-- [chatHandler.js](be/sockets/chatHandler.js) - Chat system (global chat, commands)
-- JWT authentication middleware for all socket connections
-- Server-authoritative timing using setTimeout for action completion
+**Systems:** Activities, Crafting, Combat, Chat (all use Socket.io)
 
-**Frontend Socket Services** ([ui/src/app/services/](ui/src/app/services/)):
-- [location.service.ts](ui/src/app/services/location.service.ts) - Activity state management
-- [crafting.service.ts](ui/src/app/services/crafting.service.ts) - Crafting state management
-- [combat.service.ts](ui/src/app/services/combat.service.ts) - Combat state management
-- [chat.service.ts](ui/src/app/services/chat.service.ts) - Chat state management
-- [socket.service.ts](ui/src/app/services/socket.service.ts) - Base Socket.io client wrapper
-- Angular signals for reactive state updates
-- Effect hooks for setting up listeners when connected
-- Auto-reconnection and status restoration
-
-### Key Features
-
-**Server-Authoritative Timing:**
-- Backend controls when actions complete using setTimeout
-- Prevents client-side manipulation of completion times
-- Activity durations, crafting times, and combat turn timings enforced server-side
-
-**Client-Driven Auto-Restart:**
-- Frontend stores last action parameters (e.g., lastRecipeId, lastActivityId)
-- Automatically restarts completed actions without user input
-- Prevents AFK grinding: player must be active at completion to restart
-- Can be disabled for cancelled or error states
-
-**Activity Overwriting:**
-- Starting a new activity automatically cancels the current one
-- Starting a new crafting automatically cancels the current one
-- Starting travel automatically cancels the current activity
-- No blocking errors - actions seamlessly overwrite each other
-- Only combat blocks travel (cannot flee via travel action)
-
-**Real-Time State Updates:**
-- Socket events broadcast state changes instantly
-- No HTTP polling overhead (previously 500ms-1s intervals)
-- Player actions immediately visible without page refresh
-- Combat turns, crafting progress, activity completion all real-time
-
-**Reconnection Handling:**
-- Status check events restore state after disconnect/reload
-- `activity:getStatus`, `crafting:getStatus`, `combat:getStatus`
-- Progress timers resume from server timestamps
-- No lost progress on temporary disconnections
-
-### Socket Event Patterns
-
-**Activity System Events:**
-- `activity:start` - Start gathering/combat activity
-- `activity:started` - Server confirms activity started
-- `activity:completed` - Activity finished, rewards awarded
-- `activity:cancelled` - Activity cancelled by player
-- `activity:getStatus` - Reconnection status check
-
-**Crafting System Events:**
-- `crafting:start` - Start crafting recipe
-- `crafting:started` - Server confirms crafting started
-- `crafting:completed` - Crafting finished, item created
-- `crafting:cancelled` - Crafting cancelled by player
-- `crafting:error` - Insufficient materials or other error
-- `crafting:getStatus` - Reconnection status check
-
-**Combat System Events:**
-- `combat:attack` - Player basic attack
-- `combat:playerAttack` - Server broadcasts player attack result
-- `combat:monsterAttack` - Server broadcasts monster attack
-- `combat:useAbility` - Player uses combat ability
-- `combat:abilityUsed` - Server broadcasts ability result
-- `combat:useItem` - Player uses consumable item
-- `combat:itemUsed` - Server broadcasts item use result
-- `combat:victory` - Combat won, rewards awarded
-- `combat:defeat` - Combat lost, player respawns
-- `combat:fled` - Player fled from combat
-- `combat:getStatus` - Reconnection status check
-
-**Chat System Events:**
-- `chat:sendMessage` - Send message to global chat
-- `chat:message` - Receive broadcasted message
-- `chat:getHistory` - Load chat history
-- `chat:getOnlineCount` - Get online player count
-
-### Frontend Service Pattern
-
-All Socket.io services follow a consistent pattern:
-
-```typescript
-@Injectable({ providedIn: 'root' })
-export class ExampleService {
-  private socketService = inject(SocketService);
-
-  // Signals for reactive state
-  activeState = signal<State | null>(null);
-  isActive = signal<boolean>(false);
-
-  // Observables for events
-  completed$ = new Subject<Result>();
-  error$ = new Subject<Error>();
-
-  // Store for auto-restart
-  private lastActionParams: any = null;
-
-  constructor() {
-    // Setup listeners when connected
-    effect(() => {
-      if (this.socketService.isConnected()) {
-        this.setupSocketListeners();
-      }
-    });
-  }
-
-  private setupSocketListeners(): void {
-    this.socketService.on('event:started', (data) => {
-      // Update signals
-    });
-
-    this.socketService.on('event:completed', (data) => {
-      // Handle completion, emit event, auto-restart
-      this.completed$.next(result);
-      if (this.lastActionParams) {
-        this.startAction(this.lastActionParams);
-      }
-    });
-  }
-
-  async startAction(params: any): Promise<any> {
-    this.lastActionParams = params; // Store for auto-restart
-    return await this.socketService.emit('event:start', params);
-  }
-
-  ngOnDestroy(): void {
-    // Clean up listeners
-    this.socketService.off('event:started');
-    this.socketService.off('event:completed');
-  }
-}
-```
-
-### Migration from HTTP Polling
-
-**Before (HTTP Polling):**
-- Location/Activity: 1-second polling interval in locationController
-- Crafting: HTTP endpoint with manual status checks
-- Combat: 500ms polling for real-time combat feel
-- High server load, network overhead, delayed updates
-
-**After (Socket.io):**
-- All systems use real-time socket events
-- Zero polling overhead
-- Instant state updates
-- Server-authoritative timing prevents exploits
-- Client-driven auto-restart prevents AFK grinding
-- Reconnection support for seamless experience
-
-### Benefits
-
-- **Performance**: Eliminated 1000+ HTTP requests per minute during active gameplay
-- **Responsiveness**: Instant feedback on all player actions
-- **Scalability**: Reduced server CPU and network usage
-- **User Experience**: Smooth real-time gameplay without polling delays
-- **Security**: Server-authoritative timing prevents client manipulation
-- **Anti-AFK**: Client-driven restart requires active player presence
+**Full Documentation:** [project/docs/socketio-architecture.md](project/docs/socketio-architecture.md)
 
 ## Vendor/NPC Trading System
 
-NPC merchants at gathering locations for buying tools and selling resources.
+Buy tools and sell resources at gathering locations
 
-**Key Files:**
-- VendorService: [be/services/vendorService.ts](be/services/vendorService.ts) - Load from VendorRegistry, calculate prices
-- VendorController: [be/controllers/vendorController.js](be/controllers/vendorController.js) - Buy/sell transactions
-- Vendor Component: [ui/src/app/components/game/vendor/](ui/src/app/components/game/vendor/) - Buy/Sell tabs
-- Vendor Registry: [be/data/vendors/VendorRegistry.ts](be/data/vendors/VendorRegistry.ts) - TypeScript vendor definitions
-
-**Key Features:**
-- Infinite stock (architecture supports limited)
-- Buy prices: Fixed per item in vendor JSON
-- Sell prices: 50% of vendor price (base + quality/trait bonuses)
+**Quick Facts:**
+- Buy prices: Fixed per vendor | Sell prices: 50% of base (+ quality/trait bonuses)
+- Infinite vendor stock (architecture supports limited)
 - Drag-and-drop selling from inventory
-- Gold sync via auth service
 
-**Configuration:**
-- Vendor TypeScript: Create module in `be/data/vendors/{VendorId}.ts` and register in VendorRegistry
-- Facility link: Add `vendorIds` array to facility TypeScript definition
-- Multiple vendors per facility supported
+**Key Files:** [vendorService.ts](be/services/vendorService.ts), [VendorRegistry.ts](be/data/vendors/VendorRegistry.ts)
 
 ## Cooking/Crafting System
 
-Create items from ingredients with quality inheritance and instance selection.
+Create items from ingredients with quality inheritance and Socket.io real-time updates
 
-**Key Files:**
-- RecipeService: [be/services/recipeService.ts](be/services/recipeService.ts) - Load from RecipeRegistry, validate, calculate quality
-- CraftingHandler: [be/sockets/craftingHandler.ts](be/sockets/craftingHandler.ts) - Socket.io real-time crafting (replaces HTTP polling)
-- CraftingController: [be/controllers/craftingController.js](be/controllers/craftingController.js) - Legacy HTTP endpoints (deprecated)
-- CraftingService: [ui/src/app/services/crafting.service.ts](ui/src/app/services/crafting.service.ts) - Frontend Socket.io service
-- Crafting Component: [ui/src/app/components/game/crafting/](ui/src/app/components/game/crafting/) - Recipe browser, instance selection
-- Recipe Registry: [be/data/recipes/RecipeRegistry.ts](be/data/recipes/RecipeRegistry.ts) - TypeScript recipe definitions
+**Quick Facts:**
+- Skills: Cooking (4 recipes), Smithing (16 recipes), Alchemy (6 recipes)
+- Instance selection (choose specific items by quality/traits)
+- Quality inheritance: max ingredient quality + skill bonus (every 10 levels = +1, max +2)
+- Subcategory ingredients ("any herb" instead of specific itemIds)
+- Recipe unlock system (progressive discovery)
+- Auto-restart after completion
 
-**Key Features:**
-- **Real-time Socket.io**: Server-authoritative timing, instant completion events, no HTTP polling
-- **Instance selection**: Choose specific items by quality/traits (Player.activeCrafting.selectedIngredients Map)
-- **Quality inheritance**: Max ingredient quality + skill bonus (every 10 levels = +1, max +2)
-- **Time-based**: 6-12 second durations with server-controlled completion
-- **Auto-select best**: One-click highest quality ingredient selection
-- **Quality badges**: Common, Uncommon, Rare, Epic, Legendary
-- **Recipe filtering**: Search by name/description, show craftable only, sort by level/name/XP
-- **Auto-restart**: Client-driven automatic restart of last completed recipe
-- **Progress timer**: Client-side countdown with server timestamp synchronization
+**Key Files:** [recipeService.ts](be/services/recipeService.ts), [RecipeRegistry.ts](be/data/recipes/RecipeRegistry.ts), [craftingHandler.ts](be/sockets/craftingHandler.ts)
+**Socket Events:** `crafting:start`, `crafting:started`, `crafting:completed`, `crafting:cancelled`
 
-**Current Skills:**
-- Cooking (4 recipes: shrimp/trout/salmon/cod at kennik-kitchen)
-- Smithing (16 recipes: ore smelting, bronze/iron equipment - weapons, armor, tools)
-- Alchemy (6 recipes: health/mana potions levels 1-15 at village-apothecary)
-
-**Advanced Features:**
-- **Subcategory ingredients**: Recipes can require "any herb" instead of specific itemIds
-  - Backend validates both `itemId` and `subcategory` ingredient types
-  - Frontend filters inventory by `item.definition.subcategories.includes(subcategory)`
-  - Enables flexible ingredient selection and quality optimization
-- **Recipe unlock system**: Progressive discovery via crafting achievements
-  - `unlockConditions: { craftedRecipes: ['basic_health_tincture'] }` for recipe chains
-  - `discoveredByDefault: true` for starter recipes
-  - Player.unlockedRecipes tracks discovered recipes
-  - Backend `checkRecipeUnlocks()` awards new recipes on craft completion
-- **Multi-instance selection**: Can select 2+ of same item instance as ingredients
-  - Cycling logic: 0 → 1 → 2 → max → 0
-  - Quality badge display for each instance
-  - Auto-select best quality feature
-- See [project/docs/alchemy-subcategory-implementation.md](project/docs/alchemy-subcategory-implementation.md) for full technical details
-
-**Configuration:**
-- Recipe TypeScript: Create module in `be/data/recipes/{skill}/{RecipeId}.ts` and register in RecipeRegistry
-- Facility: Set `type: "crafting"` and `craftingSkills: ["alchemy"]` in facility TypeScript definition
-- Subcategory ingredients: Use `{ subcategory: 'herb', quantity: 2 }` instead of `{ itemId: 'sage', quantity: 2 }`
-- Item subcategories: Add `subcategories: ['herb']` to item definition
+**Full Documentation:** [project/docs/alchemy-subcategory-implementation.md](project/docs/alchemy-subcategory-implementation.md)
 
 ## Combat System
 
-Turn-based combat system with monsters, abilities, and stat tracking.
+Turn-based combat with abilities, buffs/debuffs, and real-time Socket.io events
 
-**Key Files:**
-- CombatService: [be/services/combatService.ts](be/services/combatService.ts) - Combat logic, damage calculation, monster AI
-- CombatHandler: [be/sockets/combatHandler.ts](be/sockets/combatHandler.ts) - Socket.io real-time combat (replaces HTTP polling)
-- CombatController: [be/controllers/combatController.js](be/controllers/combatController.js) - Legacy HTTP endpoints (deprecated)
-- CombatService (Frontend): [ui/src/app/services/combat.service.ts](ui/src/app/services/combat.service.ts) - Frontend Socket.io service
-- Combat Component: [ui/src/app/components/game/combat/](ui/src/app/components/game/combat/) - Combat UI, health bars, combat log
-- Monster Registry: [be/data/monsters/MonsterRegistry.ts](be/data/monsters/MonsterRegistry.ts) - TypeScript monster definitions
-- Ability Registry: [be/data/abilities/AbilityRegistry.ts](be/data/abilities/AbilityRegistry.ts) - TypeScript ability definitions
+**Quick Facts:**
+- 5 monsters, 10 abilities (6 damage + 4 buff/debuff)
+- Turn-based with weapon speed intervals
+- Timestamp-based cooldowns, consumable items, combat restart
+- Damage formula: base + skill + equipment + buffs (with crit/dodge)
+- Loot drops via drop tables
 
-**Key Features:**
-- **Real-time Socket.io**: Instant combat events, no 500ms HTTP polling, server-authoritative turn timing
-- **Turn-based combat**: Player and monster alternate attacks based on weapon speed
-- **Combat abilities**: Weapon-specific special attacks (10 abilities: 6 damage + 4 buff/debuff)
-- **Buff/Debuff system**: Stat modifiers, DoT/HoT effects, duration tracking, visual UI display
-- **Timestamp-based cooldowns**: Real-time cooldown tracking using server timestamps instead of turn counts
-- **Consumable items**: Use health/mana potions during combat via item-button component
-- **Combat restart**: "Start New Encounter" button to repeat same activity without navigation
-- **Damage calculation**: Base damage + skill level + equipment bonuses + active buffs, with crit/dodge mechanics
-- **Monster AI**: Basic attack patterns with ability usage
-- **Combat stats**: Track defeats, damage dealt/taken, deaths, critical hits, dodges
-- **Combat log**: Color-coded event history with timestamps and auto-scroll
-- **Loot drops**: Monsters drop items via drop tables on defeat
-- **UI components**: Reusable ability-button, item-button, and buff-icon components with cooldowns, tooltips
-- **Real-time updates**: HP/mana changes, attack timings, ability usage, buff applications all broadcast instantly
+**Key Files:** [combatService.ts](be/services/combatService.ts), [combatHandler.ts](be/sockets/combatHandler.ts), [MonsterRegistry.ts](be/data/monsters/MonsterRegistry.ts), [AbilityRegistry.ts](be/data/abilities/AbilityRegistry.ts)
+**Socket Events:** `combat:attack`, `combat:useAbility`, `combat:victory`, `combat:defeat`
 
-**Current Content:**
-- Monsters: Bandit Thug (L3, one-handed), Forest Wolf (L2, ranged), Goblin Warrior (L4, two-handed), Goblin Scout (L5, ranged), Goblin Shaman (L6, casting)
-- Damage Abilities: Heavy Strike, Quick Slash (one-handed), Aimed Shot, Rapid Fire (ranged), Fire Bolt, Ice Shard (casting)
-- Buff/Debuff Abilities: Battle Fury (+20% dmg self), Weaken Armor (-15 armor enemy), Poison Strike (DoT), Regeneration (HoT)
-- Combat activities: 6 combat encounters at 3 locations (Forest Clearing, Goblin Village) requiring appropriate weapon skills
-- Combat drops: Raw meat, fangs, leather scraps, herbs, potions, crude equipment + gold
-- Locations: Goblin Village (3 progressive combat encounters), Forest Clearing (3 encounters)
-
-**Combat Flow:**
-1. Player starts combat via activity (requires appropriate weapon equipped)
-2. Turn-based attacks with weapon speed determining attack intervals
-3. Use abilities (cooldown-based), consumables, or basic attacks
-4. Monster defeated → rewards (XP, loot, gold) → option to restart or return
-5. Player defeated → respawn at location with no penalty
-6. Flee during combat (confirmation) or return after combat ends (instant)
-
-**Configuration:**
-- Monster TypeScript: Create module in `be/data/monsters/definitions/{MonsterId}.ts` and register in MonsterRegistry
-- Ability TypeScript: Create module in `be/data/abilities/definitions/{AbilityId}.ts` and register in AbilityRegistry
-- Combat activity: Create activity TypeScript module linking to monster drop table
+**Full Documentation:** [project/docs/combat-system.md](project/docs/combat-system.md)
 - Full documentation: [project/docs/combat-system.md](project/docs/combat-system.md)
 
 ## Next Steps / Ideas
