@@ -5,10 +5,10 @@ import { InventoryService } from './inventory.service';
 import { SkillsService } from './skills.service';
 import { AttributesService } from './attributes.service';
 import { SocketService } from './socket.service';
-import { Ability } from '@shared/types';
+import { Ability, ActiveBuff } from '@shared/types';
 
-// Re-export Ability so components can import it
-export type { Ability };
+// Re-export types so components can import them
+export type { Ability, ActiveBuff };
 
 export interface Combat {
   activityId?: string | null;
@@ -33,13 +33,14 @@ export interface Combat {
   combatLog: CombatLogEntry[];
   availableAbilities: Ability[];
   abilityCooldowns: { [abilityId: string]: number };
+  activeBuffs: ActiveBuff[];
   combatEnded?: boolean; // Flag indicating combat has ended
 }
 
 export interface CombatLogEntry {
   timestamp: Date;
   message: string;
-  type: 'damage' | 'heal' | 'dodge' | 'miss' | 'crit' | 'ability' | 'system' | 'loot';
+  type: 'damage' | 'heal' | 'dodge' | 'miss' | 'crit' | 'ability' | 'system' | 'loot' | 'buff' | 'debuff';
   damageValue?: number;
   target?: 'player' | 'monster';
   isNew?: boolean;
@@ -136,7 +137,8 @@ export class CombatService {
         turnCount: data.combat.turnCount,
         combatLog: initialLog,
         availableAbilities: data.combat.availableAbilities || [],
-        abilityCooldowns: data.combat.abilityCooldowns || {}
+        abilityCooldowns: data.combat.abilityCooldowns || {},
+        activeBuffs: data.combat.activeBuffs || []
       });
 
       this.inCombat.set(true);
@@ -174,6 +176,11 @@ export class CombatService {
         combat.combatLog.push(logEntry);
       }
 
+      // Update active buffs if provided
+      if (data.activeBuffs !== undefined) {
+        combat.activeBuffs = data.activeBuffs;
+      }
+
       this.activeCombat.set({ ...combat });
     });
 
@@ -206,6 +213,11 @@ export class CombatService {
           isNew: true
         };
         combat.combatLog.push(logEntry);
+      }
+
+      // Update active buffs if provided
+      if (data.activeBuffs !== undefined) {
+        combat.activeBuffs = data.activeBuffs;
       }
 
       this.activeCombat.set({ ...combat });
@@ -247,6 +259,11 @@ export class CombatService {
           isNew: true
         };
         combat.combatLog.push(logEntry);
+      }
+
+      // Update active buffs if provided
+      if (data.activeBuffs !== undefined) {
+        combat.activeBuffs = data.activeBuffs;
       }
 
       this.activeCombat.set({ ...combat });
@@ -293,6 +310,11 @@ export class CombatService {
           isNew: true
         };
         combat.combatLog.push(logEntry);
+      }
+
+      // Update active buffs if provided
+      if (data.activeBuffs !== undefined) {
+        combat.activeBuffs = data.activeBuffs;
       }
 
       this.activeCombat.set({ ...combat });
@@ -449,7 +471,8 @@ export class CombatService {
             timestamp: new Date(entry.timestamp)
           })),
           availableAbilities: combat.availableAbilities || [],
-          abilityCooldowns: combat.abilityCooldowns
+          abilityCooldowns: combat.abilityCooldowns,
+          activeBuffs: combat.activeBuffs || []
         });
         this.inCombat.set(true);
       } else if (response.success && !response.inCombat) {

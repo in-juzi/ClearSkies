@@ -8,11 +8,12 @@ import { LocationService } from '../../../services/location.service';
 import { AbilityButtonComponent } from '../../shared/ability-button/ability-button.component';
 import { ItemButtonComponent } from '../../shared/item-button/item-button.component';
 import { ItemMiniComponent } from '../../shared/item-mini/item-mini.component';
+import { BuffIconComponent } from '../../shared/buff-icon/buff-icon';
 
 @Component({
   selector: 'app-combat',
   standalone: true,
-  imports: [CommonModule, AbilityButtonComponent, ItemButtonComponent, ItemMiniComponent],
+  imports: [CommonModule, AbilityButtonComponent, ItemButtonComponent, ItemMiniComponent, BuffIconComponent],
   templateUrl: './combat.component.html',
   styleUrls: ['./combat.component.scss']
 })

@@ -63,6 +63,17 @@
                  [style.background-color]="'#3b82f6'"></div>
           </div>
         </div>
+
+        <!-- Active Buffs (Player) -->
+        @if (combat.activeBuffs && combat.activeBuffs.length > 0) {
+          <div class="buffs-container">
+            @for (buff of combat.activeBuffs; track buff.buffId) {
+              @if (buff.target === 'player') {
+                <app-buff-icon [buff]="buff" [size]="36"></app-buff-icon>
+              }
+            }
+          </div>
+        }
       </div>
 
       <!-- VS Indicator -->
@@ -118,6 +129,17 @@
                  [style.background-color]="monsterHpColor()"></div>
           </div>
         </div>
+
+        <!-- Active Debuffs (Monster) -->
+        @if (combat.activeBuffs && combat.activeBuffs.length > 0) {
+          <div class="buffs-container">
+            @for (buff of combat.activeBuffs; track buff.buffId) {
+              @if (buff.target === 'monster') {
+                <app-buff-icon [buff]="buff" [size]="36"></app-buff-icon>
+              }
+            }
+          </div>
+        }
       </div>
     </div>
 

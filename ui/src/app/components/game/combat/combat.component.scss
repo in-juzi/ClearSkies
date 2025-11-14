@@ -223,6 +223,19 @@
   transition: width 0.3s ease, background-color 0.3s ease;
 }
 
+// Buffs Container
+.buffs-container {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 0.75rem;
+  padding: 0.5rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  min-height: 48px;
+}
+
 // Action Bar
 .action-bar {
   display: flex;
@@ -457,6 +470,22 @@
       color: var(--color-accent-purple);
     }
     border-left-color: var(--color-accent-purple);
+  }
+
+  &.log-buff {
+    .log-message {
+      color: #4ade80; // green for player buffs
+      font-weight: 600;
+    }
+    border-left-color: #4ade80;
+  }
+
+  &.log-debuff {
+    .log-message {
+      color: #f87171; // red for enemy debuffs
+      font-weight: 600;
+    }
+    border-left-color: #f87171;
   }
 
   &.log-loot {
