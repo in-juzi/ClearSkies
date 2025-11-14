@@ -49,6 +49,7 @@ export class CraftingComponent implements OnInit {
       quantity: number;
       qualities?: { [key: string]: number };
       traits?: { [key: string]: number };
+      definition?: any; // Item definition for icon display
     };
   }> = [];
 
@@ -103,6 +104,9 @@ export class CraftingComponent implements OnInit {
     const elapsed = recipe.duration - remaining;
     return (elapsed / recipe.duration) * 100;
   });
+
+  // Get output item definitions for selected recipe
+  selectedRecipeOutputItems = signal<any[]>([]);
 
 
   // Get selected ingredient items for display
@@ -178,22 +182,48 @@ export class CraftingComponent implements OnInit {
         const outputs = lastResult.outputs || (lastResult.output ? [lastResult.output] : []);
 
         // Add to crafting log (one entry per output)
-        const newEntries = outputs.map(output => ({
-          timestamp: new Date(),
-          recipeName: lastResult.recipe.name,
-          experience: lastResult.experience.xp,
-          skill: lastResult.experience.skill,
-          output: {
-            itemId: output.itemId,
-            name: output.name, // Include display name
-            quantity: output.quantity,
-            qualities: output.qualities,
-            traits: output.traits
-          }
-        }));
+        // Fetch item definitions for each output to include icons and display names
+        outputs.forEach(output => {
+          this.inventoryService.getItemDefinition(output.itemId).subscribe({
+            next: (itemDef) => {
+              const newEntry = {
+                timestamp: new Date(),
+                recipeName: lastResult.recipe.name,
+                experience: lastResult.experience.xp,
+                skill: lastResult.experience.skill,
+                output: {
+                  itemId: output.itemId,
+                  name: output.name || itemDef.name, // Use output name or definition name
+                  quantity: output.quantity,
+                  qualities: output.qualities,
+                  traits: output.traits,
+                  definition: itemDef // Include full definition for icon
+                }
+              };
 
-        // Create new array instead of mutating to ensure Angular change detection
-        this.craftingLog = [...newEntries, ...this.craftingLog].slice(0, 10);
+              // Create new array instead of mutating to ensure Angular change detection
+              this.craftingLog = [newEntry, ...this.craftingLog].slice(0, 10);
+            },
+            error: (error) => {
+              console.warn('Could not load item definition for log:', error);
+              // Add entry without definition as fallback
+              const newEntry = {
+                timestamp: new Date(),
+                recipeName: lastResult.recipe.name,
+                experience: lastResult.experience.xp,
+                skill: lastResult.experience.skill,
+                output: {
+                  itemId: output.itemId,
+                  name: output.name,
+                  quantity: output.quantity,
+                  qualities: output.qualities,
+                  traits: output.traits
+                }
+              };
+              this.craftingLog = [newEntry, ...this.craftingLog].slice(0, 10);
+            }
+          });
+        });
 
         const recipeId = lastResult.recipe.recipeId;
         const recipe = this.recipeService.getRecipe(recipeId);
@@ -296,6 +326,42 @@ export class CraftingComponent implements OnInit {
     this.message.set(null);
     // Auto-select best quality ingredients
     this.autoSelectBestQuality(recipe);
+    // Load output item definitions
+    this.loadOutputItemDefinitions(recipe);
+  }
+
+  /**
+   * Load output item definitions for display
+   */
+  private loadOutputItemDefinitions(recipe: Recipe): void {
+    const outputs = this.getRecipeOutputs(recipe);
+    const loadedItems: any[] = [];
+
+    outputs.forEach(output => {
+      this.inventoryService.getItemDefinition(output.itemId).subscribe({
+        next: (itemDef) => {
+          loadedItems.push({
+            ...output,
+            definition: itemDef,
+            name: itemDef.name
+          });
+          // Update signal when all items are loaded
+          if (loadedItems.length === outputs.length) {
+            this.selectedRecipeOutputItems.set(loadedItems);
+          }
+        },
+        error: (error) => {
+          console.warn('Could not load output item definition:', error);
+          loadedItems.push({
+            ...output,
+            name: output.itemId // Fallback to itemId
+          });
+          if (loadedItems.length === outputs.length) {
+            this.selectedRecipeOutputItems.set(loadedItems);
+          }
+        }
+      });
+    });
   }
 
   /**

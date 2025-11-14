@@ -100,7 +100,7 @@ export default function (io: Server): void {
      * Event: chat:getOnlineCount
      * Client requests count of online users
      */
-    socket.on('chat:getOnlineCount', async (callback?: (response: any) => void) => {
+    socket.on('chat:getOnlineCount', async (data: any, callback?: (response: any) => void) => {
       try {
         // Get all sockets in the 'global' room
         const sockets = await io.in('global').fetchSockets();

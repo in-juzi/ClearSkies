@@ -584,12 +584,19 @@
   }
 
   .recipe-description-detail {
-    padding: var(--spacing-m);
-    background: var(--color-bg-overlay);
-    border-radius: var(--radius-s);
     color: var(--color-text-secondary);
-    margin-bottom: var(--spacing-l);
     font-style: italic;
+    line-height: 1.5;
+    margin-top: var(--spacing-xs);
+    font-size: var(--font-size-s);
+
+    // When standalone (not inside output-item-display)
+    &:not(.output-details .recipe-description-detail) {
+      padding: var(--spacing-m);
+      background: var(--color-bg-overlay);
+      border-radius: var(--radius-s);
+      margin-bottom: var(--spacing-l);
+    }
   }
 
   .ingredients-section,
@@ -603,7 +610,6 @@
   }
 
   .ingredient-group {
-    margin-bottom: var(--spacing-xl);
     padding: var(--spacing-l);
     background: var(--color-bg-elevated);
     border-radius: var(--radius-card);
@@ -791,6 +797,44 @@
     }
   }
 
+  .output-item-display {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-m);
+    padding: var(--spacing-m);
+    background: var(--gradient-card);
+    border-radius: var(--radius-s);
+    margin-bottom: var(--spacing-m);
+
+    .output-icon-inline {
+      flex-shrink: 0;
+    }
+
+    .output-details {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-xs);
+    }
+
+    .output-name-display {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-m);
+
+      .output-name {
+        font-weight: var(--font-weight-medium);
+        color: var(--color-secondary);
+        font-size: var(--font-size-l);
+      }
+
+      .output-quantity {
+        color: var(--color-accent-gold);
+        font-weight: var(--font-weight-medium);
+      }
+    }
+  }
+
   .quality-note {
     font-size: var(--font-size-s);
     color: var(--color-text-muted);
@@ -799,6 +843,7 @@
 
   .craft-actions {
     margin-top: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
 
     .btn-craft {
       width: 100%;

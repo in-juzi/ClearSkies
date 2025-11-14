@@ -9,7 +9,6 @@
   <!-- Active Crafting Progress -->
   @if (craftingService.isCrafting() || isRestarting()) {
     <div class="active-crafting">
-      <h3>Crafting in Progress</h3>
       @if (activeRecipe() && activeOutputIcon()) {
         <div class="recipe-output-display">
           <app-icon
@@ -89,6 +88,7 @@
                 [showIcon]="true"
                 [showQuantity]="true"
                 [showItemId]="true"
+                [showDisplayName]="true"
                 [showModifiers]="true">
               </app-item-mini>
               <app-xp-mini
@@ -235,8 +235,46 @@
         </div>
       </div>
 
-      <div class="recipe-description-detail">
-        {{ selectedRecipe()!.description }}
+      <!-- Output Section -->
+      <div class="output-section">
+        <h3>Creates</h3>
+        @for (outputItem of selectedRecipeOutputItems(); track outputItem.itemId) {
+          <div class="output-item-display">
+            @if (outputItem.definition?.icon) {
+              <app-icon
+                [icon]="outputItem.definition.icon"
+                [size]="32"
+                class="output-icon-inline">
+              </app-icon>
+            }
+            <div class="output-details">
+              <div class="output-name-display">
+                <span class="output-name">{{ outputItem.name }}</span>
+                <span class="output-quantity">x{{ outputItem.quantity }}</span>
+              </div>
+              <div class="recipe-description-detail">
+                {{ selectedRecipe()!.description }}
+              </div>
+              @if (outputItem.qualityModifier === 'inherit') {
+                <div class="quality-note">
+                  Quality inherited from ingredients + {{ skill }} level bonus
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="craft-actions">
+        @if (canCraft(selectedRecipe()!).canCraft) {
+          <button class="btn-craft" (click)="startCrafting(selectedRecipe()!)">
+            Start Crafting
+          </button>
+        } @else {
+          <div class="cannot-craft-message">
+            {{ canCraft(selectedRecipe()!).message }}
+          </div>
+        }
       </div>
 
       <div class="ingredients-section">
@@ -303,33 +341,6 @@
                 Clear Selection
               </button>
             </div>
-          </div>
-        }
-      </div>
-
-      <div class="output-section">
-        <h3>Output{{ getRecipeOutputs(selectedRecipe()!).length > 1 ? 's' : '' }}</h3>
-        @for (output of getRecipeOutputs(selectedRecipe()!); track output.itemId) {
-          <div class="output-item">
-            <span class="output-name">{{ output.itemId }}</span>
-            <span class="output-quantity">x{{ output.quantity }}</span>
-          </div>
-          @if (output.qualityModifier === 'inherit') {
-            <div class="quality-note">
-              Quality will be inherited from ingredients and affected by your {{ skill }} level.
-            </div>
-          }
-        }
-      </div>
-
-      <div class="craft-actions">
-        @if (canCraft(selectedRecipe()!).canCraft) {
-          <button class="btn-craft" (click)="startCrafting(selectedRecipe()!)">
-            Start Crafting
-          </button>
-        } @else {
-          <div class="cannot-craft-message">
-            {{ canCraft(selectedRecipe()!).message }}
           </div>
         }
       </div>
