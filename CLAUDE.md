@@ -37,24 +37,23 @@
 - ✅ AWS deployment configuration (completed - S3 static hosting for frontend, EC2 for backend API)
 
 **Recent Changes** (Last 10 commits):
+- refactor: migrate frontend services to use environment configuration
+- fix: configure production environment and build scripts
+- feat: configure backend server to bind to 0.0.0.0 for EC2 deployment
+- docs: update CLAUDE.md with AWS deployment architecture
 - feat: configure production API endpoint for EC2 backend
 - feat: configure CORS for S3 static hosting deployment
 - chore: add EC2 SSH key to .gitignore
+- docs: update CLAUDE.md with shared types and constants migration
 - chore: add Python script for automated constant migration
 - refactor: update location component to use shared Activity types
-- refactor: migrate frontend models to use @shared/types
-- refactor: migrate backend services to use @shared/types
-- refactor: add backward compatibility layer for backend types
-- refactor: migrate alchemy recipes to use SUBCATEGORY constants
-- refactor: migrate item definitions to use CATEGORY and SUBCATEGORY constants
 
 **Known Issues**:
 - None currently identified
 
 **Next Priorities**:
-- Complete AWS deployment (database migrations, PM2 setup, security group configuration)
 - Equipment stat application (apply armor/damage/evasion bonuses to combat calculations)
-- SSL/HTTPS setup with CloudFront CDN for production
+- SSL/HTTPS setup with CloudFront CDN for production deployment
 - Steel tier equipment (requires steel ingots from iron + coal)
 - More alchemy recipes (buff potions, debuff potions, transmutation)
 - Combat system enhancements (more monsters, abilities, boss fights)
