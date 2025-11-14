@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
-const Player = require('../models/Player');
 
 async function up() {
   console.log('Running migration: Add activeCrafting field to Player model');
 
+  const Player = mongoose.model('Player');
   const players = await Player.find({});
   let modified = 0;
 
@@ -29,6 +29,7 @@ async function up() {
 async function down() {
   console.log('Rolling back migration: Remove activeCrafting field from Player model');
 
+  const Player = mongoose.model('Player');
   const players = await Player.find({});
   let modified = 0;
 
