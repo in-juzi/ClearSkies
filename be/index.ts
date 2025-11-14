@@ -51,7 +51,12 @@ console.log(`✓ Loaded ${require('./data/recipes/RecipeRegistry').RecipeRegistr
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:4200', 'http://clearskies-frontend-dev.s3-website-us-east-1.amazonaws.com'],
+  origin: [
+    'http://localhost:4200',
+    'http://clearskies-frontend-dev.s3-website-us-east-1.amazonaws.com',
+    'http://clearskies.juzi.dev',
+    'https://clearskies.juzi.dev'
+  ],
   credentials: true
 }));
 app.use(express.json());
@@ -103,7 +108,12 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
 // Initialize Socket.io
 const io = new Server(server, {
   cors: {
-    origin: ['http://localhost:4200', 'http://clearskies-frontend-dev.s3-website-us-east-1.amazonaws.com'],
+    origin: [
+      'http://localhost:4200',
+      'http://clearskies-frontend-dev.s3-website-us-east-1.amazonaws.com',
+      'http://clearskies.juzi.dev',
+      'https://clearskies.juzi.dev'
+    ],
     credentials: true
   }
 });
