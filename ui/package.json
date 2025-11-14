@@ -9,7 +9,9 @@
     "build:cloudflare": "ng build --configuration cloudflare",
     "build:dev": "ng build --configuration development",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "deploy": "npm run build:cloudflare && cd dist/ui/browser && aws s3 sync . s3://clearskies.juzi.dev --delete",
+    "deploy:invalidate": "npm run deploy && aws cloudfront create-invalidation --distribution-id YOUR_DISTRIBUTION_ID --paths \"/*\""
   },
   "prettier": {
     "printWidth": 100,
