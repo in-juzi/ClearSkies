@@ -7,15 +7,125 @@ import {
   AttackResult,
   ActiveBuff,
   BuffApplication,
-  StatModifier
+  StatModifier,
+  BuffableStat,
+  ModifierType
 } from '@shared/types';
 import { MonsterRegistry } from '../data/monsters/MonsterRegistry';
 import { AbilityRegistry } from '../data/abilities/AbilityRegistry';
+import { COMBAT_FORMULAS } from '../data/constants/combat-constants';
+import { ICombatEntity, PlayerCombatEntity, MonsterCombatEntity, WeaponData } from './combat/CombatEntity';
+
+/**
+ * Cached passive ability effects for an entity
+ */
+interface PassiveEffects {
+  armorBonus: number;
+  evasionBonus: number;
+  critChanceBonus: number;
+  damageBonus: number;
+  conditionalBonuses: Array<{
+    trigger: string;
+    effect: string;
+    value: number;
+  }>;
+}
 
 class CombatService {
+  // Cache passive ability effects to avoid re-calculating every damage calculation
+  private passiveEffectsCache = new Map<string, PassiveEffects>();
+
   constructor() {
     console.log(`Loaded ${MonsterRegistry.size} monsters from MonsterRegistry (compile-time)`);
     console.log(`Loaded ${AbilityRegistry.size} abilities from AbilityRegistry (compile-time)`);
+  }
+
+  /**
+   * Get or calculate passive ability effects for an entity
+   * Uses cache to avoid repeated iterations over passive abilities
+   */
+  private getPassiveEffects(entity: any): PassiveEffects {
+    // Generate cache key (monsterId for monsters, player _id for players)
+    const cacheKey = entity.monsterId || (entity._id ? entity._id.toString() : 'unknown');
+
+    // Check cache first
+    if (this.passiveEffectsCache.has(cacheKey)) {
+      return this.passiveEffectsCache.get(cacheKey)!;
+    }
+
+    // Calculate effects from passive abilities
+    const effects: PassiveEffects = {
+      armorBonus: 0,
+      evasionBonus: 0,
+      critChanceBonus: 0,
+      damageBonus: 0,
+      conditionalBonuses: []
+    };
+
+    if (entity.passiveAbilities) {
+      for (const ability of entity.passiveAbilities) {
+        if (!ability.effects) continue;
+
+        // Accumulate always-active bonuses
+        if (ability.effects.armorBonus) {
+          effects.armorBonus += ability.effects.armorBonus;
+        }
+        if (ability.effects.evasionBonus) {
+          effects.evasionBonus += ability.effects.evasionBonus;
+        }
+        if (ability.effects.critChanceBonus) {
+          effects.critChanceBonus += ability.effects.critChanceBonus;
+        }
+
+        // Handle damage bonuses (may be conditional)
+        if (ability.effects.damageBonus) {
+          if (ability.effects.trigger) {
+            // Conditional bonus (e.g., below_50_percent_hp)
+            effects.conditionalBonuses.push({
+              trigger: ability.effects.trigger,
+              effect: 'damageBonus',
+              value: ability.effects.damageBonus
+            });
+          } else {
+            // Always-active bonus
+            effects.damageBonus += ability.effects.damageBonus;
+          }
+        }
+      }
+    }
+
+    // Cache the result
+    this.passiveEffectsCache.set(cacheKey, effects);
+
+    return effects;
+  }
+
+  /**
+   * Clear passive effects cache for an entity
+   * Call this when entity's passive abilities change
+   */
+  clearPassiveEffectsCache(entity: any): void {
+    const cacheKey = entity.monsterId || (entity._id ? entity._id.toString() : 'unknown');
+    this.passiveEffectsCache.delete(cacheKey);
+  }
+
+  /**
+   * Clear entire passive effects cache
+   * Useful for testing or when many entities change
+   */
+  clearAllPassiveEffectsCache(): void {
+    this.passiveEffectsCache.clear();
+  }
+
+  /**
+   * Wrap an entity (player or monster) in the appropriate ICombatEntity wrapper
+   */
+  private wrapEntity(entity: any, itemService: any): ICombatEntity {
+    if (entity.monsterId) {
+      return new MonsterCombatEntity(entity);
+    } else {
+      return new PlayerCombatEntity(entity, itemService);
+    }
   }
 
   /**
@@ -102,184 +212,155 @@ class CombatService {
       total += Math.floor(Math.random() * numFaces) + 1;
     }
 
-    return Math.max(1, total); // Minimum 1 damage
+    return Math.max(COMBAT_FORMULAS.MIN_DAMAGE, total);
+  }
+
+  /**
+   * Generic combat stat calculation from all sources
+   * Consolidates logic for armor, evasion, and future stats
+   *
+   * @param entity - The entity (player or monster) to calculate stat for
+   * @param itemService - Item service for equipment lookups
+   * @param player - Player reference for buff calculations
+   * @param statName - Name of stat to calculate (armor, evasion, etc.)
+   * @param combatStatKey - Key in entity.combatStats (armor, evasion)
+   * @param passiveEffectKey - Key in passive ability effects (armorBonus, evasionBonus)
+   * @param itemPropertyKey - Key in item properties (armor, evasion)
+   * @returns Total stat value after all bonuses applied
+   */
+  private calculateCombatStat(
+    entity: any,
+    itemService: any,
+    player: any | undefined,
+    statName: BuffableStat | string,
+    combatStatKey: string,
+    passiveEffectKey: string,
+    itemPropertyKey: string
+  ): number {
+    let total = 0;
+
+    // 1. Add base stat from combatStats
+    if (entity.combatStats && entity.combatStats[combatStatKey] !== undefined) {
+      total += entity.combatStats[combatStatKey];
+    }
+
+    // 2. Add bonuses from passive abilities (cached)
+    const passiveEffects = this.getPassiveEffects(entity);
+    if (passiveEffectKey && passiveEffects[passiveEffectKey as keyof PassiveEffects] !== undefined) {
+      const bonusValue = passiveEffects[passiveEffectKey as keyof PassiveEffects];
+      if (typeof bonusValue === 'number') {
+        total += bonusValue;
+      }
+    }
+
+    // 3. Add bonuses from equipped items (players only)
+    if (entity.inventory && entity.equipmentSlots) {
+      const equippedItems = this.getEquippedItems(entity);
+
+      for (const item of equippedItems) {
+        const itemDef = itemService.getItemDefinition(item.itemId);
+        if (itemDef && itemDef.properties && itemDef.properties[itemPropertyKey] !== undefined) {
+          total += itemDef.properties[itemPropertyKey];
+        }
+      }
+    }
+
+    // 4. Apply buff/debuff modifiers
+    if (player && player.activeCombat && player.activeCombat.activeBuffs) {
+      const combatEntity = this.wrapEntity(entity, itemService);
+      const target = combatEntity.getType();
+      const modifiers = this.getActiveBuffModifiers(player, target, statName);
+
+      // Apply flat modifiers
+      total += modifiers.flat;
+
+      // Apply percentage modifiers
+      if (modifiers.percentage !== 0) {
+        total = Math.floor(total * (1 + modifiers.percentage));
+      }
+    }
+
+    return Math.max(0, total); // Ensure non-negative
+  }
+
+  /**
+   * Get all equipped items for a player entity
+   * Helper method to reduce duplication
+   */
+  private getEquippedItems(entity: any): any[] {
+    if (!entity.inventory || !entity.equipmentSlots) {
+      return [];
+    }
+
+    const equippedItems = [];
+    for (const [slot, instanceId] of entity.equipmentSlots.entries()) {
+      if (instanceId) {
+        const item = entity.inventory.find((i: any) => i.instanceId === instanceId);
+        if (item) {
+          equippedItems.push(item);
+        }
+      }
+    }
+
+    return equippedItems;
   }
 
   /**
    * Calculate total armor from equipment and active buffs
    */
   calculateTotalArmor(entity: any, itemService: any, player?: any): number {
-    let totalArmor = 0;
-
-    // Add base armor from combatStats
-    if (entity.combatStats && entity.combatStats.armor) {
-      totalArmor += entity.combatStats.armor;
-    }
-
-    // Add armor from passive abilities
-    if (entity.passiveAbilities) {
-      for (const ability of entity.passiveAbilities) {
-        if (ability.effects && ability.effects.armorBonus) {
-          totalArmor += ability.effects.armorBonus;
-        }
-      }
-    }
-
-    // For players, sum armor from all equipped items
-    if (entity.inventory && entity.equipmentSlots) {
-      const equippedItems = [];
-      for (const [slot, instanceId] of entity.equipmentSlots.entries()) {
-        if (instanceId) {
-          const item = entity.inventory.find((i: any) => i.instanceId === instanceId);
-          if (item) {
-            equippedItems.push(item);
-          }
-        }
-      }
-
-      for (const item of equippedItems) {
-        const itemDef = itemService.getItemDefinition(item.itemId);
-        if (itemDef && itemDef.properties && itemDef.properties.armor) {
-          totalArmor += itemDef.properties.armor;
-        }
-      }
-    }
-
-    // Add armor from active buffs/debuffs
-    if (player && player.activeCombat && player.activeCombat.activeBuffs) {
-      const target = entity.monsterId ? 'monster' : 'player';
-      const modifiers = this.getActiveBuffModifiers(player, target, 'armor');
-
-      // Apply flat modifiers
-      totalArmor += modifiers.flat;
-
-      // Apply percentage modifiers
-      if (modifiers.percentage !== 0) {
-        totalArmor = Math.floor(totalArmor * (1 + modifiers.percentage));
-      }
-    }
-
-    return Math.max(0, totalArmor); // Ensure non-negative
+    return this.calculateCombatStat(
+      entity,
+      itemService,
+      player,
+      BuffableStat.ARMOR,
+      'armor',
+      'armorBonus',
+      'armor'
+    );
   }
 
   /**
    * Calculate total evasion from equipment and active buffs
    */
   calculateTotalEvasion(entity: any, itemService: any, player?: any): number {
-    let totalEvasion = 0;
-
-    // Add base evasion from combatStats
-    if (entity.combatStats && entity.combatStats.evasion) {
-      totalEvasion += entity.combatStats.evasion;
-    }
-
-    // Add evasion from passive abilities
-    if (entity.passiveAbilities) {
-      for (const ability of entity.passiveAbilities) {
-        if (ability.effects && ability.effects.evasionBonus) {
-          totalEvasion += ability.effects.evasionBonus;
-        }
-      }
-    }
-
-    // For players, sum evasion from all equipped items
-    if (entity.inventory && entity.equipmentSlots) {
-      const equippedItems = [];
-      for (const [slot, instanceId] of entity.equipmentSlots.entries()) {
-        if (instanceId) {
-          const item = entity.inventory.find((i: any) => i.instanceId === instanceId);
-          if (item) {
-            equippedItems.push(item);
-          }
-        }
-      }
-
-      for (const item of equippedItems) {
-        const itemDef = itemService.getItemDefinition(item.itemId);
-        if (itemDef && itemDef.properties && itemDef.properties.evasion) {
-          totalEvasion += itemDef.properties.evasion;
-        }
-      }
-    }
-
-    // Add evasion from active buffs/debuffs
-    if (player && player.activeCombat && player.activeCombat.activeBuffs) {
-      const target = entity.monsterId ? 'monster' : 'player';
-      const modifiers = this.getActiveBuffModifiers(player, target, 'evasion');
-
-      // Apply flat modifiers
-      totalEvasion += modifiers.flat;
-
-      // Apply percentage modifiers
-      if (modifiers.percentage !== 0) {
-        totalEvasion = Math.floor(totalEvasion * (1 + modifiers.percentage));
-      }
-    }
-
-    return Math.max(0, totalEvasion); // Ensure non-negative
+    return this.calculateCombatStat(
+      entity,
+      itemService,
+      player,
+      BuffableStat.EVASION,
+      'evasion',
+      'evasionBonus',
+      'evasion'
+    );
   }
 
   /**
    * Calculate armor damage reduction (diminishing returns: 1000 armor = 50% reduction)
    */
   calculateArmorReduction(armor: number): number {
-    // Formula: reduction = armor / (armor + 1000)
+    // Formula: reduction = armor / (armor + ARMOR_SCALING_FACTOR)
     // Examples: 100 armor = 9%, 500 armor = 33%, 1000 armor = 50%, 2000 armor = 67%
-    return armor / (armor + 1000);
+    return armor / (armor + COMBAT_FORMULAS.ARMOR_SCALING_FACTOR);
   }
 
   /**
    * Calculate evasion chance (diminishing returns: 1000 evasion = 50% dodge)
    */
   calculateEvasionChance(evasion: number): number {
-    // Formula: chance = evasion / (evasion + 1000)
+    // Formula: chance = evasion / (evasion + EVASION_SCALING_FACTOR)
     // Examples: 100 evasion = 9%, 500 evasion = 33%, 1000 evasion = 50%, 2000 evasion = 67%
-    const chance = evasion / (evasion + 1000);
-    return Math.min(0.75, chance); // Cap at 75% dodge chance
+    const chance = evasion / (evasion + COMBAT_FORMULAS.EVASION_SCALING_FACTOR);
+    return Math.min(COMBAT_FORMULAS.EVASION_CAP, chance); // Cap at configured max dodge chance
   }
 
   /**
    * Get equipped weapon for an entity
+   * Refactored to use ICombatEntity abstraction
    */
-  getEquippedWeapon(entity: any, itemService: any): any {
-    // For monsters, return equipment.weapon or equipment.natural
-    if (entity.monsterId) {
-      if (entity.equipment) {
-        return entity.equipment.weapon || entity.equipment.natural;
-      }
-      return null;
-    }
-
-    // For players, get mainHand item
-    if (!entity.equipmentSlots || !entity.inventory) {
-      return null;
-    }
-
-    const mainHandId = entity.equipmentSlots.get ?
-      entity.equipmentSlots.get('mainHand') :
-      entity.equipmentSlots.mainHand;
-
-    if (!mainHandId) {
-      return null;
-    }
-
-    const item = entity.inventory.find((i: any) => i.instanceId === mainHandId);
-    if (!item) {
-      return null;
-    }
-
-    const itemDef = itemService.getItemDefinition(item.itemId);
-    if (!itemDef || !itemDef.properties) {
-      return null;
-    }
-
-    return {
-      name: itemDef.name,
-      damageRoll: itemDef.properties.damageRoll || '1d2',
-      attackSpeed: itemDef.properties.attackSpeed || 3.0,
-      critChance: itemDef.properties.critChance || 0.05,
-      skillScalar: itemDef.properties.skillScalar || 'oneHanded'
-    };
+  getEquippedWeapon(entity: any, itemService: any): WeaponData | null {
+    const combatEntity = this.wrapEntity(entity, itemService);
+    return combatEntity.getWeapon();
   }
 
   /**
@@ -324,49 +405,50 @@ class CombatService {
     const attribute = attacker.attributes[mainAttr];
     const attrLevel = attribute ? attribute.level : 1;
 
-    // Calculate skill scaling (diminishing returns: +1 die face per 10 levels, max +2)
+    // Calculate skill scaling (diminishing returns: +1 die face per N levels, max bonus capped)
     // Level 1-9: 1d3, Level 10-19: 1d4, Level 20+: 1d5
-    const skillBonus = Math.min(2, Math.floor(skillLevel / 10));
-    const attrBonus = Math.min(2, Math.floor(attrLevel / 10));
+    const skillBonus = Math.min(
+      COMBAT_FORMULAS.SKILL_BONUS_MAX,
+      Math.floor(skillLevel / COMBAT_FORMULAS.SKILL_BONUS_PER_LEVELS)
+    );
+    const attrBonus = Math.min(
+      COMBAT_FORMULAS.ATTR_BONUS_MAX,
+      Math.floor(attrLevel / COMBAT_FORMULAS.ATTR_BONUS_PER_LEVELS)
+    );
     const totalLevelBonus = skillBonus + attrBonus;
 
     // Apply level scaling to damage (adds bonus to max damage)
     const scaledDamage = baseDamage + totalLevelBonus;
 
-    // Check for critical hit
-    let critChance = weapon.critChance + critBonus;
+    // Get cached passive effects
+    const passiveEffects = this.getPassiveEffects(attacker);
 
-    // Add crit chance from passive abilities
-    if (attacker.passiveAbilities) {
-      for (const ability of attacker.passiveAbilities) {
-        if (ability.effects && ability.effects.critChanceBonus) {
-          critChance += ability.effects.critChanceBonus;
-        }
-      }
-    }
+    // Check for critical hit
+    let critChance = weapon.critChance + critBonus + passiveEffects.critChanceBonus;
 
     const isCrit = Math.random() < critChance;
     let finalDamage = scaledDamage;
 
     if (isCrit) {
-      finalDamage = Math.floor(scaledDamage * 2); // 2x damage on crit
+      finalDamage = Math.floor(scaledDamage * COMBAT_FORMULAS.CRIT_MULTIPLIER);
     }
 
-    // Apply damage bonus from passive abilities (e.g., battle frenzy)
-    if (attacker.passiveAbilities) {
-      for (const ability of attacker.passiveAbilities) {
-        if (ability.effects && ability.effects.damageBonus) {
-          // Check trigger condition
-          if (ability.effects.trigger === 'below_50_percent_hp') {
-            const hpPercent = attacker.stats.health.current / attacker.stats.health.max;
-            if (hpPercent < 0.5) {
-              finalDamage = Math.floor(finalDamage * (1 + ability.effects.damageBonus));
-            }
-          } else {
-            // Always active
-            finalDamage = Math.floor(finalDamage * (1 + ability.effects.damageBonus));
+    // Apply always-active damage bonuses from passive abilities
+    if (passiveEffects.damageBonus > 0) {
+      finalDamage = Math.floor(finalDamage * (1 + passiveEffects.damageBonus));
+    }
+
+    // Apply conditional damage bonuses from passive abilities
+    for (const conditionalBonus of passiveEffects.conditionalBonuses) {
+      if (conditionalBonus.effect === 'damageBonus') {
+        // Check trigger condition
+        if (conditionalBonus.trigger === 'below_50_percent_hp') {
+          const hpPercent = attacker.stats.health.current / attacker.stats.health.max;
+          if (hpPercent < COMBAT_FORMULAS.BATTLE_FRENZY_HP_THRESHOLD) {
+            finalDamage = Math.floor(finalDamage * (1 + conditionalBonus.value));
           }
         }
+        // Add more trigger conditions here as needed
       }
     }
 
@@ -403,8 +485,8 @@ class CombatService {
     const armorReduction = this.calculateArmorReduction(defenderArmor);
     finalDamage = Math.floor(finalDamage * (1 - armorReduction));
 
-    // Ensure at least 1 damage if not dodged
-    finalDamage = Math.max(1, finalDamage);
+    // Ensure at least minimum damage if not dodged
+    finalDamage = Math.max(COMBAT_FORMULAS.MIN_DAMAGE, finalDamage);
 
     return {
       damage: finalDamage,
@@ -443,65 +525,95 @@ class CombatService {
   }
 
   /**
+   * Apply damage over time effect from a buff
+   */
+  private applyDamageOverTime(
+    buff: ActiveBuff,
+    player: any,
+    monsterInstance: any,
+    result: { playerDamage: number; monsterDamage: number }
+  ): void {
+    if (!buff.damageOverTime) return;
+
+    if (buff.target === 'monster') {
+      monsterInstance.stats.health.current = Math.max(0, monsterInstance.stats.health.current - buff.damageOverTime);
+      result.monsterDamage += buff.damageOverTime;
+      player.addCombatLog(`${buff.name} deals ${buff.damageOverTime} damage to ${monsterInstance.name}.`, 'debuff', buff.damageOverTime, 'monster');
+    } else {
+      player.takeDamage(buff.damageOverTime);
+      result.playerDamage += buff.damageOverTime;
+      player.addCombatLog(`${buff.name} deals ${buff.damageOverTime} damage to you.`, 'debuff', buff.damageOverTime, 'player');
+    }
+  }
+
+  /**
+   * Apply heal over time effect from a buff
+   */
+  private applyHealOverTime(buff: ActiveBuff, player: any, monsterInstance: any): void {
+    if (!buff.healOverTime) return;
+
+    if (buff.target === 'player') {
+      player.heal(buff.healOverTime);
+      player.addCombatLog(`${buff.name} heals you for ${buff.healOverTime} HP.`, 'buff', buff.healOverTime, 'player');
+    } else {
+      monsterInstance.stats.health.current = Math.min(
+        monsterInstance.stats.health.max,
+        monsterInstance.stats.health.current + buff.healOverTime
+      );
+      player.addCombatLog(`${buff.name} heals ${monsterInstance.name} for ${buff.healOverTime} HP.`, 'buff', buff.healOverTime, 'monster');
+    }
+  }
+
+  /**
+   * Apply mana regeneration effect from a buff
+   */
+  private applyManaRegen(buff: ActiveBuff, player: any): void {
+    if (!buff.manaRegen) return;
+
+    if (buff.target === 'player') {
+      player.stats.mana.current = Math.min(
+        player.stats.mana.max,
+        player.stats.mana.current + buff.manaRegen
+      );
+      player.addCombatLog(`${buff.name} restores ${buff.manaRegen} mana.`, 'buff');
+    }
+  }
+
+  /**
+   * Apply mana drain effect from a buff
+   */
+  private applyManaDrain(buff: ActiveBuff, player: any, monsterInstance: any): void {
+    if (!buff.manaDrain) return;
+
+    if (buff.target === 'monster') {
+      monsterInstance.stats.mana.current = Math.max(0, monsterInstance.stats.mana.current - buff.manaDrain);
+    } else {
+      player.useMana(buff.manaDrain);
+    }
+  }
+
+  /**
    * Process buff/debuff tick effects (DoT, HoT, durations)
+   * Refactored to use separate handler methods for each effect type
    */
   processBuffTick(player: any, monsterInstance: any, tickingEntity?: 'player' | 'monster'): any {
     if (!player.activeCombat || !player.activeCombat.activeBuffs) {
       return { playerDamage: 0, monsterDamage: 0, expiredBuffs: [] };
     }
 
-    let playerDamage = 0;
-    let monsterDamage = 0;
-    const expiredBuffs: string[] = [];
+    const result = {
+      playerDamage: 0,
+      monsterDamage: 0,
+      expiredBuffs: [] as string[]
+    };
 
     // Process each active buff
     for (const [buffId, buff] of player.activeCombat.activeBuffs.entries()) {
-      // Apply damage over time
-      if (buff.damageOverTime) {
-        if (buff.target === 'monster') {
-          monsterInstance.stats.health.current = Math.max(0, monsterInstance.stats.health.current - buff.damageOverTime);
-          monsterDamage += buff.damageOverTime;
-          player.addCombatLog(`${buff.name} deals ${buff.damageOverTime} damage to ${monsterInstance.name}.`, 'debuff', buff.damageOverTime, 'monster');
-        } else {
-          const damageDealt = player.takeDamage(buff.damageOverTime);
-          playerDamage += buff.damageOverTime;
-          player.addCombatLog(`${buff.name} deals ${buff.damageOverTime} damage to you.`, 'debuff', buff.damageOverTime, 'player');
-        }
-      }
-
-      // Apply heal over time
-      if (buff.healOverTime) {
-        if (buff.target === 'player') {
-          player.heal(buff.healOverTime);
-          player.addCombatLog(`${buff.name} heals you for ${buff.healOverTime} HP.`, 'buff', buff.healOverTime, 'player');
-        } else {
-          monsterInstance.stats.health.current = Math.min(
-            monsterInstance.stats.health.max,
-            monsterInstance.stats.health.current + buff.healOverTime
-          );
-          player.addCombatLog(`${buff.name} heals ${monsterInstance.name} for ${buff.healOverTime} HP.`, 'buff', buff.healOverTime, 'monster');
-        }
-      }
-
-      // Apply mana regen
-      if (buff.manaRegen) {
-        if (buff.target === 'player') {
-          player.stats.mana.current = Math.min(
-            player.stats.mana.max,
-            player.stats.mana.current + buff.manaRegen
-          );
-          player.addCombatLog(`${buff.name} restores ${buff.manaRegen} mana.`, 'buff');
-        }
-      }
-
-      // Apply mana drain
-      if (buff.manaDrain) {
-        if (buff.target === 'monster') {
-          monsterInstance.stats.mana.current = Math.max(0, monsterInstance.stats.mana.current - buff.manaDrain);
-        } else {
-          player.useMana(buff.manaDrain);
-        }
-      }
+      // Apply all buff effects using dedicated handlers
+      this.applyDamageOverTime(buff, player, monsterInstance, result);
+      this.applyHealOverTime(buff, player, monsterInstance);
+      this.applyManaRegen(buff, player);
+      this.applyManaDrain(buff, player, monsterInstance);
 
       // Decrement duration only if this buff belongs to the entity whose turn it is
       // If tickingEntity is not specified, decrement all buffs (backward compatibility)
@@ -518,7 +630,7 @@ class CombatService {
 
         // Mark expired buffs
         if (buff.duration <= 0) {
-          expiredBuffs.push(buffId);
+          result.expiredBuffs.push(buffId);
           const targetName = buff.target === 'player' ? 'you' : monsterInstance.name;
           player.addCombatLog(`${buff.name} fades from ${targetName}.`, 'system');
         }
@@ -526,21 +638,17 @@ class CombatService {
     }
 
     // Remove expired buffs
-    for (const buffId of expiredBuffs) {
+    for (const buffId of result.expiredBuffs) {
       player.removeActiveBuff(buffId);
     }
 
-    return {
-      playerDamage,
-      monsterDamage,
-      expiredBuffs
-    };
+    return result;
   }
 
   /**
    * Get total stat modifier from active buffs
    */
-  getActiveBuffModifiers(player: any, target: 'player' | 'monster', statName: string): { flat: number; percentage: number } {
+  getActiveBuffModifiers(player: any, target: 'player' | 'monster', statName: BuffableStat | string): { flat: number; percentage: number } {
     if (!player.activeCombat || !player.activeCombat.activeBuffs) {
       return { flat: 0, percentage: 0 };
     }
@@ -555,9 +663,9 @@ class CombatService {
 
       for (const modifier of buff.statModifiers) {
         if (modifier.stat === statName) {
-          if (modifier.type === 'flat') {
+          if (modifier.type === ModifierType.FLAT || modifier.type === 'flat') {
             totalFlat += modifier.value;
-          } else if (modifier.type === 'percentage') {
+          } else if (modifier.type === ModifierType.PERCENTAGE || modifier.type === 'percentage') {
             totalPercentage += modifier.value;
           }
         }
@@ -580,8 +688,8 @@ class CombatService {
     const playerWeapon = this.getEquippedWeapon(player, itemService);
     const monsterWeapon = this.getEquippedWeapon(monsterInstance, itemService);
 
-    const playerAttackSpeed = (playerWeapon ? playerWeapon.attackSpeed : 3.0) * 1000; // Convert to ms
-    const monsterAttackSpeed = (monsterWeapon ? monsterWeapon.attackSpeed : 3.0) * 1000;
+    const playerAttackSpeed = (playerWeapon ? playerWeapon.attackSpeed : 3.0) * COMBAT_FORMULAS.ATTACK_SPEED_TO_MS;
+    const monsterAttackSpeed = (monsterWeapon ? monsterWeapon.attackSpeed : 3.0) * COMBAT_FORMULAS.ATTACK_SPEED_TO_MS;
 
     // Set up combat state
     player.activeCombat = {
