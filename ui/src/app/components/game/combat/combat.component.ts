@@ -42,6 +42,9 @@ export class CombatComponent implements OnInit, OnDestroy, AfterViewChecked {
   // Smart auto-scroll - only scroll if user is at bottom
   private shouldAutoScroll = true;
 
+  // Track processed log entries to prevent duplicate floating numbers
+  private processedLogEntries = new Set<string>();
+
   // Floating damage numbers
   floatingNumbers = signal<Array<{ id: string; value: number; type: 'damage' | 'crit' | 'heal' | 'mana'; target: 'player' | 'monster' }>>([]);
 
@@ -116,15 +119,17 @@ export class CombatComponent implements OnInit, OnDestroy, AfterViewChecked {
       return;
     }
 
-    // Process all entries marked as new
+    // Process only entries we haven't seen before
     combatLog.forEach(entry => {
-      if (entry.isNew) {
+      const hash = this.getLogEntryHash(entry);
+
+      if (!this.processedLogEntries.has(hash)) {
         const floatingNumber = this.parseFloatingNumber(entry);
         if (floatingNumber) {
           this.addFloatingNumber(floatingNumber);
         }
-        // Mark as processed to avoid re-triggering
-        entry.isNew = false;
+        // Mark as processed
+        this.processedLogEntries.add(hash);
       }
     });
   });
@@ -181,6 +186,13 @@ export class CombatComponent implements OnInit, OnDestroy, AfterViewChecked {
     } catch (err) {
       // Ignore errors during scroll detection
     }
+  }
+
+  /**
+   * Generate a unique hash for a combat log entry
+   */
+  private getLogEntryHash(entry: CombatLogEntry): string {
+    return `${entry.timestamp.getTime()}-${entry.message}-${entry.type}`;
   }
 
   /**
@@ -381,6 +393,9 @@ export class CombatComponent implements OnInit, OnDestroy, AfterViewChecked {
     }
 
     this.isExecutingAction.set(true);
+
+    // Clear processed log entries for new combat
+    this.processedLogEntries.clear();
 
     // Clear combat state first
     this.combatService.restartCombat();

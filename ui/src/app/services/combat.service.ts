@@ -166,8 +166,7 @@ export class CombatService {
       if (data.combatLog) {
         combat.combatLog = data.combatLog.map((entry: any) => ({
           ...entry,
-          timestamp: new Date(entry.timestamp),
-          isNew: true
+          timestamp: new Date(entry.timestamp)
         }));
       }
 
@@ -200,8 +199,7 @@ export class CombatService {
       if (data.combatLog) {
         combat.combatLog = data.combatLog.map((entry: any) => ({
           ...entry,
-          timestamp: new Date(entry.timestamp),
-          isNew: true
+          timestamp: new Date(entry.timestamp)
         }));
       }
 
@@ -240,8 +238,7 @@ export class CombatService {
       if (data.combatLog) {
         combat.combatLog = data.combatLog.map((entry: any) => ({
           ...entry,
-          timestamp: new Date(entry.timestamp),
-          isNew: true
+          timestamp: new Date(entry.timestamp)
         }));
       }
 
@@ -274,8 +271,7 @@ export class CombatService {
       if (data.combatLog) {
         combat.combatLog = data.combatLog.map((entry: any) => ({
           ...entry,
-          timestamp: new Date(entry.timestamp),
-          isNew: true
+          timestamp: new Date(entry.timestamp)
         }));
       }
 
