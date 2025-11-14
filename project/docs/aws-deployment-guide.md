@@ -319,6 +319,18 @@ grep -r "3.226.72.134" .
 
 ### 2.7 Upload to S3
 
+**Quick Deploy (Recommended):**
+```bash
+cd ui
+npm run deploy
+```
+
+This automated script will:
+1. Build the app with Cloudflare configuration
+2. Upload all files to S3
+3. Remove old files from S3
+
+**Manual Upload:**
 ```bash
 # Upload built files to S3 (--delete removes old files)
 cd ui/dist/ui/browser
