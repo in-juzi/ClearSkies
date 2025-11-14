@@ -3,6 +3,7 @@
  */
 
 import { IconConfig, Stats, Skill, Attribute, SkillName, AttributeName } from './common';
+import { BuffableStat, ModifierType, PassiveTrigger, CombatLogTypeEnum } from './combat-enums';
 
 // ===== ENUMS & LITERAL TYPES =====
 
@@ -12,10 +13,12 @@ export type TargetType = 'single' | 'aoe' | 'self';
 
 export type DamageType = 'physical' | 'magical';
 
+// Type alias for backward compatibility with existing code using string literals
 export type CombatLogType = 'damage' | 'heal' | 'dodge' | 'miss' | 'crit' | 'ability' | 'system' | 'buff' | 'debuff';
 
 export type BuffTarget = 'player' | 'monster';
 
+// Deprecated: Use ModifierType enum instead
 export type StatModifierType = 'flat' | 'percentage';
 
 // ===== MONSTER DEFINITIONS =====
@@ -149,8 +152,8 @@ export interface BuffApplication {
  * Stat modifier for buffs/debuffs
  */
 export interface StatModifier {
-  stat: string; // e.g., 'damage', 'armor', 'evasion', 'critChance'
-  type: StatModifierType; // 'flat' or 'percentage'
+  stat: BuffableStat | string; // Type-safe enum or string for backward compatibility
+  type: ModifierType | StatModifierType; // Type-safe enum or string for backward compatibility
   value: number; // e.g., 10 for +10 armor, or 0.15 for +15% damage
 }
 

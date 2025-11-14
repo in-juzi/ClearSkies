@@ -13,6 +13,7 @@ export * from './items';
 
 // ===== COMBAT TYPES =====
 export * from './combat';
+export * from './combat-enums';
 
 // ===== LOCATION TYPES =====
 export * from './locations';
@@ -22,6 +23,9 @@ export * from './crafting';
 
 // ===== TYPE GUARDS =====
 export * from './guards';
+
+// ===== CONSTANTS =====
+export * from '../constants/item-constants';
 
 // ===== SHARED MODEL TYPES (FOR FRONTEND) =====
 export * from './models';

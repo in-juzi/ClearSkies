@@ -21,7 +21,7 @@ import {
   CombatActivity
 } from './locations';
 
-import { SUBCATEGORY } from '../../be/data/constants/item-constants';
+import { SUBCATEGORY } from '../constants/item-constants';
 
 // ===== ITEM TYPE GUARDS =====
 
