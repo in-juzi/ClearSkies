@@ -37,6 +37,9 @@
 - ✅ AWS deployment configuration (completed - S3 static hosting for frontend, EC2 for backend API)
 
 **Recent Changes** (Last 10 commits):
+- chore: update production API endpoint to new EC2 instance
+- refactor: improve server binding configuration with explicit HOST constant
+- docs: update CLAUDE.md with completed deployment configuration
 - refactor: migrate frontend services to use environment configuration
 - fix: configure production environment and build scripts
 - feat: configure backend server to bind to 0.0.0.0 for EC2 deployment
@@ -44,9 +47,6 @@
 - feat: configure production API endpoint for EC2 backend
 - feat: configure CORS for S3 static hosting deployment
 - chore: add EC2 SSH key to .gitignore
-- docs: update CLAUDE.md with shared types and constants migration
-- chore: add Python script for automated constant migration
-- refactor: update location component to use shared Activity types
 
 **Known Issues**:
 - None currently identified
@@ -1664,7 +1664,7 @@ The game is deployed using a split architecture for optimal performance and scal
 - **Instance Type**: Amazon Linux 2023 on EC2
 - **Services**: Node.js 20.x, MongoDB, PM2 process manager
 - **API Port**: 3000 (exposed via security group)
-- **Public IP**: 54.172.211.85 (configured in frontend environment)
+- **Public IP**: 3.226.72.134 (configured in frontend environment)
 
 **CORS Configuration** ([be/index.ts](be/index.ts)):
 ```typescript
@@ -1684,7 +1684,7 @@ const io = new Server(server, {
 
 **Deployment Process**:
 1. Commit and push backend changes to Git
-2. SSH into EC2: `ssh -i "clearskies-dev-ec2.pem" ec2-user@54.172.211.85`
+2. SSH into EC2: `ssh -i "clearskies-dev-ec2.pem" ec2-user@3.226.72.134`
 3. Pull updates: `cd ClearSkies && git pull`
 4. Build backend: `cd be && npm run build`
 5. Run migrations: `npm run migrate`
