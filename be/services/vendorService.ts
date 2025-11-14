@@ -53,7 +53,8 @@ class VendorService {
       return null;
     }
 
-    return stockItem.price;
+    // Use buyPrice field (primary) or fall back to price field (legacy)
+    return stockItem.buyPrice ?? stockItem.price ?? null;
   }
 
   /**
