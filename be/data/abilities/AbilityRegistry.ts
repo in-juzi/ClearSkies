@@ -13,6 +13,10 @@ import { HeavyStrike } from './definitions/HeavyStrike';
 import { IceShard } from './definitions/IceShard';
 import { QuickSlash } from './definitions/QuickSlash';
 import { RapidFire } from './definitions/RapidFire';
+import { BattleFury } from './definitions/BattleFury';
+import { WeakenArmor } from './definitions/WeakenArmor';
+import { PoisonStrike } from './definitions/PoisonStrike';
+import { Regeneration } from './definitions/Regeneration';
 
 /**
  * Central registry for all abilities
@@ -25,6 +29,10 @@ export class AbilityRegistry {
     [IceShard.abilityId, IceShard],
     [QuickSlash.abilityId, QuickSlash],
     [RapidFire.abilityId, RapidFire],
+    [BattleFury.abilityId, BattleFury],
+    [WeakenArmor.abilityId, WeakenArmor],
+    [PoisonStrike.abilityId, PoisonStrike],
+    [Regeneration.abilityId, Regeneration],
   ]);
 
   /**
