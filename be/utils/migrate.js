@@ -8,17 +8,14 @@
  *   node utils/migrate.js run <name>      - Run specific migration
  */
 
-// Load TypeScript support
-require('ts-node/register');
-
 require('dotenv').config();
 const mongoose = require('mongoose');
 const fs = require('fs');
 const path = require('path');
 
-// Import models (TypeScript files)
-require('../models/Player');
-require('../models/User');
+// Import compiled models from dist directory
+const Player = require('../dist/be/models/Player').default;
+const User = require('../dist/be/models/User').default;
 
 // Migration tracking schema
 const migrationSchema = new mongoose.Schema({
