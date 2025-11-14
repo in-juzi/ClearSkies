@@ -114,8 +114,9 @@ activityHandler(io);
 craftingHandler(io);
 combatHandler(io);
 
-// Start server
-server.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server is running on http://0.0.0.0:${PORT}`);
+// Start server - bind to 0.0.0.0 for IPv4 accessibility
+const HOST = '0.0.0.0';
+server.listen(Number(PORT), HOST, () => {
+  console.log(`Server is running on http://${HOST}:${PORT}`);
   console.log(`Socket.io is ready for connections`);
 });
