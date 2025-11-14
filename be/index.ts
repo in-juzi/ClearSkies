@@ -1,3 +1,17 @@
+// Register tsconfig paths for runtime module resolution
+import { register } from 'tsconfig-paths';
+import { compilerOptions } from './tsconfig.json';
+
+register({
+  baseUrl: __dirname,
+  paths: {
+    '@shared/types': ['../shared/types/index'],
+    '@shared/types/*': ['../shared/types/*'],
+    '@shared/constants/*': ['../shared/constants/*'],
+    '@shared/*': ['../shared/*']
+  }
+});
+
 import 'dotenv/config';
 import express from 'express';
 import http from 'http';

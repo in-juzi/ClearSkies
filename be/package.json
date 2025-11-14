@@ -11,16 +11,16 @@
     "migrate": "node utils/migrate.js up",
     "migrate:down": "node utils/migrate.js down",
     "migrate:status": "node utils/migrate.js status",
-    "validate": "npx ts-node scripts/validate-game-data.ts",
+    "validate": "npx ts-node -r tsconfig-paths/register scripts/validate-game-data.ts",
     "clean": "node -e \"require('fs').rmSync('dist', {recursive: true, force: true})\"",
     "build": "npm run validate && npm run clean && tsc && npm run copy-data",
     "build:skip-validation": "npm run clean && tsc && npm run copy-data",
     "copy-data": "node -e \"require('fs').cpSync('data', 'dist/be/data', {recursive: true})\"",
     "build:watch": "tsc --watch",
     "type-check": "tsc --noEmit",
-    "generate:items": "npx ts-node scripts/convert-json-to-ts.ts && npx ts-node scripts/generate-registry.ts",
-    "generate:registry": "npx ts-node scripts/generate-registry.ts",
-    "test:items": "npx ts-node scripts/test-item-registry.ts"
+    "generate:items": "npx ts-node -r tsconfig-paths/register scripts/convert-json-to-ts.ts && npx ts-node -r tsconfig-paths/register scripts/generate-registry.ts",
+    "generate:registry": "npx ts-node -r tsconfig-paths/register scripts/generate-registry.ts",
+    "test:items": "npx ts-node -r tsconfig-paths/register scripts/test-item-registry.ts"
   },
   "keywords": [],
   "author": "",
@@ -46,6 +46,7 @@
     "@types/uuid": "^10.0.0",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.9.3"
   }
 }

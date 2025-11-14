@@ -11,7 +11,9 @@
     "rootDir": "../",
     "paths": {
       "@shared/*": ["../shared/*"],
-      "@shared/types": ["../shared/types/index"]
+      "@shared/types": ["../shared/types/index"],
+      "@shared/types/*": ["../shared/types/*"],
+      "@shared/constants/*": ["../shared/constants/*"]
     },
 
     /* Emit */
