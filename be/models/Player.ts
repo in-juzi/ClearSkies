@@ -227,7 +227,13 @@ const playerSchema = new Schema<IPlayer>({
   gold: {
     type: Number,
     default: 100,
-    min: 0
+    min: 0,
+    validate: {
+      validator: function(value: number) {
+        return !isNaN(value) && isFinite(value);
+      },
+      message: 'Gold must be a valid number'
+    }
   },
   inventory: [{
     instanceId: { type: String, required: true },
