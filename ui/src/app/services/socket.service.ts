@@ -46,9 +46,20 @@ export class SocketService {
     this.connectionStatus.set('connecting');
 
     // Socket.io connects to base URL (not /api path)
-    const baseUrl = environment.apiUrl.replace('/api', '');
+    // Remove '/api' suffix to get the base server URL
+    let baseUrl = environment.apiUrl;
+    if (baseUrl.endsWith('/api')) {
+      baseUrl = baseUrl.slice(0, -4); // Remove last 4 characters ('/api')
+    }
+
+    // Debug logging
+    console.log('Environment apiUrl:', environment.apiUrl);
+    console.log('Socket.io connecting to:', baseUrl);
+
     const socket = io(baseUrl, {
-      auth: { token }
+      auth: { token },
+      transports: ['polling', 'websocket'], // Try polling first
+      path: '/socket.io/'
     });
 
     // Connection events
