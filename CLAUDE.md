@@ -36,18 +36,19 @@
 - ✅ CATEGORY/SUBCATEGORY constants (completed - type-safe constants for all 90+ item definitions)
 - ✅ AWS deployment configuration (completed - S3 static hosting for frontend, EC2 for backend API)
 - ✅ Cloudflare custom domain setup (completed - clearskies.juzi.dev with SSL/TLS via Cloudflare proxy)
+- ✅ Combat buff/debuff system (completed - stat modifiers, DoT/HoT, 4 new abilities, UI display)
 
 **Recent Changes** (Last 10 commits):
+- feat: add buff/debuff system foundation to combat
+- feat: add 4 new buff/debuff combat abilities
+- feat: implement buff/debuff mechanics in combat service
+- feat: add buff/debuff UI display to combat interface
+- refactor: minor UI improvements to crafting and chat
+- chore: add week percentage calculator utility script
 - fix: improve migration system compatibility with TypeScript
 - docs: update CLAUDE.md with production fixes and deployment tools
 - docs: add architecture diagram and update deployment guide
 - feat: add automated deployment and CloudFront invalidation scripts
-- fix: improve Socket.io connection reliability for production
-- fix: add NaN gold validation and migration script
-- docs: update CLAUDE.md with Cloudflare deployment configuration
-- docs: add comprehensive deployment guides for AWS and Cloudflare
-- feat: add Cloudflare environment configuration and build target
-- feat: add Cloudflare custom domain CORS support
 
 **Known Issues**:
 - None currently identified
@@ -112,7 +113,7 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 - Crafting: [ui/src/app/components/game/crafting/crafting.component.ts](ui/src/app/components/game/crafting/crafting.component.ts), [ui/src/app/components/game/crafting/crafting.component.html](ui/src/app/components/game/crafting/crafting.component.html)
 - Combat: [ui/src/app/components/game/combat/combat.component.ts](ui/src/app/components/game/combat/combat.component.ts), [ui/src/app/components/game/combat/combat.component.html](ui/src/app/components/game/combat/combat.component.html)
 - Manual: [ui/src/app/components/manual/manual.component.ts](ui/src/app/components/manual/manual.component.ts), [ui/src/app/components/manual/sections/](ui/src/app/components/manual/sections/)
-- Shared Components: [ui/src/app/components/shared/item-mini/item-mini.component.ts](ui/src/app/components/shared/item-mini/item-mini.component.ts), [ui/src/app/components/shared/item-modifiers/item-modifiers.component.ts](ui/src/app/components/shared/item-modifiers/item-modifiers.component.ts), [ui/src/app/components/shared/item-details-panel/item-details-panel.component.ts](ui/src/app/components/shared/item-details-panel/item-details-panel.component.ts), [ui/src/app/components/shared/icon/icon.component.ts](ui/src/app/components/shared/icon/icon.component.ts), [ui/src/app/components/shared/xp-mini/xp-mini.component.ts](ui/src/app/components/shared/xp-mini/xp-mini.component.ts), [ui/src/app/components/shared/ability-button/ability-button.component.ts](ui/src/app/components/shared/ability-button/ability-button.component.ts), [ui/src/app/components/shared/item-button/item-button.component.ts](ui/src/app/components/shared/item-button/item-button.component.ts)
+- Shared Components: [ui/src/app/components/shared/item-mini/item-mini.component.ts](ui/src/app/components/shared/item-mini/item-mini.component.ts), [ui/src/app/components/shared/item-modifiers/item-modifiers.component.ts](ui/src/app/components/shared/item-modifiers/item-modifiers.component.ts), [ui/src/app/components/shared/item-details-panel/item-details-panel.component.ts](ui/src/app/components/shared/item-details-panel/item-details-panel.component.ts), [ui/src/app/components/shared/icon/icon.component.ts](ui/src/app/components/shared/icon/icon.component.ts), [ui/src/app/components/shared/xp-mini/xp-mini.component.ts](ui/src/app/components/shared/xp-mini/xp-mini.component.ts), [ui/src/app/components/shared/ability-button/ability-button.component.ts](ui/src/app/components/shared/ability-button/ability-button.component.ts), [ui/src/app/components/shared/item-button/item-button.component.ts](ui/src/app/components/shared/item-button/item-button.component.ts), [ui/src/app/components/shared/buff-icon/buff-icon.ts](ui/src/app/components/shared/buff-icon/buff-icon.ts)
 - Services: [ui/src/app/services/inventory.service.ts](ui/src/app/services/inventory.service.ts), [ui/src/app/services/location.service.ts](ui/src/app/services/location.service.ts), [ui/src/app/services/skills.service.ts](ui/src/app/services/skills.service.ts), [ui/src/app/services/auth.service.ts](ui/src/app/services/auth.service.ts), [ui/src/app/services/manual.service.ts](ui/src/app/services/manual.service.ts), [ui/src/app/services/chat.service.ts](ui/src/app/services/chat.service.ts), [ui/src/app/services/vendor.service.ts](ui/src/app/services/vendor.service.ts), [ui/src/app/services/recipe.service.ts](ui/src/app/services/recipe.service.ts), [ui/src/app/services/crafting.service.ts](ui/src/app/services/crafting.service.ts), [ui/src/app/services/combat.service.ts](ui/src/app/services/combat.service.ts), [ui/src/app/services/icon.service.ts](ui/src/app/services/icon.service.ts)
 - Constants: [ui/src/app/constants/material-colors.constants.ts](ui/src/app/constants/material-colors.constants.ts)
 
@@ -609,6 +610,7 @@ npm run migrate:down     # Rollback last migration
 8. `008-rename-herbalism-to-gathering.js` - Renames herbalism skill to gathering (more thematic for barehanded foraging)
 9. `009-add-alchemy-skill.js` - Adds alchemy skill to all players (level 1, linked to Will attribute)
 10. `010-fix-nan-gold-values.js` - Fixes players with NaN or undefined gold values (sets to default 100)
+11. `011-add-active-buffs.js` - Adds activeBuffs Map to activeCombat for buff/debuff system
 
 **Creating a New Migration:**
 1. Create a file in `be/migrations/` with format: `NNN-description.js`
@@ -1389,21 +1391,23 @@ Turn-based combat system with monsters, abilities, and stat tracking.
 **Key Features:**
 - **Real-time Socket.io**: Instant combat events, no 500ms HTTP polling, server-authoritative turn timing
 - **Turn-based combat**: Player and monster alternate attacks based on weapon speed
-- **Combat abilities**: Weapon-specific special attacks (6 abilities for different weapon types)
+- **Combat abilities**: Weapon-specific special attacks (10 abilities: 6 damage + 4 buff/debuff)
+- **Buff/Debuff system**: Stat modifiers, DoT/HoT effects, duration tracking, visual UI display
 - **Timestamp-based cooldowns**: Real-time cooldown tracking using server timestamps instead of turn counts
 - **Consumable items**: Use health/mana potions during combat via item-button component
 - **Combat restart**: "Start New Encounter" button to repeat same activity without navigation
-- **Damage calculation**: Base damage + skill level + equipment bonuses, with crit/dodge mechanics
+- **Damage calculation**: Base damage + skill level + equipment bonuses + active buffs, with crit/dodge mechanics
 - **Monster AI**: Basic attack patterns with ability usage
 - **Combat stats**: Track defeats, damage dealt/taken, deaths, critical hits, dodges
 - **Combat log**: Color-coded event history with timestamps and auto-scroll
 - **Loot drops**: Monsters drop items via drop tables on defeat
-- **UI components**: Reusable ability-button and item-button components with cooldowns, tooltips
-- **Real-time updates**: HP/mana changes, attack timings, ability usage all broadcast instantly
+- **UI components**: Reusable ability-button, item-button, and buff-icon components with cooldowns, tooltips
+- **Real-time updates**: HP/mana changes, attack timings, ability usage, buff applications all broadcast instantly
 
 **Current Content:**
 - Monsters: Bandit Thug (L3, one-handed), Forest Wolf (L2, ranged), Goblin Warrior (L4, two-handed), Goblin Scout (L5, ranged), Goblin Shaman (L6, casting)
-- Abilities: Heavy Strike, Quick Slash (one-handed), Aimed Shot, Rapid Fire (ranged), Fire Bolt, Ice Shard (casting)
+- Damage Abilities: Heavy Strike, Quick Slash (one-handed), Aimed Shot, Rapid Fire (ranged), Fire Bolt, Ice Shard (casting)
+- Buff/Debuff Abilities: Battle Fury (+20% dmg self), Weaken Armor (-15 armor enemy), Poison Strike (DoT), Regeneration (HoT)
 - Combat activities: 6 combat encounters at 3 locations (Forest Clearing, Goblin Village) requiring appropriate weapon skills
 - Combat drops: Raw meat, fangs, leather scraps, herbs, potions, crude equipment + gold
 - Locations: Goblin Village (3 progressive combat encounters), Forest Clearing (3 encounters)
