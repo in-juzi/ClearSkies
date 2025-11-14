@@ -35,25 +35,25 @@
 - ✅ Shared type system (completed - @shared/types package eliminates duplicate type definitions)
 - ✅ CATEGORY/SUBCATEGORY constants (completed - type-safe constants for all 90+ item definitions)
 - ✅ AWS deployment configuration (completed - S3 static hosting for frontend, EC2 for backend API)
+- ✅ Cloudflare custom domain setup (completed - clearskies.juzi.dev with SSL/TLS via Cloudflare proxy)
 
 **Recent Changes** (Last 10 commits):
+- docs: add comprehensive deployment guides for AWS and Cloudflare
+- feat: add Cloudflare environment configuration and build target
+- feat: add Cloudflare custom domain CORS support
+- docs: update CLAUDE.md with new EC2 instance IP address
 - chore: update production API endpoint to new EC2 instance
 - refactor: improve server binding configuration with explicit HOST constant
 - docs: update CLAUDE.md with completed deployment configuration
 - refactor: migrate frontend services to use environment configuration
 - fix: configure production environment and build scripts
 - feat: configure backend server to bind to 0.0.0.0 for EC2 deployment
-- docs: update CLAUDE.md with AWS deployment architecture
-- feat: configure production API endpoint for EC2 backend
-- feat: configure CORS for S3 static hosting deployment
-- chore: add EC2 SSH key to .gitignore
 
 **Known Issues**:
 - None currently identified
 
 **Next Priorities**:
 - Equipment stat application (apply armor/damage/evasion bonuses to combat calculations)
-- SSL/HTTPS setup with CloudFront CDN for production deployment
 - Steel tier equipment (requires steel ingots from iron + coal)
 - More alchemy recipes (buff potions, debuff potions, transmutation)
 - Combat system enhancements (more monsters, abilities, boss fights)
@@ -70,7 +70,8 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 - **Backend**: Node.js + Express + MongoDB
 - **Frontend**: Angular 20 (standalone components)
 - **Authentication**: JWT-based with bcrypt password hashing
-- **Deployment**: AWS S3 (frontend static hosting) + EC2 (backend API)
+- **Deployment**: AWS S3 (frontend) + EC2 (backend) with Cloudflare proxy (SSL/TLS + CDN)
+- **Production URL**: https://clearskies.juzi.dev
 
 ## Quick Task Guide
 
@@ -1643,43 +1644,44 @@ if (isWeaponItem(item)) {
 - Source maps for debugging
 - Used as dependency by both frontend and backend
 
-## AWS Deployment Architecture
+## Deployment Architecture
 
-The game is deployed using a split architecture for optimal performance and scalability:
+The game is deployed using AWS infrastructure with Cloudflare proxy for SSL/TLS and CDN:
 
-### Frontend (S3 Static Hosting)
-- **S3 Bucket**: `clearskies-frontend-dev` (US East 1)
-- **Hosting Type**: Static website hosting
+**Production URL**: https://clearskies.juzi.dev
+**API Endpoint**: https://api.juzi.dev
+
+### Frontend
+- **S3 Bucket**: `clearskies-frontend-dev` (US East 1) - Static website hosting
+- **Cloudflare Proxy**: `clearskies.juzi.dev` → S3 endpoint (enables SSL/TLS + CDN)
 - **Content**: Angular production build (`ui/dist/ui/browser/*`)
-- **Public Access**: Enabled with bucket policy for public read
-- **URL**: `http://clearskies-frontend-dev.s3-website-us-east-1.amazonaws.com`
+- **Environments**:
+  - Development: `environment.ts` → `http://localhost:3000/api`
+  - EC2 Production: `environment.prod.ts` → `http://3.226.72.134:3000/api`
+  - Cloudflare Production: `environment.cloudflare.ts` → `https://api.juzi.dev/api`
 
 **Deployment Process**:
-1. Update API endpoint in `ui/src/environments/environment.prod.ts`
-2. Build locally: `cd ui && npm run build`
-3. Upload to S3: Upload all files from `ui/dist/ui/browser/` to bucket root
-4. Files are immediately available at S3 website endpoint
+1. Build for Cloudflare: `cd ui && npm run build:cloudflare`
+2. Upload to S3: Upload all files from `ui/dist/ui/browser/` to bucket root
+3. Access at: https://clearskies.juzi.dev
 
-### Backend (EC2 Instance)
-- **Instance Type**: Amazon Linux 2023 on EC2
+### Backend
+- **EC2 Instance**: Amazon Linux 2023 on t2.micro (3.226.72.134)
+- **Cloudflare Proxy**: `api.juzi.dev` → EC2:3000 (enables SSL/TLS + DDoS protection)
 - **Services**: Node.js 20.x, MongoDB, PM2 process manager
 - **API Port**: 3000 (exposed via security group)
-- **Public IP**: 3.226.72.134 (configured in frontend environment)
 
 **CORS Configuration** ([be/index.ts](be/index.ts)):
 ```typescript
 app.use(cors({
-  origin: ['http://localhost:4200', 'http://clearskies-frontend-dev.s3-website-us-east-1.amazonaws.com'],
+  origin: [
+    'http://localhost:4200',
+    'http://clearskies-frontend-dev.s3-website-us-east-1.amazonaws.com',
+    'http://clearskies.juzi.dev',
+    'https://clearskies.juzi.dev'
+  ],
   credentials: true
 }));
-
-// Socket.io CORS
-const io = new Server(server, {
-  cors: {
-    origin: ['http://localhost:4200', 'http://clearskies-frontend-dev.s3-website-us-east-1.amazonaws.com'],
-    credentials: true
-  }
-});
 ```
 
 **Deployment Process**:
@@ -1706,10 +1708,19 @@ JWT_EXPIRE=7d
 NODE_ENV=production
 ```
 
+### Cloudflare Configuration
+- **DNS Records**:
+  - `clearskies.juzi.dev` (CNAME) → S3 website endpoint (proxied, SSL enabled)
+  - `api.juzi.dev` (A) → 3.226.72.134 (proxied, SSL enabled)
+- **Features**: Free SSL/TLS certificates, DDoS protection, CDN caching, analytics
+- **Detailed Setup**: See [project/docs/cloudflare-custom-domain-setup.md](project/docs/cloudflare-custom-domain-setup.md)
+
+### Deployment Guides
+- **AWS Setup**: [project/docs/aws-deployment-guide.md](project/docs/aws-deployment-guide.md) - Complete EC2 and S3 deployment
+- **Cloudflare Setup**: [project/docs/cloudflare-custom-domain-setup.md](project/docs/cloudflare-custom-domain-setup.md) - Custom domain with SSL/TLS
+
 ### Future Enhancements
-- **CloudFront CDN**: Add CloudFront distribution for S3 bucket (faster global delivery, HTTPS support)
-- **SSL/HTTPS**: Configure SSL certificate via AWS Certificate Manager
-- **Nginx Reverse Proxy**: Add Nginx on EC2 for better routing and SSL termination
 - **Auto-scaling**: Configure EC2 auto-scaling groups for high traffic
 - **Monitoring**: CloudWatch metrics for API performance and error tracking
+- **CDN Optimization**: Cloudflare cache rules for static assets
 
