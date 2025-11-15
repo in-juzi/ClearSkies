@@ -55,7 +55,7 @@ export const QUALITY_SETS = {
   FOOD: ['age'],
 
   // Herbs and plants
-  HERB: ['age'],
+  HERB: [],
 } as const;
 
 /**
@@ -108,6 +108,12 @@ export const TRAIT_SETS = {
 
   // Potions and consumables
   POTION: ['blessed', 'cursed'],
+
+  // Alchemy herbs with special effect traits
+  HERB_RESTORATIVE: ['pristine', 'restorative'],
+  HERB_EMPOWERING: ['pristine', 'empowering', 'blessed', 'cursed'],
+  HERB_INVIGORATING: ['pristine', 'invigorating'],
+  HERB_WARDING: ['pristine', 'warding'],
 } as const;
 
 /**
@@ -121,6 +127,10 @@ export const TRAIT_IDS = {
   CURSED: 'cursed',
   BLESSED: 'blessed',
   MASTERWORK: 'masterwork',
+  RESTORATIVE: 'restorative',
+  EMPOWERING: 'empowering',
+  INVIGORATING: 'invigorating',
+  WARDING: 'warding',
 } as const;
 
 // ===== TIER VALUES =====

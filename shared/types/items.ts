@@ -248,7 +248,18 @@ export interface TraitLevel {
       healthDrain?: number;
     };
     alchemy?: {
-      bonusProperties: string[];
+      bonusProperties?: string[];
+      buffEffect?: {
+        stat: string;
+        value: number;
+        duration: number;
+        isPercentage?: boolean;
+      };
+      hotEffect?: {
+        healPerTick: number;
+        ticks: number;
+        tickInterval: number;
+      };
     };
     smithing?: {
       bonusMultiplier?: number;
