@@ -8,9 +8,9 @@
 import { Recipe } from '../../../types';
 import { SUBCATEGORY } from '../../constants/item-constants';
 
-export const BasicManaTincture: Recipe = {
-  recipeId: 'basic_mana_tincture',
-  name: 'Basic Mana Tincture',
+export const ManaTinctureRecipe: Recipe = {
+  recipeId: 'mana_tincture',
+  name: 'Mana Tincture',
   description: 'A simple herbal infusion that restores minor mana. Any combination of herbs will work.',
   skill: 'alchemy',
   requiredLevel: 1,
@@ -19,7 +19,7 @@ export const BasicManaTincture: Recipe = {
     { subcategory: SUBCATEGORY.HERB, quantity: 2 }  // Any 2 herbs!
   ],
   outputs: [
-    { itemId: 'weak_mana_potion', quantity: 1, qualityModifier: 'inherit' }
+    { itemId: 'mana_tincture', quantity: 1, qualityModifier: 'inherit' }
   ],
   experience: 20,
   unlockConditions: {

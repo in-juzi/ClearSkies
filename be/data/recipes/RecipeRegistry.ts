@@ -8,16 +8,16 @@
 import { Recipe } from '../../types/crafting';
 
 // ALCHEMY
-import { BasicHealthTincture } from './alchemy/BasicHealthTincture';
-import { BasicManaTincture } from './alchemy/BasicManaTincture';
-import { ConcentratedVitalityElixir } from './alchemy/ConcentratedVitalityElixir';
-import { DragonsFuryBrew } from './alchemy/DragonsFuryBrew';
-import { EnhancedHealthPotion } from './alchemy/EnhancedHealthPotion';
-import { EnhancedManaPotion } from './alchemy/EnhancedManaPotion';
-import { FloralRejuvenationDraught } from './alchemy/FloralRejuvenationDraught';
-import { MandrakePowerElixir } from './alchemy/MandrakePowerElixir';
-import { NettleVigorDraught } from './alchemy/NettleVigorDraught';
-import { SageWardingTonic } from './alchemy/SageWardingTonic';
+import { HealthTinctureRecipe } from './alchemy/HealthTinctureRecipe';
+import { ManaTinctureRecipe } from './alchemy/ManaTinctureRecipe';
+import { HealthElixirRecipe } from './alchemy/HealthElixirRecipe';
+import { FuryBrewRecipe } from './alchemy/FuryBrewRecipe';
+import { HealthPotionRecipe } from './alchemy/HealthPotionRecipe';
+import { ManaPotionRecipe } from './alchemy/ManaPotionRecipe';
+import { FloralRejuvenationDraughtRecipe } from './alchemy/FloralRejuvenationDraughtRecipe';
+import { PowerElixirRecipe } from './alchemy/PowerElixirRecipe';
+import { VigorDraughtRecipe } from './alchemy/VigorDraughtRecipe';
+import { WardingTonicRecipe } from './alchemy/WardingTonicRecipe';
 
 // COOKING
 import { CookCod } from './cooking/CookCod';
@@ -49,16 +49,16 @@ import { SmeltIronIngot } from './smithing/SmeltIronIngot';
  */
 export class RecipeRegistry {
   private static readonly items = new Map<string, Recipe>([
-    [BasicHealthTincture.recipeId, BasicHealthTincture],
-    [BasicManaTincture.recipeId, BasicManaTincture],
-    [ConcentratedVitalityElixir.recipeId, ConcentratedVitalityElixir],
-    [DragonsFuryBrew.recipeId, DragonsFuryBrew],
-    [EnhancedHealthPotion.recipeId, EnhancedHealthPotion],
-    [EnhancedManaPotion.recipeId, EnhancedManaPotion],
-    [FloralRejuvenationDraught.recipeId, FloralRejuvenationDraught],
-    [MandrakePowerElixir.recipeId, MandrakePowerElixir],
-    [NettleVigorDraught.recipeId, NettleVigorDraught],
-    [SageWardingTonic.recipeId, SageWardingTonic],
+    [HealthTinctureRecipe.recipeId, HealthTinctureRecipe],
+    [ManaTinctureRecipe.recipeId, ManaTinctureRecipe],
+    [HealthElixirRecipe.recipeId, HealthElixirRecipe],
+    [FuryBrewRecipe.recipeId, FuryBrewRecipe],
+    [HealthPotionRecipe.recipeId, HealthPotionRecipe],
+    [ManaPotionRecipe.recipeId, ManaPotionRecipe],
+    [FloralRejuvenationDraughtRecipe.recipeId, FloralRejuvenationDraughtRecipe],
+    [PowerElixirRecipe.recipeId, PowerElixirRecipe],
+    [VigorDraughtRecipe.recipeId, VigorDraughtRecipe],
+    [WardingTonicRecipe.recipeId, WardingTonicRecipe],
     [CookCod.recipeId, CookCod],
     [CookSalmon.recipeId, CookSalmon],
     [CookShrimp.recipeId, CookShrimp],

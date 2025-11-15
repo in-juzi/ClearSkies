@@ -14,12 +14,12 @@ import { CookedShrimp } from './definitions/consumables/CookedShrimp';
 import { CookedTrout } from './definitions/consumables/CookedTrout';
 import { FuryBrew } from './definitions/consumables/FuryBrew';
 import { HealthPotion } from './definitions/consumables/HealthPotion';
-import { HealthPotionMinor } from './definitions/consumables/HealthPotionMinor';
-import { HealthPotionStrong } from './definitions/consumables/HealthPotionStrong';
-import { HealthPotionWeak } from './definitions/consumables/HealthPotionWeak';
+import { HealthDraught } from './definitions/consumables/HealthDraught';
+import { HealthElixir } from './definitions/consumables/HealthElixir';
+import { HealthTincture } from './definitions/consumables/HealthTincture';
 import { ManaPotion } from './definitions/consumables/ManaPotion';
-import { ManaPotionMinor } from './definitions/consumables/ManaPotionMinor';
-import { ManaPotionWeak } from './definitions/consumables/ManaPotionWeak';
+import { ManaDraught } from './definitions/consumables/ManaDraught';
+import { ManaTincture } from './definitions/consumables/ManaTincture';
 import { PowerElixir } from './definitions/consumables/PowerElixir';
 import { VigorDraught } from './definitions/consumables/VigorDraught';
 import { WardingTonic } from './definitions/consumables/WardingTonic';
@@ -105,12 +105,12 @@ export class ItemRegistry {
     [CookedTrout.itemId, CookedTrout],
     [FuryBrew.itemId, FuryBrew],
     [HealthPotion.itemId, HealthPotion],
-    [HealthPotionMinor.itemId, HealthPotionMinor],
-    [HealthPotionStrong.itemId, HealthPotionStrong],
-    [HealthPotionWeak.itemId, HealthPotionWeak],
+    [HealthDraught.itemId, HealthDraught],
+    [HealthElixir.itemId, HealthElixir],
+    [HealthTincture.itemId, HealthTincture],
     [ManaPotion.itemId, ManaPotion],
-    [ManaPotionMinor.itemId, ManaPotionMinor],
-    [ManaPotionWeak.itemId, ManaPotionWeak],
+    [ManaDraught.itemId, ManaDraught],
+    [ManaTincture.itemId, ManaTincture],
     [PowerElixir.itemId, PowerElixir],
     [VigorDraught.itemId, VigorDraught],
     [WardingTonic.itemId, WardingTonic],

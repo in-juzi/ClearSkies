@@ -9,9 +9,9 @@
 import { Recipe } from '../../../types';
 import { SUBCATEGORY } from '../../constants/item-constants';
 
-export const ConcentratedVitalityElixir: Recipe = {
-  recipeId: 'concentrated_vitality_elixir',
-  name: 'Concentrated Vitality Elixir',
+export const HealthElixirRecipe: Recipe = {
+  recipeId: 'health_elixir',
+  name: 'Health Elixir',
   description: 'A potent mixture combining three herbs for maximum health restoration. Quality matters greatly.',
   skill: 'alchemy',
   requiredLevel: 10,
@@ -20,7 +20,7 @@ export const ConcentratedVitalityElixir: Recipe = {
     { subcategory: SUBCATEGORY.HERB, quantity: 3 }  // Any 3 herbs - choose wisely!
   ],
   outputs: [
-    { itemId: 'strong_health_potion', quantity: 1, qualityModifier: 'inherit' }
+    { itemId: 'health_elixir', quantity: 1, qualityModifier: 'inherit' }
   ],
   experience: 50,
   unlockConditions: {

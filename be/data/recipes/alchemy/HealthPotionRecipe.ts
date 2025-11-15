@@ -9,9 +9,9 @@
 import { Recipe } from '../../../types';
 import { SUBCATEGORY } from '../../constants/item-constants';
 
-export const EnhancedHealthPotion: Recipe = {
-  recipeId: 'enhanced_health_potion',
-  name: 'Enhanced Health Potion',
+export const HealthPotionRecipe: Recipe = {
+  recipeId: 'health_potion',
+  name: 'Health Potion',
   description: 'A refined herbal concoction with improved healing properties. Chamomile\'s calming essence is key.',
   skill: 'alchemy',
   requiredLevel: 5,
@@ -26,6 +26,6 @@ export const EnhancedHealthPotion: Recipe = {
   experience: 35,
   unlockConditions: {
     discoveredByDefault: false,
-    requiredRecipes: ['basic_health_tincture']  // Unlock by crafting basic version
+    requiredRecipes: ['health_tincture']  // Unlock by crafting basic version
   }
 } as const;

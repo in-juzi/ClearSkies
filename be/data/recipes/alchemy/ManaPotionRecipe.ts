@@ -9,9 +9,9 @@
 import { Recipe } from '../../../types';
 import { SUBCATEGORY } from '../../constants/item-constants';
 
-export const EnhancedManaPotion: Recipe = {
-  recipeId: 'enhanced_mana_potion',
-  name: 'Enhanced Mana Potion',
+export const ManaPotionRecipe: Recipe = {
+  recipeId: 'mana_potion',
+  name: 'Mana Potion',
   description: 'A refined herbal infusion with improved mana restoration. Sage provides mental clarity.',
   skill: 'alchemy',
   requiredLevel: 5,
@@ -26,6 +26,6 @@ export const EnhancedManaPotion: Recipe = {
   experience: 35,
   unlockConditions: {
     discoveredByDefault: false,
-    requiredRecipes: ['basic_mana_tincture']  // Unlock by crafting basic version
+    requiredRecipes: ['mana_tincture']  // Unlock by crafting basic version
   }
 } as const;

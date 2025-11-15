@@ -8,9 +8,9 @@
 import { Recipe } from '../../../types';
 import { SUBCATEGORY } from '../../constants/item-constants';
 
-export const BasicHealthTincture: Recipe = {
-  recipeId: 'basic_health_tincture',
-  name: 'Basic Health Tincture',
+export const HealthTinctureRecipe: Recipe = {
+  recipeId: 'health_tincture',
+  name: 'Health Tincture',
   description: 'A simple herbal remedy that restores minor health. Any combination of herbs will work.',
   skill: 'alchemy',
   requiredLevel: 1,
@@ -19,7 +19,7 @@ export const BasicHealthTincture: Recipe = {
     { subcategory: SUBCATEGORY.HERB, quantity: 2 }  // Any 2 herbs!
   ],
   outputs: [
-    { itemId: 'weak_health_potion', quantity: 1, qualityModifier: 'inherit' }
+    { itemId: 'health_tincture', quantity: 1, qualityModifier: 'inherit' }
   ],
   experience: 20,
   unlockConditions: {
