@@ -218,7 +218,20 @@ export const getMe = async (req: Request, res: Response): Promise<void> => {
           level: player.level,
           experience: player.experience,
           gold: player.gold,
-          stats: player.stats,
+          stats: {
+            health: {
+              current: player.stats?.health?.current || 0,
+              max: player.stats?.health?.max || 100
+            },
+            mana: {
+              current: player.stats?.mana?.current || 0,
+              max: player.stats?.mana?.max || 50
+            },
+            strength: player.stats?.strength || 10,
+            dexterity: player.stats?.dexterity || 10,
+            intelligence: player.stats?.intelligence || 10,
+            vitality: player.stats?.vitality || 10
+          },
           skills: player.skills,
           location: player.currentLocation,
           lastPlayed: player.lastPlayed
