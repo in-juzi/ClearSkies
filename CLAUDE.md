@@ -41,18 +41,21 @@
 - ✅ Combat constants system (completed - centralized combat formulas, type-safe enums)
 - ✅ Shared constants architecture (completed - item/combat constants accessible to frontend/backend)
 - ✅ TypeScript path aliases (completed - tsconfig-paths for clean @shared/* imports)
+- ✅ Game loading screen (completed - immersive loading with animations and data preloading)
+- ✅ Global loading overlay (completed - app-wide loading during auth initialization)
+- ✅ Skill progression calculator (completed - development utility for game balance analysis)
 
 **Recent Changes** (Last 10 commits):
+- chore: add skill progression calculator and player debug utilities
+- fix: normalize player stats structure in getMe endpoint
+- feat: add global loading overlay for auth initialization
+- feat: add game loading screen with animations and data preloading
+- docs: update CLAUDE.md with trait-based potion effects system
 - chore: add development notes and helper scripts
 - docs: add herb-trait mapping and quality-trait design discussion
 - feat: integrate trait-based buffs and HoTs into combat item consumption
 - feat: add potion buff and HoT application methods to combat service
 - feat: add consumable effect extraction for trait-based buffs and HoTs
-- feat: add four buff potion alchemy recipes
-- feat: add four buff potion consumables
-- feat: assign alchemy effect traits to herbs
-- feat: add four alchemy-specific traits with buff and HoT effects
-- feat: add alchemy trait types and constants for buff/HoT effects
 
 **Known Issues**:
 - None currently identified
@@ -141,6 +144,8 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 
 **Utilities:**
 - [be/utils/add-item.js](be/utils/add-item.js) - Add items to player inventory
+- [be/utils/calculate-skill-progression.ts](be/utils/calculate-skill-progression.ts) - Skill progression calculator (npm run progression)
+- [be/utils/check-player-location.js](be/utils/check-player-location.js) - Debug player location and stats
 - [be/utils/content-generator.js](be/utils/content-generator.js) - Interactive content creation
 - [be/utils/test-xp-scaling.js](be/utils/test-xp-scaling.js) - XP formula testing
 - [be/scripts/validate-game-data.ts](be/scripts/validate-game-data.ts) - Validate cross-references (npm run validate)
