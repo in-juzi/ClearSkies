@@ -9,6 +9,10 @@
  */
 
 require('dotenv').config();
+
+// Register tsconfig-paths to resolve @shared/* imports
+require('tsconfig-paths/register');
+
 const mongoose = require('mongoose');
 const fs = require('fs');
 const path = require('path');
