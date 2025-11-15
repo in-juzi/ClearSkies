@@ -39,7 +39,7 @@ export type SkillName =
 export type AttributeName =
   | 'strength'
   | 'endurance'
-  | 'magic'
+  | 'wisdom'     // Renamed from 'magic'
   | 'perception'
   | 'dexterity'
   | 'will'

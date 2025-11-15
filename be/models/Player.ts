@@ -13,6 +13,7 @@ import {
   CombatLogEntry,
   CombatStats
 } from '@shared/types';
+import { ATTRIBUTE_SCALING } from '../../shared/constants/attribute-constants';
 
 // ============================================================================
 // Type Definitions
@@ -100,6 +101,12 @@ export interface IPlayer extends Document {
   skills: Record<SkillName, Skill>;
   createdAt: Date;
   lastPlayed: Date;
+
+  // Virtual properties
+  readonly maxHP: number;
+  readonly maxMP: number;
+  readonly carryingCapacity: number;
+  readonly currentWeight: number;
 
   // Methods
   updateLastPlayed(): Promise<void>;
@@ -333,7 +340,7 @@ const playerSchema = new Schema<IPlayer>({
       level: { type: Number, default: 1, min: 1 },
       experience: { type: Number, default: 0, min: 0 }
     },
-    magic: {
+    wisdom: {
       level: { type: Number, default: 1, min: 1 },
       experience: { type: Number, default: 0, min: 0 }
     },
@@ -413,7 +420,7 @@ const playerSchema = new Schema<IPlayer>({
     casting: {
       level: { type: Number, default: 1, min: 1 },
       experience: { type: Number, default: 0, min: 0 },
-      mainAttribute: { type: String, default: 'magic' }
+      mainAttribute: { type: String, default: 'wisdom' }
     },
     gun: {
       level: { type: Number, default: 1, min: 1 },
@@ -431,6 +438,58 @@ const playerSchema = new Schema<IPlayer>({
   }
 }, {
   timestamps: true
+});
+
+// ============================================================================
+// Virtual Properties
+// ============================================================================
+
+// Maximum HP based on attributes
+playerSchema.virtual('maxHP').get(function(this: IPlayer) {
+  const str = this.attributes.strength?.level || 1;
+  const end = this.attributes.endurance?.level || 1;
+  const will = this.attributes.will?.level || 1;
+
+  return ATTRIBUTE_SCALING.BASE_HP +
+    (str * ATTRIBUTE_SCALING.STR_HP_BONUS) +
+    (end * ATTRIBUTE_SCALING.END_HP_BONUS) +
+    (will * ATTRIBUTE_SCALING.WILL_HP_BONUS);
+});
+
+// Maximum MP based on attributes
+playerSchema.virtual('maxMP').get(function(this: IPlayer) {
+  const wis = this.attributes.wisdom?.level || 1;
+  const will = this.attributes.will?.level || 1;
+
+  return ATTRIBUTE_SCALING.BASE_MP +
+    (wis * ATTRIBUTE_SCALING.WIS_MP_BONUS) +
+    (will * ATTRIBUTE_SCALING.WILL_MP_BONUS);
+});
+
+// Carrying capacity (kg) based on attributes
+playerSchema.virtual('carryingCapacity').get(function(this: IPlayer) {
+  const str = this.attributes.strength?.level || 1;
+  const end = this.attributes.endurance?.level || 1;
+
+  return ATTRIBUTE_SCALING.BASE_CAPACITY_KG +
+    (str * ATTRIBUTE_SCALING.STR_CAPACITY_BONUS) +
+    (end * ATTRIBUTE_SCALING.END_CAPACITY_BONUS);
+});
+
+// Current weight of all inventory items
+playerSchema.virtual('currentWeight').get(function(this: IPlayer) {
+  // Import itemService dynamically to avoid circular dependency
+  const itemService = require('../services/itemService').default;
+
+  let totalWeight = 0;
+  for (const item of this.inventory) {
+    const itemDef = itemService.getItemDefinition(item.itemId);
+    if (itemDef && itemDef.properties.weight) {
+      totalWeight += itemDef.properties.weight * item.quantity;
+    }
+  }
+
+  return Math.round(totalWeight * 10) / 10; // Round to 1 decimal place
 });
 
 // ============================================================================
@@ -452,15 +511,11 @@ playerSchema.methods.addExperience = async function(this: IPlayer, amount: numbe
 
   if (newLevel > this.level && newLevel <= 100) {
     this.level = newLevel;
-    // Increase stats on level up
-    this.stats.health.max += 10;
-    this.stats.health.current = this.stats.health.max;
-    this.stats.mana.max += 5;
-    this.stats.mana.current = this.stats.mana.max;
-    this.stats.strength += 2;
-    this.stats.dexterity += 2;
-    this.stats.intelligence += 2;
-    this.stats.vitality += 2;
+    // HP/MP now come from attributes - fully restore on level up
+    this.stats.health.current = this.maxHP;
+    this.stats.mana.current = this.maxMP;
+    // Note: stats.strength/dexterity/intelligence/vitality are deprecated
+    // Character progression now happens through attribute leveling
   }
 
   await this.save();
@@ -500,7 +555,7 @@ playerSchema.methods.addAttributeExperience = async function(
   level?: number;
   attribute: AttributeName;
 }> {
-  const validAttributes: AttributeName[] = ['strength', 'endurance', 'magic', 'perception', 'dexterity', 'will', 'charisma'];
+  const validAttributes: AttributeName[] = ['strength', 'endurance', 'wisdom', 'perception', 'dexterity', 'will', 'charisma'];
 
   if (!validAttributes.includes(attributeName)) {
     throw new Error(`Invalid attribute name: ${attributeName}`);
@@ -525,7 +580,7 @@ playerSchema.methods.addAttributeExperience = async function(
 
 // Get progress to next attribute level (0-100%)
 playerSchema.methods.getAttributeProgress = function(this: IPlayer, attributeName: AttributeName): number {
-  const validAttributes: AttributeName[] = ['strength', 'endurance', 'magic', 'perception', 'dexterity', 'will', 'charisma'];
+  const validAttributes: AttributeName[] = ['strength', 'endurance', 'wisdom', 'perception', 'dexterity', 'will', 'charisma'];
 
   if (!validAttributes.includes(attributeName)) {
     throw new Error(`Invalid attribute name: ${attributeName}`);
@@ -621,20 +676,29 @@ playerSchema.methods.getSkillProgress = function(this: IPlayer, skillName: Skill
 
 // Add item to inventory
 playerSchema.methods.addItem = function(this: IPlayer, itemInstance: any): any {
-  // Check inventory capacity
-  const currentSize = this.inventory.reduce((sum, item) => sum + item.quantity, 0);
-  if (currentSize + itemInstance.quantity > this.inventoryCapacity) {
-    throw new Error('Inventory is full');
+  // Import itemService for weight calculation
+  const itemService = require('../services/itemService').default;
+  const itemDef = itemService.getItemDefinition(itemInstance.itemId);
+
+  // Check weight-based carrying capacity
+  const itemWeight = itemDef?.properties?.weight || 0;
+  const totalItemWeight = itemWeight * itemInstance.quantity;
+  const currentWeight = this.currentWeight; // Uses virtual property
+  const capacity = this.carryingCapacity; // Uses virtual property
+
+  if (currentWeight + totalItemWeight > capacity) {
+    const available = capacity - currentWeight;
+    throw new Error(
+      `Cannot carry ${totalItemWeight.toFixed(1)}kg (${available.toFixed(1)}kg capacity remaining, ${capacity.toFixed(1)}kg total)`
+    );
   }
 
   // Try to stack with existing items
-  const itemService = require('../services/itemService').default;
   const existingItem = this.inventory.find(inv =>
     itemService.canStack(inv, itemInstance)
   );
 
   if (existingItem) {
-    const itemDef = itemService.getItemDefinition(itemInstance.itemId);
 
     if (itemDef.stackable) {
       existingItem.quantity += itemInstance.quantity;
@@ -876,7 +940,7 @@ playerSchema.methods.heal = function(this: IPlayer, amount: number): void {
     throw new Error('Heal amount must be positive');
   }
 
-  this.stats.health.current = Math.min(this.stats.health.max, this.stats.health.current + amount);
+  this.stats.health.current = Math.min(this.maxHP, this.stats.health.current + amount);
 };
 
 // Use mana for abilities
@@ -898,7 +962,7 @@ playerSchema.methods.restoreMana = function(this: IPlayer, amount: number): void
     throw new Error('Mana amount must be positive');
   }
 
-  this.stats.mana.current = Math.min(this.stats.mana.max, this.stats.mana.current + amount);
+  this.stats.mana.current = Math.min(this.maxMP, this.stats.mana.current + amount);
 };
 
 // Use a consumable item and apply its effects
@@ -984,6 +1048,25 @@ playerSchema.methods.addCombatLog = function(this: IPlayer, message: string, typ
 
 // Clear active combat (used when combat ends)
 playerSchema.methods.clearCombat = function(this: IPlayer): void {
+  // Convert remaining HoT effects to instant healing before clearing combat
+  if (this.activeCombat && this.activeCombat.activeBuffs) {
+    let totalRemainingHealing = 0;
+
+    for (const buff of this.activeCombat.activeBuffs.values()) {
+      // Only process HoT buffs on the player
+      if (buff.target === 'player' && buff.healOverTime && buff.duration > 0) {
+        const remainingHealing = buff.healOverTime * buff.duration;
+        totalRemainingHealing += remainingHealing;
+      }
+    }
+
+    // Apply the converted healing
+    if (totalRemainingHealing > 0) {
+      this.heal(totalRemainingHealing);
+      console.log(`[Combat End] Converted ${totalRemainingHealing} HP from remaining HoT effects`);
+    }
+  }
+
   this.activeCombat = {
     activityId: '',
     monsterId: '',
