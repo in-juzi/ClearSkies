@@ -224,24 +224,13 @@ class RecipeService {
 
     // Collect ingredient qualities and traits once (shared across all outputs)
     const qualityMaps: Map<string, number>[] = [];
+    const traitMaps: Map<string, number>[] = [];
     for (const ingredient of ingredientInstances) {
       if (ingredient.qualities && ingredient.qualities.size > 0) {
         qualityMaps.push(ingredient.qualities);
       }
-    }
-
-    let bestIngredient: any = null;
-    let bestTraitCount = 0;
-    if (ingredientInstances.length > 0) {
-      bestIngredient = ingredientInstances[0];
-      bestTraitCount = bestIngredient.traits ? bestIngredient.traits.size : 0;
-
-      for (const ingredient of ingredientInstances) {
-        const traitCount = ingredient.traits ? ingredient.traits.size : 0;
-        if (traitCount > bestTraitCount) {
-          bestIngredient = ingredient;
-          bestTraitCount = traitCount;
-        }
+      if (ingredient.traits && ingredient.traits.size > 0) {
+        traitMaps.push(ingredient.traits);
       }
     }
 
@@ -291,9 +280,28 @@ class RecipeService {
           output.qualities.set(primaryQuality, newLevel);
         }
 
-        // Trait inheritance: Inherit traits from best ingredient
-        if (bestIngredient && bestIngredient.traits && bestIngredient.traits.size > 0) {
-          output.traits = new Map(bestIngredient.traits);
+        // Trait inheritance: Combine all traits from all ingredients, taking max level
+        if (traitMaps.length > 0) {
+          const allTraitTypes = new Set<string>();
+          for (const traitMap of traitMaps) {
+            for (const traitType of traitMap.keys()) {
+              allTraitTypes.add(traitType);
+            }
+          }
+
+          // For each trait type, take the max level from ingredients
+          for (const traitType of allTraitTypes) {
+            let maxLevel = 0;
+            for (const traitMap of traitMaps) {
+              const level = traitMap.get(traitType) || 0;
+              if (level > maxLevel) {
+                maxLevel = level;
+              }
+            }
+            if (maxLevel > 0) {
+              output.traits.set(traitType, maxLevel);
+            }
+          }
         }
       }
 

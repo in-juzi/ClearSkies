@@ -135,11 +135,24 @@ function scheduleCraftingCompletion(
         return plainItem;
       });
 
+      // Convert outputItems to plain objects with qualities/traits
+      const plainOutputs = outputItems.map((item: any) => {
+        const plainItem = item.toObject ? item.toObject() : item;
+        if (plainItem.qualities instanceof Map) {
+          plainItem.qualities = Object.fromEntries(plainItem.qualities);
+        }
+        if (plainItem.traits instanceof Map) {
+          plainItem.traits = Object.fromEntries(plainItem.traits);
+        }
+        return plainItem;
+      });
+
       // Emit completion event
       io.to(`user:${userId}`).emit('crafting:completed', {
         success: true,
         recipeName: recipe.name,
-        result: outputItems[0], // First output item
+        result: plainOutputs[0], // First output item (legacy)
+        outputs: plainOutputs, // All output items (new schema)
         xpGained: recipe.experience,
         skillUpdate: xpResult.skill,
         attributeUpdate: xpResult.attribute,
