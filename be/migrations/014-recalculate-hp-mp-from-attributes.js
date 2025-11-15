@@ -105,4 +105,9 @@ async function down() {
   console.log(`Rollback complete: ${result.modifiedCount} players reset to 100 HP/MP`);
 }
 
-module.exports = { up, down };
+module.exports = {
+  name: '014-recalculate-hp-mp-from-attributes',
+  description: 'Recalculate all players\' current HP and MP based on attribute-driven formulas',
+  up,
+  down
+};
