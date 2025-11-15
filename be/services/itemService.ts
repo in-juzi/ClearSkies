@@ -610,6 +610,59 @@ class ItemService {
 
     return shuffled.slice(0, count);
   }
+
+  /**
+   * Extract consumable effects from item instance (including trait-based buff/HoT effects)
+   * Returns all effects that should be applied when consuming the item
+   */
+  getConsumableEffects(itemInstance: ItemInstance | any) {
+    const itemDef = this.getItemDefinition(itemInstance.itemId);
+    if (!itemDef || itemDef.category !== 'consumable') {
+      return null;
+    }
+
+    const effects: any = {
+      healthRestore: (itemDef.properties as any).healthRestore || 0,
+      manaRestore: (itemDef.properties as any).manaRestore || 0,
+      buffs: [],
+      hots: []
+    };
+
+    // Process traits for buff/HoT effects
+    if (itemInstance.traits) {
+      const traitMap = itemInstance.traits instanceof Map ? itemInstance.traits : new Map(Object.entries(itemInstance.traits));
+
+      for (const [traitId, level] of traitMap.entries()) {
+        const traitDef = this.traitDefinitions.get(traitId);
+        if (!traitDef || !traitDef.levels[level]) continue;
+
+        const traitLevel = traitDef.levels[level];
+        const alchemyEffects = traitLevel.effects.alchemy;
+
+        if (!alchemyEffects) continue;
+
+        // Add buff effects
+        if (alchemyEffects.buffEffect) {
+          effects.buffs.push({
+            traitId,
+            traitName: traitDef.name,
+            ...alchemyEffects.buffEffect
+          });
+        }
+
+        // Add HoT effects
+        if (alchemyEffects.hotEffect) {
+          effects.hots.push({
+            traitId,
+            traitName: traitDef.name,
+            ...alchemyEffects.hotEffect
+          });
+        }
+      }
+    }
+
+    return effects;
+  }
 }
 
 // Create singleton instance
