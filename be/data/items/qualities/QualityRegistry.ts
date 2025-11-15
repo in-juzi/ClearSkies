@@ -6,12 +6,12 @@
 import { QualityDefinition } from '../../../types/items';
 
 import { AgeQuality } from './definitions/AgeQuality';
+import { GrainQuality } from './definitions/GrainQuality';
 import { JuicyQuality } from './definitions/JuicyQuality';
-import { MoistureQuality } from './definitions/MoistureQuality';
+import { PotencyQuality } from './definitions/PotencyQuality';
 import { PurityQuality } from './definitions/PurityQuality';
 import { SheenQuality } from './definitions/SheenQuality';
 import { SizeQuality } from './definitions/SizeQuality';
-import { WoodGrainQuality } from './definitions/WoodGrainQuality';
 
 /**
  * Central registry for all qualities
@@ -19,12 +19,12 @@ import { WoodGrainQuality } from './definitions/WoodGrainQuality';
 export class QualityRegistry {
   private static readonly qualities = new Map<string, QualityDefinition>([
     [AgeQuality.qualityId, AgeQuality],
+    [GrainQuality.qualityId, GrainQuality],
     [JuicyQuality.qualityId, JuicyQuality],
-    [MoistureQuality.qualityId, MoistureQuality],
+    [PotencyQuality.qualityId, PotencyQuality],
     [PurityQuality.qualityId, PurityQuality],
     [SheenQuality.qualityId, SheenQuality],
     [SizeQuality.qualityId, SizeQuality],
-    [WoodGrainQuality.qualityId, WoodGrainQuality],
   ]);
 
   /**

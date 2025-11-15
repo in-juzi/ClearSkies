@@ -35,14 +35,13 @@ export const QUALITY_SETS = {
   NONE: [],
 
   // Single qualities
-  WOOD_GRAIN: ['woodGrain'],
-  MOISTURE: ['moisture'],
   PURITY: ['purity'],
   SHEEN: ['sheen'],
   AGE: ['age'],
-
-  // Wood-based items (logs, wooden equipment)
-  WOOD: ['woodGrain', 'moisture'],
+  JUICY: ['juicy'],
+  SIZE: ['size'],
+  GRAIN: ['grain'],
+  POTENCY: ['potency'],
 
   // Ore and metal items
   ORE: ['purity'],
@@ -52,21 +51,26 @@ export const QUALITY_SETS = {
   GEMSTONE: ['sheen'],
 
   // Food items (raw and cooked)
-  FOOD: ['age'],
+  FOOD: ['age', 'juicy', 'size'],
 
   // Herbs and plants
-  HERB: [],
+  HERB: ['potency'],
+
+  // Wood-based items (logs, wooden equipment)
+  WOOD: ['grain'],
 } as const;
 
 /**
  * All quality IDs for reference
  */
 export const QUALITY_IDS = {
-  WOOD_GRAIN: 'woodGrain',
-  MOISTURE: 'moisture',
   AGE: 'age',
+  GRAIN: 'grain',
+  JUICY: 'juicy',
+  POTENCY: 'potency',
   PURITY: 'purity',
   SHEEN: 'sheen',
+  SIZE: 'size',
 } as const;
 
 // ===== TRAIT SETS =====
@@ -81,37 +85,49 @@ export const TRAIT_SETS = {
   // Single traits
   PRISTINE: ['pristine'],
   BLESSED: ['blessed'],
-  CURSED: ['cursed'],
   FRAGRANT: ['fragrant'],
-  KNOTTED: ['knotted'],
-  WEATHERED: ['weathered'],
   MASTERWORK: ['masterwork'],
+  HARDENED: ['hardened'],
+  BALANCED: ['balanced'],
+  REINFORCED: ['reinforced'],
 
   // Wood-based items
-  WOOD: ['knotted', 'weathered'],
-  WOOD_PRISTINE: ['pristine', 'knotted', 'weathered'],
+  WOOD: ['balanced'],
+  WOOD_PRISTINE: ['pristine', 'balanced'],
 
-  // Metal equipment
-  EQUIPMENT: ['masterwork', 'cursed', 'blessed'],
-  EQUIPMENT_PRISTINE: ['pristine', 'masterwork', 'cursed', 'blessed'],
+  // Metal equipment (weapons)
+  WEAPON: ['hardened', 'blessed'],
+  WEAPON_PRISTINE: ['pristine', 'hardened', 'blessed'],
+
+  // Metal equipment (armor)
+  ARMOR: ['reinforced', 'blessed'],
+  ARMOR_PRISTINE: ['pristine', 'reinforced', 'blessed'],
+
+  // Metal equipment (tools)
+  TOOL: ['balanced', 'blessed'],
+  TOOL_PRISTINE: ['pristine', 'balanced', 'blessed'],
+
+  // General equipment (legacy, kept for compatibility)
+  EQUIPMENT: ['masterwork', 'blessed'],
+  EQUIPMENT_PRISTINE: ['pristine', 'masterwork', 'blessed'],
 
   // Gemstones and valuable items
   GEMSTONE: ['pristine', 'blessed'],
 
   // Food items
-  FOOD: ['blessed', 'cursed'],
-  FOOD_FRAGRANT: ['fragrant', 'blessed', 'cursed'],
+  FOOD: ['blessed'],
+  FOOD_FRAGRANT: ['fragrant', 'blessed'],
 
   // Herbs and plants
   HERB: ['fragrant', 'blessed'],
   HERB_PRISTINE: ['pristine', 'fragrant', 'blessed'],
 
   // Potions and consumables
-  POTION: ['blessed', 'cursed'],
+  POTION: ['blessed'],
 
   // Alchemy herbs with special effect traits
   HERB_RESTORATIVE: ['pristine', 'restorative'],
-  HERB_EMPOWERING: ['pristine', 'empowering', 'blessed', 'cursed'],
+  HERB_EMPOWERING: ['pristine', 'empowering', 'blessed'],
   HERB_INVIGORATING: ['pristine', 'invigorating'],
   HERB_WARDING: ['pristine', 'warding'],
 } as const;
@@ -120,16 +136,16 @@ export const TRAIT_SETS = {
  * All trait IDs for reference
  */
 export const TRAIT_IDS = {
-  FRAGRANT: 'fragrant',
-  KNOTTED: 'knotted',
-  WEATHERED: 'weathered',
-  PRISTINE: 'pristine',
-  CURSED: 'cursed',
+  BALANCED: 'balanced',
   BLESSED: 'blessed',
-  MASTERWORK: 'masterwork',
-  RESTORATIVE: 'restorative',
   EMPOWERING: 'empowering',
+  FRAGRANT: 'fragrant',
+  HARDENED: 'hardened',
   INVIGORATING: 'invigorating',
+  MASTERWORK: 'masterwork',
+  PRISTINE: 'pristine',
+  REINFORCED: 'reinforced',
+  RESTORATIVE: 'restorative',
   WARDING: 'warding',
 } as const;
 

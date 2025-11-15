@@ -5,32 +5,34 @@
 
 import { TraitDefinition } from '../../../types/items';
 
+import { BalancedTrait } from './definitions/BalancedTrait';
 import { BlessedTrait } from './definitions/BlessedTrait';
-import { CursedTrait } from './definitions/CursedTrait';
 import { EmpoweringTrait } from './definitions/EmpoweringTrait';
 import { FragrantTrait } from './definitions/FragrantTrait';
+import { HardenedTrait } from './definitions/HardenedTrait';
 import { InvigoratingTrait } from './definitions/InvigoratingTrait';
 import { MasterworkTrait } from './definitions/MasterworkTrait';
 import { PristineTrait } from './definitions/PristineTrait';
+import { ReinforcedTrait } from './definitions/ReinforcedTrait';
 import { RestorativeTrait } from './definitions/RestorativeTrait';
 import { WardingTrait } from './definitions/WardingTrait';
-import { WeatheredTrait } from './definitions/WeatheredTrait';
 
 /**
  * Central registry for all traits
  */
 export class TraitRegistry {
   private static readonly traits = new Map<string, TraitDefinition>([
+    [BalancedTrait.traitId, BalancedTrait],
     [BlessedTrait.traitId, BlessedTrait],
-    [CursedTrait.traitId, CursedTrait],
     [EmpoweringTrait.traitId, EmpoweringTrait],
     [FragrantTrait.traitId, FragrantTrait],
+    [HardenedTrait.traitId, HardenedTrait],
     [InvigoratingTrait.traitId, InvigoratingTrait],
     [MasterworkTrait.traitId, MasterworkTrait],
     [PristineTrait.traitId, PristineTrait],
+    [ReinforcedTrait.traitId, ReinforcedTrait],
     [RestorativeTrait.traitId, RestorativeTrait],
     [WardingTrait.traitId, WardingTrait],
-    [WeatheredTrait.traitId, WeatheredTrait],
   ]);
 
   /**
