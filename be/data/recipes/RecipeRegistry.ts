@@ -10,10 +10,14 @@ import { Recipe } from '../../types/crafting';
 // ALCHEMY
 import { BasicHealthTincture } from './alchemy/BasicHealthTincture';
 import { BasicManaTincture } from './alchemy/BasicManaTincture';
+import { ConcentratedVitalityElixir } from './alchemy/ConcentratedVitalityElixir';
+import { DragonsFuryBrew } from './alchemy/DragonsFuryBrew';
 import { EnhancedHealthPotion } from './alchemy/EnhancedHealthPotion';
 import { EnhancedManaPotion } from './alchemy/EnhancedManaPotion';
-import { ConcentratedVitalityElixir } from './alchemy/ConcentratedVitalityElixir';
 import { FloralRejuvenationDraught } from './alchemy/FloralRejuvenationDraught';
+import { MandrakePowerElixir } from './alchemy/MandrakePowerElixir';
+import { NettleVigorDraught } from './alchemy/NettleVigorDraught';
+import { SageWardingTonic } from './alchemy/SageWardingTonic';
 
 // COOKING
 import { CookCod } from './cooking/CookCod';
@@ -47,10 +51,14 @@ export class RecipeRegistry {
   private static readonly items = new Map<string, Recipe>([
     [BasicHealthTincture.recipeId, BasicHealthTincture],
     [BasicManaTincture.recipeId, BasicManaTincture],
+    [ConcentratedVitalityElixir.recipeId, ConcentratedVitalityElixir],
+    [DragonsFuryBrew.recipeId, DragonsFuryBrew],
     [EnhancedHealthPotion.recipeId, EnhancedHealthPotion],
     [EnhancedManaPotion.recipeId, EnhancedManaPotion],
-    [ConcentratedVitalityElixir.recipeId, ConcentratedVitalityElixir],
     [FloralRejuvenationDraught.recipeId, FloralRejuvenationDraught],
+    [MandrakePowerElixir.recipeId, MandrakePowerElixir],
+    [NettleVigorDraught.recipeId, NettleVigorDraught],
+    [SageWardingTonic.recipeId, SageWardingTonic],
     [CookCod.recipeId, CookCod],
     [CookSalmon.recipeId, CookSalmon],
     [CookShrimp.recipeId, CookShrimp],
