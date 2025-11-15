@@ -269,6 +269,57 @@ export class ItemDetailsPanelComponent implements OnChanges {
   }
 
   /**
+   * Format subcategory name for display (capitalize first letter)
+   */
+  formatSubcategoryName(subcategory: string): string {
+    return subcategory.charAt(0).toUpperCase() + subcategory.slice(1);
+  }
+
+  /**
+   * Calculate scaled health restore (with Potency quality multiplier)
+   */
+  getScaledHealthRestore(): number {
+    if (!this.item?.definition.properties['healthRestore']) return 0;
+
+    const baseRestore = this.item.definition.properties['healthRestore'];
+    const potencyMultiplier = this.getPotencyMultiplier();
+
+    return Math.round(baseRestore * potencyMultiplier);
+  }
+
+  /**
+   * Calculate scaled mana restore (with Potency quality multiplier)
+   */
+  getScaledManaRestore(): number {
+    if (!this.item?.definition.properties['manaRestore']) return 0;
+
+    const baseRestore = this.item.definition.properties['manaRestore'];
+    const potencyMultiplier = this.getPotencyMultiplier();
+
+    return Math.round(baseRestore * potencyMultiplier);
+  }
+
+  /**
+   * Check if item has Potency quality
+   */
+  hasPotencyQuality(): boolean {
+    if (!this.item?.qualityDetails) return false;
+    return 'potency' in this.item.qualityDetails;
+  }
+
+  /**
+   * Get Potency quality multiplier
+   */
+  private getPotencyMultiplier(): number {
+    if (!this.item?.qualityDetails?.['potency']) return 1.0;
+
+    const potencyLevel = this.item.qualityDetails['potency'].level;
+    const potencyEffect = this.item.qualityDetails['potency'].levelData.effects?.['alchemy']?.['potencyMultiplier'];
+
+    return potencyEffect || 1.0;
+  }
+
+  /**
    * Start dragging the panel
    */
   onDragStart(event: MouseEvent): void {
