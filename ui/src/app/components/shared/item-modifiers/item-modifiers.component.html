@@ -21,6 +21,28 @@
     }
   }
 
+  <!-- Badge-Name Mode: Shows full name + level (Purity 3, Freshness 2) -->
+  @if (displayMode === 'badge-name') {
+    @if (showQualities && hasQualities()) {
+      @for (quality of getQualityEntries(); track quality[0]) {
+        <span class="quality-badge-name"
+              [class]="getQualityColor(quality[1])"
+              [title]="getQualityTooltip(quality[0], quality[1])">
+          {{ getQualityName(quality[0]) }} {{ quality[1] }}
+        </span>
+      }
+    }
+    @if (showTraits && hasTraits()) {
+      @for (trait of getTraitEntries(); track trait[0]) {
+        <span class="trait-badge-name"
+              [class]="getTraitColor(trait[1])"
+              [title]="getTraitTooltip(trait[0], trait[1])">
+          {{ getTraitName(trait[0]) }} {{ trait[1] }}
+        </span>
+      }
+    }
+  }
+
   <!-- Badge-Tier Mode: Shows average quality tier (Common, Rare, Epic) -->
   @if (displayMode === 'badge-tier') {
     @if (hasQualities()) {

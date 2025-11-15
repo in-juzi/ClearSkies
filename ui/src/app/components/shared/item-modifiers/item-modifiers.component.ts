@@ -11,7 +11,7 @@ import { InventoryService } from '../../../services/inventory.service';
 })
 export class ItemModifiersComponent {
   @Input() item: any; // Item with qualities/traits
-  @Input() displayMode: 'badge-level' | 'badge-tier' | 'inline-text' = 'badge-level';
+  @Input() displayMode: 'badge-level' | 'badge-tier' | 'badge-name' | 'inline-text' = 'badge-level';
   @Input() showQualities: boolean = true;
   @Input() showTraits: boolean = true;
   @Input() size: 'mini' | 'normal' | 'large' = 'normal';
@@ -23,6 +23,25 @@ export class ItemModifiersComponent {
   Object = Object;
 
   /**
+   * Get quality full name
+   */
+  getQualityName(qualityId: string): string {
+    const qualityNames: { [key: string]: string } = {
+      'purity': 'Purity',
+      'freshness': 'Freshness',
+      'woodGrain': 'Wood Grain',
+      'moisture': 'Moisture',
+      'age': 'Age',
+      'potency': 'Potency',
+      'grain': 'Grain',
+      'luster': 'Luster',
+      'sheen': 'Sheen'
+    };
+
+    return qualityNames[qualityId] || qualityId.charAt(0).toUpperCase() + qualityId.slice(1);
+  }
+
+  /**
    * Get quality shorthand (first letter uppercase or from definition)
    */
   getQualityShorthand(qualityId: string): string {
@@ -32,10 +51,38 @@ export class ItemModifiersComponent {
       'freshness': 'F',
       'woodGrain': 'W',
       'moisture': 'M',
-      'age': 'A'
+      'age': 'A',
+      'potency': 'Po',
+      'grain': 'G',
+      'luster': 'L',
+      'sheen': 'S'
     };
 
     return shorthands[qualityId] || qualityId.charAt(0).toUpperCase();
+  }
+
+  /**
+   * Get trait full name
+   */
+  getTraitName(traitId: string): string {
+    const traitNames: { [key: string]: string } = {
+      'fragrant': 'Fragrant',
+      'knotted': 'Knotted',
+      'weathered': 'Weathered',
+      'pristine': 'Pristine',
+      'cursed': 'Cursed',
+      'blessed': 'Blessed',
+      'masterwork': 'Masterwork',
+      'restorative': 'Restorative',
+      'empowering': 'Empowering',
+      'invigorating': 'Invigorating',
+      'warding': 'Warding',
+      'hardened': 'Hardened',
+      'reinforced': 'Reinforced',
+      'balanced': 'Balanced'
+    };
+
+    return traitNames[traitId] || traitId.charAt(0).toUpperCase() + traitId.slice(1);
   }
 
   /**
@@ -50,7 +97,14 @@ export class ItemModifiersComponent {
       'pristine': 'Pr',
       'cursed': 'Cu',
       'blessed': 'Bl',
-      'masterwork': 'Ma'
+      'masterwork': 'Ma',
+      'restorative': 'Re',
+      'empowering': 'Em',
+      'invigorating': 'In',
+      'warding': 'Wa',
+      'hardened': 'Ha',
+      'reinforced': 'Rf',
+      'balanced': 'Ba'
     };
 
     return shorthands[traitId] || traitId.charAt(0).toUpperCase();

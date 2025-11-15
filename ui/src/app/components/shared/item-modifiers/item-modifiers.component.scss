@@ -14,6 +14,12 @@
       font-size: var(--font-size-xs);
       padding: var(--spacing-xxs);
     }
+
+    .quality-badge-name,
+    .trait-badge-name {
+      font-size: var(--font-size-xs);
+      padding: var(--spacing-xxs);
+    }
   }
 
   &.normal {
@@ -25,6 +31,12 @@
       font-size: var(--font-size-s);
       padding: var(--spacing-xs) var(--spacing-s);
     }
+
+    .quality-badge-name,
+    .trait-badge-name {
+      font-size: var(--font-size-s);
+      padding: var(--spacing-xs) var(--spacing-s);
+    }
   }
 
   &.large {
@@ -33,6 +45,12 @@
     .quality-badge,
     .trait-badge,
     .tier-badge {
+      font-size: var(--font-size-m);
+      padding: var(--spacing-s) var(--spacing-m);
+    }
+
+    .quality-badge-name,
+    .trait-badge-name {
       font-size: var(--font-size-m);
       padding: var(--spacing-s) var(--spacing-m);
     }
@@ -129,6 +147,66 @@
   &.common {
     background: rgba(128, 128, 128, 0.2);
     color: #aaa;
+  }
+}
+
+// Badge-Name styling (Purity 3, Freshness 2 format)
+.quality-badge-name,
+.trait-badge-name {
+  border-radius: var(--radius-s);
+  font-weight: var(--font-weight-medium);
+  line-height: 1;
+  white-space: nowrap;
+  transition: all var(--transition-fast);
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+}
+
+// Quality name badge colors (same as quality-badge)
+.quality-badge-name {
+  &.level-5 {
+    background: rgba(156, 39, 176, 0.3);
+    color: #9c27b0;
+  }
+
+  &.level-4 {
+    background: rgba(76, 175, 80, 0.3);
+    color: #4caf50;
+  }
+
+  &.level-3 {
+    background: rgba(33, 150, 243, 0.3);
+    color: #2196f3;
+  }
+
+  &.level-2 {
+    background: rgba(255, 193, 7, 0.3);
+    color: #ffc107;
+  }
+
+  &.level-1 {
+    background: rgba(244, 67, 54, 0.3);
+    color: #f44336;
+  }
+}
+
+// Trait name badge colors (same as trait-badge)
+.trait-badge-name {
+  &.trait-3 {
+    background: rgba(156, 39, 176, 0.3);
+    color: #9c27b0;
+  }
+
+  &.trait-2 {
+    background: rgba(33, 150, 243, 0.3);
+    color: #2196f3;
+  }
+
+  &.trait-1 {
+    background: rgba(76, 175, 80, 0.3);
+    color: #4caf50;
   }
 }
 
