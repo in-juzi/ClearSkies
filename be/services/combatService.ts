@@ -960,6 +960,56 @@ class CombatService {
 
     return rewards;
   }
+
+  /**
+   * Apply a buff from a consumable (potion trait effect)
+   */
+  applyPotionBuff(player: any, buffEffect: any, turnCount: number): ActiveBuff {
+    const buffId = uuidv4();
+
+    const statModifier: StatModifier = {
+      stat: buffEffect.stat as BuffableStat,
+      value: buffEffect.value,
+      type: buffEffect.isPercentage ? ModifierType.PERCENTAGE : ModifierType.FLAT
+    };
+
+    const buff: ActiveBuff = {
+      buffId,
+      abilityId: `potion_${buffEffect.traitId}`,
+      name: `${buffEffect.traitName} Buff`,
+      description: `${buffEffect.isPercentage ? '+' + (buffEffect.value * 100) + '%' : '+' + buffEffect.value} ${buffEffect.stat}`,
+      target: 'player',
+      appliedAt: turnCount,
+      duration: Math.ceil(buffEffect.duration / 3), // Convert seconds to turns (approx 3s per turn)
+      statModifiers: [statModifier],
+      stackCount: 1
+    };
+
+    player.addActiveBuff(buff);
+    return buff;
+  }
+
+  /**
+   * Apply a Health-over-Time effect from a consumable (potion trait effect)
+   */
+  applyPotionHoT(player: any, hotEffect: any, turnCount: number): ActiveBuff {
+    const buffId = uuidv4();
+
+    const buff: ActiveBuff = {
+      buffId,
+      abilityId: `potion_${hotEffect.traitId}`,
+      name: `${hotEffect.traitName} Regeneration`,
+      description: `+${hotEffect.healPerTick} HP per turn for ${hotEffect.ticks} turns`,
+      target: 'player',
+      appliedAt: turnCount,
+      duration: hotEffect.ticks,
+      healOverTime: hotEffect.healPerTick,
+      stackCount: 1
+    };
+
+    player.addActiveBuff(buff);
+    return buff;
+  }
 }
 
 export default new CombatService();
