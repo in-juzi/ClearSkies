@@ -29,7 +29,7 @@ export const GoblinShaman: Monster = {
       "level": 3,
       "experience": 0
     },
-    "magic": {
+    "wisdom": {
       "level": 8,
       "experience": 0
     },
@@ -74,7 +74,7 @@ export const GoblinShaman: Monster = {
     "casting": {
       "level": 8,
       "experience": 0,
-      "mainAttribute": "magic"
+      "mainAttribute": "wisdom"
     },
     "gun": {
       "level": 1,

@@ -21,7 +21,7 @@ export const ManaTincture: ConsumableItem = {
     tier: TIER.T1,
     manaRestore: 20
   },
-  allowedQualities: QUALITY_SETS.NONE,
+  allowedQualities: QUALITY_SETS.POTENCY,
   allowedTraits: TRAIT_SETS.POTION,
   icon: {
     path: 'item-categories/item_cat_potion_1.svg',

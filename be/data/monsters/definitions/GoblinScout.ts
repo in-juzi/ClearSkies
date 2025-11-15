@@ -29,7 +29,7 @@ export const GoblinScout: Monster = {
       "level": 3,
       "experience": 0
     },
-    "magic": {
+    "wisdom": {
       "level": 1,
       "experience": 0
     },
@@ -74,7 +74,7 @@ export const GoblinScout: Monster = {
     "casting": {
       "level": 1,
       "experience": 0,
-      "mainAttribute": "magic"
+      "mainAttribute": "wisdom"
     },
     "gun": {
       "level": 1,

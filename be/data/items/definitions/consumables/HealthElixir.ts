@@ -21,7 +21,7 @@ export const HealthElixir: ConsumableItem = {
     tier: TIER.T3,
     healthRestore: 75
   },
-  allowedQualities: QUALITY_SETS.NONE,
+  allowedQualities: QUALITY_SETS.POTENCY,
   allowedTraits: TRAIT_SETS.POTION,
   icon: {
     path: 'item-categories/item_cat_potion_1.svg',
