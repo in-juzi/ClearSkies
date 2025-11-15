@@ -157,6 +157,11 @@ export class CombatService {
         combat.monsterHealth.max = data.monster.maxHp;
       }
 
+      // Update turn count
+      if (data.turnCount !== undefined) {
+        combat.turnCount = data.turnCount;
+      }
+
       // Update next attack time
       if (data.playerNextAttackTime) {
         combat.playerNextAttackTime = new Date(data.playerNextAttackTime);
@@ -188,6 +193,11 @@ export class CombatService {
       if (data.player) {
         combat.playerHealth.current = data.player.currentHp;
         combat.playerHealth.max = data.player.maxHp;
+      }
+
+      // Update turn count
+      if (data.turnCount !== undefined) {
+        combat.turnCount = data.turnCount;
       }
 
       // Update next attack time
@@ -229,6 +239,11 @@ export class CombatService {
         combat.playerMana.current = data.player.currentMana;
       }
 
+      // Update turn count
+      if (data.turnCount !== undefined) {
+        combat.turnCount = data.turnCount;
+      }
+
       // Update cooldowns
       if (data.abilityCooldowns) {
         combat.abilityCooldowns = data.abilityCooldowns;
@@ -260,6 +275,11 @@ export class CombatService {
       if (data.player) {
         combat.playerHealth.current = data.player.currentHp;
         combat.playerMana.current = data.player.currentMana;
+      }
+
+      // Update turn count
+      if (data.turnCount !== undefined) {
+        combat.turnCount = data.turnCount;
       }
 
       // Refresh inventory
@@ -469,16 +489,16 @@ export class CombatService {
   }
 
   /**
-   * Get ability cooldown remaining (in seconds)
+   * Get ability cooldown remaining (in turns)
    */
   getAbilityCooldownRemaining(abilityId: string): number {
     const combat = this.activeCombat();
     if (!combat) return 0;
 
-    const cooldownEnd = combat.abilityCooldowns[abilityId];
-    if (!cooldownEnd) return 0;
+    const availableTurn = combat.abilityCooldowns[abilityId];
+    if (!availableTurn) return 0;
 
-    const remaining = Math.ceil((cooldownEnd - Date.now()) / 1000);
+    const remaining = availableTurn - combat.turnCount;
     return Math.max(0, remaining);
   }
 

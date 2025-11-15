@@ -1,6 +1,6 @@
 import { Injectable, signal, inject, effect } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, of } from 'rxjs';
 import { Item } from '@shared/types';
 import {
   InventoryResponse,
@@ -10,6 +10,7 @@ import {
   RemoveItemRequest
 } from '../models/inventory.model';
 import { AuthService } from './auth.service';
+import { ItemDataService } from './item-data.service';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -19,11 +20,14 @@ export class InventoryService {
   private apiUrl = `${environment.apiUrl}/inventory`;
   private authService = inject(AuthService);
   private http = inject(HttpClient);
+  private itemDataService = inject(ItemDataService);
 
   // Signals for reactive state
   inventory = signal<ItemDetails[]>([]);
-  inventoryCapacity = signal<number>(100);
-  inventorySize = signal<number>(0);
+  inventoryCapacity = signal<number>(100); // DEPRECATED: use carryingCapacity
+  carryingCapacity = signal<number>(53); // in kg (base 50 + 1 STR + 1 END)
+  currentWeight = signal<number>(0); // in kg
+  inventorySize = signal<number>(0); // DEPRECATED: item count
   inventoryValue = signal<number>(0);
   gold = signal<number>(0);
   itemDefinitions = signal<Item[]>([]);
@@ -45,8 +49,10 @@ export class InventoryService {
     return this.http.get<InventoryResponse>(this.apiUrl).pipe(
       tap(response => {
         this.inventory.set(response.inventory);
-        this.inventoryCapacity.set(response.capacity);
-        this.inventorySize.set(response.size);
+        this.inventoryCapacity.set(response.capacity); // DEPRECATED
+        this.carryingCapacity.set(response.carryingCapacity);
+        this.currentWeight.set(response.currentWeight);
+        this.inventorySize.set(response.size); // DEPRECATED
         this.inventoryValue.set(response.totalValue);
       })
     );
@@ -97,24 +103,36 @@ export class InventoryService {
 
   /**
    * Get all item definitions (catalog)
+   * Now uses local ItemDataService instead of API calls
    */
   getItemDefinitions(category?: string): Observable<ItemDefinitionsResponse> {
-    const url = category
-      ? `${this.apiUrl}/definitions?category=${category}`
-      : `${this.apiUrl}/definitions`;
+    const items = category
+      ? this.itemDataService.getItemsByCategory(category)
+      : this.itemDataService.getAllItems();
 
-    return this.http.get<ItemDefinitionsResponse>(url).pipe(
-      tap(response => {
-        this.itemDefinitions.set(response.items);
-      })
-    );
+    this.itemDefinitions.set(items);
+
+    return of({ items });
   }
 
   /**
    * Get single item definition
+   * Now uses local ItemDataService instead of API calls
    */
   getItemDefinition(itemId: string): Observable<Item> {
-    return this.http.get<Item>(`${this.apiUrl}/definitions/${itemId}`);
+    const item = this.itemDataService.getItemDefinition(itemId);
+    if (!item) {
+      throw new Error(`Item definition not found: ${itemId}`);
+    }
+    return of(item);
+  }
+
+  /**
+   * Get single item definition synchronously from cache
+   * Now uses local ItemDataService instead of cache
+   */
+  getItemDefinitionSync(itemId: string): Item | undefined {
+    return this.itemDataService.getItemDefinition(itemId);
   }
 
   /**
