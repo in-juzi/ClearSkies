@@ -297,12 +297,15 @@ class RecipeService {
         }
       }
 
-      // Create item instance using itemService
+      // Create item instance using itemService with 'crafted' context
+      // This allows traits to be validated against trait applicableCategories
+      // rather than item allowedTraits, enabling trait inheritance from ingredients
       const itemInstance = itemService.createItemInstance(
         output.itemId,
         output.quantity,
         output.qualities,
-        output.traits
+        output.traits,
+        'crafted'
       );
 
       outputItems.push(itemInstance);

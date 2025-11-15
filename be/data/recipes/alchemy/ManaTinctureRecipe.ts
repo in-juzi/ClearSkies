@@ -21,8 +21,5 @@ export const ManaTinctureRecipe: Recipe = {
   outputs: [
     { itemId: 'mana_tincture', quantity: 1, qualityModifier: 'inherit' }
   ],
-  experience: 20,
-  unlockConditions: {
-    discoveredByDefault: true
-  }
+  experience: 20
 } as const;

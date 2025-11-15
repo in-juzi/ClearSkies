@@ -22,9 +22,5 @@ export const DragonsFuryBrew: Recipe = {
   outputs: [
     { itemId: 'fury_brew', quantity: 1, qualityModifier: 'inherit' }
   ],
-  experience: 75,
-  unlockConditions: {
-    discoveredByDefault: false,
-    requiredRecipes: ['mandrake_power_elixir']  // Unlock by crafting power elixir
-  }
+  experience: 75
 } as const;

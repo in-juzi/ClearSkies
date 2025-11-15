@@ -21,8 +21,5 @@ export const HealthTinctureRecipe: Recipe = {
   outputs: [
     { itemId: 'health_tincture', quantity: 1, qualityModifier: 'inherit' }
   ],
-  experience: 20,
-  unlockConditions: {
-    discoveredByDefault: true
-  }
+  experience: 20
 } as const;

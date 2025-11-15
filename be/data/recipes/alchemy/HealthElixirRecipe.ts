@@ -22,8 +22,5 @@ export const HealthElixirRecipe: Recipe = {
   outputs: [
     { itemId: 'health_elixir', quantity: 1, qualityModifier: 'inherit' }
   ],
-  experience: 50,
-  unlockConditions: {
-    discoveredByDefault: true  // Available at level 10
-  }
+  experience: 50
 } as const;

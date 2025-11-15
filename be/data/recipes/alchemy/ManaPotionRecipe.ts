@@ -23,9 +23,5 @@ export const ManaPotionRecipe: Recipe = {
   outputs: [
     { itemId: 'mana_draught', quantity: 1, qualityModifier: 'inherit' }
   ],
-  experience: 35,
-  unlockConditions: {
-    discoveredByDefault: false,
-    requiredRecipes: ['mana_tincture']  // Unlock by crafting basic version
-  }
+  experience: 35
 } as const;

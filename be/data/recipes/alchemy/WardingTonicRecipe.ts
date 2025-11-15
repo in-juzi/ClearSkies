@@ -20,8 +20,5 @@ export const SageWardingTonic: Recipe = {
   outputs: [
     { itemId: 'warding_tonic', quantity: 1, qualityModifier: 'inherit' }
   ],
-  experience: 25,
-  unlockConditions: {
-    discoveredByDefault: true
-  }
+  experience: 25
 } as const;

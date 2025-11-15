@@ -3,7 +3,6 @@
  * A refined herbal concoction with improved healing properties
  * Level: 5 Alchemy | Duration: 10s | XP: 35
  * Combines chamomile's soothing properties with any additional herb
- * Unlocked after crafting Basic Health Tincture
  */
 
 import { Recipe } from '../../../types';
@@ -23,9 +22,5 @@ export const HealthPotionRecipe: Recipe = {
   outputs: [
     { itemId: 'health_draught', quantity: 1, qualityModifier: 'inherit' }
   ],
-  experience: 35,
-  unlockConditions: {
-    discoveredByDefault: false,
-    requiredRecipes: ['health_tincture']  // Unlock by crafting basic version
-  }
+  experience: 35
 } as const;

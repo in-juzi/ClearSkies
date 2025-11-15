@@ -24,8 +24,5 @@ export const FloralRejuvenationDraught: Recipe = {
     { itemId: 'health_elixir', quantity: 1, qualityModifier: 'inherit' },
     { itemId: 'mana_tincture', quantity: 1, qualityModifier: 'inherit' }  // Bonus output!
   ],
-  experience: 65,
-  unlockConditions: {
-    discoveredByDefault: true  // Available at level 15
-  }
+  experience: 65
 } as const;

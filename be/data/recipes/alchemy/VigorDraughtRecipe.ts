@@ -23,9 +23,5 @@ export const NettleVigorDraught: Recipe = {
   outputs: [
     { itemId: 'vigor_draught', quantity: 1, qualityModifier: 'inherit' }
   ],
-  experience: 35,
-  unlockConditions: {
-    discoveredByDefault: false,
-    requiredRecipes: ['health_tincture']  // Unlock by crafting basic version
-  }
+  experience: 35
 } as const;

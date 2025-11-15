@@ -22,9 +22,5 @@ export const MandrakePowerElixir: Recipe = {
   outputs: [
     { itemId: 'power_elixir', quantity: 1, qualityModifier: 'inherit' }
   ],
-  experience: 45,
-  unlockConditions: {
-    discoveredByDefault: false,
-    requiredRecipes: ['nettle_vigor_draught']  // Unlock by crafting vigor draught
-  }
+  experience: 45
 } as const;
