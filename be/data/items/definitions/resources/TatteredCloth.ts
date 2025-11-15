@@ -25,7 +25,7 @@ export const TatteredCloth: ResourceItem = {
   "allowedQualities": QUALITY_SETS.NONE,
   "allowedTraits": TRAIT_SETS.NONE,
   "icon": {
-    "path": "item-categories/item_cat_cloth.svg",
+    "path": "items/folded-paper.svg",
     "material": "cloth"
   }
 } as const;

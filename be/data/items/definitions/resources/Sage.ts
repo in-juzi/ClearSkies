@@ -24,7 +24,7 @@ export const Sage: ResourceItem = {
   "allowedQualities": QUALITY_SETS.HERB,
   "allowedTraits": TRAIT_SETS.HERB_WARDING,
   "icon": {
-    "path": "item-categories/item_cat_mushroom.svg",
-    "material": "herb"
+    "path": "items/leaves.svg",
+    "material": "sage"
   }
 } as const;

@@ -39,6 +39,13 @@
       box-shadow: none;
       border-color: var(--color-border);
       background: linear-gradient(135deg, rgba(26, 26, 46, 0.8), rgba(22, 33, 62, 0.6));
+
+      // Still show tooltip on disabled buttons
+      .item-tooltip {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
     }
   }
 }
@@ -90,7 +97,8 @@
 }
 
 .item-unusable {
-  pointer-events: none;
+  // Allow hover events for tooltips even when disabled
+  // pointer-events: none;
 }
 
 // Icon container

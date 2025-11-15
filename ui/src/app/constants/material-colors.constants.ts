@@ -459,6 +459,11 @@ export const MATERIAL_COLORS: Record<string, ColorChannels> = {
     edge: '#BA55D3',      // Medium orchid edge
     detail: '#8B008B'     // Dark magenta detail
   },
+  sage: {
+    primary: '#9DC183',   // Silvery sage green (upper left leaf)
+    secondary: '#7A9B76', // Darker sage (upper right leaf)
+    detail: '#B8C9A8'     // Lighter silvery-green (lower left leaf)
+  },
 
   // Flowers
   chamomile: {
