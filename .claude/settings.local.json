@@ -2,6 +2,7 @@
   "permissions": {
     "allow": [
       "Bash(move:*)",
+      "Bash(mv:*)",
       "Bash(mkdir:*)",
       "Bash(claude mcp add:*)",
       "Bash(git add:*)",
@@ -12,7 +13,8 @@
       "Bash(node -e:*)",
       "Bash(node utils/add-item.js:*)",
       "Bash(find:*)",
-      "Bash(npm run validate:*)"
+      "Bash(npm run validate:*)",
+      "Bash(rm:*)"
     ],
     "deny": [],
     "ask": []
