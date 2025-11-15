@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener, inject } from '@angular/core';
+import { Component, OnInit, HostListener, inject, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InventoryService } from '../../../services/inventory.service';
@@ -10,6 +10,7 @@ import { ItemDetails } from '../../../models/inventory.model';
 import { ItemModifiersComponent } from '../../shared/item-modifiers/item-modifiers.component';
 import { IconComponent } from '../../shared/icon/icon.component';
 import { ItemDetailsPanelComponent } from '../../shared/item-details-panel/item-details-panel.component';
+import { isEquipmentItem, isConsumableItem } from '@shared/types';
 
 @Component({
   selector: 'app-inventory',
@@ -34,6 +35,22 @@ export class InventoryComponent implements OnInit {
     { value: 'equipment', label: 'Equipment', shortLabel: 'Equipment' },
     { value: 'consumable', label: 'Consumables', shortLabel: 'Consumables' }
   ];
+
+  // Floating gold gain notifications
+  floatingGold = signal<Array<{ id: string; amount: number }>>([]);
+  private lastGoldAmount = 0;
+
+  // Watch for gold changes and trigger floating notification
+  private goldWatcherEffect = effect(() => {
+    const currentGold = this.inventoryService.gold();
+
+    if (this.lastGoldAmount > 0 && currentGold > this.lastGoldAmount) {
+      const goldGained = currentGold - this.lastGoldAmount;
+      this.addFloatingGold(goldGained);
+    }
+
+    this.lastGoldAmount = currentGold;
+  });
 
   constructor(
     public inventoryService: InventoryService
@@ -96,6 +113,35 @@ export class InventoryComponent implements OnInit {
       // Normal click: Select item to show details
       this.selectItem(item);
     }
+  }
+
+  /**
+   * Handle item right-click (context menu) for quick actions
+   * Right-click equipment: Equip/unequip
+   * Right-click consumable: Use item
+   */
+  onItemRightClick(event: MouseEvent, item: ItemDetails): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    // Don't trigger right-click actions if Alt key is held
+    if (event.altKey) {
+      return;
+    }
+
+    // Check item category and perform appropriate action
+    if (isEquipmentItem(item.definition)) {
+      // Equipment: Toggle equip/unequip
+      if (item.equipped) {
+        this.unequipItem(item.instanceId);
+      } else {
+        this.equipItem(item.instanceId);
+      }
+    } else if (isConsumableItem(item.definition)) {
+      // Consumable: Use item
+      this.useItem(item.instanceId);
+    }
+    // Note: Resources and other items don't have right-click actions
   }
 
   selectItem(item: ItemDetails): void {
@@ -188,6 +234,26 @@ export class InventoryComponent implements OnInit {
     return rarityClasses[rarity] || 'border-gray-500';
   }
 
+  /**
+   * Get tooltip text for item based on its category
+   */
+  getItemTooltip(item: ItemDetails): string {
+    const altAction = this.vendorService.isVendorOpen() ? 'sell' : 'drop';
+    let rightClickAction = '';
+
+    if (isEquipmentItem(item.definition)) {
+      rightClickAction = item.equipped ? 'unequip' : 'equip';
+    } else if (isConsumableItem(item.definition)) {
+      rightClickAction = 'use';
+    }
+
+    if (rightClickAction) {
+      return `Right-click to ${rightClickAction} | Alt+Click to ${altAction}`;
+    } else {
+      return `Alt+Click to ${altAction}`;
+    }
+  }
+
   getTotalWeight(): number {
     return this.inventoryService.inventory().reduce((total, item) => {
       return total + (item.definition.properties.weight * item.quantity);
@@ -276,9 +342,14 @@ export class InventoryComponent implements OnInit {
    * Equip an item
    */
   equipItem(instanceId: string): void {
-    if (!this.selectedItem) return;
+    // Get item from inventory
+    const item = this.inventoryService.inventory().find(i => i.instanceId === instanceId);
+    if (!item) {
+      console.error('Item not found in inventory');
+      return;
+    }
 
-    const slot = this.selectedItem.definition.slot;
+    const slot = item.definition.slot;
     if (!slot) {
       console.error('Item has no slot defined');
       return;
@@ -289,10 +360,10 @@ export class InventoryComponent implements OnInit {
         console.log('Item equipped');
         // Reload equipment service to update equipment display
         this.equipmentService.loadEquippedItems().subscribe();
-        // Wait for inventory to reload, then update selected item
+        // Wait for inventory to reload, then update selected item if this was the selected item
         setTimeout(() => {
           const updatedItem = this.inventoryService.inventory().find(i => i.instanceId === instanceId);
-          if (updatedItem) {
+          if (updatedItem && this.selectedItem?.instanceId === instanceId) {
             this.selectedItem = updatedItem;
           }
         }, 100);
@@ -307,9 +378,14 @@ export class InventoryComponent implements OnInit {
    * Unequip an item
    */
   unequipItem(instanceId: string): void {
-    if (!this.selectedItem) return;
+    // Get item from inventory
+    const item = this.inventoryService.inventory().find(i => i.instanceId === instanceId);
+    if (!item) {
+      console.error('Item not found in inventory');
+      return;
+    }
 
-    const slot = this.selectedItem.definition.slot;
+    const slot = item.definition.slot;
     if (!slot) {
       console.error('Item has no slot defined');
       return;
@@ -320,10 +396,10 @@ export class InventoryComponent implements OnInit {
         console.log('Item unequipped');
         // Reload equipment service to update equipment display
         this.equipmentService.loadEquippedItems().subscribe();
-        // Wait for inventory to reload, then update selected item
+        // Wait for inventory to reload, then update selected item if this was the selected item
         setTimeout(() => {
           const updatedItem = this.inventoryService.inventory().find(i => i.instanceId === instanceId);
-          if (updatedItem) {
+          if (updatedItem && this.selectedItem?.instanceId === instanceId) {
             this.selectedItem = updatedItem;
           }
         }, 100);
@@ -338,21 +414,23 @@ export class InventoryComponent implements OnInit {
    * Use a consumable item
    */
   useItem(instanceId: string): void {
-    if (!this.selectedItem) return;
-
     this.inventoryService.useItem(instanceId).subscribe({
       next: (response: any) => {
         console.log('Item used successfully:', response);
 
-        // Close the details panel if item quantity is now 0
+        // Close the details panel if item quantity is now 0 and it was the selected item
         setTimeout(() => {
           const updatedItem = this.inventoryService.inventory().find(i => i.instanceId === instanceId);
           if (!updatedItem) {
-            // Item was completely consumed
-            this.closeItemDetails();
+            // Item was completely consumed - close details if it was selected
+            if (this.selectedItem?.instanceId === instanceId) {
+              this.closeItemDetails();
+            }
           } else {
-            // Update selected item with new quantity
-            this.selectedItem = updatedItem;
+            // Update selected item with new quantity if it was selected
+            if (this.selectedItem?.instanceId === instanceId) {
+              this.selectedItem = updatedItem;
+            }
           }
         }, 100);
       },
@@ -419,5 +497,21 @@ export class InventoryComponent implements OnInit {
 
     console.log(`Dropped ${successCount} items successfully${errorCount > 0 ? `, ${errorCount} failed` : ''}`);
     this.selectedItem = null;
+  }
+
+  /**
+   * Add a floating gold gain notification
+   */
+  private addFloatingGold(amount: number): void {
+    const id = `gold-${Date.now()}-${Math.random()}`;
+    const floatingGoldNotification = { id, amount };
+
+    // Add to signal
+    this.floatingGold.update(notifications => [...notifications, floatingGoldNotification]);
+
+    // Remove after animation completes (1000ms)
+    setTimeout(() => {
+      this.floatingGold.update(notifications => notifications.filter(n => n.id !== id));
+    }, 1000);
   }
 }

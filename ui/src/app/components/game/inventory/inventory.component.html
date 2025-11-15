@@ -30,9 +30,10 @@
       [class.alt-drop-mode]="isAltKeyHeld && !vendorService.isVendorOpen()"
       [draggable]="true"
       (click)="onItemClick($event, item)"
+      (contextmenu)="onItemRightClick($event, item)"
       (dragstart)="onItemDragStart($event, item)"
       (dragend)="onItemDragEnd($event)"
-      [title]="'Alt+Click to ' + (vendorService.isVendorOpen() ? 'sell' : 'drop')">
+      [title]="getItemTooltip(item)">
       <!-- Item icon (left side) -->
       <div class="item-icon">
         <app-icon
@@ -98,7 +99,16 @@
           <span class="stat-value">{{ getTotalWeight().toFixed(1) }} kg</span>
         </div>
       </div>
-      <div class="stat-item">
+      <div class="stat-item gold-stat-item">
+        <!-- Floating Gold Notifications -->
+        <div class="floating-gold-container">
+          @for (goldNotif of floatingGold(); track goldNotif.id) {
+            <div class="floating-gold">
+              +{{ goldNotif.amount }}g
+            </div>
+          }
+        </div>
+
         <span class="stat-icon">💰</span>
         <div class="stat-content">
           <span class="stat-label">Gold</span>
