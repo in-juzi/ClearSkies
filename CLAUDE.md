@@ -58,18 +58,21 @@
 - ✅ Potency quality fix (completed - quality multipliers now apply to consumables)
 - ✅ Weight-based inventory (completed - carrying capacity based on strength/endurance)
 - ✅ Equipment stat application (completed - armor/damage/evasion bonuses applied to combat calculations)
+- ✅ Activity log component (completed - reusable component for crafting/gathering/combat completions)
+- ✅ Trait combination system (completed - multi-ingredient crafting combines all traits at max levels)
+- ✅ HP/MP schema cleanup (completed - removed legacy max fields, use virtual properties exclusively)
 
 **Recent Changes** (Last 10 commits):
-- docs: update ideas and notes
-- chore: add development utilities
-- docs: add comprehensive system documentation
-- fix: update UI components for context-aware traits
-- feat: add carrying capacity display to inventory UI
-- feat: add dynamic HP/MP bars with attribute tooltips
-- feat: add frontend services for attribute-based progression
-- fix: update frontend models for magic→wisdom rename
-- feat: add weight-based inventory system
-- fix: enable Potency quality on alchemy potions
+- chore: clean up development utilities and add UI-specific build check
+- feat: add custom icons for Sage and Tattered Cloth items
+- refactor: simplify navigation link labels for cleaner travel UI
+- fix: improve location UI rendering and travel destination display
+- refactor: reorganize combat UI layout and improve action bar presentation
+- fix: remove legacy HP/MP max fields from Player schema and add initialization hook
+- feat: implement trait combination system for multi-ingredient crafting
+- refactor: migrate crafting UI to use activity log component and improve instance display
+- feat: enhance item details panel with consumable effects and improved layout
+- feat: add badge-name display mode to item modifiers component
 
 **Known Issues**:
 - None currently identified
@@ -117,7 +120,7 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 
 **Backend Core:**
 - Controllers: [be/controllers/inventoryController.js](be/controllers/inventoryController.js), [be/controllers/locationController.js](be/controllers/locationController.js), [be/controllers/skillsController.js](be/controllers/skillsController.js), [be/controllers/attributesController.js](be/controllers/attributesController.js), [be/controllers/authController.js](be/controllers/authController.js), [be/controllers/manualController.js](be/controllers/manualController.js), [be/controllers/vendorController.js](be/controllers/vendorController.js), [be/controllers/craftingController.js](be/controllers/craftingController.js), [be/controllers/combatController.js](be/controllers/combatController.js)
-- Models: [be/models/Player.js](be/models/Player.js), [be/models/User.js](be/models/User.js), [be/models/ChatMessage.js](be/models/ChatMessage.js)
+- Models: [be/models/Player.ts](be/models/Player.ts), [be/models/User.js](be/models/User.js), [be/models/ChatMessage.js](be/models/ChatMessage.js)
 - Services (TypeScript): [be/services/itemService.ts](be/services/itemService.ts), [be/services/locationService.ts](be/services/locationService.ts), [be/services/dropTableService.ts](be/services/dropTableService.ts), [be/services/vendorService.ts](be/services/vendorService.ts), [be/services/recipeService.ts](be/services/recipeService.ts), [be/services/combatService.ts](be/services/combatService.ts)
 - Routes: [be/routes/inventory.js](be/routes/inventory.js), [be/routes/locations.js](be/routes/locations.js), [be/routes/skills.js](be/routes/skills.js), [be/routes/attributes.js](be/routes/attributes.js), [be/routes/auth.js](be/routes/auth.js), [be/routes/manual.js](be/routes/manual.js), [be/routes/vendors.js](be/routes/vendors.js), [be/routes/crafting.js](be/routes/crafting.js), [be/routes/combat.js](be/routes/combat.js)
 - Sockets: [be/sockets/chatHandler.js](be/sockets/chatHandler.js), [be/sockets/activityHandler.ts](be/sockets/activityHandler.ts), [be/sockets/craftingHandler.ts](be/sockets/craftingHandler.ts), [be/sockets/combatHandler.ts](be/sockets/combatHandler.ts)
@@ -136,7 +139,7 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 - Crafting: [ui/src/app/components/game/crafting/crafting.component.ts](ui/src/app/components/game/crafting/crafting.component.ts), [ui/src/app/components/game/crafting/crafting.component.html](ui/src/app/components/game/crafting/crafting.component.html)
 - Combat: [ui/src/app/components/game/combat/combat.component.ts](ui/src/app/components/game/combat/combat.component.ts), [ui/src/app/components/game/combat/combat.component.html](ui/src/app/components/game/combat/combat.component.html)
 - Manual: [ui/src/app/components/manual/manual.component.ts](ui/src/app/components/manual/manual.component.ts), [ui/src/app/components/manual/sections/](ui/src/app/components/manual/sections/)
-- Shared Components: [ui/src/app/components/shared/item-mini/item-mini.component.ts](ui/src/app/components/shared/item-mini/item-mini.component.ts), [ui/src/app/components/shared/item-modifiers/item-modifiers.component.ts](ui/src/app/components/shared/item-modifiers/item-modifiers.component.ts), [ui/src/app/components/shared/item-details-panel/item-details-panel.component.ts](ui/src/app/components/shared/item-details-panel/item-details-panel.component.ts), [ui/src/app/components/shared/icon/icon.component.ts](ui/src/app/components/shared/icon/icon.component.ts), [ui/src/app/components/shared/xp-mini/xp-mini.component.ts](ui/src/app/components/shared/xp-mini/xp-mini.component.ts), [ui/src/app/components/shared/ability-button/ability-button.component.ts](ui/src/app/components/shared/ability-button/ability-button.component.ts), [ui/src/app/components/shared/item-button/item-button.component.ts](ui/src/app/components/shared/item-button/item-button.component.ts), [ui/src/app/components/shared/buff-icon/buff-icon.ts](ui/src/app/components/shared/buff-icon/buff-icon.ts)
+- Shared Components: [ui/src/app/components/shared/item-mini/item-mini.component.ts](ui/src/app/components/shared/item-mini/item-mini.component.ts), [ui/src/app/components/shared/item-modifiers/item-modifiers.component.ts](ui/src/app/components/shared/item-modifiers/item-modifiers.component.ts), [ui/src/app/components/shared/item-details-panel/item-details-panel.component.ts](ui/src/app/components/shared/item-details-panel/item-details-panel.component.ts), [ui/src/app/components/shared/icon/icon.component.ts](ui/src/app/components/shared/icon/icon.component.ts), [ui/src/app/components/shared/xp-mini/xp-mini.component.ts](ui/src/app/components/shared/xp-mini/xp-mini.component.ts), [ui/src/app/components/shared/ability-button/ability-button.component.ts](ui/src/app/components/shared/ability-button/ability-button.component.ts), [ui/src/app/components/shared/item-button/item-button.component.ts](ui/src/app/components/shared/item-button/item-button.component.ts), [ui/src/app/components/shared/buff-icon/buff-icon.ts](ui/src/app/components/shared/buff-icon/buff-icon.ts), [ui/src/app/components/shared/activity-log/activity-log.component.ts](ui/src/app/components/shared/activity-log/activity-log.component.ts)
 - Services: [ui/src/app/services/inventory.service.ts](ui/src/app/services/inventory.service.ts), [ui/src/app/services/location.service.ts](ui/src/app/services/location.service.ts), [ui/src/app/services/skills.service.ts](ui/src/app/services/skills.service.ts), [ui/src/app/services/auth.service.ts](ui/src/app/services/auth.service.ts), [ui/src/app/services/manual.service.ts](ui/src/app/services/manual.service.ts), [ui/src/app/services/chat.service.ts](ui/src/app/services/chat.service.ts), [ui/src/app/services/vendor.service.ts](ui/src/app/services/vendor.service.ts), [ui/src/app/services/recipe.service.ts](ui/src/app/services/recipe.service.ts), [ui/src/app/services/crafting.service.ts](ui/src/app/services/crafting.service.ts), [ui/src/app/services/combat.service.ts](ui/src/app/services/combat.service.ts), [ui/src/app/services/icon.service.ts](ui/src/app/services/icon.service.ts)
 - Constants: [ui/src/app/constants/material-colors.constants.ts](ui/src/app/constants/material-colors.constants.ts), [ui/src/app/constants/game-data.constants.ts](ui/src/app/constants/game-data.constants.ts)
 
@@ -435,11 +438,14 @@ See [project/docs/005-content-generator-agent.md](project/docs/005-content-gener
 
 ## Critical Code Locations
 
-### Player Model (be/models/Player.js)
+### Player Model (be/models/Player.ts)
 - Skills schema: ~L15-40
 - Attributes schema: ~L42-55
 - Inventory schema: ~L57-75
 - Equipment slots: ~L77-85
+- Stats schema: ~L196-203 (health.current, mana.current - max values are virtual properties)
+- Virtual properties: `maxHP` ~L460, `maxMP` ~L469, `carryingCapacity` ~L481, `currentWeight` ~L490
+- Pre-save hook: ~L498-510 (initializes HP/MP for new players)
 - `addSkillExperience()`: ~L145-165
 - `addAttributeExperience()`: ~L167-185
 - `addItem()`: ~L200-240 (includes stacking logic)
@@ -856,12 +862,13 @@ Create items from ingredients with quality inheritance and Socket.io real-time u
 **Quick Facts:**
 - Skills: Cooking (4 recipes), Smithing (16 recipes), Alchemy (10 recipes)
 - Potion naming: Medieval alchemy categories (Tincture/Draught/Elixir instead of Weak/Minor/Strong)
-- Trait inheritance: herbs transfer special effect traits (restorative, empowering, invigorating, warding) to potions
+- Trait combination: multi-ingredient recipes combine all traits at maximum levels from any ingredient
 - Instance selection (choose specific items by quality/traits)
 - Quality inheritance: max ingredient quality + skill bonus (every 10 levels = +1, max +2)
 - Subcategory ingredients ("any herb" instead of specific itemIds)
 - Recipe unlock system (progressive discovery)
 - Auto-restart after completion
+- Activity log component: reusable component displays recent crafting completions with items and XP
 
 **Key Files:** [recipeService.ts](be/services/recipeService.ts), [RecipeRegistry.ts](be/data/recipes/RecipeRegistry.ts), [craftingHandler.ts](be/sockets/craftingHandler.ts)
 **Socket Events:** `crafting:start`, `crafting:started`, `crafting:completed`, `crafting:cancelled`
@@ -873,7 +880,12 @@ Herbs carry special effect traits that transfer to crafted potions:
 - **Invigorating** (Nettle): +15%/25%/35% attack speed buff for 45s
 - **Warding** (Sage): +50/100/150 flat armor buff for 60s
 
-When crafting, potions inherit traits from herb ingredients. Higher trait levels (determined by herb quality during gathering) result in stronger effects when consumed in combat.
+**Trait Combination Logic:**
+When crafting with multiple ingredients, all traits from all ingredients are combined, taking the maximum level for each trait type:
+- Ingredient A (Restorative 2) + Ingredient B (Empowering 3) → Output (Restorative 2 + Empowering 3)
+- Ingredient A (Restorative 2) + Ingredient B (Restorative 1) → Output (Restorative 2)
+
+This allows complex potion effects when combining different herbs. Higher trait levels (determined by herb quality during gathering) result in stronger effects when consumed in combat.
 
 **Full Documentation:** [project/docs/020-alchemy-subcategory-implementation.md](project/docs/020-alchemy-subcategory-implementation.md), [project/docs/037-herb-trait-mapping.md](project/docs/037-herb-trait-mapping.md)
 
