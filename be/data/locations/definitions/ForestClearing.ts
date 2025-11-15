@@ -18,7 +18,7 @@ export const ForestClearing: Location = {
   "navigationLinks": [
     {
       "targetLocationId": "kennik",
-      "name": "Return to Kennik",
+      "name": "Kennik",
       "description": "The path back to the fishing village",
       "travelTime": 6,
       "requirements": {},

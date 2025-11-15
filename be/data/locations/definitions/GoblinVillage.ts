@@ -16,7 +16,7 @@ export const GoblinVillage: Location = {
   "navigationLinks": [
     {
       "targetLocationId": "forest-clearing",
-      "name": "Return to Forest Clearing",
+      "name": "Forest Clearing",
       "description": "Escape back to the safety of the forest clearing",
       "travelTime": 15,
       "requirements": {},

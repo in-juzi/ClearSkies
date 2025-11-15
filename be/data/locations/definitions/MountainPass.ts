@@ -19,7 +19,7 @@ export const MountainPass: Location = {
   "navigationLinks": [
     {
       "targetLocationId": "forest-clearing",
-      "name": "Return to Forest",
+      "name": "Forest",
       "description": "Descend back to the forest clearing",
       "travelTime": 12,
       "requirements": {},
