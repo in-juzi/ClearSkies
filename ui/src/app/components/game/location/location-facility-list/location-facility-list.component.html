@@ -1,0 +1,53 @@
+<!-- Facility List View (shown when no facility is selected and not in combat) -->
+@if (!selectedFacility() && !vendorService.isVendorOpen() && !inCombat() && !combatService.combatEnded() && !startingActivity()) {
+  <div class="facilities-view">
+    <h2>Facilities</h2>
+    <div class="facilities-list">
+      @for (facility of currentLocation()?.facilities; track facility.facilityId) {
+        <div class="facility-card" (click)="selectFacility(facility)">
+          <h3>{{ facility.name }}</h3>
+          <p>{{ facility.description }}</p>
+          <span class="facility-type">{{ facility.type }}</span>
+        </div>
+      }
+    </div>
+
+    <!-- Navigation Links -->
+    @if (currentLocation()?.navigationLinks && currentLocation()!.navigationLinks.length > 0) {
+      <div class="navigation-section">
+        <h2>Travel</h2>
+        <div class="navigation-list">
+          @for (link of currentLocation()?.navigationLinks; track link.targetLocationId) {
+            <div class="nav-link"
+              [class.available]="link.available"
+              [class.unavailable]="!link.available">
+              <h3>{{ link.name }}</h3>
+              <p>{{ link.description }}</p>
+              <div class="nav-meta">
+                <span>⏱️ {{ link.travelTime }}s</span>
+                @if (!link.available) {
+                  <span class="unavailable-badge">Requirements Not Met</span>
+                }
+              </div>
+              @if (link.requirementFailures && link.requirementFailures.length > 0) {
+                <div class="requirement-failures">
+                  <p class="error">Not met:</p>
+                  <ul>
+                    @for (failure of link.requirementFailures; track failure) {
+                      <li>{{ failure }}</li>
+                    }
+                  </ul>
+                </div>
+              }
+              @if (link.available) {
+                <button (click)="travel(link.targetLocationId)" class="btn-primary">
+                  Travel
+                </button>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+}

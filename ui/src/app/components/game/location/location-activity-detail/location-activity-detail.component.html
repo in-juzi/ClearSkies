@@ -1,0 +1,97 @@
+<!-- Activity Detail View -->
+@if ((selectedActivity() || startingActivity()) && !inCombat() && !combatService.combatEnded()) {
+  <div class="activity-detail">
+    <button (click)="backToActivities()" class="btn-back" [disabled]="startingActivity()">← Back to
+      Activities</button>
+    <h2>{{ selectedActivity()!.name }}</h2>
+    <p>{{ selectedActivity()!.description }}</p>
+
+    <div class="activity-info">
+      @if (hasValidDuration(selectedActivity())) {
+        <div class="info-item">
+          <strong>Duration:</strong> {{ selectedActivity()!.duration }}s
+        </div>
+      }
+      <div class="info-item">
+        <strong>Type:</strong> {{ selectedActivity()!.type }}
+      </div>
+      @if (selectedActivity()!.type === 'combat' && selectedActivity()!.monsterLevel) {
+        <div class="info-item">
+          <strong>Monster Level:</strong> {{ selectedActivity()!.monsterLevel }}
+        </div>
+      }
+    </div>
+
+    @if (hasRequirements(selectedActivity())) {
+      <div class="requirements">
+        <h3>Requirements</h3>
+        <ul>
+          @for (skill of selectedActivity()!.requirements.skills | keyvalue; track skill.key) {
+            <li class="requirement-skill">
+              <img [src]="getSkillIcon(skill.key)" [alt]="getSkillDisplayName(skill.key)" class="skill-icon-large"
+                loading="lazy">
+              {{ getSkillDisplayName(skill.key) }} Level {{ skill.value }}
+            </li>
+          }
+          @for (attr of selectedActivity()!.requirements.attributes | keyvalue; track attr.key) {
+            <li>
+              {{ attr.key }} Level {{ attr.value }}
+            </li>
+          }
+          @for (equipped of selectedActivity()!.requirements.equipped; track equipped.subtype) {
+            <li>
+              Any {{ formatEquipmentSubtype(equipped.subtype) }} equipped
+            </li>
+          }
+          @for (inv of selectedActivity()!.requirements.inventory; track inv.itemId) {
+            <li>
+              {{ inv.quantity || 1 }}x {{ inv.itemId }} in inventory
+            </li>
+          }
+        </ul>
+        @if (selectedActivity()?.requirementFailures && (selectedActivity()?.requirementFailures?.length ?? 0) > 0) {
+          <div class="requirement-failures">
+            <p class="error">Not met:</p>
+            <ul>
+              @for (failure of selectedActivity()?.requirementFailures; track failure) {
+                <li>{{ failure }}</li>
+              }
+            </ul>
+          </div>
+        }
+      </div>
+    }
+
+    @if (selectedActivity()!.rewards) {
+      <div class="rewards">
+        <h3>Rewards</h3>
+        <ul>
+          @for (exp of selectedActivity()!.rewards.experience | keyvalue; track exp.key) {
+            <li class="reward-skill">
+              <img [src]="getSkillIcon(exp.key)" [alt]="getSkillDisplayName(exp.key)" class="skill-icon-large"
+                loading="lazy">
+              {{ getSkillDisplayName(exp.key) }}: +{{ exp.value }} XP
+            </li>
+          }
+          @for (item of selectedActivity()!.rewards.items; track item.itemId) {
+            <li>
+              {{ item.itemId }} ({{ item.quantity.min }}-{{ item.quantity.max }}) - {{ (item.chance * 100).toFixed(0) }}%
+              chance
+            </li>
+          }
+          @if (selectedActivity()?.rewards?.gold) {
+            <li>
+              Gold: {{ selectedActivity()?.rewards?.gold?.min }}-{{ selectedActivity()?.rewards?.gold?.max }}
+            </li>
+          }
+        </ul>
+      </div>
+    }
+
+    <button (click)="startActivity()" [disabled]="!selectedActivity()?.available || startingActivity()"
+      [class.btn-disabled]="!selectedActivity()?.available || startingActivity()" class="btn-primary">
+      {{ startingActivity() ? 'Starting...' : (selectedActivity()?.available ? 'Start Activity' : 'Requirements Not
+      Met') }}
+    </button>
+  </div>
+}

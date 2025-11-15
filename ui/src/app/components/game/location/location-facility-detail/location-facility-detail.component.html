@@ -1,0 +1,67 @@
+<!-- Facility Detail View (shown when facility is selected but vendor is not open and not in combat) -->
+@if (selectedFacility() && !selectedActivityId() && !vendorService.isVendorOpen() && !inCombat() && !combatService.combatEnded() && !startingActivity()) {
+  <div class="facility-detail">
+    <button (click)="backToFacilities()" class="btn-back">← Back to Facilities</button>
+    <h2>{{ selectedFacility()?.name }}</h2>
+    <p>{{ selectedFacility()?.description }}</p>
+
+    <!-- Merchants/Vendors Section -->
+    @if (getVendorIds(selectedFacility()).length > 0) {
+      <div class="vendors-section">
+        <h3>Merchants</h3>
+        <div class="vendors-list">
+          @for (vendorId of getVendorIds(selectedFacility()); track vendorId) {
+            <button class="vendor-card" (click)="openVendor(vendorId)">
+              <div class="vendor-info">
+                <span class="vendor-name">
+                  {{ getVendor(vendorId)?.name || 'Merchant' }}
+                </span>
+                @if (getVendor(vendorId)?.greeting) {
+                  <span class="vendor-greeting">
+                    {{ getVendor(vendorId)?.greeting }}
+                  </span>
+                }
+              </div>
+            </button>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Crafting Section (for crafting-type facilities) -->
+    @if (selectedFacility()?.type === 'crafting') {
+      <div class="crafting-section">
+        <app-crafting [skill]="getCraftingSkill(selectedFacility())"
+          [facilityId]="selectedFacility()?.facilityId || ''">
+        </app-crafting>
+      </div>
+    }
+
+    <!-- Activities Section -->
+    @if (selectedFacility()?.activities && selectedFacility()!.activities.length > 0) {
+      <h3>Activities</h3>
+    }
+    <div class="activities-list">
+      @for (activity of selectedFacility()?.activities; track activity.activityId) {
+        <div class="activity-card"
+          [class.available]="activity.available"
+          [class.unavailable]="!activity.available"
+          (click)="selectActivity(activity)">
+          <h4>{{ activity.name }}</h4>
+          <p>{{ activity.description }}</p>
+          <div class="activity-meta">
+            @if (activity.duration !== undefined && activity.duration > 0) {
+              <span>⏱️ {{ activity.duration }}s</span>
+            }
+            @if (activity.type === 'combat' && activity.monsterLevel) {
+              <span>⚔️ Level {{ activity.monsterLevel }}</span>
+            }
+            @if (!activity.available) {
+              <span class="unavailable-badge">Requirements Not Met</span>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}

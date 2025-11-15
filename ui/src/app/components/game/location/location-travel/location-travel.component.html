@@ -1,0 +1,17 @@
+@if (travelState()?.isTravel) {
+  <div class="traveling-view">
+    <h2>Traveling...</h2>
+    <div class="travel-progress">
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="getTravelProgressPercent()"></div>
+      </div>
+      <p>Destination: {{ currentLocation()?.name }}</p>
+      <p>Time remaining: {{ formatTime(travelState()?.remainingTime || 0) }}</p>
+    </div>
+    <div class="travel-actions">
+      <button (click)="cancelTravel()" class="btn-danger">
+        Cancel
+      </button>
+    </div>
+  </div>
+}

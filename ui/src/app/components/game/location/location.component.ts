@@ -10,18 +10,20 @@ import { Vendor } from '../../../models/vendor.model';
 import { SkillWithProgress, SkillName } from '../../../models/user.model';
 import { ConfirmDialogService } from '../../../services/confirm-dialog.service';
 import { VendorComponent } from '../vendor/vendor.component';
-import { CraftingComponent } from '../crafting/crafting.component';
 import { CombatComponent } from '../combat/combat.component';
-import { ItemMiniComponent } from '../../shared/item-mini/item-mini.component';
-import { XpMiniComponent } from '../../shared/xp-mini/xp-mini.component';
-import { SKILL_ICONS, SKILL_DISPLAY_NAMES } from '../../../constants/game-data.constants';
+import { LocationTravelComponent } from './location-travel/location-travel.component';
+import { LocationFacilityListComponent } from './location-facility-list/location-facility-list.component';
+import { LocationActivityProgressComponent } from './location-activity-progress/location-activity-progress.component';
+import { LocationActivityDetailComponent } from './location-activity-detail/location-activity-detail.component';
+import { LocationFacilityDetailComponent } from './location-facility-detail/location-facility-detail.component';
+import { SKILL_ICONS, SKILL_DISPLAY_NAMES, formatEquipmentSubtype } from '../../../constants/game-data.constants';
 import { CombatService } from '../../../services/combat.service';
 
 @Component({
   selector: 'app-location',
-  imports: [CommonModule, VendorComponent, CraftingComponent, CombatComponent, ItemMiniComponent, XpMiniComponent],
-  templateUrl: './location.html',
-  styleUrl: './location.scss',
+  imports: [CommonModule, VendorComponent, CombatComponent, LocationTravelComponent, LocationFacilityListComponent, LocationActivityProgressComponent, LocationActivityDetailComponent, LocationFacilityDetailComponent],
+  templateUrl: './location.component.html',
+  styleUrl: './location.component.scss',
   standalone: true
 })
 export class LocationComponent implements OnInit, OnDestroy {
@@ -39,6 +41,7 @@ export class LocationComponent implements OnInit, OnDestroy {
   // Expose skill constants for template
   skillIcons = SKILL_ICONS;
   skillNames = SKILL_DISPLAY_NAMES;
+  formatEquipmentSubtype = formatEquipmentSubtype;
 
   // Exposed signals from service
   currentLocation = this.locationService.currentLocation;
@@ -302,29 +305,15 @@ export class LocationComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Select a facility to view its activities and vendors
+   * Handle facility selection from child component
    */
-  selectFacility(facility: Facility) {
-    if (facility.stub) {
-      this.logToChat(facility.stubMessage || 'This facility is not yet available', 'info');
-      return;
-    }
+  onFacilitySelected(facility: Facility) {
+    this.selectedActivityId.set(null);
+    // Close any open vendor when switching facilities
+    this.vendorService.closeVendor();
 
-    // Always load facility activities (vendors are shown alongside, not instead of)
-    this.locationService.getFacility(facility.facilityId).subscribe({
-      next: () => {
-        this.selectedActivityId.set(null);
-        // Close any open vendor when switching facilities
-        this.vendorService.closeVendor();
-
-        // Load vendor data for this facility
-        this.loadFacilityVendors(facility);
-      },
-      error: (err) => {
-        this.logToChat('Failed to load facility', 'error');
-        console.error('Error loading facility:', err);
-      }
-    });
+    // Load vendor data for this facility
+    this.loadFacilityVendors(facility);
   }
 
   /**
@@ -542,31 +531,6 @@ export class LocationComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Cancel current travel
-   */
-  async cancelTravel() {
-    const confirmed = await this.confirmDialog.confirm({
-      title: 'Cancel Travel',
-      message: 'Are you sure you want to cancel travel? You will return to your previous location.',
-      confirmLabel: 'Yes, Cancel',
-      cancelLabel: 'No, Continue'
-    });
-
-    if (!confirmed) {
-      return;
-    }
-
-    this.locationService.cancelTravel()
-      .then((response: any) => {
-        this.logToChat(response.message, 'success');
-        this.locationService.getCurrentLocation().subscribe(); // Refresh location
-      })
-      .catch((err: any) => {
-        this.logToChat(err.error?.message || 'Failed to cancel travel', 'error');
-      });
-  }
-
-  /**
    * Start traveling to a location
    */
   travel(targetLocationId: string) {
@@ -608,26 +572,6 @@ export class LocationComponent implements OnInit, OnDestroy {
 
     // Return percentage (elapsed / total * 100)
     return Math.min(100, Math.max(0, (elapsed / totalDuration) * 100));
-  }
-
-  /**
-   * Get progress percentage for travel
-   */
-  getTravelProgressPercent(): number {
-    const travel = this.travelState();
-
-    if (!travel || !travel.isTravel || !travel.startTime || !travel.endTime) {
-      return 0;
-    }
-
-    const start = new Date(travel.startTime).getTime();
-    const end = new Date(travel.endTime).getTime();
-    const now = Date.now();
-
-    const total = end - start;
-    const elapsed = now - start;
-
-    return Math.min(100, Math.max(0, (elapsed / total) * 100));
   }
 
   /**

@@ -1,0 +1,147 @@
+// Facility detail
+.facility-detail {
+  h2 {
+    color: var(--color-secondary);
+    margin: var(--spacing-l) 0;
+  }
+
+  h3 {
+    color: var(--color-secondary);
+    margin: var(--spacing-2xl) 0 var(--spacing-m) 0;
+    font-size: var(--font-size-xl);
+  }
+
+  p {
+    color: var(--color-text-tertiary);
+    line-height: var(--line-height-normal);
+    margin: var(--spacing-s) 0;
+  }
+}
+
+// Vendors section
+.vendors-section {
+  margin-bottom: var(--spacing-2xl);
+}
+
+.vendors-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--spacing-m);
+  margin-top: var(--spacing-m);
+}
+
+.vendor-card {
+  background-color: var(--color-bg-elevated);
+  border: var(--border-default);
+  border-radius: var(--radius-card);
+  padding: var(--spacing-l);
+  cursor: pointer;
+  transition: all var(--transition-normal) ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-s);
+  font-size: var(--spacing-m);
+  color: var(--color-text-label);
+
+  &:hover {
+    background-color: var(--color-bg-tertiary);
+    border-color: var(--color-secondary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(138, 43, 226, 0.3);
+  }
+
+  .vendor-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xs);
+    text-align: center;
+  }
+
+  .vendor-name {
+    color: var(--color-secondary);
+    font-weight: var(--font-weight-medium);
+    font-size: var(--font-size-l);
+  }
+
+  .vendor-greeting {
+    color: var(--color-text-label);
+    font-size: var(--font-size-s);
+    font-style: italic;
+    opacity: var(--opacity-muted);
+  }
+}
+
+// Activities list
+.activities-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: var(--spacing-l);
+}
+
+.activity-card {
+  background-color: var(--color-bg-elevated);
+  border: var(--border-default);
+  border-radius: var(--radius-card);
+  padding: var(--spacing-l);
+  cursor: pointer;
+  transition: all var(--transition-normal) ease;
+
+  &.available:hover {
+    background-color: var(--color-bg-tertiary);
+    border-color: var(--color-text-label);
+    transform: translateY(-2px);
+  }
+
+  &.unavailable {
+    opacity: var(--opacity-muted);
+    cursor: not-allowed;
+  }
+
+  h4 {
+    color: var(--color-secondary);
+    margin: 0 0 var(--spacing-s) 0;
+  }
+
+  p {
+    color: var(--color-text-label);
+    font-size: var(--font-size-s);
+    margin: var(--spacing-s) 0;
+  }
+
+  .activity-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: var(--spacing-m);
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+  }
+
+  .unavailable-badge {
+    background-color: rgba(139, 0, 0, 0.5);
+    padding: 0.2rem var(--spacing-s);
+    border-radius: var(--radius-s);
+    font-size: var(--font-size-xs);
+    color: var(--color-error-light);
+  }
+}
+
+// Back button
+.btn-back {
+  background-color: transparent;
+  border: var(--border-light);
+  color: var(--color-text-muted);
+  padding: var(--spacing-s) var(--spacing-l);
+  border-radius: var(--radius-s);
+  cursor: pointer;
+  font-size: var(--font-size-m);
+  transition: all var(--transition-fast) ease;
+
+  &:hover {
+    background-color: var(--color-bg-elevated);
+    border-color: var(--color-text-label);
+    color: var(--color-text-tertiary);
+  }
+}

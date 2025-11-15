@@ -1,0 +1,66 @@
+<div class="location-container">
+
+  <!-- Traveling State -->
+  <app-location-travel></app-location-travel>
+
+  <!-- Main Location View (no activity, no travel) -->
+  @if (!travelState()?.isTravel && currentLocation()) {
+    <div class="main-view">
+      <!-- Location Header -->
+      <div class="location-header" [style.background-color]="currentLocation()?.biome?.theme?.primaryColor">
+        <h1>{{ currentLocation()?.name }}</h1>
+        <p class="location-description">{{ currentLocation()?.description }}</p>
+        <span class="biome-badge" [style.background-color]="currentLocation()?.biome?.theme?.accentColor">
+          {{ currentLocation()?.biome?.name }}
+        </span>
+      </div>
+      <!-- Active Activity Progress -->
+      @if (activeActivity()?.activityId && activityProgress() && !startingActivity()) {
+        <app-location-activity-progress></app-location-activity-progress>
+      } @else {
+        <!-- Activity Detail View -->
+        <app-location-activity-detail
+          [selectedActivity]="selectedActivity()"
+          [startingActivity]="startingActivity()"
+          (backRequested)="backToActivities()"
+          (startRequested)="startActivity()">
+        </app-location-activity-detail>
+
+        <!-- Vendor View (shown when vendor is open) -->
+        @if (selectedFacility() && vendorService.isVendorOpen()) {
+          <div class="vendor-view">
+            <app-vendor></app-vendor>
+          </div>
+        }
+
+        <!-- Combat Section (when in combat or combat ended for review) - MOVED OUTSIDE facility detail -->
+        @if (inCombat() || combatService.combatEnded()) {
+          <div class="combat-section">
+            <!-- Return to Facility Button (shown during combat or after combat ends) -->
+            <button (click)="fleeCombat()" class="btn-back">← Return to Facility</button>
+
+            <app-combat></app-combat>
+          </div>
+        }
+
+        <!-- Facility Detail View (shown when facility is selected but vendor is not open and not in combat) -->
+        <app-location-facility-detail
+          [selectedFacility]="selectedFacility()"
+          [selectedActivityId]="selectedActivityId()"
+          [startingActivity]="startingActivity()"
+          [facilityVendors]="facilityVendors"
+          (backRequested)="backToFacilities()"
+          (vendorOpenRequested)="openVendor($event)"
+          (activitySelected)="selectActivity($event)">
+        </app-location-facility-detail>
+
+        <!-- Facility List View (shown when no facility is selected and not in combat) -->
+        <app-location-facility-list
+          (facilitySelected)="onFacilitySelected($event)"
+          (travelRequested)="travel($event)"
+          [startingActivity]="startingActivity()">
+        </app-location-facility-list>
+      }
+    </div>
+  }
+</div>

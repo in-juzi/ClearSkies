@@ -1,0 +1,290 @@
+// Activity view
+.activity-view {
+  text-align: center;
+
+  h2 {
+    color: var(--color-secondary);
+    margin-bottom: var(--spacing-2xl);
+  }
+
+  p {
+    color: var(--color-text-tertiary);
+    margin: var(--spacing-s) 0;
+  }
+
+  .complete-text {
+    color: var(--color-success);
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-xl);
+  }
+}
+
+// Progress bars
+.progress-bar {
+  width: 100%;
+  height: var(--height-progress-bar);
+  background-color: var(--color-bg-primary);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  border: var(--border-default);
+  margin: var(--spacing-l) 0;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--gradient-progress);
+  transition: width var(--transition-normal) ease;
+}
+
+// Skill Training Display
+.skill-training {
+  margin-top: var(--spacing-2xl);
+  padding: var(--spacing-l);
+  background: linear-gradient(135deg, rgba(138, 43, 226, 0.15) 0%, rgba(74, 78, 105, 0.15) 100%);
+  border: var(--border-width-medium) solid var(--color-accent-purple);
+  border-radius: var(--radius-card);
+}
+
+.skill-training-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-m);
+  margin-bottom: var(--spacing-l);
+
+  .skill-icon {
+    width: 48px;
+    height: 48px;
+    filter: drop-shadow(0 2px 8px rgba(138, 43, 226, 0.4));
+  }
+
+  .skill-title-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+
+    h3 {
+      color: var(--color-secondary);
+      margin: 0;
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-bold);
+    }
+
+    .training-label {
+      color: var(--color-text-label);
+      font-size: var(--font-size-s);
+      font-style: italic;
+      opacity: var(--opacity-muted);
+    }
+  }
+}
+
+.skill-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-m);
+}
+
+.skill-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-m);
+
+  .skill-level {
+    color: var(--color-secondary);
+    font-weight: var(--font-weight-bold);
+  }
+
+  .skill-xp {
+    color: var(--color-text-label);
+    font-family: var(--font-monospace);
+  }
+}
+
+.xp-bar {
+  width: 100%;
+  height: 24px;
+  background-color: var(--color-bg-primary);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  border: var(--border-default);
+  position: relative;
+}
+
+.xp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-accent-purple) 0%, var(--color-secondary) 100%);
+  transition: width var(--transition-normal) ease;
+  box-shadow: 0 0 10px rgba(138, 43, 226, 0.5);
+}
+
+// Rewards display
+.rewards-display {
+  background-color: rgba(255, 215, 0, 0.1);
+  border: var(--border-width-medium) solid var(--color-secondary);
+  border-radius: var(--radius-card);
+  padding: var(--spacing-2xl);
+  margin-top: var(--spacing-2xl);
+
+  h3 {
+    color: var(--color-secondary);
+    margin-top: 0;
+    text-align: center;
+  }
+}
+
+.reward-items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-m);
+}
+
+.reward-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-s);
+  padding: var(--spacing-s);
+  background-color: var(--color-bg-overlay);
+  border-radius: var(--radius-s);
+  color: var(--color-text-tertiary);
+
+  .reward-icon {
+    font-size: var(--font-size-2xl);
+  }
+
+  .level-up {
+    margin-left: auto;
+    color: var(--color-secondary);
+    font-weight: var(--font-weight-bold);
+    animation: pulse 1s ease-in-out infinite;
+  }
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+// Activity Log
+.activity-log {
+  margin-top: var(--spacing-2xl);
+  background-color: rgba(26, 26, 46, 0.5);
+  border: var(--border-light);
+  border-radius: var(--radius-card);
+  padding: var(--spacing-l);
+  max-height: 300px;
+  overflow-y: auto;
+
+  h3 {
+    color: var(--color-secondary);
+    margin: 0 0 var(--spacing-l) 0;
+    font-size: var(--font-size-l);
+    text-align: center;
+  }
+}
+
+.log-entries {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-s);
+}
+
+.log-entry {
+  display: flex;
+  gap: var(--spacing-m);
+  padding: var(--spacing-s);
+  background-color: rgba(74, 78, 105, 0.2);
+  border-radius: var(--radius-s);
+  border-left: 3px solid var(--color-accent-purple);
+  font-size: var(--font-size-s);
+  transition: background-color var(--transition-fast) ease;
+
+  &:hover {
+    background-color: rgba(74, 78, 105, 0.3);
+  }
+}
+
+.log-timestamp {
+  color: var(--color-text-muted);
+  font-family: var(--font-monospace);
+  font-size: var(--font-size-xs);
+  min-width: 60px;
+  flex-shrink: 0;
+  align-content: center;
+}
+
+.log-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.log-activity {
+  width: fit-content;
+  color: var(--color-text-tertiary);
+  font-weight: var(--font-weight-medium);
+}
+
+.log-rewards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-s);
+  font-size: var(--font-size-xs);
+}
+
+.reward-mini {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.15rem 0.4rem;
+  background-color: var(--color-bg-overlay);
+  border-radius: 3px;
+  color: var(--color-text-label);
+  white-space: nowrap;
+
+  &.item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.1rem;
+  }
+}
+
+.level-up-mini {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.4rem;
+  background-color: rgba(255, 215, 0, 0.2);
+  border: 1px solid rgba(255, 215, 0, 0.4);
+  border-radius: 3px;
+  color: var(--color-secondary);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-xs);
+  animation: pulse 1s ease-in-out infinite;
+}
+
+// Back button
+.btn-back {
+  background-color: transparent;
+  border: var(--border-light);
+  color: var(--color-text-muted);
+  padding: var(--spacing-s) var(--spacing-l);
+  border-radius: var(--radius-s);
+  cursor: pointer;
+  font-size: var(--font-size-m);
+  transition: all var(--transition-fast) ease;
+
+  &:hover {
+    background-color: var(--color-bg-elevated);
+    border-color: var(--color-text-label);
+    color: var(--color-text-tertiary);
+  }
+}

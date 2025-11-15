@@ -1,0 +1,57 @@
+// Traveling view
+.traveling-view {
+  text-align: center;
+
+  h2 {
+    color: var(--color-secondary);
+    margin-bottom: var(--spacing-2xl);
+  }
+
+  p {
+    color: var(--color-text-tertiary);
+    margin: var(--spacing-s) 0;
+  }
+}
+
+// Progress bars
+.progress-bar {
+  width: 100%;
+  height: var(--height-progress-bar);
+  background-color: var(--color-bg-primary);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  border: var(--border-default);
+  margin: var(--spacing-l) 0;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--gradient-progress);
+  transition: width var(--transition-normal) ease;
+}
+
+// Travel actions
+.travel-actions {
+  margin-top: var(--spacing-xl);
+  display: flex;
+  gap: var(--spacing-m);
+  justify-content: center;
+}
+
+// Buttons
+.btn-danger {
+  background: linear-gradient(135deg, var(--color-error) 0%, var(--color-error-light) 100%);
+  border: none;
+  color: var(--color-text-primary);
+  padding: var(--spacing-m) var(--spacing-2xl);
+  border-radius: var(--radius-button);
+  cursor: pointer;
+  font-size: var(--font-size-l);
+  font-weight: var(--font-weight-bold);
+  transition: all var(--transition-normal) ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(139, 0, 0, 0.4);
+  }
+}

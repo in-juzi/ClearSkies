@@ -1,0 +1,173 @@
+// Facilities view
+.facilities-view {
+  h2 {
+    margin-bottom: var(--spacing-l);
+  }
+
+  .facilities-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--spacing-l);
+    margin-bottom: var(--spacing-4xl);
+  }
+}
+
+.facility-card {
+  background-color: var(--color-bg-elevated);
+  border: var(--border-default);
+  border-radius: var(--radius-card);
+  padding: var(--spacing-l);
+  cursor: pointer;
+  transition: all var(--transition-normal) ease;
+
+  &:hover {
+    background-color: var(--color-bg-tertiary);
+    border-color: var(--color-text-label);
+    transform: translateY(-2px);
+  }
+
+  h3 {
+    color: var(--color-secondary);
+    margin: 0 0 var(--spacing-s) 0;
+    font-size: var(--font-size-xl);
+  }
+
+  p {
+    color: var(--color-text-label);
+    margin: var(--spacing-s) 0;
+    font-size: var(--font-size-m);
+    line-height: var(--line-height-relaxed);
+  }
+
+  .facility-type {
+    display: inline-block;
+    padding: var(--spacing-xs) var(--spacing-s);
+    background-color: rgba(138, 43, 226, 0.3);
+    border-radius: var(--radius-s);
+    font-size: var(--font-size-xs);
+    color: var(--color-text-label);
+    margin-top: var(--spacing-s);
+  }
+}
+
+// Navigation section
+.navigation-section {
+  margin-top: var(--spacing-l);
+  padding-top: var(--spacing-l);
+  border-top: var(--border-width-medium) solid var(--color-surface-border);
+
+  h2 {
+    color: var(--color-secondary);
+    margin-bottom: var(--spacing-l);
+  }
+}
+
+.navigation-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-l);
+}
+
+.nav-link {
+  background-color: var(--color-bg-elevated);
+  border: var(--border-default);
+  border-radius: var(--radius-card);
+  padding: var(--spacing-xl);
+  transition: all var(--transition-normal) ease;
+
+  &.available {
+    cursor: pointer;
+
+    &:hover {
+      background-color: var(--color-bg-tertiary);
+      border-color: var(--color-text-label);
+      transform: translateY(-2px);
+    }
+  }
+
+  &.unavailable {
+    opacity: var(--opacity-muted);
+  }
+
+  h3 {
+    color: var(--color-secondary);
+    margin: 0 0 var(--spacing-s) 0;
+    font-size: var(--font-size-xl);
+  }
+
+  p {
+    color: var(--color-text-label);
+    font-size: var(--font-size-m);
+    margin: var(--spacing-s) 0;
+  }
+
+  .nav-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: var(--spacing-m) 0;
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+  }
+
+  .unavailable-badge {
+    background-color: rgba(139, 0, 0, 0.5);
+    padding: var(--spacing-xs) var(--spacing-s);
+    border-radius: var(--radius-s);
+    font-size: var(--font-size-xs);
+    color: var(--color-text-label);
+  }
+
+  .requirement-failures {
+    margin-top: var(--spacing-m);
+    padding: var(--spacing-m);
+    background-color: rgba(139, 0, 0, 0.2);
+    border-radius: var(--radius-s);
+    border: 1px solid rgba(139, 0, 0, 0.4);
+
+    p.error {
+      color: var(--color-error);
+      margin: 0 0 var(--spacing-xs) 0;
+      font-weight: var(--font-weight-medium);
+    }
+
+    ul {
+      margin: 0;
+      padding-left: var(--spacing-l);
+      color: var(--color-text-label);
+      font-size: var(--font-size-s);
+
+      li {
+        margin: var(--spacing-xs) 0;
+      }
+    }
+  }
+
+  button {
+    margin-top: var(--spacing-m);
+  }
+}
+
+// Buttons
+.btn-primary {
+  background: var(--gradient-purple);
+  border: none;
+  color: var(--color-text-primary);
+  padding: var(--spacing-m) var(--spacing-2xl);
+  border-radius: var(--radius-button);
+  cursor: pointer;
+  font-size: var(--font-size-l);
+  font-weight: var(--font-weight-bold);
+  transition: all var(--transition-normal) ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow-purple);
+  }
+
+  &:disabled {
+    opacity: var(--opacity-disabled);
+    cursor: not-allowed;
+    background: var(--color-surface-border);
+  }
+}
