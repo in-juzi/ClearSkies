@@ -7,9 +7,13 @@ import { TraitDefinition } from '../../../types/items';
 
 import { BlessedTrait } from './definitions/BlessedTrait';
 import { CursedTrait } from './definitions/CursedTrait';
+import { EmpoweringTrait } from './definitions/EmpoweringTrait';
 import { FragrantTrait } from './definitions/FragrantTrait';
+import { InvigoratingTrait } from './definitions/InvigoratingTrait';
 import { MasterworkTrait } from './definitions/MasterworkTrait';
 import { PristineTrait } from './definitions/PristineTrait';
+import { RestorativeTrait } from './definitions/RestorativeTrait';
+import { WardingTrait } from './definitions/WardingTrait';
 import { WeatheredTrait } from './definitions/WeatheredTrait';
 
 /**
@@ -19,9 +23,13 @@ export class TraitRegistry {
   private static readonly traits = new Map<string, TraitDefinition>([
     [BlessedTrait.traitId, BlessedTrait],
     [CursedTrait.traitId, CursedTrait],
+    [EmpoweringTrait.traitId, EmpoweringTrait],
     [FragrantTrait.traitId, FragrantTrait],
+    [InvigoratingTrait.traitId, InvigoratingTrait],
     [MasterworkTrait.traitId, MasterworkTrait],
     [PristineTrait.traitId, PristineTrait],
+    [RestorativeTrait.traitId, RestorativeTrait],
+    [WardingTrait.traitId, WardingTrait],
     [WeatheredTrait.traitId, WeatheredTrait],
   ]);
 
