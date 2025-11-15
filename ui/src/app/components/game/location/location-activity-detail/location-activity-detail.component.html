@@ -54,7 +54,7 @@
             <p class="error">Not met:</p>
             <ul>
               @for (failure of selectedActivity()?.requirementFailures; track failure) {
-                <li>{{ failure }}</li>
+                <li>{{ formatFailureMessage(failure) }}</li>
               }
             </ul>
           </div>

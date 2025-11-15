@@ -76,6 +76,20 @@ export class LocationActivityDetailComponent {
   }
 
   /**
+   * Format requirement failure message to use skill display names
+   */
+  formatFailureMessage(failure: string): string {
+    // Pattern: "Requires {skillName} level {number}"
+    const skillMatch = failure.match(/Requires (\w+) level (\d+)/);
+    if (skillMatch) {
+      const [, skillName, level] = skillMatch;
+      const displayName = this.getSkillDisplayName(skillName);
+      return `Requires ${displayName} level ${level}`;
+    }
+    return failure;
+  }
+
+  /**
    * Go back to activity list
    */
   backToActivities() {

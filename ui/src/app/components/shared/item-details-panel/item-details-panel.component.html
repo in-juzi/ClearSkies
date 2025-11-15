@@ -302,7 +302,7 @@
         *ngIf="showDropControls"
         (click)="onRemoveAll()"
         [disabled]="!!item.equipped">
-        Drop All
+        {{ item.quantity === 1 ? 'Drop' : 'Drop All' }}
       </button>
     </div>
   </div>

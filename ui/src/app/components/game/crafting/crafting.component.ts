@@ -271,6 +271,8 @@ export class CraftingComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadRecipes();
+    // Load item definitions for ingredient name lookups
+    this.inventoryService.getItemDefinitions().subscribe();
   }
 
   /**
@@ -465,7 +467,12 @@ export class CraftingComponent implements OnInit {
       // Capitalize first letter for display
       return ingredient.subcategory.charAt(0).toUpperCase() + ingredient.subcategory.slice(1);
     }
-    return ingredient.itemId || 'Unknown';
+    // For specific itemId, look up the item definition to get the display name
+    if (ingredient.itemId) {
+      const itemDef = this.inventoryService.getItemDefinitionSync(ingredient.itemId);
+      return itemDef?.name || ingredient.itemId;
+    }
+    return 'Unknown';
   }
 
   /**
