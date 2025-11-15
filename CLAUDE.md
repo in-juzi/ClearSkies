@@ -52,18 +52,23 @@
 - ✅ Location component decomposition (completed - split into 5 specialized sub-components)
 - ✅ Equipment subtype display system (completed - human-readable labels for all equipment types)
 - ✅ Legacy potion cleanup (completed - removed old item definitions, added migration script)
+- ✅ Context-aware trait system (completed - dual validation/display for crafting vs random generation)
+- ✅ Attribute-based progression (completed - HP/MP/capacity scale with attributes)
+- ✅ Magic→Wisdom rename (completed - better medieval fantasy terminology)
+- ✅ Potency quality fix (completed - quality multipliers now apply to consumables)
+- ✅ Weight-based inventory (completed - carrying capacity based on strength/endurance)
 
 **Recent Changes** (Last 10 commits):
-- chore: update Claude Code settings
-- feat: add backend build check slash command
-- feat: add database migration for legacy potion renaming
-- refactor: standardize alchemy recipe naming and exports
-- refactor: remove legacy potion items from registries
-- refactor: update item details panel to use equipment subtype formatter
-- feat: add equipment subtype display names to frontend constants
-- refactor: decompose location component into specialized sub-components
-- refactor: standardize Angular component filenames to .component.* convention
-- chore: remove duplicate and obsolete files
+- docs: update ideas and notes
+- chore: add development utilities
+- docs: add comprehensive system documentation
+- fix: update UI components for context-aware traits
+- feat: add carrying capacity display to inventory UI
+- feat: add dynamic HP/MP bars with attribute tooltips
+- feat: add frontend services for attribute-based progression
+- fix: update frontend models for magic→wisdom rename
+- feat: add weight-based inventory system
+- fix: enable Potency quality on alchemy potions
 
 **Known Issues**:
 - None currently identified
@@ -137,10 +142,11 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 
 **Game Data (TypeScript):**
 - Shared Types: [shared/types/](shared/types/) - Shared type definitions used by both frontend and backend
-- Shared Constants: [shared/constants/item-constants.ts](shared/constants/item-constants.ts) - Type-safe CATEGORY, SUBCATEGORY, RARITY, TIER (source of truth)
+- Shared Constants: [shared/constants/item-constants.ts](shared/constants/item-constants.ts), [shared/constants/attribute-constants.ts](shared/constants/attribute-constants.ts) - Type-safe game constants (source of truth)
 - Item Registry: [be/data/items/ItemRegistry.ts](be/data/items/ItemRegistry.ts) - All items in [definitions/](be/data/items/definitions/)
 - Item Constants (BE): [be/data/constants/item-constants.ts](be/data/constants/item-constants.ts) - Re-exports from shared/constants
 - Combat Constants: [be/data/constants/combat-constants.ts](be/data/constants/combat-constants.ts) - Combat formulas and balance tuning
+- Attribute Constants: [shared/constants/attribute-constants.ts](shared/constants/attribute-constants.ts) - HP/MP/capacity scaling formulas
 - Combat Enums: [shared/types/combat-enums.ts](shared/types/combat-enums.ts) - Type-safe BuffableStat, ModifierType, PassiveTrigger
 - Location Registry: [be/data/locations/LocationRegistry.ts](be/data/locations/LocationRegistry.ts) - All locations in [definitions/](be/data/locations/definitions/)
 - Activity Registry: [be/data/locations/ActivityRegistry.ts](be/data/locations/ActivityRegistry.ts) - All activities in [activities/](be/data/locations/activities/)
@@ -519,17 +525,18 @@ See [project/docs/012-completed-features.md](project/docs/012-completed-features
 
 **ChatMessage** ([be/models/ChatMessage.js](be/models/ChatMessage.js) ~L10-20): Chat history (userId, username, message, channel)
 
-**Player** ([be/models/Player.js](be/models/Player.js) ~L15-135): Game data
+**Player** ([be/models/Player.ts](be/models/Player.ts) ~L15-500): Game data
 - Skills (13): woodcutting, mining, fishing, gathering (renamed from herbalism), smithing, cooking, alchemy (new), oneHanded, dualWield, twoHanded, ranged, casting, gun
-- Attributes (7): strength, endurance, magic, perception, dexterity, will, charisma
-- Skill-Attribute links: woodcutting/mining→strength, fishing/smithing→endurance, gathering/cooking/alchemy→will, oneHanded/twoHanded→strength, dualWield/ranged→dexterity, casting→magic, gun→perception
+- Attributes (7): strength, endurance, wisdom (renamed from magic), perception, dexterity, will, charisma
+- Skill-Attribute links: woodcutting/mining→strength, fishing/smithing→endurance, gathering/cooking/alchemy→will, oneHanded/twoHanded→strength, dualWield/ranged→dexterity, casting→wisdom, gun→perception
 - Inventory: items with qualities (Map), traits (Map), quantities, equipped flag
 - Equipment slots (Map): 10 default slots (head, body, mainHand, offHand, belt, gloves, boots, necklace, ringRight, ringLeft)
 - Location state: currentLocation, discoveredLocations, activeActivity, travelState
 - Combat state: activeCombat (monster instance, turn tracking, cooldowns, combat log, activityId), combatStats (defeats, damage, deaths, crits, dodges), lastCombatActivityId
 - Character: characterName (optional display name), gold, questProgress, achievements
+- Virtual properties: maxHP (STR×3 + END×2 + WILL×1 + 10), maxMP (WIS×6 + WILL×3 + 10), carryingCapacity (STR×2kg + END×1kg + 50kg), currentWeight
 
-**Key Methods:** See [be/models/Player.js](be/models/Player.js) for full list
+**Key Methods:** See [be/models/Player.ts](be/models/Player.ts) for full list
 - Skills/Inventory: `addSkillExperience()` ~L145, `addItem()` ~L200, `equipItem()` ~L280
 - Combat: `takeDamage()` ~L610, `heal()` ~L620, `useMana()` ~L628, `isInCombat()` ~L650, `addCombatLog()` ~L655
 
@@ -654,7 +661,11 @@ Three-tier architecture: Item Definitions → Quality/Trait Definitions → Item
 - 13 trait types (4 alchemy-specific: restorative, empowering, invigorating, warding)
 - Category-specific traits: Hardened (weapons), Reinforced (armor), Balanced (tools/wood)
 - Intuitive quality names: Grain (wood), Potency (herbs), Purity (ores), Sheen (gems)
+- Context-aware validation: 'random' (strict allowedTraits) vs 'crafted' (permissive applicableCategories)
+- Context-aware display: Traits show different names per category ("Restorative" on herbs → "Regeneration" on potions)
 - Herbs transfer effect traits to crafted potions (buff/HoT effects in combat)
+- Potency quality applies to consumables (multiplies health/mana restore by 1.10-1.50)
+- Weight-based carrying capacity (scales with STR/END attributes)
 - Probabilistic generation: 35% plain, 45% one quality, 15% two qualities
 - Items stack if same itemId + quality levels + trait levels
 - Multi-channel SVG icon colorization (40+ materials)
@@ -666,7 +677,7 @@ Three-tier architecture: Item Definitions → Quality/Trait Definitions → Item
 - Trait Registry: [TraitRegistry.ts](be/data/items/traits/TraitRegistry.ts)
 - Item Service: [itemService.ts](be/services/itemService.ts)
 
-**Full Documentation:** [project/docs/015-inventory-system.md](project/docs/015-inventory-system.md), [project/docs/011-level-based-quality-trait-system.md](project/docs/011-level-based-quality-trait-system.md)
+**Full Documentation:** [project/docs/015-inventory-system.md](project/docs/015-inventory-system.md), [project/docs/011-level-based-quality-trait-system.md](project/docs/011-level-based-quality-trait-system.md), [project/docs/040-context-aware-trait-system.md](project/docs/040-context-aware-trait-system.md), [project/docs/042-potency-quality-consumable-fix.md](project/docs/042-potency-quality-consumable-fix.md)
 
 ## Location System
 
@@ -719,6 +730,26 @@ Skills → Attributes with 50% XP passthrough and progressive scaling
 - L5-6: 45 XP (100%) | L7: 34 XP (75%) | L10: 20 XP (44%) | L15: 12 XP (26%)
 
 **Full Documentation:** [project/docs/032-xp-system.md](project/docs/032-xp-system.md)
+
+## Attribute Progression System
+
+Attributes dynamically scale HP, MP, and carrying capacity
+
+**Key Facts:**
+- HP formula: 10 + (STR×3) + (END×2) + (WILL×1)
+- MP formula: 10 + (WIS×6) + (WILL×3)
+- Carrying capacity: 50kg + (STR×2kg) + (END×1kg)
+- Attributes renamed: magic → wisdom (better medieval fantasy terminology)
+- Virtual properties on Player model (computed on-demand, no database storage)
+- Combat system uses dynamic maxHP/maxMP instead of static values
+- Migration: 013-rename-magic-to-wisdom.js updates existing player documents
+
+**Scaling Examples:**
+- Level 1 attributes (all 1): 17 HP, 20 MP, 53kg capacity
+- Level 25 attributes (all 25): 160 HP, 235 MP, 125kg capacity
+- Level 50 attributes (all 50): 310 HP, 460 MP, 200kg capacity
+
+**Full Documentation:** [project/docs/041-attribute-progression-system.md](project/docs/041-attribute-progression-system.md)
 
 ## Content Generator Agent
 
