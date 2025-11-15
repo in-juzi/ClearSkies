@@ -28,8 +28,8 @@ export class LoginComponent {
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
 
-    // Get return URL from query params or default to /game
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/game';
+    // Get return URL from query params or default to /game/loading
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/game/loading';
   }
 
   onSubmit(): void {

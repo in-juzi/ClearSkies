@@ -16,12 +16,32 @@ export interface Player {
   skills: PlayerSkills;
   gold: number;
   location: Location;
+  currentLocation?: string;  // Location ID string
   inventory: InventoryItem[];
   activeCrafting?: {
     recipeId: string;
     startTime: Date;
     endTime: Date;
   };
+  activeActivity?: {
+    activityId: string;
+    facilityId: string;
+    locationId: string;
+    startTime: Date;
+    endTime: Date;
+  };
+  activeCombat?: {
+    monsterId: string;
+    turnCount: number;
+    combatLog: any[];
+  };
+  travelState?: {
+    isTravel: boolean;
+    targetLocationId: string;
+    startTime: Date;
+    endTime: Date;
+  };
+  lastCombatActivityId?: string;
   unlockedRecipes?: string[];
   lastPlayed: Date;
 }
