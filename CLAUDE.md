@@ -48,18 +48,22 @@
 - ✅ Quality/trait system redesign (completed - removed confusing modifiers, added category-specific traits)
 - ✅ Inventory right-click actions (completed - quick equip/unequip and item usage)
 - ✅ Documentation reorganization (completed - numbered naming convention for 39 docs)
+- ✅ Angular component naming standardization (completed - all components use .component.* convention)
+- ✅ Location component decomposition (completed - split into 5 specialized sub-components)
+- ✅ Equipment subtype display system (completed - human-readable labels for all equipment types)
+- ✅ Legacy potion cleanup (completed - removed old item definitions, added migration script)
 
 **Recent Changes** (Last 10 commits):
+- chore: update Claude Code settings
+- feat: add backend build check slash command
+- feat: add database migration for legacy potion renaming
+- refactor: standardize alchemy recipe naming and exports
+- refactor: remove legacy potion items from registries
+- refactor: update item details panel to use equipment subtype formatter
+- feat: add equipment subtype display names to frontend constants
+- refactor: decompose location component into specialized sub-components
+- refactor: standardize Angular component filenames to .component.* convention
 - chore: remove duplicate and obsolete files
-- chore: add project-doc command and update Claude settings
-- docs: reorganize documentation with numbered naming convention
-- feat: add inventory UI enhancements for better usability
-- fix: update item definitions to use redesigned quality/trait sets
-- refactor: redesign quality and trait system for better gameplay clarity
-- refactor: standardize potion naming to medieval alchemy conventions
-- chore: add skill progression calculator and player debug utilities
-- fix: normalize player stats structure in getMe endpoint
-- feat: add global loading overlay for auth initialization
 
 **Known Issues**:
 - None currently identified
@@ -116,8 +120,11 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 **Frontend Core:**
 - Game Component: [ui/src/app/components/game/game.component.ts](ui/src/app/components/game/game.component.ts), [ui/src/app/components/game/game.component.html](ui/src/app/components/game/game.component.html)
 - Inventory: [ui/src/app/components/game/inventory/inventory.component.ts](ui/src/app/components/game/inventory/inventory.component.ts), [ui/src/app/components/game/inventory/inventory.component.html](ui/src/app/components/game/inventory/inventory.component.html)
-- Location: [ui/src/app/components/game/location/location.ts](ui/src/app/components/game/location/location.ts), [ui/src/app/components/game/location/location.html](ui/src/app/components/game/location/location.html)
-- Skills: [ui/src/app/components/game/skills/skills.ts](ui/src/app/components/game/skills/skills.ts)
+- Location: [ui/src/app/components/game/location/location.component.ts](ui/src/app/components/game/location/location.component.ts), [ui/src/app/components/game/location/location.component.html](ui/src/app/components/game/location/location.component.html)
+  - Location Sub-components: [location-activity-detail/](ui/src/app/components/game/location/location-activity-detail/), [location-activity-progress/](ui/src/app/components/game/location/location-activity-progress/), [location-facility-detail/](ui/src/app/components/game/location/location-facility-detail/), [location-facility-list/](ui/src/app/components/game/location/location-facility-list/), [location-travel/](ui/src/app/components/game/location/location-travel/)
+- Skills: [ui/src/app/components/game/skills/skills.component.ts](ui/src/app/components/game/skills/skills.component.ts)
+- Attributes: [ui/src/app/components/game/attributes/attributes.component.ts](ui/src/app/components/game/attributes/attributes.component.ts)
+- Character Status: [ui/src/app/components/game/character-status/character-status.component.ts](ui/src/app/components/game/character-status/character-status.component.ts)
 - Equipment: [ui/src/app/components/game/equipment/equipment.component.ts](ui/src/app/components/game/equipment/equipment.component.ts)
 - Chat: [ui/src/app/components/game/chat/chat.component.ts](ui/src/app/components/game/chat/chat.component.ts)
 - Vendor: [ui/src/app/components/game/vendor/vendor.component.ts](ui/src/app/components/game/vendor/vendor.component.ts), [ui/src/app/components/game/vendor/vendor.component.html](ui/src/app/components/game/vendor/vendor.component.html)
@@ -126,7 +133,7 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 - Manual: [ui/src/app/components/manual/manual.component.ts](ui/src/app/components/manual/manual.component.ts), [ui/src/app/components/manual/sections/](ui/src/app/components/manual/sections/)
 - Shared Components: [ui/src/app/components/shared/item-mini/item-mini.component.ts](ui/src/app/components/shared/item-mini/item-mini.component.ts), [ui/src/app/components/shared/item-modifiers/item-modifiers.component.ts](ui/src/app/components/shared/item-modifiers/item-modifiers.component.ts), [ui/src/app/components/shared/item-details-panel/item-details-panel.component.ts](ui/src/app/components/shared/item-details-panel/item-details-panel.component.ts), [ui/src/app/components/shared/icon/icon.component.ts](ui/src/app/components/shared/icon/icon.component.ts), [ui/src/app/components/shared/xp-mini/xp-mini.component.ts](ui/src/app/components/shared/xp-mini/xp-mini.component.ts), [ui/src/app/components/shared/ability-button/ability-button.component.ts](ui/src/app/components/shared/ability-button/ability-button.component.ts), [ui/src/app/components/shared/item-button/item-button.component.ts](ui/src/app/components/shared/item-button/item-button.component.ts), [ui/src/app/components/shared/buff-icon/buff-icon.ts](ui/src/app/components/shared/buff-icon/buff-icon.ts)
 - Services: [ui/src/app/services/inventory.service.ts](ui/src/app/services/inventory.service.ts), [ui/src/app/services/location.service.ts](ui/src/app/services/location.service.ts), [ui/src/app/services/skills.service.ts](ui/src/app/services/skills.service.ts), [ui/src/app/services/auth.service.ts](ui/src/app/services/auth.service.ts), [ui/src/app/services/manual.service.ts](ui/src/app/services/manual.service.ts), [ui/src/app/services/chat.service.ts](ui/src/app/services/chat.service.ts), [ui/src/app/services/vendor.service.ts](ui/src/app/services/vendor.service.ts), [ui/src/app/services/recipe.service.ts](ui/src/app/services/recipe.service.ts), [ui/src/app/services/crafting.service.ts](ui/src/app/services/crafting.service.ts), [ui/src/app/services/combat.service.ts](ui/src/app/services/combat.service.ts), [ui/src/app/services/icon.service.ts](ui/src/app/services/icon.service.ts)
-- Constants: [ui/src/app/constants/material-colors.constants.ts](ui/src/app/constants/material-colors.constants.ts)
+- Constants: [ui/src/app/constants/material-colors.constants.ts](ui/src/app/constants/material-colors.constants.ts), [ui/src/app/constants/game-data.constants.ts](ui/src/app/constants/game-data.constants.ts)
 
 **Game Data (TypeScript):**
 - Shared Types: [shared/types/](shared/types/) - Shared type definitions used by both frontend and backend
@@ -626,6 +633,7 @@ Schema changes require migrations to update existing records
 - `/context-update` - Update CLAUDE.md with latest project context and changes
 - `/logical-commits` - Analyze unstaged changes and create logical, atomic commits
 - `/checkpoint` - Run logical-commits + context-update in one automated workflow
+- `/be-build-check` - Check backend TypeScript build for errors and fix them automatically
 
 ## Environment Variables
 
