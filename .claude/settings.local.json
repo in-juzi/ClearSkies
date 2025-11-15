@@ -13,6 +13,7 @@
       "Bash(node -e:*)",
       "Bash(node utils/add-item.js:*)",
       "Bash(find:*)",
+      "Bash(npm run migrate:*)",
       "Bash(npm run validate:*)",
       "Bash(rm:*)"
     ],
