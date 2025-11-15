@@ -164,7 +164,7 @@ export class PlayerCombatEntity implements ICombatEntity {
   }
 
   getMaxHealth(): number {
-    return this.player.stats.health.max;
+    return this.player.maxHP;
   }
 
   getCurrentMana(): number {
@@ -172,7 +172,7 @@ export class PlayerCombatEntity implements ICombatEntity {
   }
 
   getMaxMana(): number {
-    return this.player.stats.mana.max;
+    return this.player.maxMP;
   }
 
   getBaseArmor(): number {
@@ -209,7 +209,7 @@ export class PlayerCombatEntity implements ICombatEntity {
 
   restoreMana(amount: number): void {
     this.player.stats.mana.current = Math.min(
-      this.player.stats.mana.max,
+      this.player.maxMP,
       this.player.stats.mana.current + amount
     );
   }

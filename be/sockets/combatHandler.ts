@@ -171,6 +171,7 @@ export default function (io: Server): void {
             currentHp: player.stats.health.current,
             currentMana: player.stats.mana.current
           },
+          turnCount: player.activeCombat!.turnCount,
           abilityCooldowns: Object.fromEntries(player.activeCombat!.abilityCooldowns),
           combatLog: player.activeCombat!.combatLog,
           activeBuffs: serializeActiveBuffs(player)
@@ -257,7 +258,7 @@ export default function (io: Server): void {
 
         // Apply immediate mana restoration
         if (manaAmount > 0) {
-          const maxMana = player.stats.mana.max;
+          const maxMana = player.maxMP;
           player.stats.mana.current = Math.min(maxMana, player.stats.mana.current + manaAmount);
         }
 
@@ -333,6 +334,7 @@ export default function (io: Server): void {
             currentHp: player.stats.health.current,
             currentMana: player.stats.mana.current
           },
+          turnCount: player.activeCombat!.turnCount,
           inventory,
           combatLog: player.activeCombat!.combatLog,
           activeBuffs: serializeActiveBuffs(player)
@@ -448,9 +450,9 @@ export default function (io: Server): void {
               monster: monsterInstance,
               player: {
                 currentHp: player.stats.health.current,
-                maxHp: player.stats.health.max,
+                maxHp: player.maxHP,
                 currentMana: player.stats.mana.current,
-                maxMana: player.stats.mana.max
+                maxMana: player.maxMP
               },
               turnCount: player.activeCombat!.turnCount,
               playerNextAttackTime: player.activeCombat!.playerNextAttackTime,
@@ -637,6 +639,7 @@ async function performPlayerTurn(userId: string, io: Server): Promise<void> {
         currentHp: monsterInstance.stats.health.current,
         maxHp: monsterInstance.stats.health.max
       },
+      turnCount: player.activeCombat!.turnCount,
       playerNextAttackTime: player.activeCombat!.playerNextAttackTime,
       combatLog: player.activeCombat!.combatLog,
       activeBuffs: serializeActiveBuffs(player)
@@ -722,8 +725,9 @@ async function performMonsterTurn(userId: string, io: Server): Promise<void> {
       result: attackResult,
       player: {
         currentHp: player.stats.health.current,
-        maxHp: player.stats.health.max
+        maxHp: player.maxHP
       },
+      turnCount: player.activeCombat!.turnCount,
       monsterNextAttackTime: player.activeCombat!.monsterNextAttackTime,
       combatLog: player.activeCombat!.combatLog,
       activeBuffs: serializeActiveBuffs(player)
@@ -861,8 +865,8 @@ async function handleCombatDefeat(player: any, io: Server, userId: string): Prom
     player.combatStats.deaths += 1;
 
     // Respawn player at full health/mana
-    player.stats.health.current = player.stats.health.max;
-    player.stats.mana.current = player.stats.mana.max;
+    player.stats.health.current = player.maxHP;
+    player.stats.mana.current = player.maxMP;
 
     // Store activity ID before clearing combat
     const activityId = player.activeCombat!.activityId;
@@ -878,9 +882,9 @@ async function handleCombatDefeat(player: any, io: Server, userId: string): Prom
       message: 'You were defeated! Respawning...',
       player: {
         currentHp: player.stats.health.current,
-        maxHp: player.stats.health.max,
+        maxHp: player.maxHP,
         currentMana: player.stats.mana.current,
-        maxMana: player.stats.mana.max
+        maxMana: player.maxMP
       },
       activityId
     });

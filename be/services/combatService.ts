@@ -443,7 +443,9 @@ class CombatService {
       if (conditionalBonus.effect === 'damageBonus') {
         // Check trigger condition
         if (conditionalBonus.trigger === 'below_50_percent_hp') {
-          const hpPercent = attacker.stats.health.current / attacker.stats.health.max;
+          // Use maxHP for players (dynamic from attributes), stats.health.max for monsters
+          const maxHp = attacker.maxHP || attacker.stats.health.max;
+          const hpPercent = attacker.stats.health.current / maxHp;
           if (hpPercent < COMBAT_FORMULAS.BATTLE_FRENZY_HP_THRESHOLD) {
             finalDamage = Math.floor(finalDamage * (1 + conditionalBonus.value));
           }
@@ -554,13 +556,13 @@ class CombatService {
 
     if (buff.target === 'player') {
       player.heal(buff.healOverTime);
-      player.addCombatLog(`${buff.name} heals you for ${buff.healOverTime} HP.`, 'buff', buff.healOverTime, 'player');
+      player.addCombatLog(`${buff.name} heals you for ${buff.healOverTime} HP.`, 'heal', buff.healOverTime, 'player');
     } else {
       monsterInstance.stats.health.current = Math.min(
         monsterInstance.stats.health.max,
         monsterInstance.stats.health.current + buff.healOverTime
       );
-      player.addCombatLog(`${buff.name} heals ${monsterInstance.name} for ${buff.healOverTime} HP.`, 'buff', buff.healOverTime, 'monster');
+      player.addCombatLog(`${buff.name} heals ${monsterInstance.name} for ${buff.healOverTime} HP.`, 'heal', buff.healOverTime, 'monster');
     }
   }
 
@@ -572,7 +574,7 @@ class CombatService {
 
     if (buff.target === 'player') {
       player.stats.mana.current = Math.min(
-        player.stats.mana.max,
+        player.maxMP, // Use dynamic MP from attributes
         player.stats.mana.current + buff.manaRegen
       );
       player.addCombatLog(`${buff.name} restores ${buff.manaRegen} mana.`, 'buff');
@@ -609,11 +611,17 @@ class CombatService {
 
     // Process each active buff
     for (const [buffId, buff] of player.activeCombat.activeBuffs.entries()) {
-      // Apply all buff effects using dedicated handlers
-      this.applyDamageOverTime(buff, player, monsterInstance, result);
-      this.applyHealOverTime(buff, player, monsterInstance);
-      this.applyManaRegen(buff, player);
-      this.applyManaDrain(buff, player, monsterInstance);
+      // Only apply effects if this buff belongs to the entity whose turn it is
+      // If tickingEntity is not specified, apply all buff effects (backward compatibility)
+      const shouldApplyEffects = !tickingEntity || buff.target === tickingEntity;
+
+      if (shouldApplyEffects) {
+        // Apply all buff effects using dedicated handlers
+        this.applyDamageOverTime(buff, player, monsterInstance, result);
+        this.applyHealOverTime(buff, player, monsterInstance);
+        this.applyManaRegen(buff, player);
+        this.applyManaDrain(buff, player, monsterInstance);
+      }
 
       // Decrement duration only if this buff belongs to the entity whose turn it is
       // If tickingEntity is not specified, decrement all buffs (backward compatibility)
@@ -753,9 +761,9 @@ class CombatService {
           monsterNextAttackTime: player.activeCombat.monsterNextAttackTime,
           player: {
             currentHp: player.stats.health.current,
-            maxHp: player.stats.health.max,
+            maxHp: player.maxHP, // Use dynamic HP from attributes
             currentMana: player.stats.mana.current,
-            maxMana: player.stats.mana.max
+            maxMana: player.maxMP // Use dynamic MP from attributes
           },
           availableAbilities: availableAbilities.map((ability: Ability) => ({
             abilityId: ability.abilityId,
@@ -949,8 +957,8 @@ class CombatService {
 
       player.addCombatLog(`Defeated! Lost ${goldLost} gold.`, 'system');
 
-      // Restore player to full health
-      player.stats.health.current = player.stats.health.max;
+      // Restore player to full health (using dynamic HP from attributes)
+      player.stats.health.current = player.maxHP;
     }
 
     // Clear combat state
@@ -1009,6 +1017,50 @@ class CombatService {
 
     player.addActiveBuff(buff);
     return buff;
+  }
+
+  /**
+   * Use a consumable item outside of combat
+   * Converts HoT effects to instant healing, applies buffs as instant stat boosts
+   */
+  useConsumableOutOfCombat(player: any, itemInstance: any, itemService: any): any {
+    const effects = itemService.getConsumableEffects(itemInstance);
+    if (!effects) {
+      throw new Error('Invalid consumable item');
+    }
+
+    let totalHealing = effects.healthRestore || 0;
+    let totalManaRestore = effects.manaRestore || 0;
+
+    // Convert HoT traits to instant healing
+    for (const hot of effects.hots) {
+      const hotHealing = hot.healPerTick * hot.ticks;
+      totalHealing += hotHealing;
+    }
+
+    // Apply healing
+    const beforeHealth = player.stats.health.current;
+    if (totalHealing > 0) {
+      player.heal(totalHealing);
+    }
+    const actualHealing = player.stats.health.current - beforeHealth;
+
+    // Apply mana restoration
+    const beforeMana = player.stats.mana.current;
+    if (totalManaRestore > 0) {
+      player.restoreMana(totalManaRestore);
+    }
+    const actualManaRestore = player.stats.mana.current - beforeMana;
+
+    // Note: Buff effects from traits are ignored outside combat
+    // They only apply during active combat encounters
+
+    return {
+      healthRestored: actualHealing,
+      manaRestored: actualManaRestore,
+      totalPotentialHealing: totalHealing,
+      convertedFromHoT: totalHealing - (effects.healthRestore || 0)
+    };
   }
 }
 
