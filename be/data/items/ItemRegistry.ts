@@ -12,6 +12,7 @@ import { CookedCod } from './definitions/consumables/CookedCod';
 import { CookedSalmon } from './definitions/consumables/CookedSalmon';
 import { CookedShrimp } from './definitions/consumables/CookedShrimp';
 import { CookedTrout } from './definitions/consumables/CookedTrout';
+import { FuryBrew } from './definitions/consumables/FuryBrew';
 import { HealthPotion } from './definitions/consumables/HealthPotion';
 import { HealthPotionMinor } from './definitions/consumables/HealthPotionMinor';
 import { HealthPotionStrong } from './definitions/consumables/HealthPotionStrong';
@@ -19,6 +20,9 @@ import { HealthPotionWeak } from './definitions/consumables/HealthPotionWeak';
 import { ManaPotion } from './definitions/consumables/ManaPotion';
 import { ManaPotionMinor } from './definitions/consumables/ManaPotionMinor';
 import { ManaPotionWeak } from './definitions/consumables/ManaPotionWeak';
+import { PowerElixir } from './definitions/consumables/PowerElixir';
+import { VigorDraught } from './definitions/consumables/VigorDraught';
+import { WardingTonic } from './definitions/consumables/WardingTonic';
 
 // EQUIPMENT
 import { BambooFishingRod } from './definitions/equipment/BambooFishingRod';
@@ -99,6 +103,7 @@ export class ItemRegistry {
     [CookedSalmon.itemId, CookedSalmon],
     [CookedShrimp.itemId, CookedShrimp],
     [CookedTrout.itemId, CookedTrout],
+    [FuryBrew.itemId, FuryBrew],
     [HealthPotion.itemId, HealthPotion],
     [HealthPotionMinor.itemId, HealthPotionMinor],
     [HealthPotionStrong.itemId, HealthPotionStrong],
@@ -106,6 +111,9 @@ export class ItemRegistry {
     [ManaPotion.itemId, ManaPotion],
     [ManaPotionMinor.itemId, ManaPotionMinor],
     [ManaPotionWeak.itemId, ManaPotionWeak],
+    [PowerElixir.itemId, PowerElixir],
+    [VigorDraught.itemId, VigorDraught],
+    [WardingTonic.itemId, WardingTonic],
     [BambooFishingRod.itemId, BambooFishingRod],
     [BronzeBoots.itemId, BronzeBoots],
     [BronzeGloves.itemId, BronzeGloves],
