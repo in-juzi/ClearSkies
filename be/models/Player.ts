@@ -196,12 +196,10 @@ const playerSchema = new Schema<IPlayer>({
   },
   stats: {
     health: {
-      current: { type: Number, default: 100 },
-      max: { type: Number, default: 100 }
+      current: { type: Number } // Will be set by pre-save hook based on attributes
     },
     mana: {
-      current: { type: Number, default: 50 },
-      max: { type: Number, default: 50 }
+      current: { type: Number } // Will be set by pre-save hook based on attributes
     },
     strength: { type: Number, default: 10 },
     dexterity: { type: Number, default: 10 },
@@ -490,6 +488,26 @@ playerSchema.virtual('currentWeight').get(function(this: IPlayer) {
   }
 
   return Math.round(totalWeight * 10) / 10; // Round to 1 decimal place
+});
+
+// ============================================================================
+// Middleware Hooks
+// ============================================================================
+
+// Pre-save hook: Initialize HP/MP for new players based on starting attributes
+playerSchema.pre('save', function(this: IPlayer, next) {
+  // Only run for new documents (not on updates)
+  if (this.isNew) {
+    // Set current HP/MP to max based on starting attributes
+    // This ensures new players start with full health/mana
+    if (this.stats.health.current === undefined || this.stats.health.current === null) {
+      this.stats.health.current = this.maxHP;
+    }
+    if (this.stats.mana.current === undefined || this.stats.mana.current === null) {
+      this.stats.mana.current = this.maxMP;
+    }
+  }
+  next();
 });
 
 // ============================================================================
