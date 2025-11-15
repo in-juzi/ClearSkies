@@ -4,7 +4,8 @@
 
 **Active Features**:
 - ✅ Gathering system (completed - 14 herbs, 4 gathering locations, renamed from Herbalism)
-- ✅ Alchemy skill system (completed - 6 potion recipes with progressive unlocks)
+- ✅ Alchemy skill system (completed - 10 potion recipes with progressive unlocks)
+- ✅ Trait-based potion effects (completed - herbs transfer combat buff/HoT traits to crafted potions)
 - ✅ Subcategory-based crafting (completed - recipes can use "any herb" instead of specific items)
 - ✅ Recipe unlock system (completed - progressive discovery via crafting achievements)
 - ✅ Combat skills framework (completed - 6 combat skills added)
@@ -42,17 +43,16 @@
 - ✅ TypeScript path aliases (completed - tsconfig-paths for clean @shared/* imports)
 
 **Recent Changes** (Last 10 commits):
-- docs: add combat service refactoring documentation
-- feat: add tsconfig-paths for runtime module resolution
-- refactor: replace magic numbers with combat constants
-- feat: add combat constants and type-safe enums
-- refactor: move item constants to shared location
-- chore: remove compiled TypeScript files from shared types
-- refactor: enhance combat log processing to prevent duplicate floating numbers
-- refactor: update ability materials and combat log handling for buffs and debuffs
-- refactor: remove dead code from combat system
-- docs: update CLAUDE.md with buff/debuff system documentation
-- feat: add automated deployment and CloudFront invalidation scripts
+- chore: add development notes and helper scripts
+- docs: add herb-trait mapping and quality-trait design discussion
+- feat: integrate trait-based buffs and HoTs into combat item consumption
+- feat: add potion buff and HoT application methods to combat service
+- feat: add consumable effect extraction for trait-based buffs and HoTs
+- feat: add four buff potion alchemy recipes
+- feat: add four buff potion consumables
+- feat: assign alchemy effect traits to herbs
+- feat: add four alchemy-specific traits with buff and HoT effects
+- feat: add alchemy trait types and constants for buff/HoT effects
 
 **Known Issues**:
 - None currently identified
@@ -60,7 +60,7 @@
 **Next Priorities**:
 - Equipment stat application (apply armor/damage/evasion bonuses to combat calculations)
 - Steel tier equipment (requires steel ingots from iron + coal)
-- More alchemy recipes (buff potions, debuff potions, transmutation)
+- More alchemy recipes (debuff potions, stat potions, transmutation)
 - Combat system enhancements (more monsters, abilities, boss fights)
 - Vendor enhancements (restocking, skill-based pricing, buy orders)
 - Player housing system
@@ -232,11 +232,13 @@ export const NewItem: ResourceItem = {
 ```
 **Then register in**: `be/data/items/ItemRegistry.ts`
 
-**Item Constants**: See [be/data/constants/item-constants.ts](be/data/constants/item-constants.ts) and [README](be/data/constants/README.md) for all available constants:
+**Item Constants**: See [shared/constants/item-constants.ts](shared/constants/item-constants.ts) and [README](be/data/constants/README.md) for all available constants:
 - **CATEGORY**: CONSUMABLE, EQUIPMENT, RESOURCE
 - **SUBCATEGORY**: 60+ values (HERB, FLOWER, FISH, ORE, INGOT, GEMSTONE, WOOD, WEAPON, ARMOR, TOOL, etc.)
 - **SUBCATEGORY_SETS**: Predefined arrays (ALL_HERBS, ALL_FLOWERS, ALL_GEMSTONES, etc.)
-- **RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL, SLOT, WEAPON_SUBTYPE**
+- **RARITY, TIER, QUALITY_SETS, TRAIT_SETS, TRAIT_IDS, MATERIAL, SLOT, WEAPON_SUBTYPE**
+- **TRAIT_SETS** includes: EQUIPMENT_PRISTINE, POTION, HERB_RESTORATIVE, HERB_EMPOWERING, HERB_INVIGORATING, HERB_WARDING
+- **TRAIT_IDS** includes: PRISTINE, RESTORATIVE, EMPOWERING, INVIGORATING, WARDING, BLESSED, CURSED, MASTERWORK
 
 ### Adding New Activity
 **File**: `be/data/locations/activities/{ActivityId}.ts`
@@ -629,9 +631,11 @@ Backend requires `.env` file with:
 Three-tier architecture: Item Definitions → Quality/Trait Definitions → Item Instances
 
 **Quick Facts:**
-- 68+ items (resources, equipment, consumables) in TypeScript registries
+- 75+ items (resources, equipment, consumables) in TypeScript registries
 - 5-level quality system (1-5 integer levels) with escalating bonuses
-- 3-level trait system (Map<traitId, level>) for special modifiers
+- 3-level trait system (Map<traitId, level>) for special modifiers and alchemy effects
+- 10 trait types (4 alchemy-specific: restorative, empowering, invigorating, warding)
+- Herbs transfer effect traits to crafted potions (buff/HoT effects in combat)
 - Probabilistic generation: 35% plain, 45% one quality, 15% two qualities
 - Items stack if same itemId + quality levels + trait levels
 - Multi-channel SVG icon colorization (40+ materials)
@@ -799,7 +803,8 @@ Buy tools and sell resources at gathering locations
 Create items from ingredients with quality inheritance and Socket.io real-time updates
 
 **Quick Facts:**
-- Skills: Cooking (4 recipes), Smithing (16 recipes), Alchemy (6 recipes)
+- Skills: Cooking (4 recipes), Smithing (16 recipes), Alchemy (10 recipes)
+- Trait inheritance: herbs transfer special effect traits (restorative, empowering, invigorating, warding) to potions
 - Instance selection (choose specific items by quality/traits)
 - Quality inheritance: max ingredient quality + skill bonus (every 10 levels = +1, max +2)
 - Subcategory ingredients ("any herb" instead of specific itemIds)
@@ -809,7 +814,16 @@ Create items from ingredients with quality inheritance and Socket.io real-time u
 **Key Files:** [recipeService.ts](be/services/recipeService.ts), [RecipeRegistry.ts](be/data/recipes/RecipeRegistry.ts), [craftingHandler.ts](be/sockets/craftingHandler.ts)
 **Socket Events:** `crafting:start`, `crafting:started`, `crafting:completed`, `crafting:cancelled`
 
-**Full Documentation:** [project/docs/alchemy-subcategory-implementation.md](project/docs/alchemy-subcategory-implementation.md)
+**Alchemy Trait System:**
+Herbs carry special effect traits that transfer to crafted potions:
+- **Restorative** (Chamomile): +5/10/15 HP per tick HoT effect (3 levels)
+- **Empowering** (Dragon's Breath, Mandrake Root, Moonpetal): +20%/30%/40% damage buff for 30s
+- **Invigorating** (Nettle): +15%/25%/35% attack speed buff for 45s
+- **Warding** (Sage): +50/100/150 flat armor buff for 60s
+
+When crafting, potions inherit traits from herb ingredients. Higher trait levels (determined by herb quality during gathering) result in stronger effects when consumed in combat.
+
+**Full Documentation:** [project/docs/alchemy-subcategory-implementation.md](project/docs/alchemy-subcategory-implementation.md), [project/docs/herb-trait-mapping.md](project/docs/herb-trait-mapping.md)
 
 ## Combat System
 
@@ -818,7 +832,8 @@ Turn-based combat with abilities, buffs/debuffs, and real-time Socket.io events
 **Quick Facts:**
 - 5 monsters, 10 abilities (6 damage + 4 buff/debuff)
 - Turn-based with weapon speed intervals
-- Timestamp-based cooldowns, consumable items, combat restart
+- Timestamp-based cooldowns, consumable items with trait-based effects, combat restart
+- Potions apply buffs/HoTs based on inherited traits (damage, attack speed, armor, healing over time)
 - Damage formula: base + skill + equipment + buffs (with crit/dodge)
 - Loot drops via drop tables
 
