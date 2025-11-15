@@ -115,3 +115,52 @@ export function formatSkillName(skillName: SkillName): string {
 export function formatAttributeName(attributeName: AttributeName): string {
   return ATTRIBUTE_DISPLAY_NAMES[attributeName];
 }
+
+/**
+ * Equipment subtype display names (human-readable)
+ */
+export const EQUIPMENT_SUBTYPE_DISPLAY_NAMES: Record<string, string> = {
+  // Tool subtypes
+  'woodcutting-axe': 'Woodcutting Axe',
+  'mining-pickaxe': 'Mining Pickaxe',
+  'fishing-rod': 'Fishing Rod',
+  'gathering-sickle': 'Gathering Sickle',
+
+  // Weapon subtypes
+  'sword': 'Sword',
+  'axe': 'Axe',
+  'mace': 'Mace',
+  'dagger': 'Dagger',
+  'staff': 'Staff',
+  'bow': 'Bow',
+  'crossbow': 'Crossbow',
+  'gun': 'Gun',
+  'shield': 'Shield',
+
+  // Armor subtypes
+  'helm': 'Helm',
+  'coif': 'Coif',
+  'tunic': 'Tunic',
+  'plate': 'Plate',
+  'gloves': 'Gloves',
+  'boots': 'Boots',
+  'belt': 'Belt'
+};
+
+/**
+ * Helper function to format equipment subtype names for display
+ * Includes fallback formatter for unmapped subtypes
+ */
+export function formatEquipmentSubtype(subtype: string): string {
+  // Check if we have a mapped display name
+  if (EQUIPMENT_SUBTYPE_DISPLAY_NAMES[subtype]) {
+    return EQUIPMENT_SUBTYPE_DISPLAY_NAMES[subtype];
+  }
+
+  // Fallback: converts kebab-case to Title Case
+  // Example: 'woodcutting-axe' -> 'Woodcutting Axe'
+  return subtype
+    .split('-')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
