@@ -201,7 +201,8 @@ class ItemService {
     itemId: string,
     quantity: number = 1,
     qualities: QualityMap = {},
-    traits: TraitMap = {}
+    traits: TraitMap = {},
+    context: 'random' | 'crafted' | 'admin' = 'random'
   ): ItemInstance {
     const itemDef = this.getItemDefinition(itemId);
     if (!itemDef) {
@@ -224,10 +225,33 @@ class ItemService {
       }
     }
 
-    // Validate traits (now level-based)
+    // Validate traits based on context
+    if (context === 'random') {
+      // Strict validation: only allow traits in allowedTraits (for drops/gathering)
+      this._validateTraitsAgainstAllowed(itemDef, traits);
+    } else if (context === 'crafted') {
+      // Permissive validation: allow any trait applicable to item category (for crafting)
+      this._validateTraitsAgainstCategory(itemDef, traits);
+    }
+    // 'admin' context skips all trait validation
+
+    return {
+      instanceId: uuidv4(),
+      itemId,
+      quantity,
+      qualities,
+      traits,
+      equipped: false
+    };
+  }
+
+  /**
+   * Validate traits against item's allowedTraits (strict validation for random generation)
+   */
+  private _validateTraitsAgainstAllowed(itemDef: Item, traits: TraitMap): void {
     for (const [traitId, level] of Object.entries(traits)) {
       if (!itemDef.allowedTraits.includes(traitId)) {
-        throw new Error(`Trait ${traitId} not allowed for item ${itemId}`);
+        throw new Error(`Trait ${traitId} not allowed for item ${itemDef.itemId} (allowedTraits: ${itemDef.allowedTraits.join(', ')})`);
       }
       const traitDef = this.getTraitDefinition(traitId);
       if (!traitDef) {
@@ -239,15 +263,32 @@ class ItemService {
         throw new Error(`Trait ${traitId} level ${level} out of range [1, ${maxLevel}]`);
       }
     }
+  }
 
-    return {
-      instanceId: uuidv4(),
-      itemId,
-      quantity,
-      qualities,
-      traits,
-      equipped: false
-    };
+  /**
+   * Validate traits against trait's applicableCategories (permissive validation for crafting)
+   */
+  private _validateTraitsAgainstCategory(itemDef: Item, traits: TraitMap): void {
+    for (const [traitId, level] of Object.entries(traits)) {
+      const traitDef = this.getTraitDefinition(traitId);
+      if (!traitDef) {
+        throw new Error(`Unknown trait: ${traitId}`);
+      }
+
+      // Check if trait is applicable to this item category
+      if (!traitDef.applicableCategories?.includes(itemDef.category)) {
+        throw new Error(
+          `Trait ${traitId} not applicable to category ${itemDef.category} ` +
+          `(allowed categories: ${traitDef.applicableCategories?.join(', ') || 'none'})`
+        );
+      }
+
+      // Validate level is integer and in range
+      const maxLevel = traitDef.maxLevel;
+      if (!Number.isInteger(level) || level < 1 || level > maxLevel) {
+        throw new Error(`Trait ${traitId} level ${level} out of range [1, ${maxLevel}]`);
+      }
+    }
   }
 
   /**
@@ -315,15 +356,22 @@ class ItemService {
       }
     }
 
-    // Get trait details (level-based)
+    // Get trait details (level-based with context-aware display)
     const traitDetails: Record<string, any> = {};
     if (itemInstance.traits) {
       for (const [traitId, level] of Object.entries(itemInstance.traits)) {
         const traitDef = this.getTraitDefinition(traitId);
         if (traitDef && traitDef.levels?.[level.toString()]) {
+          // Use category-specific names/descriptions if available
+          const displayName = traitDef.nameByCategory?.[itemDef.category] || traitDef.name;
+          const displayShorthand = traitDef.shorthandByCategory?.[itemDef.category] || traitDef.shorthand;
+          const displayDescription = traitDef.descriptionByCategory?.[itemDef.category] || traitDef.description;
+
           traitDetails[traitId] = {
             traitId,
-            name: traitDef.name,
+            name: displayName,
+            shorthand: displayShorthand,
+            description: displayDescription,
             rarity: traitDef.rarity,
             level,
             maxLevel: traitDef.maxLevel,
@@ -627,6 +675,30 @@ class ItemService {
       buffs: [],
       hots: []
     };
+
+    // Process qualities for potency multiplier
+    let potencyMultiplier = 1.0;
+    if (itemInstance.qualities) {
+      const qualityMap = itemInstance.qualities instanceof Map
+        ? itemInstance.qualities
+        : new Map(Object.entries(itemInstance.qualities));
+
+      for (const [qualityId, level] of qualityMap.entries()) {
+        const qualityDef = this.qualityDefinitions.get(qualityId);
+        if (!qualityDef || !qualityDef.levels[level]) continue;
+
+        const qualityLevel = qualityDef.levels[level];
+        const alchemyEffects = qualityLevel.effects.alchemy;
+
+        if (alchemyEffects?.potencyMultiplier) {
+          potencyMultiplier *= alchemyEffects.potencyMultiplier;
+        }
+      }
+    }
+
+    // Apply potency multiplier to base effects
+    effects.healthRestore = Math.floor(effects.healthRestore * potencyMultiplier);
+    effects.manaRestore = Math.floor(effects.manaRestore * potencyMultiplier);
 
     // Process traits for buff/HoT effects
     if (itemInstance.traits) {
