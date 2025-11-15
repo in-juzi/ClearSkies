@@ -21,8 +21,8 @@ export const Sage: ResourceItem = {
     "tier": TIER.T1,
     "skillSource": SKILL_SOURCE.GATHERING
   },
-  "allowedQualities": QUALITY_SETS.NONE,
-  "allowedTraits": TRAIT_SETS.HERB_PRISTINE,
+  "allowedQualities": QUALITY_SETS.HERB,
+  "allowedTraits": TRAIT_SETS.HERB_WARDING,
   "icon": {
     "path": "item-categories/item_cat_mushroom.svg",
     "material": "herb"

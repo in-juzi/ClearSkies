@@ -4,7 +4,7 @@
  */
 
 import { ResourceItem } from '../../../../types/items';
-import { CATEGORY, RARITY, TIER, QUALITY_SETS, MATERIAL, SKILL_SOURCE } from '../../../constants/item-constants';
+import { CATEGORY, RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL, SKILL_SOURCE } from '../../../constants/item-constants';
 
 export const DragonsBreath: ResourceItem = {
   "itemId": "dragons_breath",
@@ -27,12 +27,8 @@ export const DragonsBreath: ResourceItem = {
     "tier": TIER.T3,
     "skillSource": SKILL_SOURCE.GATHERING
   },
-  "allowedQualities": QUALITY_SETS.NONE,
-  "allowedTraits": [
-    "pristine",
-    "cursed",
-    "masterwork"
-  ],
+  "allowedQualities": QUALITY_SETS.HERB,
+  "allowedTraits": TRAIT_SETS.HERB_PRISTINE,
   "icon": {
     "path": "item-categories/item_cat_mushroom.svg",
     "material": "herb"

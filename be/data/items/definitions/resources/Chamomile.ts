@@ -26,11 +26,8 @@ export const Chamomile: ResourceItem = {
     "tier": TIER.T1,
     "skillSource": SKILL_SOURCE.GATHERING
   },
-  "allowedQualities": QUALITY_SETS.NONE,
-  "allowedTraits": [
-    "fragrant",
-    "pristine"
-  ],
+  "allowedQualities": QUALITY_SETS.HERB,
+  "allowedTraits": TRAIT_SETS.HERB_RESTORATIVE,
   "icon": {
     "path": "items/vine-flower.svg",
     "material": "chamomile"

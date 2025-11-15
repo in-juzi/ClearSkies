@@ -4,7 +4,7 @@
  */
 
 import { ResourceItem } from '../../../../types/items';
-import { CATEGORY, RARITY, TIER, QUALITY_SETS, MATERIAL, SKILL_SOURCE } from '../../../constants/item-constants';
+import { CATEGORY, RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL, SKILL_SOURCE } from '../../../constants/item-constants';
 
 export const MandrakeRoot: ResourceItem = {
   "itemId": "mandrake_root",
@@ -26,12 +26,8 @@ export const MandrakeRoot: ResourceItem = {
     "tier": TIER.T2,
     "skillSource": SKILL_SOURCE.GATHERING
   },
-  "allowedQualities": QUALITY_SETS.NONE,
-  "allowedTraits": [
-    "pristine",
-    "blessed",
-    "cursed"
-  ],
+  "allowedQualities": QUALITY_SETS.HERB,
+  "allowedTraits": TRAIT_SETS.HERB_EMPOWERING,
   "icon": {
     "path": "item-categories/item_cat_mushroom.svg",
     "material": "herb"

@@ -9,7 +9,7 @@ export const AgeQuality: Quality = {
   "qualityId": "age",
   "name": "Age",
   "shorthand": "AG",
-  "description": "How aged the wood is - older wood has enhanced properties",
+  "description": "How aged or fermented the item is - affects potency and value",
   "applicableCategories": [
     "resource"
   ],
