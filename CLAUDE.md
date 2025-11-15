@@ -44,18 +44,22 @@
 - ✅ Game loading screen (completed - immersive loading with animations and data preloading)
 - ✅ Global loading overlay (completed - app-wide loading during auth initialization)
 - ✅ Skill progression calculator (completed - development utility for game balance analysis)
+- ✅ Potion naming standardization (completed - medieval alchemy naming: tincture/draught/elixir)
+- ✅ Quality/trait system redesign (completed - removed confusing modifiers, added category-specific traits)
+- ✅ Inventory right-click actions (completed - quick equip/unequip and item usage)
+- ✅ Documentation reorganization (completed - numbered naming convention for 39 docs)
 
 **Recent Changes** (Last 10 commits):
+- chore: remove duplicate and obsolete files
+- chore: add project-doc command and update Claude settings
+- docs: reorganize documentation with numbered naming convention
+- feat: add inventory UI enhancements for better usability
+- fix: update item definitions to use redesigned quality/trait sets
+- refactor: redesign quality and trait system for better gameplay clarity
+- refactor: standardize potion naming to medieval alchemy conventions
 - chore: add skill progression calculator and player debug utilities
 - fix: normalize player stats structure in getMe endpoint
 - feat: add global loading overlay for auth initialization
-- feat: add game loading screen with animations and data preloading
-- docs: update CLAUDE.md with trait-based potion effects system
-- chore: add development notes and helper scripts
-- docs: add herb-trait mapping and quality-trait design discussion
-- feat: integrate trait-based buffs and HoTs into combat item consumption
-- feat: add potion buff and HoT application methods to combat service
-- feat: add consumable effect extraction for trait-based buffs and HoTs
 
 **Known Issues**:
 - None currently identified
@@ -96,7 +100,7 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 
 > **IMPORTANT**: **NEVER start backend/frontend servers** - they are always running during development. Only rebuild with `npm run build` if code changes require it. If you need to restart servers, ask the user first.
 
-> **Content Creation Reference**: When creating new game content (monsters, locations, activities, drop tables), refer to [project/docs/content-creation-pitfalls.md](project/docs/content-creation-pitfalls.md) for common pitfalls and solutions.
+> **Content Creation Reference**: When creating new game content (monsters, locations, activities, drop tables), refer to [project/docs/019-content-creation-pitfalls.md](project/docs/019-content-creation-pitfalls.md) for common pitfalls and solutions.
 
 ## Quick File Reference
 
@@ -383,7 +387,7 @@ const instanceIds = selectedIngredients.get
 
 **Content Validator** (`.claude/agents/content-validator.md`): Run "validate all game content" to check references, detect broken links, find unused content.
 
-See [project/docs/content-generator-agent.md](project/docs/content-generator-agent.md) for full documentation.
+See [project/docs/005-content-generator-agent.md](project/docs/005-content-generator-agent.md) for full documentation.
 
 ## Optimization Guidelines for AI
 
@@ -500,7 +504,7 @@ See [project/docs/content-generator-agent.md](project/docs/content-generator-age
 **Social**: Real-time chat (Socket.io), Vendor trading, Gold system
 **Architecture**: Full Socket.io migration (activities, crafting, combat) - eliminated HTTP polling, server-authoritative timing, client-driven auto-restart
 
-See [project/docs/completed-features.md](project/docs/completed-features.md) for full list.
+See [project/docs/012-completed-features.md](project/docs/012-completed-features.md) for full list.
 
 ### Database Models
 
@@ -613,7 +617,7 @@ Schema changes require migrations to update existing records
 
 **Location:** `be/migrations/NNN-description.js` (11 existing migrations)
 
-**Full Documentation:** [project/docs/database-migrations.md](project/docs/database-migrations.md)
+**Full Documentation:** [project/docs/034-database-migrations.md](project/docs/034-database-migrations.md)
 
 ## Custom Commands
 
@@ -639,11 +643,14 @@ Three-tier architecture: Item Definitions → Quality/Trait Definitions → Item
 - 75+ items (resources, equipment, consumables) in TypeScript registries
 - 5-level quality system (1-5 integer levels) with escalating bonuses
 - 3-level trait system (Map<traitId, level>) for special modifiers and alchemy effects
-- 10 trait types (4 alchemy-specific: restorative, empowering, invigorating, warding)
+- 13 trait types (4 alchemy-specific: restorative, empowering, invigorating, warding)
+- Category-specific traits: Hardened (weapons), Reinforced (armor), Balanced (tools/wood)
+- Intuitive quality names: Grain (wood), Potency (herbs), Purity (ores), Sheen (gems)
 - Herbs transfer effect traits to crafted potions (buff/HoT effects in combat)
 - Probabilistic generation: 35% plain, 45% one quality, 15% two qualities
 - Items stack if same itemId + quality levels + trait levels
 - Multi-channel SVG icon colorization (40+ materials)
+- Right-click inventory items for quick actions (equip/unequip/use)
 
 **Key Files:**
 - Item Registry: [ItemRegistry.ts](be/data/items/ItemRegistry.ts)
@@ -651,7 +658,7 @@ Three-tier architecture: Item Definitions → Quality/Trait Definitions → Item
 - Trait Registry: [TraitRegistry.ts](be/data/items/traits/TraitRegistry.ts)
 - Item Service: [itemService.ts](be/services/itemService.ts)
 
-**Full Documentation:** [project/docs/inventory-system.md](project/docs/inventory-system.md), [project/docs/level-based-quality-trait-system.md](project/docs/level-based-quality-trait-system.md)
+**Full Documentation:** [project/docs/015-inventory-system.md](project/docs/015-inventory-system.md), [project/docs/011-level-based-quality-trait-system.md](project/docs/011-level-based-quality-trait-system.md)
 
 ## Location System
 
@@ -673,7 +680,7 @@ Four-tier hierarchy: Locations → Facilities → Activities → Drop Tables
 
 **Socket Events:** `activity:start`, `activity:started`, `activity:completed`, `activity:cancelled`, `activity:getStatus`
 
-**Full Documentation:** [project/docs/location-system.md](project/docs/location-system.md), [project/docs/drop-table-system.md](project/docs/drop-table-system.md)
+**Full Documentation:** [project/docs/031-location-system.md](project/docs/031-location-system.md), [project/docs/002-drop-table-system.md](project/docs/002-drop-table-system.md)
 
 ## Equipment System
 
@@ -688,7 +695,7 @@ Four-tier hierarchy: Locations → Facilities → Activities → Drop Tables
 **Key Methods** (Player model):
 - `equipItem(instanceId, slotName)`, `unequipItem(slotName)`, `getEquippedItems()`
 
-**Full Documentation:** [project/docs/equipment-system.md](project/docs/equipment-system.md)
+**Full Documentation:** [project/docs/001-equipment-system.md](project/docs/001-equipment-system.md)
 
 ## XP System
 
@@ -703,7 +710,7 @@ Skills → Attributes with 50% XP passthrough and progressive scaling
 **Scaling Example** (L5 activity, 45 base XP):
 - L5-6: 45 XP (100%) | L7: 34 XP (75%) | L10: 20 XP (44%) | L15: 12 XP (26%)
 
-**Full Documentation:** [project/docs/xp-system.md](project/docs/xp-system.md)
+**Full Documentation:** [project/docs/032-xp-system.md](project/docs/032-xp-system.md)
 
 ## Content Generator Agent
 
@@ -715,7 +722,7 @@ AI-powered autonomous agent for creating game content (locations, facilities, ac
 
 **What It Does:** Reads existing data, validates references, creates TypeScript modules, balances rewards
 
-**Full Documentation:** [project/docs/content-generator-agent.md](project/docs/content-generator-agent.md)
+**Full Documentation:** [project/docs/005-content-generator-agent.md](project/docs/005-content-generator-agent.md)
 
 ## Fast Paths (Zero Exploration Needed)
 
@@ -790,7 +797,7 @@ Bidirectional real-time communication replacing HTTP polling for activities, cra
 
 **Systems:** Activities, Crafting, Combat, Chat (all use Socket.io)
 
-**Full Documentation:** [project/docs/socketio-architecture.md](project/docs/socketio-architecture.md)
+**Full Documentation:** [project/docs/033-socketio-architecture.md](project/docs/033-socketio-architecture.md)
 
 ## Vendor/NPC Trading System
 
@@ -809,6 +816,7 @@ Create items from ingredients with quality inheritance and Socket.io real-time u
 
 **Quick Facts:**
 - Skills: Cooking (4 recipes), Smithing (16 recipes), Alchemy (10 recipes)
+- Potion naming: Medieval alchemy categories (Tincture/Draught/Elixir instead of Weak/Minor/Strong)
 - Trait inheritance: herbs transfer special effect traits (restorative, empowering, invigorating, warding) to potions
 - Instance selection (choose specific items by quality/traits)
 - Quality inheritance: max ingredient quality + skill bonus (every 10 levels = +1, max +2)
@@ -828,7 +836,7 @@ Herbs carry special effect traits that transfer to crafted potions:
 
 When crafting, potions inherit traits from herb ingredients. Higher trait levels (determined by herb quality during gathering) result in stronger effects when consumed in combat.
 
-**Full Documentation:** [project/docs/alchemy-subcategory-implementation.md](project/docs/alchemy-subcategory-implementation.md), [project/docs/herb-trait-mapping.md](project/docs/herb-trait-mapping.md)
+**Full Documentation:** [project/docs/020-alchemy-subcategory-implementation.md](project/docs/020-alchemy-subcategory-implementation.md), [project/docs/037-herb-trait-mapping.md](project/docs/037-herb-trait-mapping.md)
 
 ## Combat System
 
@@ -845,8 +853,7 @@ Turn-based combat with abilities, buffs/debuffs, and real-time Socket.io events
 **Key Files:** [combatService.ts](be/services/combatService.ts), [combatHandler.ts](be/sockets/combatHandler.ts), [MonsterRegistry.ts](be/data/monsters/MonsterRegistry.ts), [AbilityRegistry.ts](be/data/abilities/AbilityRegistry.ts)
 **Socket Events:** `combat:attack`, `combat:useAbility`, `combat:victory`, `combat:defeat`
 
-**Full Documentation:** [project/docs/combat-system.md](project/docs/combat-system.md)
-- Full documentation: [project/docs/combat-system.md](project/docs/combat-system.md)
+**Full Documentation:** [project/docs/017-combat-system.md](project/docs/017-combat-system.md)
 
 ## Next Steps / Ideas
 
@@ -1218,12 +1225,12 @@ NODE_ENV=production
   - `clearskies.juzi.dev` (CNAME) → S3 website endpoint (proxied, SSL enabled)
   - `api.juzi.dev` (A) → 3.226.72.134 (proxied, SSL enabled)
 - **Features**: Free SSL/TLS certificates, DDoS protection, CDN caching, analytics
-- **Detailed Setup**: See [project/docs/cloudflare-custom-domain-setup.md](project/docs/cloudflare-custom-domain-setup.md)
+- **Detailed Setup**: See [project/docs/024-cloudflare-custom-domain-setup.md](project/docs/024-cloudflare-custom-domain-setup.md)
 
 ### Deployment Guides
-- **Architecture Diagram**: [project/docs/architecture-diagram.md](project/docs/architecture-diagram.md) - Visual infrastructure overview
-- **AWS Setup**: [project/docs/aws-deployment-guide.md](project/docs/aws-deployment-guide.md) - Complete EC2 and S3 deployment
-- **Cloudflare Setup**: [project/docs/cloudflare-custom-domain-setup.md](project/docs/cloudflare-custom-domain-setup.md) - Custom domain with SSL/TLS
+- **Architecture Diagram**: [project/docs/025-architecture-diagram.md](project/docs/025-architecture-diagram.md) - Visual infrastructure overview
+- **AWS Setup**: [project/docs/026-aws-deployment-guide.md](project/docs/026-aws-deployment-guide.md) - Complete EC2 and S3 deployment
+- **Cloudflare Setup**: [project/docs/024-cloudflare-custom-domain-setup.md](project/docs/024-cloudflare-custom-domain-setup.md) - Custom domain with SSL/TLS
 - **Quick Deploy**: `cd ui && npm run deploy` - Automated build and S3 upload with cache invalidation
 
 ### Future Enhancements
