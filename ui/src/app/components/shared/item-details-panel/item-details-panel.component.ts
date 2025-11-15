@@ -145,12 +145,14 @@ export class ItemDetailsPanelComponent implements OnChanges {
   formatEffectType(effectKey: string): string {
     const typeMap: { [key: string]: string } = {
       'vendorPrice': 'Vendor Price',
-      'alchemy': 'Alchemy',
+      'alchemy': 'Alchemy Effect',
       'smithing': 'Smithing',
       'cooking': 'Cooking',
       'burning': 'Burning',
-      'combat': 'Combat',
-      'consumption': 'Consumption'
+      'combat': 'Combat Effect',
+      'consumption': 'Consumption',
+      'activity': 'Activity Effect',
+      'activityTime': 'Activity Time'
     };
     return typeMap[effectKey] || effectKey;
   }
@@ -189,9 +191,15 @@ export class ItemDetailsPanelComponent implements OnChanges {
       effects.push(`Healing ${percentNum >= 0 ? '+' : ''}${percent}%`);
     }
 
+    if (effectData.yieldMultiplier !== undefined) {
+      const percentNum = (effectData.yieldMultiplier - 1) * 100;
+      const percent = percentNum.toFixed(0);
+      effects.push(`Yield ${percentNum >= 0 ? '+' : ''}${percent}%`);
+    }
+
     if (effectData.damageBonus !== undefined) {
-      const percent = (effectData.damageBonus * 100).toFixed(0);
-      effects.push(`Damage +${percent}%`);
+      // damageBonus is a flat value, not a percentage
+      effects.push(`+${effectData.damageBonus} Damage`);
     }
 
     if (effectData.healthDrain !== undefined) {
@@ -206,7 +214,58 @@ export class ItemDetailsPanelComponent implements OnChanges {
       effects.push(`Grants: ${effectData.bonusProperties.join(', ')}`);
     }
 
+    // Activity Time Reduction (percentage) - e.g., Grain quality
+    if (effectData.reductionPercent !== undefined) {
+      const percent = (effectData.reductionPercent * 100).toFixed(0);
+      effects.push(`-${percent}% Activity Time`);
+    }
+
+    // Activity Time Reduction (flat seconds) - e.g., Balanced trait
+    if (effectData.timeReduction !== undefined) {
+      effects.push(`-${effectData.timeReduction}s Activity Time`);
+    }
+
+    // Hot Effect (Healing over Time) - e.g., Restorative trait
+    if (effectData.hotEffect !== undefined) {
+      const hot = effectData.hotEffect;
+      const totalHealing = hot.healPerTick * hot.ticks;
+      const totalDuration = (hot.ticks * hot.tickInterval).toFixed(0);
+      effects.push(`${hot.healPerTick} HP per tick × ${hot.ticks} ticks (${totalHealing} HP over ${totalDuration}s)`);
+    }
+
+    // Buff Effect (Stat Buffs) - e.g., Empowering, Invigorating, Warding traits
+    if (effectData.buffEffect !== undefined) {
+      const buff = effectData.buffEffect;
+      const statName = this.formatStatName(buff.stat);
+      let valueStr: string;
+
+      if (buff.isPercentage) {
+        const percent = (buff.value * 100).toFixed(0);
+        valueStr = `+${percent}%`;
+      } else {
+        valueStr = `+${buff.value}`;
+      }
+
+      effects.push(`${valueStr} ${statName} for ${buff.duration}s`);
+    }
+
     return effects.join(', ');
+  }
+
+  /**
+   * Format stat name for display
+   */
+  formatStatName(stat: string): string {
+    const statMap: { [key: string]: string } = {
+      'damage': 'Damage',
+      'attackSpeed': 'Attack Speed',
+      'armor': 'Armor',
+      'evasion': 'Evasion',
+      'critChance': 'Crit Chance',
+      'healthRegen': 'Health Regen',
+      'manaRegen': 'Mana Regen'
+    };
+    return statMap[stat] || stat;
   }
 
   /**
