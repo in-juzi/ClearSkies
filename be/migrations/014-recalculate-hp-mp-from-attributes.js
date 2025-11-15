@@ -55,17 +55,40 @@ async function up() {
     const currentHP = player.stats?.health?.current || 100;
     const currentMP = player.stats?.mana?.current || 100;
 
-    // Calculate HP/MP percentage to preserve relative health state
-    const hpPercentage = currentHP / 100; // Assumes old max was 100
-    const mpPercentage = currentMP / 100;
+    // Check if this player has already been migrated
+    // If current HP/MP are already close to the calculated max, skip
+    if (currentHP === newMaxHP && currentMP === newMaxMP) {
+      console.log(`Player ${player._id}: Already migrated, skipping`);
+      skipped++;
+      continue;
+    }
 
-    // Set new current values (preserving percentage of health)
-    const updatedHP = Math.round(newMaxHP * hpPercentage);
-    const updatedMP = Math.round(newMaxMP * mpPercentage);
+    // For idempotency: Only calculate percentage if values look like old defaults
+    // If current HP is close to 100 or very different from new max, use percentage
+    // Otherwise, just set to full health (safest option for re-runs)
+    let updatedHP, updatedMP;
+
+    if (currentHP >= 80 && currentHP <= 100) {
+      // Looks like old system, preserve percentage
+      const hpPercentage = currentHP / 100;
+      updatedHP = Math.round(newMaxHP * hpPercentage);
+    } else {
+      // Already partially migrated or unusual value, set to full
+      updatedHP = newMaxHP;
+    }
+
+    if (currentMP >= 80 && currentMP <= 100) {
+      // Looks like old system, preserve percentage
+      const mpPercentage = currentMP / 100;
+      updatedMP = Math.round(newMaxMP * mpPercentage);
+    } else {
+      // Already partially migrated or unusual value, set to full
+      updatedMP = newMaxMP;
+    }
 
     console.log(`Player ${player._id}:`);
     console.log(`  Attributes: STR=${strength}, END=${endurance}, WILL=${will}, WIS=${wisdom}`);
-    console.log(`  Old HP/MP: ${currentHP}/100, ${currentMP}/100`);
+    console.log(`  Old HP/MP: ${currentHP}, ${currentMP}`);
     console.log(`  New HP/MP: ${updatedHP}/${newMaxHP}, ${updatedMP}/${newMaxMP}`);
 
     // Update the player document
@@ -83,6 +106,10 @@ async function up() {
   }
 
   console.log(`Migration complete: ${updated} players updated, ${skipped} skipped`);
+
+  return {
+    message: `Updated ${updated} players, skipped ${skipped}`
+  };
 }
 
 async function down() {
@@ -103,6 +130,10 @@ async function down() {
   );
 
   console.log(`Rollback complete: ${result.modifiedCount} players reset to 100 HP/MP`);
+
+  return {
+    message: `Reset ${result.modifiedCount} players to 100 HP/MP`
+  };
 }
 
 module.exports = {
