@@ -32,7 +32,6 @@ export const PhoenixVine: ResourceItem = {
   "allowedTraits": [
     "pristine",
     "blessed",
-    "cursed",
     "masterwork"
   ],
   "icon": {

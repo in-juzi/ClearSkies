@@ -40,6 +40,6 @@ export const BambooFishingRod: EquipmentItem = {
     "toolEfficiency": 1,
     "requiredLevel": 1
   },
-  "allowedQualities": QUALITY_SETS.WOOD_GRAIN,
-  "allowedTraits": TRAIT_SETS.GEMSTONE
+  "allowedQualities": QUALITY_SETS.WOOD,
+  "allowedTraits": TRAIT_SETS.TOOL_PRISTINE
 } as const;

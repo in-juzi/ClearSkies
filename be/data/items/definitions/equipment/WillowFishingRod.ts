@@ -40,6 +40,6 @@ export const WillowFishingRod: EquipmentItem = {
     "toolEfficiency": 1.5,
     "requiredLevel": 5
   },
-  "allowedQualities": QUALITY_SETS.WOOD_GRAIN,
-  "allowedTraits": TRAIT_SETS.EQUIPMENT_PRISTINE
+  "allowedQualities": QUALITY_SETS.WOOD,
+  "allowedTraits": TRAIT_SETS.TOOL_PRISTINE
 } as const;

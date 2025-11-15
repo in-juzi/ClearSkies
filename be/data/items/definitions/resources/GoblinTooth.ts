@@ -23,7 +23,7 @@ export const GoblinTooth: ResourceItem = {
     "skillSource": SKILL_SOURCE.COMBAT
   },
   "allowedQualities": QUALITY_SETS.SHEEN,
-  "allowedTraits": TRAIT_SETS.CURSED,
+  "allowedTraits": TRAIT_SETS.PRISTINE,
   "icon": {
     "path": "items/fangs.svg",
     "material": "bone"

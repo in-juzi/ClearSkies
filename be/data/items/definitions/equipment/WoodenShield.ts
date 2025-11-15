@@ -34,6 +34,6 @@ export const WoodenShield: EquipmentItem = {
     "blockChance": 0.15,
     "requiredLevel": 1
   },
-  "allowedQualities": QUALITY_SETS.WOOD_GRAIN,
-  "allowedTraits": TRAIT_SETS.WOOD_PRISTINE
+  "allowedQualities": QUALITY_SETS.WOOD,
+  "allowedTraits": TRAIT_SETS.ARMOR_PRISTINE
 } as const;

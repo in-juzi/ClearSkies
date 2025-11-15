@@ -21,16 +21,8 @@ export const OakLog: ResourceItem = {
     "tier": TIER.T1,
     "skillSource": SKILL_SOURCE.WOODCUTTING
   },
-  "allowedQualities": [
-    "woodGrain",
-    "moisture",
-    "age"
-  ],
-  "allowedTraits": [
-    "fragrant",
-    "weathered",
-    "pristine"
-  ],
+  "allowedQualities": QUALITY_SETS.WOOD,
+  "allowedTraits": TRAIT_SETS.WOOD_PRISTINE,
   "icon": {
     "path": "item-categories/item_cat_log.svg",
     "material": "oak_log"

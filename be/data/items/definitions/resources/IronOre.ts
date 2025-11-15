@@ -22,10 +22,7 @@ export const IronOre: ResourceItem = {
     "skillSource": SKILL_SOURCE.MINING
   },
   "allowedQualities": QUALITY_SETS.ORE,
-  "allowedTraits": [
-    "pristine",
-    "cursed"
-  ],
+  "allowedTraits": TRAIT_SETS.PRISTINE,
   "icon": {
     "path": "item-categories/item_cat_ore.svg",
     "material": "iron_ore"

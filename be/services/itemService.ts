@@ -303,13 +303,13 @@ class ItemService {
     if (itemInstance.qualities) {
       for (const [qualityId, level] of Object.entries(itemInstance.qualities)) {
         const qualityDef = this.getQualityDefinition(qualityId);
-        if (qualityDef && qualityDef.levels?.[level as number - 1]) {
+        if (qualityDef && qualityDef.levels?.[level.toString()]) {
           qualityDetails[qualityId] = {
             qualityId,
             name: qualityDef.name,
             level,
-            maxLevel: qualityDef.levels.length,
-            levelData: qualityDef.levels[level as number - 1]
+            maxLevel: qualityDef.maxLevel,
+            levelData: qualityDef.levels[level.toString()]
           };
         }
       }
@@ -320,14 +320,14 @@ class ItemService {
     if (itemInstance.traits) {
       for (const [traitId, level] of Object.entries(itemInstance.traits)) {
         const traitDef = this.getTraitDefinition(traitId);
-        if (traitDef && traitDef.levels?.[level as number - 1]) {
+        if (traitDef && traitDef.levels?.[level.toString()]) {
           traitDetails[traitId] = {
             traitId,
             name: traitDef.name,
             rarity: traitDef.rarity,
             level,
-            maxLevel: traitDef.levels.length,
-            levelData: traitDef.levels[level as number - 1]
+            maxLevel: traitDef.maxLevel,
+            levelData: traitDef.levels[level.toString()]
           };
         }
       }

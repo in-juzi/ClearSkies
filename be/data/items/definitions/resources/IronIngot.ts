@@ -23,7 +23,6 @@ export const IronIngot: ResourceItem = {
   },
   "allowedTraits": [
     "pristine",
-    "cursed",
     "masterwork"
   ],
   "icon": {
