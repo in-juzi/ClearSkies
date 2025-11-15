@@ -21,7 +21,7 @@ export const HealthPotionRecipe: Recipe = {
     { subcategory: SUBCATEGORY.HERB, quantity: 1 }      // Any additional herb for potency
   ],
   outputs: [
-    { itemId: 'health_potion', quantity: 1, qualityModifier: 'inherit' }
+    { itemId: 'health_draught', quantity: 1, qualityModifier: 'inherit' }
   ],
   experience: 35,
   unlockConditions: {

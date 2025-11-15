@@ -36,7 +36,7 @@ export const PotencyQuality: Quality = {
           "modifier": 1.16
         },
         "alchemy": {
-          "effectMultiplier": 1.20
+          "potencyMultiplier": 1.20
         }
       }
     },
@@ -48,7 +48,7 @@ export const PotencyQuality: Quality = {
           "modifier": 1.24
         },
         "alchemy": {
-          "effectMultiplier": 1.30
+          "potencyMultiplier": 1.30
         }
       }
     },
@@ -60,7 +60,7 @@ export const PotencyQuality: Quality = {
           "modifier": 1.32
         },
         "alchemy": {
-          "effectMultiplier": 1.40
+          "potencyMultiplier": 1.40
         }
       }
     },
@@ -72,7 +72,7 @@ export const PotencyQuality: Quality = {
           "modifier": 1.4
         },
         "alchemy": {
-          "effectMultiplier": 1.50
+          "potencyMultiplier": 1.50
         }
       }
     }

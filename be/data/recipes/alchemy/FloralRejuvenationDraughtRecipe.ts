@@ -21,8 +21,8 @@ export const FloralRejuvenationDraught: Recipe = {
     { subcategory: SUBCATEGORY.HERB, quantity: 1 }      // Base herb for stability
   ],
   outputs: [
-    { itemId: 'strong_health_potion', quantity: 1, qualityModifier: 'inherit' },
-    { itemId: 'weak_mana_potion', quantity: 1, qualityModifier: 'inherit' }  // Bonus output!
+    { itemId: 'health_elixir', quantity: 1, qualityModifier: 'inherit' },
+    { itemId: 'mana_tincture', quantity: 1, qualityModifier: 'inherit' }  // Bonus output!
   ],
   experience: 65,
   unlockConditions: {

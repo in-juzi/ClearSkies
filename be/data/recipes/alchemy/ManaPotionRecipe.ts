@@ -21,7 +21,7 @@ export const ManaPotionRecipe: Recipe = {
     { subcategory: SUBCATEGORY.HERB, quantity: 1 }      // Any additional herb for potency
   ],
   outputs: [
-    { itemId: 'mana_potion', quantity: 1, qualityModifier: 'inherit' }
+    { itemId: 'mana_draught', quantity: 1, qualityModifier: 'inherit' }
   ],
   experience: 35,
   unlockConditions: {

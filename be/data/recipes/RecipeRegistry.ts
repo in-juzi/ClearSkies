@@ -11,13 +11,13 @@ import { Recipe } from '../../types/crafting';
 import { HealthTinctureRecipe } from './alchemy/HealthTinctureRecipe';
 import { ManaTinctureRecipe } from './alchemy/ManaTinctureRecipe';
 import { HealthElixirRecipe } from './alchemy/HealthElixirRecipe';
-import { FuryBrewRecipe } from './alchemy/FuryBrewRecipe';
+import { DragonsFuryBrew } from './alchemy/FuryBrewRecipe';
 import { HealthPotionRecipe } from './alchemy/HealthPotionRecipe';
 import { ManaPotionRecipe } from './alchemy/ManaPotionRecipe';
-import { FloralRejuvenationDraughtRecipe } from './alchemy/FloralRejuvenationDraughtRecipe';
-import { PowerElixirRecipe } from './alchemy/PowerElixirRecipe';
-import { VigorDraughtRecipe } from './alchemy/VigorDraughtRecipe';
-import { WardingTonicRecipe } from './alchemy/WardingTonicRecipe';
+import { FloralRejuvenationDraught } from './alchemy/FloralRejuvenationDraughtRecipe';
+import { MandrakePowerElixir } from './alchemy/PowerElixirRecipe';
+import { NettleVigorDraught } from './alchemy/VigorDraughtRecipe';
+import { SageWardingTonic } from './alchemy/WardingTonicRecipe';
 
 // COOKING
 import { CookCod } from './cooking/CookCod';
@@ -52,13 +52,13 @@ export class RecipeRegistry {
     [HealthTinctureRecipe.recipeId, HealthTinctureRecipe],
     [ManaTinctureRecipe.recipeId, ManaTinctureRecipe],
     [HealthElixirRecipe.recipeId, HealthElixirRecipe],
-    [FuryBrewRecipe.recipeId, FuryBrewRecipe],
+    [DragonsFuryBrew.recipeId, DragonsFuryBrew],
     [HealthPotionRecipe.recipeId, HealthPotionRecipe],
     [ManaPotionRecipe.recipeId, ManaPotionRecipe],
-    [FloralRejuvenationDraughtRecipe.recipeId, FloralRejuvenationDraughtRecipe],
-    [PowerElixirRecipe.recipeId, PowerElixirRecipe],
-    [VigorDraughtRecipe.recipeId, VigorDraughtRecipe],
-    [WardingTonicRecipe.recipeId, WardingTonicRecipe],
+    [FloralRejuvenationDraught.recipeId, FloralRejuvenationDraught],
+    [MandrakePowerElixir.recipeId, MandrakePowerElixir],
+    [NettleVigorDraught.recipeId, NettleVigorDraught],
+    [SageWardingTonic.recipeId, SageWardingTonic],
     [CookCod.recipeId, CookCod],
     [CookSalmon.recipeId, CookSalmon],
     [CookShrimp.recipeId, CookShrimp],
