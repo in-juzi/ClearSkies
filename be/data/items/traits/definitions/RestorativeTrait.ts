@@ -8,11 +8,24 @@ import { TraitDefinition as Trait } from '../../../../types/items';
 export const RestorativeTrait: Trait = {
   "traitId": "restorative",
   "name": "Restorative",
+  "nameByCategory": {
+    "resource": "Restorative",
+    "consumable": "Regeneration"
+  },
   "shorthand": "RST",
+  "shorthandByCategory": {
+    "resource": "RST",
+    "consumable": "RGN"
+  },
   "description": "Calming and healing properties that restore health over time",
+  "descriptionByCategory": {
+    "resource": "Calming and healing properties that can be extracted through alchemy",
+    "consumable": "Gradually restores health over time when consumed"
+  },
   "rarity": "uncommon",
   "applicableCategories": [
-    "resource"
+    "resource",
+    "consumable"
   ],
   "maxLevel": 3,
   "levels": {

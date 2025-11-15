@@ -8,11 +8,24 @@ import { TraitDefinition as Trait } from '../../../../types/items';
 export const WardingTrait: Trait = {
   "traitId": "warding",
   "name": "Warding",
+  "nameByCategory": {
+    "resource": "Warding",
+    "consumable": "Fortification"
+  },
   "shorthand": "WRD",
+  "shorthandByCategory": {
+    "resource": "WRD",
+    "consumable": "FRT"
+  },
   "description": "Protective properties that fortify defenses",
+  "descriptionByCategory": {
+    "resource": "Protective properties that can be infused through alchemy",
+    "consumable": "Fortifies defenses when consumed"
+  },
   "rarity": "uncommon",
   "applicableCategories": [
-    "resource"
+    "resource",
+    "consumable"
   ],
   "maxLevel": 3,
   "levels": {

@@ -8,11 +8,24 @@ import { TraitDefinition as Trait } from '../../../../types/items';
 export const EmpoweringTrait: Trait = {
   "traitId": "empowering",
   "name": "Empowering",
+  "nameByCategory": {
+    "resource": "Empowering",
+    "consumable": "Strength"
+  },
   "shorthand": "EMP",
+  "shorthandByCategory": {
+    "resource": "EMP",
+    "consumable": "STR"
+  },
   "description": "Magical potency that amplifies offensive power",
+  "descriptionByCategory": {
+    "resource": "Magical potency that can be distilled through alchemy",
+    "consumable": "Amplifies offensive power when consumed"
+  },
   "rarity": "rare",
   "applicableCategories": [
-    "resource"
+    "resource",
+    "consumable"
   ],
   "maxLevel": 3,
   "levels": {

@@ -217,8 +217,11 @@ export interface QualityLevel {
 export interface TraitDefinition {
   traitId: string;
   name: string;
+  nameByCategory?: Record<string, string>; // Category-specific display names
   shorthand: string;
+  shorthandByCategory?: Record<string, string>; // Category-specific shorthand
   description: string;
+  descriptionByCategory?: Record<string, string>; // Category-specific descriptions
   rarity: Rarity;
   applicableCategories: string[];
   maxLevel: number;

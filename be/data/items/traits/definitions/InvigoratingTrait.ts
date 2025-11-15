@@ -8,11 +8,24 @@ import { TraitDefinition as Trait } from '../../../../types/items';
 export const InvigoratingTrait: Trait = {
   "traitId": "invigorating",
   "name": "Invigorating",
+  "nameByCategory": {
+    "resource": "Invigorating",
+    "consumable": "Haste"
+  },
   "shorthand": "INV",
+  "shorthandByCategory": {
+    "resource": "INV",
+    "consumable": "HST"
+  },
   "description": "Energizing properties that quicken reflexes and actions",
+  "descriptionByCategory": {
+    "resource": "Energizing properties that can be extracted through alchemy",
+    "consumable": "Quickens reflexes and actions when consumed"
+  },
   "rarity": "uncommon",
   "applicableCategories": [
-    "resource"
+    "resource",
+    "consumable"
   ],
   "maxLevel": 3,
   "levels": {
