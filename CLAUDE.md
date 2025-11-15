@@ -57,6 +57,7 @@
 - ✅ Magic→Wisdom rename (completed - better medieval fantasy terminology)
 - ✅ Potency quality fix (completed - quality multipliers now apply to consumables)
 - ✅ Weight-based inventory (completed - carrying capacity based on strength/endurance)
+- ✅ Equipment stat application (completed - armor/damage/evasion bonuses applied to combat calculations)
 
 **Recent Changes** (Last 10 commits):
 - docs: update ideas and notes
@@ -74,7 +75,6 @@
 - None currently identified
 
 **Next Priorities**:
-- Equipment stat application (apply armor/damage/evasion bonuses to combat calculations)
 - Steel tier equipment (requires steel ingots from iron + coal)
 - More alchemy recipes (debuff potions, stat potions, transmutation)
 - Combat system enhancements (more monsters, abilities, boss fights)
