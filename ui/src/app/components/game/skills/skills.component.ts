@@ -7,8 +7,8 @@ import { ALL_SKILLS, SKILL_DISPLAY_NAMES, SKILL_ICONS } from '../../../constants
 @Component({
   selector: 'app-skills',
   imports: [CommonModule],
-  templateUrl: './skills.html',
-  styleUrl: './skills.scss',
+  templateUrl: './skills.component.html',
+  styleUrl: './skills.component.scss',
 })
 export class Skills implements OnInit {
   private skillsService = inject(SkillsService);

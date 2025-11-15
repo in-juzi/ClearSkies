@@ -6,12 +6,12 @@ import { AttributesService } from '../../services/attributes.service';
 import { CombatService } from '../../services/combat.service';
 import { ManualDialogService } from '../../services/manual-dialog.service';
 import { ManualComponent } from '../manual/manual.component';
-import { Skills } from './skills/skills';
-import { AttributesComponent } from './attributes/attributes';
+import { Skills } from './skills/skills.component';
+import { AttributesComponent } from './attributes/attributes.component';
 import { InventoryComponent } from './inventory/inventory.component';
-import { LocationComponent } from './location/location';
-import { Equipment } from './equipment/equipment';
-import { CharacterStatus } from './character-status/character-status';
+import { LocationComponent } from './location/location.component';
+import { Equipment } from './equipment/equipment.component';
+import { CharacterStatus } from './character-status/character-status.component';
 import { ChatComponent } from './chat/chat.component';
 import { ALL_SKILLS, ALL_ATTRIBUTES } from '../../constants/game-data.constants';
 

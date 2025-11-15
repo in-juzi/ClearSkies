@@ -17,8 +17,8 @@ interface SlotConfig {
   selector: 'app-equipment',
   standalone: true,
   imports: [CommonModule, IconComponent, ItemDetailsPanelComponent],
-  templateUrl: './equipment.html',
-  styleUrl: './equipment.scss',
+  templateUrl: './equipment.component.html',
+  styleUrl: './equipment.component.scss',
 })
 export class Equipment {
   equipmentService = inject(EquipmentService);

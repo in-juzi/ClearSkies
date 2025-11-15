@@ -8,8 +8,8 @@ import { ALL_ATTRIBUTES, ATTRIBUTE_ICONS } from '../../../constants/game-data.co
   selector: 'app-attributes',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './attributes.html',
-  styleUrls: ['./attributes.scss']
+  templateUrl: './attributes.component.html',
+  styleUrls: ['./attributes.component.scss']
 })
 export class AttributesComponent implements OnInit {
   attributes = signal<AttributesResponse | null>(null);
