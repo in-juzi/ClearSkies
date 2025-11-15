@@ -238,31 +238,61 @@ export default function (io: Server): void {
           return;
         }
 
-        // Apply consumable effect
-        const consumable = itemDef as any;
-        let healAmount = 0;
-        let manaAmount = 0;
+        // Get all consumable effects (including trait-based buffs/HoTs)
+        const effects = itemService.getConsumableEffects(item);
+        if (!effects) {
+          if (typeof callback === 'function') {
+            callback({ success: false, message: 'Invalid consumable item' });
+          }
+          return;
+        }
 
-        if (consumable.properties?.healthRestore) {
-          healAmount = consumable.properties.healthRestore;
+        let healAmount = effects.healthRestore || 0;
+        let manaAmount = effects.manaRestore || 0;
+
+        // Apply immediate healing
+        if (healAmount > 0) {
           player.heal(healAmount);
         }
 
-        if (consumable.properties?.manaRestore) {
-          manaAmount = consumable.properties.manaRestore;
+        // Apply immediate mana restoration
+        if (manaAmount > 0) {
           const maxMana = player.stats.mana.max;
           player.stats.mana.current = Math.min(maxMana, player.stats.mana.current + manaAmount);
         }
 
-        // Log item use
-        let message = `You use ${itemDef.name}`;
-        if (healAmount > 0 && manaAmount > 0) {
-          message += ` (restored ${healAmount} HP and ${manaAmount} mana)`;
-        } else if (healAmount > 0) {
-          message += ` (restored ${healAmount} HP)`;
-        } else if (manaAmount > 0) {
-          message += ` (restored ${manaAmount} mana)`;
+        // Apply buff effects from traits
+        for (const buff of effects.buffs) {
+          combatService.applyPotionBuff(player, buff, player.activeCombat.turnCount);
         }
+
+        // Apply HoT effects from traits
+        for (const hot of effects.hots) {
+          combatService.applyPotionHoT(player, hot, player.activeCombat.turnCount);
+        }
+
+        // Build log message
+        let message = `You use ${itemDef.name}`;
+        const effectMessages = [];
+
+        if (healAmount > 0) effectMessages.push(`${healAmount} HP`);
+        if (manaAmount > 0) effectMessages.push(`${manaAmount} mana`);
+        if (effects.buffs.length > 0) {
+          for (const buff of effects.buffs) {
+            const value = buff.isPercentage ? `${buff.value * 100}%` : `+${buff.value}`;
+            effectMessages.push(`${value} ${buff.stat} for ${buff.duration}s`);
+          }
+        }
+        if (effects.hots.length > 0) {
+          for (const hot of effects.hots) {
+            effectMessages.push(`+${hot.healPerTick} HP/tick for ${hot.ticks * hot.tickInterval}s`);
+          }
+        }
+
+        if (effectMessages.length > 0) {
+          message += ` (${effectMessages.join(', ')})`;
+        }
+
         player.addCombatLog(message, 'heal', healAmount, 'player');
 
         // Remove item from inventory
