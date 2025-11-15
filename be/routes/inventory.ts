@@ -25,13 +25,10 @@ router.post('/items/random', inventoryController.addRandomItem);
 // Remove item from inventory
 router.delete('/items', inventoryController.removeItem);
 
-// Get item definitions (catalog)
-router.get('/definitions', inventoryController.getItemDefinitions);
+// NOTE: Item definition endpoints removed - frontend now uses ItemDataService
+// which directly imports backend ItemRegistry (zero API calls needed)
 
-// Get single item definition
-router.get('/definitions/:itemId', inventoryController.getItemDefinition);
-
-// Reload item definitions (admin)
+// Reload item definitions (admin) - kept for backward compatibility / hot-reload
 router.post('/reload', inventoryController.reloadDefinitions);
 
 // Equipment routes

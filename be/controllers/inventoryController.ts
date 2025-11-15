@@ -81,8 +81,10 @@ export const getInventory = async (req: Request, res: Response): Promise<void> =
 
     res.json({
       inventory: enhancedInventory,
-      capacity: player.inventoryCapacity,
-      size: player.getInventorySize(),
+      capacity: player.inventoryCapacity, // DEPRECATED: use carryingCapacity instead
+      carryingCapacity: player.carryingCapacity, // in kg
+      currentWeight: player.currentWeight, // in kg
+      size: player.getInventorySize(), // DEPRECATED: item count no longer used for capacity
       totalValue: player.getInventoryValue()
     });
   } catch (error) {
@@ -372,6 +374,8 @@ export const getItemCombatStats = async (req: Request<{ instanceId: string }>, r
 
 /**
  * Get all available item definitions
+ * @deprecated Frontend now uses ItemDataService with direct backend registry import
+ * This endpoint is no longer used and can be removed in a future version
  */
 export const getItemDefinitions = async (req: Request<{}, {}, {}, { category?: ItemCategory }>, res: Response): Promise<void> => {
   try {
@@ -393,6 +397,8 @@ export const getItemDefinitions = async (req: Request<{}, {}, {}, { category?: I
 
 /**
  * Get single item definition
+ * @deprecated Frontend now uses ItemDataService with direct backend registry import
+ * This endpoint is no longer used and can be removed in a future version
  */
 export const getItemDefinition = async (req: Request<{ itemId: string }>, res: Response): Promise<void> => {
   try {
@@ -580,8 +586,8 @@ export const useItem = async (req: Request<{}, {}, UseItemRequest>, res: Respons
     }
 
     // Check if player is at full health and mana (don't waste items)
-    const isHealthFull = player.stats.health.current >= player.stats.health.max;
-    const isManaFull = player.stats.mana.current >= player.stats.mana.max;
+    const isHealthFull = player.stats.health.current >= player.maxHP;
+    const isManaFull = player.stats.mana.current >= player.maxMP;
     const consumableItem = itemDefinition as ConsumableItem;
     const restoresHealth = (consumableItem.properties?.healthRestore || 0) > 0;
     const restoresMana = (consumableItem.properties?.manaRestore || 0) > 0;
@@ -602,7 +608,9 @@ export const useItem = async (req: Request<{}, {}, UseItemRequest>, res: Respons
     }
 
     // Use the item and apply effects
-    const effects = player.useConsumableItem(itemInstance, itemDefinition);
+    // Out-of-combat potions convert HoT to instant healing
+    const combatService = require('../services/combatService').default;
+    const effects = combatService.useConsumableOutOfCombat(player, itemInstance, itemService);
 
     // Remove one instance of the item from inventory
     player.removeItem(instanceId, 1);
@@ -615,17 +623,37 @@ export const useItem = async (req: Request<{}, {}, UseItemRequest>, res: Respons
       const activeCombat = player.activeCombat!;
       combat = {
         ...convertMapsToObjects(activeCombat),
-        playerHealth: player.stats.health,
-        playerMana: player.stats.mana,
+        playerHealth: {
+          current: player.stats.health.current,
+          max: player.maxHP
+        },
+        playerMana: {
+          current: player.stats.mana.current,
+          max: player.maxMP
+        },
         combatLog: activeCombat.combatLog.map(entry => convertMapsToObjects(entry))
       };
     }
 
+    // Build informative message
+    let message = 'Item used successfully';
+    if (effects.convertedFromHoT > 0) {
+      message = `${itemDefinition.name} restored ${effects.healthRestored} HP (${effects.convertedFromHoT} from regeneration)`;
+    } else if (effects.healthRestored > 0) {
+      message = `${itemDefinition.name} restored ${effects.healthRestored} HP`;
+    }
+
     res.json({
-      message: 'Item used successfully',
+      message,
       effects,
-      health: player.stats.health,
-      mana: player.stats.mana,
+      health: {
+        current: player.stats.health.current,
+        max: player.maxHP
+      },
+      mana: {
+        current: player.stats.mana.current,
+        max: player.maxMP
+      },
       combat,
       itemUsed: {
         itemId: itemDefinition.itemId,
