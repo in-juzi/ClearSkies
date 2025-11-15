@@ -95,6 +95,70 @@ export class GameComponent implements OnInit {
     }, 0);
   }
 
+  // Calculate max HP from attributes
+  getMaxHP(): number {
+    const attrs = this.attributes();
+    if (!attrs) return 10; // Base HP
+
+    const str = attrs['strength']?.level || 1;
+    const end = attrs['endurance']?.level || 1;
+    const will = attrs['will']?.level || 1;
+
+    // Formula: Base 10 + STR×3 + END×2 + WILL×1
+    return 10 + (str * 3) + (end * 2) + (will * 1);
+  }
+
+  // Calculate max MP from attributes
+  getMaxMP(): number {
+    const attrs = this.attributes();
+    if (!attrs) return 10; // Base MP
+
+    const wis = attrs['wisdom']?.level || 1;
+    const will = attrs['will']?.level || 1;
+
+    // Formula: Base 10 + WIS×6 + WILL×3
+    return 10 + (wis * 6) + (will * 3);
+  }
+
+  // Get HP percentage for bar
+  getHPPercent(): number {
+    const player = this.currentPlayer();
+    if (!player) return 0;
+    const max = this.getMaxHP();
+    return max > 0 ? (player.stats.health.current / max) * 100 : 0;
+  }
+
+  // Get MP percentage for bar
+  getMPPercent(): number {
+    const player = this.currentPlayer();
+    if (!player) return 0;
+    const max = this.getMaxMP();
+    return max > 0 ? (player.stats.mana.current / max) * 100 : 0;
+  }
+
+  // Get HP tooltip showing formula
+  getHPTooltip(): string {
+    const attrs = this.attributes();
+    if (!attrs) return 'HP from attributes';
+
+    const str = attrs['strength']?.level || 1;
+    const end = attrs['endurance']?.level || 1;
+    const will = attrs['will']?.level || 1;
+
+    return `Max HP: ${this.getMaxHP()}\n\nFormula:\nBase: 10\nStrength (${str}): +${str * 3}\nEndurance (${end}): +${end * 2}\nWill (${will}): +${will * 1}`;
+  }
+
+  // Get MP tooltip showing formula
+  getMPTooltip(): string {
+    const attrs = this.attributes();
+    if (!attrs) return 'MP from attributes';
+
+    const wis = attrs['wisdom']?.level || 1;
+    const will = attrs['will']?.level || 1;
+
+    return `Max MP: ${this.getMaxMP()}\n\nFormula:\nBase: 10\nWisdom (${wis}): +${wis * 6}\nWill (${will}): +${will * 3}`;
+  }
+
   // Toggle sidebar collapse state
   toggleLeftSidebar(): void {
     this.leftSidebarCollapsed.update(collapsed => !collapsed);

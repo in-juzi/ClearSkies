@@ -124,21 +124,21 @@
                   <!-- Health and Mana Displays -->
                   <div class="health-mana-container">
                     <div class="stat-display">
-                      <div class="stat-label">Health</div>
+                      <div class="stat-label" [title]="getHPTooltip()">Health ⓘ</div>
                       <div class="bar-container">
                         <div class="bar health-bar"
-                             [style.width.%]="(currentPlayer()!.stats.health.current / currentPlayer()!.stats.health.max) * 100">
+                             [style.width.%]="getHPPercent()">
                         </div>
-                        <div class="bar-text">{{ currentPlayer()!.stats.health.current }} / {{ currentPlayer()!.stats.health.max }}</div>
+                        <div class="bar-text">{{ currentPlayer()!.stats.health.current }} / {{ getMaxHP() }}</div>
                       </div>
                     </div>
                     <div class="stat-display">
-                      <div class="stat-label">Mana</div>
+                      <div class="stat-label" [title]="getMPTooltip()">Mana ⓘ</div>
                       <div class="bar-container">
                         <div class="bar mana-bar"
-                             [style.width.%]="(currentPlayer()!.stats.mana.current / currentPlayer()!.stats.mana.max) * 100">
+                             [style.width.%]="getMPPercent()">
                         </div>
-                        <div class="bar-text">{{ currentPlayer()!.stats.mana.current }} / {{ currentPlayer()!.stats.mana.max }}</div>
+                        <div class="bar-text">{{ currentPlayer()!.stats.mana.current }} / {{ getMaxMP() }}</div>
                       </div>
                     </div>
                   </div>
