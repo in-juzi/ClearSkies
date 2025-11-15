@@ -221,11 +221,11 @@ export const getMe = async (req: Request, res: Response): Promise<void> => {
           stats: {
             health: {
               current: player.stats?.health?.current || 0,
-              max: player.stats?.health?.max || 100
+              max: player.maxHP  // Use virtual property for attribute-based calculation
             },
             mana: {
               current: player.stats?.mana?.current || 0,
-              max: player.stats?.mana?.max || 50
+              max: player.maxMP  // Use virtual property for attribute-based calculation
             },
             strength: player.stats?.strength || 10,
             dexterity: player.stats?.dexterity || 10,

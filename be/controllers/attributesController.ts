@@ -29,7 +29,7 @@ export const getAllAttributes = async (req: Request, res: Response): Promise<voi
 
     // Build response with all attributes and their progress
     const attributes: Record<string, any> = {};
-    const attributeNames: AttributeName[] = ['strength', 'endurance', 'magic', 'perception', 'dexterity', 'will', 'charisma'];
+    const attributeNames: AttributeName[] = ['strength', 'endurance', 'wisdom', 'perception', 'dexterity', 'will', 'charisma'];
 
     for (const name of attributeNames) {
       attributes[name] = {
@@ -57,7 +57,7 @@ export const getAttribute = async (
 ): Promise<void> => {
   try {
     const { attributeName } = req.params;
-    const validAttributes: AttributeName[] = ['strength', 'endurance', 'magic', 'perception', 'dexterity', 'will', 'charisma'];
+    const validAttributes: AttributeName[] = ['strength', 'endurance', 'wisdom', 'perception', 'dexterity', 'will', 'charisma'];
 
     if (!validAttributes.includes(attributeName)) {
       res.status(400).json({ message: `Invalid attribute name: ${attributeName}` });
