@@ -15,7 +15,7 @@ export const KennikPotionSeller: Vendor = {
   "sellPriceMultiplier": 0.5,
   "stock": [
     {
-      "itemId": "health_potion_minor",
+      "itemId": "health_tincture",
       "buyPrice": 75,
       "stockType": "infinite"
     }

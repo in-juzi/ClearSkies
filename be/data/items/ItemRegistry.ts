@@ -13,11 +13,9 @@ import { CookedSalmon } from './definitions/consumables/CookedSalmon';
 import { CookedShrimp } from './definitions/consumables/CookedShrimp';
 import { CookedTrout } from './definitions/consumables/CookedTrout';
 import { FuryBrew } from './definitions/consumables/FuryBrew';
-import { HealthPotion } from './definitions/consumables/HealthPotion';
 import { HealthDraught } from './definitions/consumables/HealthDraught';
 import { HealthElixir } from './definitions/consumables/HealthElixir';
 import { HealthTincture } from './definitions/consumables/HealthTincture';
-import { ManaPotion } from './definitions/consumables/ManaPotion';
 import { ManaDraught } from './definitions/consumables/ManaDraught';
 import { ManaTincture } from './definitions/consumables/ManaTincture';
 import { PowerElixir } from './definitions/consumables/PowerElixir';
@@ -104,11 +102,9 @@ export class ItemRegistry {
     [CookedShrimp.itemId, CookedShrimp],
     [CookedTrout.itemId, CookedTrout],
     [FuryBrew.itemId, FuryBrew],
-    [HealthPotion.itemId, HealthPotion],
     [HealthDraught.itemId, HealthDraught],
     [HealthElixir.itemId, HealthElixir],
     [HealthTincture.itemId, HealthTincture],
-    [ManaPotion.itemId, ManaPotion],
     [ManaDraught.itemId, ManaDraught],
     [ManaTincture.itemId, ManaTincture],
     [PowerElixir.itemId, PowerElixir],

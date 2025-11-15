@@ -52,7 +52,7 @@ export const CombatGoblinShaman: DropTable = {
       "qualityBonus": 1
     },
     {
-      "itemId": "health_potion_minor",
+      "itemId": "health_tincture",
       "weight": 30,
       "quantity": {
         "min": 1,
@@ -60,7 +60,7 @@ export const CombatGoblinShaman: DropTable = {
       }
     },
     {
-      "itemId": "mana_potion_minor",
+      "itemId": "mana_tincture",
       "weight": 35,
       "quantity": {
         "min": 1,
