@@ -30,7 +30,7 @@ export const ALL_SKILLS: readonly SkillName[] = [
 export const ALL_ATTRIBUTES: readonly AttributeName[] = [
   'strength',
   'endurance',
-  'magic',
+  'wisdom', // Renamed from 'magic'
   'perception',
   'dexterity',
   'will',
@@ -81,7 +81,7 @@ export const SKILL_ICONS: Record<SkillName, string> = {
 export const ATTRIBUTE_DISPLAY_NAMES: Record<AttributeName, string> = {
   strength: 'Strength',
   endurance: 'Endurance',
-  magic: 'Magic',
+  wisdom: 'Wisdom', // Renamed from 'Magic'
   perception: 'Perception',
   dexterity: 'Dexterity',
   will: 'Will',
@@ -94,7 +94,7 @@ export const ATTRIBUTE_DISPLAY_NAMES: Record<AttributeName, string> = {
 export const ATTRIBUTE_ICONS: Record<AttributeName, string> = {
   strength: 'assets/icons/attributes/attr_strength.svg',
   endurance: 'assets/icons/attributes/attr_endurance.svg',
-  magic: 'assets/icons/attributes/attr_magic.svg',
+  wisdom: 'assets/icons/attributes/attr_magic.svg', // Still using magic icon for now
   perception: 'assets/icons/attributes/attr_perception.svg',
   dexterity: 'assets/icons/attributes/attr_dexterity.svg',
   will: 'assets/icons/attributes/attr_will.svg',

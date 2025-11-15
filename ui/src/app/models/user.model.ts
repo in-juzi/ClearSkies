@@ -162,7 +162,7 @@ export interface SkillExperienceResponse {
 }
 
 export type SkillName = 'woodcutting' | 'mining' | 'fishing' | 'gathering' | 'smithing' | 'cooking' | 'alchemy' | 'oneHanded' | 'dualWield' | 'twoHanded' | 'ranged' | 'casting' | 'gun';
-export type AttributeName = 'strength' | 'endurance' | 'magic' | 'perception' | 'dexterity' | 'will' | 'charisma';
+export type AttributeName = 'strength' | 'endurance' | 'wisdom' | 'perception' | 'dexterity' | 'will' | 'charisma'; // 'magic' renamed to 'wisdom'
 
 export interface Location {
   currentZone: string;

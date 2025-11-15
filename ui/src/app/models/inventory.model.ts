@@ -89,8 +89,10 @@ export interface ItemDetails extends ItemInstance {
 
 export interface InventoryResponse {
   inventory: ItemDetails[];
-  capacity: number;
-  size: number;
+  capacity: number; // DEPRECATED: use carryingCapacity instead
+  carryingCapacity: number; // in kg
+  currentWeight: number; // in kg
+  size: number; // DEPRECATED: item count no longer used for capacity
   totalValue: number;
 }
 

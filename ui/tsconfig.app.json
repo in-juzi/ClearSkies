@@ -8,7 +8,8 @@
     "baseUrl": "./",
     "paths": {
       "@shared/*": ["../shared/*"],
-      "@shared/types": ["../shared/types/index"]
+      "@shared/types": ["../shared/types/index"],
+      "@be/data/*": ["../be/data/*"]
     }
   },
   "include": [
