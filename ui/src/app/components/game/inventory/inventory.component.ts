@@ -5,6 +5,7 @@ import { InventoryService } from '../../../services/inventory.service';
 import { EquipmentService } from '../../../services/equipment.service';
 import { VendorService } from '../../../services/vendor.service';
 import { ChatService } from '../../../services/chat.service';
+import { AuthService } from '../../../services/auth.service';
 import { ConfirmDialogService } from '../../../services/confirm-dialog.service';
 import { ItemDetails } from '../../../models/inventory.model';
 import { ItemModifiersComponent } from '../../shared/item-modifiers/item-modifiers.component';
@@ -23,6 +24,7 @@ export class InventoryComponent implements OnInit {
   private confirmDialog = inject(ConfirmDialogService);
   private equipmentService = inject(EquipmentService);
   private chatService = inject(ChatService);
+  private authService = inject(AuthService);
   public vendorService = inject(VendorService); // Public for template access
 
   selectedItem: ItemDetails | null = null;
@@ -202,6 +204,11 @@ export class InventoryComponent implements OnInit {
           createdAt: new Date()
         });
 
+        // Update gold (triggers floating gold notification)
+        if (response.gold !== undefined) {
+          this.authService.updatePlayerGold(response.gold);
+        }
+
         // Update inventory
         this.inventoryService.getInventory().subscribe();
 
@@ -258,6 +265,12 @@ export class InventoryComponent implements OnInit {
     return this.inventoryService.inventory().reduce((total, item) => {
       return total + (item.definition.properties.weight * item.quantity);
     }, 0);
+  }
+
+  getWeightPercent(): number {
+    const capacity = this.inventoryService.carryingCapacity();
+    const current = this.inventoryService.currentWeight();
+    return capacity > 0 ? (current / capacity) * 100 : 0;
   }
 
   // Dev helper: Add test item with random qualities

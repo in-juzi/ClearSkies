@@ -86,17 +86,22 @@
   <div class="inventory-stats-container">
     <div class="inventory-stats">
       <div class="stat-item">
-        <span class="stat-icon">📦</span>
+        <span class="stat-icon">⚖️</span>
         <div class="stat-content">
-          <span class="stat-label">Capacity</span>
-          <span class="stat-value">{{ inventoryService.inventorySize() }} / {{ inventoryService.inventoryCapacity() }}</span>
+          <span class="stat-label">Carrying Capacity</span>
+          <span class="stat-value"
+                [class.weight-normal]="getWeightPercent() < 80"
+                [class.weight-warning]="getWeightPercent() >= 80 && getWeightPercent() < 95"
+                [class.weight-critical]="getWeightPercent() >= 95">
+            {{ inventoryService.currentWeight().toFixed(1) }} / {{ inventoryService.carryingCapacity().toFixed(1) }} kg
+          </span>
         </div>
       </div>
       <div class="stat-item">
-        <span class="stat-icon">⚖️</span>
+        <span class="stat-icon">📦</span>
         <div class="stat-content">
-          <span class="stat-label">Weight</span>
-          <span class="stat-value">{{ getTotalWeight().toFixed(1) }} kg</span>
+          <span class="stat-label">Item Count</span>
+          <span class="stat-value">{{ inventoryService.inventorySize() }}</span>
         </div>
       </div>
       <div class="stat-item gold-stat-item">

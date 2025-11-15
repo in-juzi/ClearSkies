@@ -117,6 +117,29 @@
   max-width: 100%;
 }
 
+/* Weight capacity color coding */
+.stat-value.weight-normal {
+  color: var(--color-green-400);
+}
+
+.stat-value.weight-warning {
+  color: var(--color-yellow-400);
+}
+
+.stat-value.weight-critical {
+  color: var(--color-red-400);
+  animation: pulse-warning 2s ease-in-out infinite;
+}
+
+@keyframes pulse-warning {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
 .category-filter {
   display: flex;
   flex-wrap: wrap;
