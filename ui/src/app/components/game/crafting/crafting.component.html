@@ -1,11 +1,4 @@
 <div class="crafting-container">
-  <!-- Message Display -->
-  @if (message()) {
-    <div class="message" [class]="message()!.type">
-      {{ message()!.text }}
-    </div>
-  }
-
   <!-- Active Crafting Progress -->
   @if (craftingService.isCrafting() || isRestarting()) {
     <div class="active-crafting">
@@ -43,12 +36,15 @@
                 <div class="ingredient-instances-display">
                   @for (instance of group.instances; track instance.instanceId) {
                     <div class="instance-with-remaining">
-                      <app-item-mini
-                        [item]="createItemForDisplay(instance, instance.usedQuantity)"
-                        [showIcon]="false"
-                        [showItemId]="false"
-                        [showModifiers]="true">
-                      </app-item-mini>
+                      <div class="instance-with-name">
+                        <span class="instance-item-name">{{ instance.definition?.name || instance.itemId }}</span>
+                        <app-item-mini
+                          [item]="createItemForDisplay(instance, instance.usedQuantity)"
+                          [showIcon]="false"
+                          [showItemId]="false"
+                          [showModifiers]="true">
+                        </app-item-mini>
+                      </div>
                       <span class="remaining-text">({{ instance.remainingQuantity }} left)</span>
                     </div>
                   }
@@ -75,33 +71,12 @@
 
   <!-- Crafting Log -->
   @if (craftingLog.length > 0 && autoRestartEnabled()) {
-    <div class="crafting-log">
-      <h3>Recent Completions</h3>
-      <div class="log-entries">
-        @for (entry of craftingLog; track entry.timestamp) {
-          <div class="log-entry">
-            <div class="log-timestamp">{{ entry.timestamp | date:'HH:mm:ss' }}</div>
-            <div class="log-content">
-              <span class="log-recipe">{{ entry.recipeName }}</span>
-              <app-item-mini
-                [item]="entry.output"
-                [showIcon]="true"
-                [showQuantity]="true"
-                [showItemId]="true"
-                [showDisplayName]="true"
-                [showModifiers]="true">
-              </app-item-mini>
-              <app-xp-mini
-                [skillName]="entry.skill"
-                [xp]="entry.experience"
-                [showIcon]="true"
-                [showSkillName]="true">
-              </app-xp-mini>
-            </div>
-          </div>
-        }
-      </div>
-    </div>
+    <app-activity-log
+      [entries]="craftingLog"
+      [maxEntries]="10"
+      [showTimestamp]="true"
+      [title]="'Recent Completions'">
+    </app-activity-log>
   }
 
   <!-- Last Crafting Result -->
@@ -289,6 +264,17 @@
               </span>
             </div>
 
+            <div class="ingredient-actions">
+              <button class="btn-auto-select"
+                      (click)="autoSelectBestQuality(selectedRecipe()!)">
+                Auto-select Best
+              </button>
+              <button class="btn-clear-selection"
+                      (click)="clearSelection()">
+                Clear Selection
+              </button>
+            </div>
+
             <div class="instance-list">
               @for (instance of getAvailableInstancesByIngredient(ingredient); track instance.instanceId) {
                 <div class="instance-card"
@@ -296,29 +282,14 @@
                      [class.selected]="getSelectedQuantity(instance.instanceId) > 0"
                      [class.fully-selected]="getSelectedQuantity(instance.instanceId) === instance.quantity">
                   <div class="instance-info">
+                    <span class="instance-item-name">{{ instance.definition?.name || instance.itemId }}</span>
                     <span class="instance-quantity">x{{ instance.quantity }}</span>
-                    <app-item-modifiers [item]="instance" displayMode="badge-tier" size="normal"></app-item-modifiers>
+                    <app-item-modifiers [item]="instance" displayMode="badge-name" size="normal"></app-item-modifiers>
                   </div>
 
                   @if (getSelectedQuantity(instance.instanceId) > 0) {
                     <div class="selection-indicator">
                       ✓ {{ getSelectedQuantity(instance.instanceId) }} selected
-                    </div>
-                  }
-
-                  @if (instance.qualities && Object.keys(instance.qualities).length > 0) {
-                    <div class="qualities">
-                      @for (quality of Object.entries(instance.qualities); track quality[0]) {
-                        <span class="quality-item">{{ quality[0] }}: {{ quality[1] }}</span>
-                      }
-                    </div>
-                  }
-
-                  @if (instance.traits && Object.keys(instance.traits).length > 0) {
-                    <div class="traits">
-                      @for (trait of Object.entries(instance.traits); track trait[0]) {
-                        <span class="trait-item">{{ trait[0] }}: {{ trait[1] }}</span>
-                      }
                     </div>
                   }
                 </div>
@@ -329,17 +300,6 @@
                   No {{ getIngredientLabel(ingredient) }} available
                 </div>
               }
-            </div>
-
-            <div class="ingredient-actions">
-              <button class="btn-auto-select"
-                      (click)="autoSelectBestQuality(selectedRecipe()!)">
-                Auto-select Best
-              </button>
-              <button class="btn-clear-selection"
-                      (click)="clearSelection()">
-                Clear Selection
-              </button>
             </div>
           </div>
         }

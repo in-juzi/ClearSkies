@@ -5,16 +5,17 @@ import { CraftingService } from '../../../services/crafting.service';
 import { InventoryService } from '../../../services/inventory.service';
 import { AuthService } from '../../../services/auth.service';
 import { SkillsService } from '../../../services/skills.service';
+import { ChatService } from '../../../services/chat.service';
 import { Recipe } from '../../../models/recipe.model';
 import { ItemModifiersComponent } from '../../shared/item-modifiers/item-modifiers.component';
 import { ItemMiniComponent } from '../../shared/item-mini/item-mini.component';
-import { XpMiniComponent } from '../../shared/xp-mini/xp-mini.component';
 import { IconComponent } from '../../shared/icon/icon.component';
+import { ActivityLogComponent, ActivityLogEntry } from '../../shared/activity-log/activity-log.component';
 
 @Component({
   selector: 'app-crafting',
   standalone: true,
-  imports: [CommonModule, ItemModifiersComponent, ItemMiniComponent, XpMiniComponent, IconComponent],
+  imports: [CommonModule, ItemModifiersComponent, ItemMiniComponent, IconComponent, ActivityLogComponent],
   templateUrl: './crafting.component.html',
   styleUrls: ['./crafting.component.scss']
 })
@@ -27,7 +28,6 @@ export class CraftingComponent implements OnInit {
 
   // UI state
   selectedRecipe = signal<Recipe | null>(null);
-  message = signal<{ text: string; type: 'success' | 'error' | 'info' } | null>(null);
   selectedIngredients = signal<Map<string, string[]>>(new Map()); // itemId -> instanceId[]
   autoRestartEnabled = signal<boolean>(false); // Auto-restart crafting flag
   lastCraftedRecipeId = signal<string | null>(null); // Track last crafted recipe for auto-restart
@@ -38,20 +38,7 @@ export class CraftingComponent implements OnInit {
   searchQuery = signal<string>('');
   showCraftableOnly = signal<boolean>(false);
   sortBy = signal<'level' | 'name' | 'xp'>('level');
-  craftingLog: Array<{
-    timestamp: Date;
-    recipeName: string;
-    experience: number;
-    skill: string;
-    output: {
-      itemId: string;
-      name?: string; // Display name of the item
-      quantity: number;
-      qualities?: { [key: string]: number };
-      traits?: { [key: string]: number };
-      definition?: any; // Item definition for icon display
-    };
-  }> = [];
+  craftingLog: ActivityLogEntry[] = [];
 
   // Computed values
   filteredRecipes = computed(() => {
@@ -156,7 +143,8 @@ export class CraftingComponent implements OnInit {
     public craftingService: CraftingService,
     private inventoryService: InventoryService,
     private authService: AuthService,
-    private skillsService: SkillsService
+    private skillsService: SkillsService,
+    private chatService: ChatService
   ) {
     // Setup auto-restart watcher in constructor (injection context)
     effect(() => {
@@ -186,18 +174,31 @@ export class CraftingComponent implements OnInit {
         outputs.forEach(output => {
           this.inventoryService.getItemDefinition(output.itemId).subscribe({
             next: (itemDef) => {
-              const newEntry = {
+              const newEntry: ActivityLogEntry = {
                 timestamp: new Date(),
-                recipeName: lastResult.recipe.name,
-                experience: lastResult.experience.xp,
-                skill: lastResult.experience.skill,
-                output: {
-                  itemId: output.itemId,
-                  name: output.name || itemDef.name, // Use output name or definition name
-                  quantity: output.quantity,
-                  qualities: output.qualities,
-                  traits: output.traits,
-                  definition: itemDef // Include full definition for icon
+                activityName: lastResult.recipe.name,
+                activityType: 'crafting',
+                rewards: {
+                  items: [{
+                    itemId: output.itemId,
+                    name: output.name || itemDef.name, // Use output name or definition name
+                    quantity: output.quantity,
+                    qualities: output.qualities,
+                    traits: output.traits,
+                    definition: itemDef // Include full definition for icon
+                  }],
+                  experience: [{
+                    skill: lastResult.experience.skill,
+                    xp: lastResult.experience.xp,
+                    leveledUp: lastResult.experience.skillResult?.leveledUp,
+                    newLevel: lastResult.experience.skillResult?.newLevel
+                  }],
+                  attributes: lastResult.experience.attributeResult ? [{
+                    attribute: lastResult.experience.attributeResult.attribute,
+                    xp: Math.floor(lastResult.experience.xp * 0.5), // 50% of skill XP goes to attribute
+                    leveledUp: lastResult.experience.attributeResult.leveledUp,
+                    newLevel: lastResult.experience.attributeResult.newLevel
+                  }] : []
                 }
               };
 
@@ -207,17 +208,30 @@ export class CraftingComponent implements OnInit {
             error: (error) => {
               console.warn('Could not load item definition for log:', error);
               // Add entry without definition as fallback
-              const newEntry = {
+              const newEntry: ActivityLogEntry = {
                 timestamp: new Date(),
-                recipeName: lastResult.recipe.name,
-                experience: lastResult.experience.xp,
-                skill: lastResult.experience.skill,
-                output: {
-                  itemId: output.itemId,
-                  name: output.name,
-                  quantity: output.quantity,
-                  qualities: output.qualities,
-                  traits: output.traits
+                activityName: lastResult.recipe.name,
+                activityType: 'crafting',
+                rewards: {
+                  items: [{
+                    itemId: output.itemId,
+                    name: output.name,
+                    quantity: output.quantity,
+                    qualities: output.qualities,
+                    traits: output.traits
+                  }],
+                  experience: [{
+                    skill: lastResult.experience.skill,
+                    xp: lastResult.experience.xp,
+                    leveledUp: lastResult.experience.skillResult?.leveledUp,
+                    newLevel: lastResult.experience.skillResult?.newLevel
+                  }],
+                  attributes: lastResult.experience.attributeResult ? [{
+                    attribute: lastResult.experience.attributeResult.attribute,
+                    xp: Math.floor(lastResult.experience.xp * 0.5), // 50% of skill XP goes to attribute
+                    leveledUp: lastResult.experience.attributeResult.leveledUp,
+                    newLevel: lastResult.experience.attributeResult.newLevel
+                  }] : []
                 }
               };
               this.craftingLog = [newEntry, ...this.craftingLog].slice(0, 10);
@@ -325,7 +339,6 @@ export class CraftingComponent implements OnInit {
     }
 
     this.selectedRecipe.set(recipe);
-    this.message.set(null);
     // Auto-select best quality ingredients
     this.autoSelectBestQuality(recipe);
     // Load output item definitions
@@ -826,11 +839,15 @@ export class CraftingComponent implements OnInit {
   }
 
   /**
-   * Show message to user
+   * Show message to user via chat
    */
   private showMessage(text: string, type: 'success' | 'error' | 'info'): void {
-    this.message.set({ text, type });
-    setTimeout(() => this.message.set(null), 5000);
+    this.chatService.addLocalMessage({
+      userId: 'system',
+      username: 'Crafting',
+      message: text,
+      createdAt: new Date()
+    });
   }
 
   /**

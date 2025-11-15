@@ -6,32 +6,6 @@
   padding: var(--spacing-l);
 }
 
-.message {
-  padding: var(--spacing-m);
-  margin-bottom: var(--spacing-l);
-  border-radius: var(--radius-s);
-  text-align: center;
-  font-weight: var(--font-weight-medium);
-
-  &.success {
-    background: rgba(76, 175, 80, 0.2);
-    color: #4caf50;
-    border: var(--border-width-medium) solid #4caf50;
-  }
-
-  &.error {
-    background: rgba(244, 67, 54, 0.2);
-    color: var(--color-error);
-    border: var(--border-width-medium) solid var(--color-error);
-  }
-
-  &.info {
-    background: rgba(33, 150, 243, 0.2);
-    color: #2196f3;
-    border: var(--border-width-medium) solid #2196f3;
-  }
-}
-
 .active-crafting {
   background: var(--color-bg-elevated);
   border: var(--border-default);
@@ -141,6 +115,20 @@
           align-items: center;
           gap: var(--spacing-xs);
 
+          .instance-with-name {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--spacing-xs);
+
+            .instance-item-name {
+              color: var(--color-text-primary);
+              font-size: var(--font-size-xs);
+              font-weight: var(--font-weight-medium);
+              text-align: center;
+            }
+          }
+
           .remaining-text {
             color: var(--color-text-secondary);
             font-size: var(--font-size-xs);
@@ -190,61 +178,6 @@
 
     &:hover {
       background: rgba(244, 67, 54, 0.3);
-    }
-  }
-}
-
-.crafting-log {
-  background: var(--color-bg-elevated);
-  border: var(--border-default);
-  border-radius: var(--radius-card);
-  padding: var(--spacing-l);
-  margin-bottom: var(--spacing-l);
-  max-height: 250px;
-  overflow-y: auto;
-
-  h3 {
-    margin: 0 0 var(--spacing-m) 0;
-    color: var(--color-accent-purple);
-    font-size: var(--font-size-m);
-  }
-
-  .log-entries {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-xs);
-  }
-
-  .log-entry {
-    display: flex;
-    gap: var(--spacing-m);
-    padding: var(--spacing-s) var(--spacing-m);
-    background: var(--color-bg-base);
-    border-radius: var(--radius-s);
-    font-size: var(--font-size-s);
-
-    .log-timestamp {
-      color: var(--color-text-muted);
-      font-size: var(--font-size-xs);
-      min-width: 60px;
-    }
-
-    .log-content {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: var(--spacing-xs);
-    }
-
-    .log-recipe {
-      color: var(--color-text-primary);
-      font-weight: var(--font-weight-medium);
-    }
-
-    .log-xp {
-      color: var(--color-accent-purple);
-      font-weight: var(--font-weight-medium);
-      font-size: var(--font-size-xs);
     }
   }
 }
@@ -614,6 +547,11 @@
     background: var(--color-bg-elevated);
     border-radius: var(--radius-card);
     border: var(--border-default);
+    margin-bottom: var(--spacing-m);
+
+    &:last-child {
+      margin-bottom: 0;
+    }
 
     .ingredient-header {
       display: flex;
@@ -636,11 +574,46 @@
       }
     }
 
+    .ingredient-actions {
+      display: flex;
+      gap: var(--spacing-s);
+      margin-bottom: var(--spacing-m);
+
+      button {
+        flex: 1;
+        padding: var(--spacing-s) var(--spacing-m);
+        border-radius: var(--radius-button);
+        font-size: var(--font-size-s);
+        font-weight: var(--font-weight-medium);
+        cursor: pointer;
+        transition: all var(--transition-fast);
+      }
+
+      .btn-auto-select {
+        background: rgba(138, 43, 226, 0.2);
+        border: var(--border-width-medium) solid var(--color-accent-purple);
+        color: var(--color-accent-purple);
+
+        &:hover {
+          background: rgba(138, 43, 226, 0.3);
+        }
+      }
+
+      .btn-clear-selection {
+        background: rgba(244, 67, 54, 0.2);
+        border: var(--border-width-medium) solid var(--color-error);
+        color: var(--color-error);
+
+        &:hover {
+          background: rgba(244, 67, 54, 0.3);
+        }
+      }
+    }
+
     .instance-list {
       display: flex;
       flex-direction: column;
       gap: var(--spacing-s);
-      margin-bottom: var(--spacing-m);
 
       .instance-card {
         padding: var(--spacing-m);
@@ -670,6 +643,13 @@
           align-items: center;
           gap: var(--spacing-m);
           margin-bottom: var(--spacing-s);
+
+          .instance-item-name {
+            font-weight: var(--font-weight-medium);
+            color: var(--color-secondary);
+            font-size: var(--font-size-m);
+            flex-shrink: 0;
+          }
 
           .instance-quantity {
             font-weight: var(--font-weight-bold);
@@ -714,24 +694,6 @@
           color: var(--color-accent-purple);
           font-weight: var(--font-weight-medium);
           font-size: var(--font-size-s);
-          margin-bottom: var(--spacing-s);
-        }
-
-        .qualities,
-        .traits {
-          display: flex;
-          flex-wrap: wrap;
-          gap: var(--spacing-xs);
-          margin-top: var(--spacing-xs);
-
-          .quality-item,
-          .trait-item {
-            padding: 2px var(--spacing-xs);
-            background: var(--color-bg-overlay);
-            border-radius: var(--radius-s);
-            font-size: var(--font-size-xs);
-            color: var(--color-text-secondary);
-          }
         }
       }
 
@@ -740,41 +702,6 @@
         text-align: center;
         color: var(--color-text-muted);
         font-style: italic;
-      }
-    }
-
-    .ingredient-actions {
-      display: flex;
-      gap: var(--spacing-s);
-
-      button {
-        flex: 1;
-        padding: var(--spacing-s) var(--spacing-m);
-        border-radius: var(--radius-button);
-        font-size: var(--font-size-s);
-        font-weight: var(--font-weight-medium);
-        cursor: pointer;
-        transition: all var(--transition-fast);
-      }
-
-      .btn-auto-select {
-        background: rgba(138, 43, 226, 0.2);
-        border: var(--border-width-medium) solid var(--color-accent-purple);
-        color: var(--color-accent-purple);
-
-        &:hover {
-          background: rgba(138, 43, 226, 0.3);
-        }
-      }
-
-      .btn-clear-selection {
-        background: rgba(244, 67, 54, 0.2);
-        border: var(--border-width-medium) solid var(--color-error);
-        color: var(--color-error);
-
-        &:hover {
-          background: rgba(244, 67, 54, 0.3);
-        }
       }
     }
   }

@@ -30,10 +30,6 @@ export class CraftingService {
   // Progress update timer
   private progressTimer: any = null;
 
-  // Store last recipe for auto-restart
-  private lastRecipeId: string | null = null;
-  private lastSelectedIngredients: { [itemId: string]: string[] } | null = null;
-
   constructor() {
     // Set up socket event listeners when connected
     effect(() => {
@@ -121,7 +117,7 @@ export class CraftingService {
         message: `Crafted ${data.recipeName}!`,
         output: data.result,
         experience: {
-          skill: data.skillUpdate?.name || 'unknown',
+          skill: data.skillUpdate?.skill || 'unknown',
           xp: data.xpGained || 0,
           skillResult: data.skillUpdate,
           attributeResult: data.attributeUpdate
@@ -137,15 +133,8 @@ export class CraftingService {
       // Emit completion event for UI notifications
       this.craftingCompleted$.next(result);
 
-      // Auto-restart if we have stored recipe details
-      if (this.lastRecipeId) {
-        this.startCrafting(this.lastRecipeId, this.lastSelectedIngredients || undefined).catch((error) => {
-          console.error('Failed to auto-restart crafting:', error);
-          // Clear stored recipe on error
-          this.lastRecipeId = null;
-          this.lastSelectedIngredients = null;
-        });
-      }
+      // Component handles auto-restart via reuseIngredientSelection()
+      // No service-level auto-restart to avoid race conditions
     });
 
     this.socketService.on('crafting:cancelled', (data: any) => {
@@ -153,10 +142,6 @@ export class CraftingService {
 
       // Stop progress timer
       this.stopProgressTimer();
-
-      // Clear stored recipe (don't auto-restart cancelled crafting)
-      this.lastRecipeId = null;
-      this.lastSelectedIngredients = null;
 
       this.activeCrafting.set(null);
       this.isCrafting.set(false);
@@ -168,10 +153,6 @@ export class CraftingService {
 
       // Stop progress timer
       this.stopProgressTimer();
-
-      // Clear stored recipe on error
-      this.lastRecipeId = null;
-      this.lastSelectedIngredients = null;
 
       this.craftingError$.next({
         error: data.message,
@@ -201,10 +182,6 @@ export class CraftingService {
         throw new Error(response.message || 'Failed to start crafting');
       }
 
-      // Store for auto-restart
-      this.lastRecipeId = recipeId;
-      this.lastSelectedIngredients = selectedIngredients || null;
-
       // Set active crafting immediately (will be updated by socket event)
       this.activeCrafting.set({
         recipeId,
@@ -232,8 +209,6 @@ export class CraftingService {
         this.activeCrafting.set(null);
         this.isCrafting.set(false);
         this.remainingTime.set(0);
-        this.lastRecipeId = null;
-        this.lastSelectedIngredients = null;
       }
 
       return response;
