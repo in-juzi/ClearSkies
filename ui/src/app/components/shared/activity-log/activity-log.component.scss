@@ -1,0 +1,97 @@
+// Activity Log
+.activity-log {
+  margin-top: var(--spacing-2xl);
+  background-color: rgba(26, 26, 46, 0.5);
+  border: var(--border-light);
+  border-radius: var(--radius-card);
+  padding: var(--spacing-l);
+  max-height: 300px;
+  overflow-y: auto;
+
+  h3 {
+    color: var(--color-secondary);
+    margin: 0 0 var(--spacing-l) 0;
+    font-size: var(--font-size-l);
+    text-align: center;
+  }
+}
+
+.log-entries {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-s);
+}
+
+.log-entry {
+  display: flex;
+  gap: var(--spacing-m);
+  padding: var(--spacing-s);
+  background-color: rgba(74, 78, 105, 0.2);
+  border-radius: var(--radius-s);
+  border-left: 3px solid var(--color-accent-purple);
+  font-size: var(--font-size-s);
+  transition: background-color var(--transition-fast) ease;
+
+  &:hover {
+    background-color: rgba(74, 78, 105, 0.3);
+  }
+}
+
+.log-timestamp {
+  color: var(--color-text-muted);
+  font-family: var(--font-monospace);
+  font-size: var(--font-size-xs);
+  min-width: 60px;
+  flex-shrink: 0;
+  align-content: center;
+}
+
+.log-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.log-activity-name {
+  width: fit-content;
+  color: var(--color-text-tertiary);
+  font-weight: var(--font-weight-medium);
+}
+
+.log-rewards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-s);
+  font-size: var(--font-size-xs);
+}
+
+.gold-reward {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.15rem 0.4rem;
+  background-color: var(--color-bg-overlay);
+  border-radius: 3px;
+  color: var(--color-accent-gold);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+}
+
+// Scrollbar styling
+.activity-log::-webkit-scrollbar {
+  width: 8px;
+}
+
+.activity-log::-webkit-scrollbar-track {
+  background: rgba(26, 26, 46, 0.3);
+}
+
+.activity-log::-webkit-scrollbar-thumb {
+  background: var(--color-surface-border);
+  border-radius: var(--radius-s);
+
+  &:hover {
+    background: var(--color-surface-border-light);
+  }
+}

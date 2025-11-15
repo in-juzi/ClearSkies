@@ -1,0 +1,64 @@
+<div class="activity-log">
+  <h3>{{ title }}</h3>
+  <div class="log-entries">
+    @for (entry of visibleEntries; track entry.timestamp) {
+      <div class="log-entry">
+        @if (showTimestamp) {
+          <div class="log-timestamp">{{ entry.timestamp | date:'HH:mm:ss' }}</div>
+        }
+        <div class="log-content">
+          <div class="log-rewards">
+            <!-- Gold -->
+            @if (entry.rewards.gold && entry.rewards.gold > 0) {
+              <span class="gold-reward">💰 {{ entry.rewards.gold }}</span>
+            }
+
+            <!-- Items -->
+            @if (entry.rewards.items && entry.rewards.items.length > 0) {
+              @for (item of entry.rewards.items; track item.itemId) {
+                <app-item-mini
+                  [item]="item"
+                  [showIcon]="true"
+                  [showQuantity]="true"
+                  [showItemId]="true"
+                  [showDisplayName]="true"
+                  [showModifiers]="true">
+                </app-item-mini>
+              }
+            }
+
+            <!-- Experience -->
+            @if (entry.rewards.experience && entry.rewards.experience.length > 0) {
+              @for (xpReward of entry.rewards.experience; track xpReward.skill) {
+                <app-xp-mini
+                  [skillName]="xpReward.skill"
+                  [xp]="xpReward.xp"
+                  [showIcon]="true"
+                  [showSkillName]="true">
+                </app-xp-mini>
+                @if (xpReward.leveledUp) {
+                  <span class="level-up-mini">{{ getSkillDisplayName(xpReward.skill) }} → Level {{ xpReward.newLevel }}!</span>
+                }
+              }
+            }
+
+            <!-- Attribute Experience -->
+            @if (entry.rewards.attributes && entry.rewards.attributes.length > 0) {
+              @for (attrReward of entry.rewards.attributes; track attrReward.attribute) {
+                <app-xp-mini
+                  [skillName]="attrReward.attribute"
+                  [xp]="attrReward.xp"
+                  [showIcon]="true"
+                  [showSkillName]="true">
+                </app-xp-mini>
+                @if (attrReward.leveledUp) {
+                  <span class="level-up-mini">{{ getAttributeDisplayName(attrReward.attribute) }} → Level {{ attrReward.newLevel }}!</span>
+                }
+              }
+            }
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>
