@@ -75,6 +75,24 @@ export class LocationTravelComponent {
   }
 
   /**
+   * Get destination name from targetLocationId
+   */
+  getDestinationName(): string {
+    const travel = this.travelState();
+    const location = this.currentLocation();
+
+    if (!travel?.targetLocationId || !location?.navigationLinks) {
+      return 'Unknown';
+    }
+
+    const navLink = location.navigationLinks.find(
+      (link: any) => link.targetLocationId === travel.targetLocationId
+    );
+
+    return navLink?.name || 'Unknown';
+  }
+
+  /**
    * Log a message to chat
    */
   private logToChat(message: string, type: 'info' | 'error' | 'success' = 'info'): void {

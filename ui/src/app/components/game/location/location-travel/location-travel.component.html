@@ -5,7 +5,7 @@
       <div class="progress-bar">
         <div class="progress-fill" [style.width.%]="getTravelProgressPercent()"></div>
       </div>
-      <p>Destination: {{ currentLocation()?.name }}</p>
+      <p>Destination: {{ getDestinationName() }}</p>
       <p>Time remaining: {{ formatTime(travelState()?.remainingTime || 0) }}</p>
     </div>
     <div class="travel-actions">

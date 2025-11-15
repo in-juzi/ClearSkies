@@ -58,7 +58,7 @@
                       [showScaling]="true">
                     </app-xp-mini>
                     @if (exp.value.leveledUp) {
-                      <span class="level-up-mini">↑</span>
+                      <span class="level-up-mini">{{ getSkillDisplayName(exp.key) }} ↑</span>
                     }
                   }
                 </div>

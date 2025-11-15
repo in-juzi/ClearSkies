@@ -1,10 +1,7 @@
 <div class="location-container">
 
-  <!-- Traveling State -->
-  <app-location-travel></app-location-travel>
-
-  <!-- Main Location View (no activity, no travel) -->
-  @if (!travelState()?.isTravel && currentLocation()) {
+  <!-- Main Location View -->
+  @if (currentLocation()) {
     <div class="main-view">
       <!-- Location Header -->
       <div class="location-header" [style.background-color]="currentLocation()?.biome?.theme?.primaryColor">
@@ -14,10 +11,15 @@
           {{ currentLocation()?.biome?.name }}
         </span>
       </div>
-      <!-- Active Activity Progress -->
-      @if (activeActivity()?.activityId && activityProgress() && !startingActivity()) {
-        <app-location-activity-progress></app-location-activity-progress>
+
+      <!-- Traveling State -->
+      @if (travelState()?.isTravel) {
+        <app-location-travel></app-location-travel>
       } @else {
+        <!-- Active Activity Progress -->
+        @if (activeActivity()?.activityId && activityProgress() && !startingActivity()) {
+          <app-location-activity-progress></app-location-activity-progress>
+        } @else {
         <!-- Activity Detail View -->
         <app-location-activity-detail
           [selectedActivity]="selectedActivity()"
@@ -60,6 +62,7 @@
           (travelRequested)="travel($event)"
           [startingActivity]="startingActivity()">
         </app-location-facility-list>
+        }
       }
     </div>
   }
