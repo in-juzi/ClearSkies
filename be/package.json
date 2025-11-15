@@ -20,7 +20,8 @@
     "type-check": "tsc --noEmit",
     "generate:items": "npx ts-node -r tsconfig-paths/register scripts/convert-json-to-ts.ts && npx ts-node -r tsconfig-paths/register scripts/generate-registry.ts",
     "generate:registry": "npx ts-node -r tsconfig-paths/register scripts/generate-registry.ts",
-    "test:items": "npx ts-node -r tsconfig-paths/register scripts/test-item-registry.ts"
+    "test:items": "npx ts-node -r tsconfig-paths/register scripts/test-item-registry.ts",
+    "progression": "npx ts-node -r tsconfig-paths/register utils/calculate-skill-progression.ts"
   },
   "keywords": [],
   "author": "",
