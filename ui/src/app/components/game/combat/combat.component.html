@@ -145,25 +145,30 @@
       </div>
     </div>
 
-    <!-- Action Bar -->
-    <div class="action-bar">
-      <!-- Combat Ended - New Encounter Button -->
-      @if (combatEnded()) {
+    <!-- Combat Ended - New Encounter Button -->
+    @if (combatEnded()) {
+      <div class="new-encounter-container">
         <button
           class="action-button new-encounter-button"
           (click)="startNewEncounter()">
           <span class="button-icon">🔄</span>
           <span class="button-text">Start New Encounter</span>
         </button>
-      }
+      </div>
+    }
 
-      <!-- Active Combat Actions -->
-      @if (!combatEnded()) {
-        <!-- Ability Buttons -->
+    <!-- Action Bar -->
+    <div class="action-bar">
+      <div class="action-bar-header">
+        <span class="action-bar-icon">⚔️</span>
+        <span class="action-bar-title">Abilities</span>
+      </div>
+      <div class="action-bar-list">
+        <!-- Ability Buttons (shown during and after combat) -->
         @for (ability of combat.availableAbilities; track ability.abilityId) {
           <app-ability-button
             [ability]="ability"
-            [disabled]="isExecutingAction() || !canUseAbility(ability)"
+            [disabled]="combatEnded() || isExecutingAction() || !canUseAbility(ability)"
             [cooldownRemaining]="getAbilityCooldown(ability)"
             [insufficientResource]="combat.playerMana.current < (ability.manaCost || 0)"
             [resourceLabel]="'Mana'"
@@ -171,11 +176,11 @@
             (abilityClick)="useAbility($event)">
           </app-ability-button>
         }
-      }
+      </div>
     </div>
 
-    <!-- Consumables Section -->
-    @if (consumables().length > 0 && !combatEnded()) {
+    <!-- Consumables Section (shown during and after combat) -->
+    @if (consumables().length > 0) {
       <div class="consumables-section">
         <div class="consumables-header">
           <span class="consumables-icon">🧪</span>
@@ -185,7 +190,7 @@
           @for (item of consumables(); track item.instanceId) {
             <app-item-button
               [item]="item"
-              [disabled]="isUsingItem() || isExecutingAction()"
+              [disabled]="combatEnded() || isUsingItem() || isExecutingAction()"
               [size]="'medium'"
               (itemClick)="useConsumable($event)">
             </app-item-button>
