@@ -28,6 +28,7 @@ import chatHandler from './sockets/chatHandler';
 import activityHandler from './sockets/activityHandler';
 import craftingHandler from './sockets/craftingHandler';
 import combatHandler from './sockets/combatHandler';
+import storageHandler from './sockets/storageHandler';
 
 // Import routes
 import authRoutes from './routes/auth';
@@ -38,6 +39,7 @@ import locationRoutes from './routes/locations';
 import manualRoutes from './routes/manual';
 import vendorRoutes from './routes/vendors';
 import craftingRoutes from './routes/crafting';
+import storageRoutes from './routes/storage';
 
 const app = express();
 const server = http.createServer(app);
@@ -106,6 +108,7 @@ app.use('/api/locations', locationRoutes);
 app.use('/api/manual', manualRoutes); // Public routes (no auth required)
 app.use('/api/vendors', vendorRoutes);
 app.use('/api/crafting', craftingRoutes);
+app.use('/api/storage', storageRoutes);
 
 // Error handling middleware
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -135,6 +138,7 @@ chatHandler(io);
 activityHandler(io);
 craftingHandler(io);
 combatHandler(io);
+storageHandler(io);
 
 // Start server - bind to 0.0.0.0 for IPv4 accessibility
 const HOST = '0.0.0.0';
