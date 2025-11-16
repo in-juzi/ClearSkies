@@ -3,7 +3,8 @@ import Player from '../models/Player';
 import locationService from '../services/locationService';
 import itemService from '../services/itemService';
 import dropTableService from '../services/dropTableService';
-import { GatheringActivity } from '@shared/types';
+import effectEvaluator from '../services/effectEvaluator';
+import { GatheringActivity, EffectContext } from '@shared/types';
 import { schedulePlayerTurn, scheduleMonsterTurn } from './combatHandler';
 
 // Track active activity timers per user
@@ -271,8 +272,27 @@ export default function (io: Server): void {
           }
         }
 
-        // Get duration (only on GatheringActivity)
-        const duration = (activity as GatheringActivity).duration || 10;
+        // Get base duration (only on GatheringActivity)
+        const baseDuration = (activity as GatheringActivity).duration || 10;
+
+        // Apply trait/quality modifiers to duration
+        const durationModifiers = effectEvaluator.getActivityDurationModifier(
+          player,
+          activity.type, // Activity type (e.g., 'gathering', 'woodcutting')
+          player.currentLocation // Current location
+        );
+
+        // Calculate final duration: (base + flat) * (1 + percentage) * multiplier
+        const finalDuration = effectEvaluator.calculateFinalValue(baseDuration, {
+          flatBonus: durationModifiers.flat,
+          percentageBonus: durationModifiers.percentage,
+          multiplier: durationModifiers.multiplier,
+          appliedEffects: [],
+          skippedEffects: []
+        });
+
+        // Ensure duration is at least 1 second
+        const duration = Math.max(1, Math.round(finalDuration));
 
         // Start activity
         const startTime = new Date();
