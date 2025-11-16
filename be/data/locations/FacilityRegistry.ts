@@ -7,6 +7,7 @@
 
 import { Facility } from '../../types/locations';
 
+import { BankFacility } from './facilities/BankFacility';
 import { ForestBanditCamp } from './facilities/ForestBanditCamp';
 import { ForestHerbGrove } from './facilities/ForestHerbGrove';
 import { ForestLoggingCamp } from './facilities/ForestLoggingCamp';
@@ -27,6 +28,7 @@ import { VolcanicGarden } from './facilities/VolcanicGarden';
  */
 export class FacilityRegistry {
   private static readonly items = new Map<string, Facility>([
+    [BankFacility.facilityId, BankFacility],
     [ForestBanditCamp.facilityId, ForestBanditCamp],
     [ForestHerbGrove.facilityId, ForestHerbGrove],
     [ForestLoggingCamp.facilityId, ForestLoggingCamp],

@@ -11,6 +11,7 @@ export const Kennik: Location = {
   "description": "A small fishing village on this nameless island. Over time, it also became a paltry port for the sailors coming from the mainland.",
   "biome": "sea",
   "facilities": [
+    "kennik-bank",
     "kennik-fishing-dock",
     "kennik-market",
     "kennik-herb-garden",
