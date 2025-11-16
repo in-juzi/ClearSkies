@@ -29,8 +29,8 @@ export const BalancedTrait: Trait = {
             context: EffectContext.ACTIVITY_DURATION,
             modifierType: ModifierType.FLAT,
             value: -1,  // Negative = time reduction
-            condition: { type: ConditionType.ALWAYS },
-            description: "-1 second activity time"
+            condition: { type: ConditionType.ITEM_REQUIRED_FOR_ACTIVITY },
+            description: "-1 second activity time (when tool is required)"
           }
         ]
       }
@@ -47,8 +47,8 @@ export const BalancedTrait: Trait = {
             context: EffectContext.ACTIVITY_DURATION,
             modifierType: ModifierType.FLAT,
             value: -2,
-            condition: { type: ConditionType.ALWAYS },
-            description: "-2 seconds activity time"
+            condition: { type: ConditionType.ITEM_REQUIRED_FOR_ACTIVITY },
+            description: "-2 seconds activity time (when tool is required)"
           }
         ]
       }
@@ -65,8 +65,8 @@ export const BalancedTrait: Trait = {
             context: EffectContext.ACTIVITY_DURATION,
             modifierType: ModifierType.FLAT,
             value: -4,
-            condition: { type: ConditionType.ALWAYS },
-            description: "-4 seconds activity time"
+            condition: { type: ConditionType.ITEM_REQUIRED_FOR_ACTIVITY },
+            description: "-4 seconds activity time (when tool is required)"
           }
         ]
       }

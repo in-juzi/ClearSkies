@@ -47,8 +47,16 @@ class EffectEvaluatorService {
     // 1. Evaluate equipped item traits
     const equippedItems = this.getEquippedItems(player);
     for (const item of equippedItems) {
-      this.evaluateItemTraits(item, context, result);
-      this.evaluateItemQualities(item, context, result);
+      // Pass the current item in runtime context for ITEM_REQUIRED_FOR_ACTIVITY checks
+      const itemContext = {
+        ...context,
+        runtime: {
+          ...context.runtime,
+          currentItem: item,
+        },
+      };
+      this.evaluateItemTraits(item, itemContext, result);
+      this.evaluateItemQualities(item, itemContext, result);
     }
 
     // 2. Evaluate equipped item affixes (future)
@@ -56,6 +64,36 @@ class EffectEvaluatorService {
 
     // 3. Evaluate active buffs (future - buffs may grant temporary effects)
     // this.evaluateActiveBuffs(player, context, result);
+
+    return result;
+  }
+
+  /**
+   * Evaluate effects for a single item only (not all equipped items)
+   * Useful for item inspection/preview
+   */
+  evaluateSingleItemEffects(
+    item: any,
+    effectContext: EffectContext,
+    runtimeContext?: EffectEvaluationContext['runtime']
+  ): EffectEvaluationResult {
+    const context: EffectEvaluationContext = {
+      entity: {}, // No player context needed for single item
+      effectContext,
+      runtime: runtimeContext || {},
+    };
+
+    const result: EffectEvaluationResult = {
+      flatBonus: 0,
+      percentageBonus: 0,
+      multiplier: 1.0,
+      appliedEffects: [],
+      skippedEffects: [],
+    };
+
+    // Evaluate this item's traits and qualities only
+    this.evaluateItemTraits(item, context, result);
+    this.evaluateItemQualities(item, context, result);
 
     return result;
   }
@@ -230,6 +268,9 @@ class EffectEvaluatorService {
         }
         return runtime.activityLocation === condition.value;
 
+      case ConditionType.ITEM_REQUIRED_FOR_ACTIVITY:
+        return this.isItemRequiredForActivity(runtime.currentItem, runtime.activity);
+
       // Target restrictions
       case ConditionType.TARGET_TYPE:
         if (!runtime.target?.type) return false;
@@ -338,6 +379,38 @@ class EffectEvaluatorService {
                             offHandDef?.subcategories?.includes('weapon');
 
     return isMainHandWeapon && isOffHandWeapon;
+  }
+
+  /**
+   * Helper: Check if an item is required for an activity
+   * An item is required if its subtype matches any of the activity's equipment requirements
+   */
+  private isItemRequiredForActivity(item: any, activity: any): boolean {
+    if (!item || !activity) return false;
+
+    // Get the item definition to check its subtype
+    const itemDef = itemService.getItemDefinition(item.itemId);
+    if (!itemDef) return false;
+
+    // Check if activity has equipment requirements
+    const requiredEquipment = activity.requirements?.equipped;
+    if (!requiredEquipment || !Array.isArray(requiredEquipment)) return false;
+
+    // Check if the item's subtype matches any required equipment subtype
+    for (const requirement of requiredEquipment) {
+      if (requirement.subtype) {
+        // First check the item's explicit subtype field (only exists on EquipmentItem)
+        if ('subtype' in itemDef && itemDef.subtype === requirement.subtype) {
+          return true;
+        }
+        // Also check subcategories array as a fallback
+        if (itemDef.subcategories?.includes(requirement.subtype)) {
+          return true;
+        }
+      }
+    }
+
+    return false;
   }
 
   /**
@@ -451,12 +524,118 @@ class EffectEvaluatorService {
   getActivityDurationModifier(
     player: any,
     activityType?: string,
-    activityLocation?: string
+    activityLocation?: string,
+    activity?: any
   ): { flat: number; percentage: number; multiplier: number } {
     const result = this.evaluatePlayerEffects(
       player,
       EffectContext.ACTIVITY_DURATION,
-      { activityType, activityLocation }
+      { activityType, activityLocation, activity }
+    );
+
+    return {
+      flat: result.flatBonus,
+      percentage: result.percentageBonus,
+      multiplier: result.multiplier,
+    };
+  }
+
+  /**
+   * Get crafting quality bonus modifier
+   */
+  getCraftingQualityBonus(
+    player: any,
+    skill?: string,
+    recipe?: any
+  ): { flat: number; percentage: number; multiplier: number } {
+    const result = this.evaluatePlayerEffects(
+      player,
+      EffectContext.CRAFTING_QUALITY_BONUS,
+      { skill, recipe }
+    );
+
+    return {
+      flat: result.flatBonus,
+      percentage: result.percentageBonus,
+      multiplier: result.multiplier,
+    };
+  }
+
+  /**
+   * Get crafting success rate modifier
+   */
+  getCraftingSuccessRate(
+    player: any,
+    skill?: string,
+    recipe?: any
+  ): { flat: number; percentage: number; multiplier: number } {
+    const result = this.evaluatePlayerEffects(
+      player,
+      EffectContext.CRAFTING_SUCCESS_RATE,
+      { skill, recipe }
+    );
+
+    return {
+      flat: result.flatBonus,
+      percentage: result.percentageBonus,
+      multiplier: result.multiplier,
+    };
+  }
+
+  /**
+   * Get crafting yield multiplier
+   */
+  getCraftingYieldMultiplier(
+    player: any,
+    skill?: string,
+    recipe?: any
+  ): { flat: number; percentage: number; multiplier: number } {
+    const result = this.evaluatePlayerEffects(
+      player,
+      EffectContext.CRAFTING_YIELD_MULTIPLIER,
+      { skill, recipe }
+    );
+
+    return {
+      flat: result.flatBonus,
+      percentage: result.percentageBonus,
+      multiplier: result.multiplier,
+    };
+  }
+
+  /**
+   * Get vendor sell price modifier
+   */
+  getVendorSellPriceModifier(
+    player: any,
+    itemInstance?: any,
+    vendor?: any
+  ): { flat: number; percentage: number; multiplier: number } {
+    const result = this.evaluatePlayerEffects(
+      player,
+      EffectContext.VENDOR_SELL_PRICE,
+      { item: itemInstance, vendor }
+    );
+
+    return {
+      flat: result.flatBonus,
+      percentage: result.percentageBonus,
+      multiplier: result.multiplier,
+    };
+  }
+
+  /**
+   * Get vendor buy price modifier
+   */
+  getVendorBuyPriceModifier(
+    player: any,
+    itemId?: string,
+    vendor?: any
+  ): { flat: number; percentage: number; multiplier: number } {
+    const result = this.evaluatePlayerEffects(
+      player,
+      EffectContext.VENDOR_BUY_PRICE,
+      { itemId, vendor }
     );
 
     return {

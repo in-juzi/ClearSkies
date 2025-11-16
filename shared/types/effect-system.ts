@@ -75,6 +75,7 @@ export enum ConditionType {
   // Activity restrictions
   ACTIVITY_TYPE = 'activity.type',       // Specific skill (woodcutting, mining, etc.)
   ACTIVITY_LOCATION = 'activity.location', // Specific location
+  ITEM_REQUIRED_FOR_ACTIVITY = 'item.required.for.activity', // Item is required for current activity
 
   // Enemy targeting
   TARGET_TYPE = 'target.type',           // Specific monster type (beast, undead, etc.)
@@ -308,6 +309,12 @@ export interface EffectEvaluationContext {
 
     /** Current activity location */
     activityLocation?: string;
+
+    /** Current activity definition (for checking requirements) */
+    activity?: any;
+
+    /** Current item being evaluated (for checking if it's required) */
+    currentItem?: any;
 
     /** Target entity (for combat targeting conditions) */
     target?: any;
