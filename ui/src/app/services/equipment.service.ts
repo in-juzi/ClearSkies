@@ -6,7 +6,8 @@ import {
   EquipItemRequest,
   UnequipItemRequest,
   EquipmentResponse,
-  ItemDetails
+  ItemDetails,
+  EquipmentStats
 } from '../models/inventory.model';
 import { environment } from '../../environments/environment';
 
@@ -20,20 +21,34 @@ export class EquipmentService {
   // Signals for reactive state
   equippedItems = signal<{ [slotName: string]: ItemDetails }>({});
   slots = signal<{ [slotName: string]: string | null }>({});
+  equipmentStats = signal<EquipmentStats>({
+    totalDamage: [],
+    averageAttackSpeed: 0,
+    totalCritChance: 0,
+    weaponCount: 0,
+    totalArmor: 0,
+    totalEvasion: 0,
+    totalBlockChance: 0,
+    armorCount: 0,
+    totalWeight: 0,
+    requiredLevel: 0,
+    itemCount: 0
+  });
 
   constructor() {
-    // Load equipped items on service initialization
+    // Load equipped items and stats on service initialization
     this.loadEquippedItems().subscribe();
   }
 
   /**
-   * Get all equipped items and slots
+   * Get all equipped items, slots, and stats (combined endpoint)
    */
   loadEquippedItems(): Observable<EquippedItemsResponse> {
     return this.http.get<EquippedItemsResponse>(this.apiUrl).pipe(
       tap(response => {
         this.equippedItems.set(response.equippedItems);
         this.slots.set(response.slots);
+        this.equipmentStats.set(response.stats);
       })
     );
   }
@@ -45,7 +60,7 @@ export class EquipmentService {
     const request: EquipItemRequest = { instanceId, slotName };
     return this.http.post<EquipmentResponse>(`${this.apiUrl}/equip`, request).pipe(
       tap(() => {
-        // Reload equipped items after equipping
+        // Reload equipped items and stats after equipping (single API call)
         this.loadEquippedItems().subscribe();
       })
     );
@@ -58,7 +73,7 @@ export class EquipmentService {
     const request: UnequipItemRequest = { slotName };
     return this.http.post<EquipmentResponse>(`${this.apiUrl}/unequip`, request).pipe(
       tap(() => {
-        // Reload equipped items after unequipping
+        // Reload equipped items and stats after unequipping (single API call)
         this.loadEquippedItems().subscribe();
       })
     );

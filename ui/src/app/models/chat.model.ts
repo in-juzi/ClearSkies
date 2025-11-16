@@ -2,6 +2,7 @@
  * Chat message interface
  */
 export interface ChatMessage {
+  _id?: string; // MongoDB document ID (optional for tracking in loops)
   userId: string;
   username: string;
   message: string;

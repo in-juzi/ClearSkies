@@ -21,7 +21,7 @@ export class ItemDataService {
 
   constructor() {
     // Import the EXACT same registries the backend uses
-    // ItemRegistry is a class, so we need to call its static methods
+    // All registries are classes, so we need to call their static methods
     this.items = new Map();
     ItemRegistry.getAllIds().forEach(id => {
       const item = ItemRegistry.get(id);
@@ -30,9 +30,23 @@ export class ItemDataService {
       }
     });
 
-    // QualityRegistry and TraitRegistry are plain objects
-    this.qualities = new Map(Object.entries(QualityRegistry));
-    this.traits = new Map(Object.entries(TraitRegistry));
+    // Load qualities using static methods
+    this.qualities = new Map();
+    QualityRegistry.getAllIds().forEach(id => {
+      const quality = QualityRegistry.get(id);
+      if (quality) {
+        this.qualities.set(id, quality);
+      }
+    });
+
+    // Load traits using static methods
+    this.traits = new Map();
+    TraitRegistry.getAllIds().forEach(id => {
+      const trait = TraitRegistry.get(id);
+      if (trait) {
+        this.traits.set(id, trait);
+      }
+    });
 
     console.log(`[ItemDataService] Loaded ${this.items.size} items, ${this.qualities.size} qualities, ${this.traits.size} traits`);
   }
@@ -99,5 +113,111 @@ export class ItemDataService {
     return Array.from(this.items.values()).filter(item =>
       item.subcategories?.includes(subcategory)
     );
+  }
+
+  /**
+   * Enrich an item instance with full definition and quality/trait details
+   * @param instance - Minimal item instance from API
+   * @returns Enriched item with definition and details
+   */
+  enrichItemInstance(instance: any): any {
+    const definition = this.getItemDefinition(instance.itemId);
+    if (!definition) {
+      console.warn(`[ItemDataService] Item definition not found for: ${instance.itemId}`);
+      return instance;
+    }
+
+    // Calculate vendor price (50% of base value + quality/trait bonuses)
+    let vendorPrice = Math.floor(definition.baseValue * 0.5);
+
+    // Add quality bonuses to vendor price
+    if (instance.qualities) {
+      for (const [qualityId, level] of Object.entries(instance.qualities)) {
+        const qualityDef = this.getQuality(qualityId);
+        const levelStr = String(level);
+        if (qualityDef?.levels?.[levelStr]) {
+          const levelData = qualityDef.levels[levelStr];
+          if (levelData.effects?.['vendor']?.priceMultiplier) {
+            vendorPrice = Math.floor(vendorPrice * levelData.effects['vendor'].priceMultiplier);
+          }
+        }
+      }
+    }
+
+    // Add trait bonuses to vendor price
+    if (instance.traits) {
+      for (const [traitId, level] of Object.entries(instance.traits)) {
+        const traitDef = this.getTrait(traitId);
+        const levelStr = String(level);
+        if (traitDef?.levels?.[levelStr]) {
+          const levelData = traitDef.levels[levelStr];
+          if (levelData.effects?.['vendor']?.priceMultiplier) {
+            vendorPrice = Math.floor(vendorPrice * levelData.effects['vendor'].priceMultiplier);
+          }
+        }
+      }
+    }
+
+    // Build quality details
+    const qualityDetails: any = {};
+    if (instance.qualities) {
+      for (const [qualityId, level] of Object.entries(instance.qualities)) {
+        const qualityDef = this.getQuality(qualityId);
+        const levelStr = String(level);
+        if (qualityDef?.levels?.[levelStr]) {
+          qualityDetails[qualityId] = {
+            qualityId,
+            name: qualityDef.name,
+            level,
+            maxLevel: qualityDef.maxLevel,
+            levelData: qualityDef.levels[levelStr]
+          };
+        }
+      }
+    }
+
+    // Build trait details with context-aware display names
+    const traitDetails: any = {};
+    if (instance.traits) {
+      for (const [traitId, level] of Object.entries(instance.traits)) {
+        const traitDef = this.getTrait(traitId);
+        const levelStr = String(level);
+        if (traitDef?.levels?.[levelStr]) {
+          // Use category-specific names/descriptions if available
+          const displayName = (traitDef as any).nameByCategory?.[definition.category] || traitDef.name;
+          const displayShorthand = (traitDef as any).shorthandByCategory?.[definition.category] || (traitDef as any).shorthand;
+          const displayDescription = (traitDef as any).descriptionByCategory?.[definition.category] || traitDef.description;
+
+          traitDetails[traitId] = {
+            traitId,
+            name: displayName,
+            shorthand: displayShorthand,
+            description: displayDescription,
+            rarity: traitDef.rarity,
+            level,
+            maxLevel: traitDef.maxLevel,
+            levelData: traitDef.levels[levelStr]
+          };
+        }
+      }
+    }
+
+    return {
+      ...instance,
+      name: definition.name, // Add top-level name for convenience
+      definition,
+      vendorPrice,
+      qualityDetails,
+      traitDetails
+    };
+  }
+
+  /**
+   * Enrich multiple item instances
+   * @param instances - Array of minimal item instances from API
+   * @returns Array of enriched items
+   */
+  enrichItemInstances(instances: any[]): any[] {
+    return instances.map(instance => this.enrichItemInstance(instance));
   }
 }

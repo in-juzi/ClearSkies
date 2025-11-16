@@ -100,8 +100,7 @@ export interface PlayerSkills {
 }
 
 export interface AttributeWithProgress extends Attribute {
-  progress: number;
-  xpToNextLevel?: number;
+  xpToNextLevel: number;
 }
 
 export interface AttributesResponse {
@@ -109,8 +108,7 @@ export interface AttributesResponse {
 }
 
 export interface SkillWithProgress extends Skill {
-  progress: number;
-  experienceToNext?: number;
+  xpToNextLevel: number;
 }
 
 export interface SkillsResponse {
@@ -143,7 +141,6 @@ export interface SkillExperienceResponse {
       name: string;
       level: number;
       experience: number;
-      progress: number;
       leveledUp: boolean;
       oldLevel: number;
       newLevel: number;
@@ -153,7 +150,6 @@ export interface SkillExperienceResponse {
       name: string;
       level: number;
       experience: number;
-      progress: number;
       leveledUp: boolean;
       oldLevel: number;
       newLevel: number;

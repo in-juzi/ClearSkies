@@ -1,6 +1,7 @@
 import { Injectable, signal, inject, effect } from '@angular/core';
 import { SocketService } from './socket.service';
-import { ItemDetails } from '../models/inventory.model';
+import { ItemDetails, ItemInstance } from '../models/inventory.model';
+import { ItemDataService } from './item-data.service';
 
 export interface StorageContainerInfo {
   containerId: string;
@@ -8,7 +9,7 @@ export interface StorageContainerInfo {
   name: string;
   capacity: number;
   usedSlots: number;
-  items: ItemDetails[];
+  items: ItemInstance[];
 }
 
 export interface StorageDepositedEvent {
@@ -32,7 +33,6 @@ export interface StorageBulkDepositedEvent {
 
 export interface StorageItemAddedEvent {
   containerId: string;
-  item: ItemDetails;
   userId: string;
 }
 
@@ -55,6 +55,7 @@ export interface StorageBulkUpdateEvent {
 })
 export class StorageService {
   private socketService = inject(SocketService);
+  private itemDataService = inject(ItemDataService);
 
   // Signals for reactive state
   containerItems = signal<ItemDetails[]>([]);
@@ -91,9 +92,12 @@ export class StorageService {
       name: string;
       capacity: number;
       usedSlots: number;
-      items: ItemDetails[];
+      items: ItemInstance[];
     }) => {
-      this.containerItems.set(data.items);
+      // Enrich minimal instances with definitions from local ItemDataService
+      const enrichedItems = this.itemDataService.enrichItemInstances(data.items);
+
+      this.containerItems.set(enrichedItems);
       this.containerCapacity.set(data.capacity);
       this.containerUsedSlots.set(data.usedSlots);
       this.containerAvailableSlots.set(data.capacity - data.usedSlots);
@@ -105,7 +109,10 @@ export class StorageService {
 
     // Deposit success
     socket.on('storage:deposited', (data: StorageDepositedEvent) => {
-      this.containerItems.set(data.container.items);
+      // Enrich minimal instances with definitions
+      const enrichedItems = this.itemDataService.enrichItemInstances(data.container.items);
+
+      this.containerItems.set(enrichedItems);
       this.containerUsedSlots.set(data.container.usedSlots);
       this.containerAvailableSlots.set(data.container.capacity - data.container.usedSlots);
       this.isLoading.set(false);
@@ -113,7 +120,10 @@ export class StorageService {
 
     // Withdraw success
     socket.on('storage:withdrawn', (data: StorageWithdrawnEvent) => {
-      this.containerItems.set(data.container.items);
+      // Enrich minimal instances with definitions
+      const enrichedItems = this.itemDataService.enrichItemInstances(data.container.items);
+
+      this.containerItems.set(enrichedItems);
       this.containerUsedSlots.set(data.container.usedSlots);
       this.containerAvailableSlots.set(data.container.capacity - data.container.usedSlots);
       this.isLoading.set(false);
@@ -121,7 +131,10 @@ export class StorageService {
 
     // Bulk deposit success
     socket.on('storage:bulkDeposited', (data: StorageBulkDepositedEvent) => {
-      this.containerItems.set(data.container.items);
+      // Enrich minimal instances with definitions
+      const enrichedItems = this.itemDataService.enrichItemInstances(data.container.items);
+
+      this.containerItems.set(enrichedItems);
       this.containerUsedSlots.set(data.container.usedSlots);
       this.containerAvailableSlots.set(data.container.capacity - data.container.usedSlots);
       this.isLoading.set(false);

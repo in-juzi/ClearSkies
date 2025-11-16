@@ -130,11 +130,26 @@ export interface EquipmentSlots {
   [slotName: string]: string | null; // slot name -> instanceId or null
 }
 
+export interface EquipmentStats {
+  totalDamage: string[];
+  averageAttackSpeed: number;
+  totalCritChance: number;
+  weaponCount: number;
+  totalArmor: number;
+  totalEvasion: number;
+  totalBlockChance: number;
+  armorCount: number;
+  totalWeight: number;
+  requiredLevel: number;
+  itemCount: number;
+}
+
 export interface EquippedItemsResponse {
   equippedItems: {
     [slotName: string]: ItemDetails;
   };
   slots: EquipmentSlots;
+  stats: EquipmentStats;
 }
 
 export interface EquipItemRequest {

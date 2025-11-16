@@ -43,12 +43,15 @@ export class InventoryService {
   }
 
   /**
-   * Fetch player's inventory
+   * Fetch player's inventory (minimal data from API, enriched locally)
    */
   getInventory(): Observable<InventoryResponse> {
     return this.http.get<InventoryResponse>(this.apiUrl).pipe(
       tap(response => {
-        this.inventory.set(response.inventory);
+        // Enrich minimal instances with definitions from local ItemDataService
+        const enrichedInventory = this.itemDataService.enrichItemInstances(response.inventory);
+
+        this.inventory.set(enrichedInventory);
         this.inventoryCapacity.set(response.capacity); // DEPRECATED
         this.carryingCapacity.set(response.carryingCapacity);
         this.currentWeight.set(response.currentWeight);
@@ -237,8 +240,13 @@ export class InventoryService {
    * Set inventory (used by vendor service after transactions)
    */
   setInventory(items: ItemDetails[]): void {
-    this.inventory.set(items);
-    this.inventorySize.set(items.reduce((sum, item) => sum + item.quantity, 0));
+    // If items are minimal instances (no definition), enrich them
+    const enrichedItems = items.map(item =>
+      item.definition ? item : this.itemDataService.enrichItemInstance(item)
+    );
+
+    this.inventory.set(enrichedItems);
+    this.inventorySize.set(enrichedItems.reduce((sum, item) => sum + item.quantity, 0));
   }
 
   /**

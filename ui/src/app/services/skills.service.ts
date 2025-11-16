@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { SkillsResponse, SkillExperienceResponse, SkillName, SkillWithProgress } from '../models/user.model';
+import { getPercentToNextLevel, getTotalXPForLevel } from '@shared/constants/attribute-constants';
 
 @Injectable({
   providedIn: 'root'
@@ -79,17 +80,26 @@ export class SkillsService {
   }
 
   /**
-   * Calculate the experience needed for next level (always 1000)
+   * Calculate the experience needed for next level
    */
-  getExperienceToNext(experience: number): number {
-    return 1000 - (experience % 1000);
+  getExperienceToNext(skill: SkillWithProgress): number {
+    return skill.xpToNextLevel;
   }
 
   /**
    * Get skill progress as a percentage (0-100)
+   * Computed from level and experience using shared formula
    */
-  getSkillProgressPercent(experience: number): number {
-    return (experience % 1000) / 10;
+  getSkillProgressPercent(skill: SkillWithProgress): number {
+    return getPercentToNextLevel(skill.level, skill.experience);
+  }
+
+  /**
+   * Get total cumulative XP for a skill
+   * Computed from level and current experience
+   */
+  getTotalXP(skill: SkillWithProgress): number {
+    return getTotalXPForLevel(skill.level) + skill.experience;
   }
 
   /**
