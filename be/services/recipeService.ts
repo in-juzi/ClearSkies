@@ -1,6 +1,7 @@
 import { Recipe } from '@shared/types';
 import { RecipeRegistry } from '../data/recipes/RecipeRegistry';
 import itemService from './itemService';
+import effectEvaluator from './effectEvaluator';
 
 class RecipeService {
   private itemService = itemService;
@@ -212,12 +213,14 @@ class RecipeService {
 
   /**
    * Calculate crafting outcome based on ingredient quality and player skill
+   * Now integrates effect system for quality bonuses and yield multipliers
    */
   calculateCraftingOutcome(
     recipe: Recipe,
     ingredientInstances: any[],
     playerSkillLevel: number,
-    itemService: any
+    itemService: any,
+    player?: any
   ): any[] {
     const outputs = recipe.outputs;
     const outputItems: any[] = [];
@@ -236,9 +239,35 @@ class RecipeService {
 
     // Process each output
     for (const outputDef of outputs) {
+      // Calculate base quantity
+      let finalQuantity = outputDef.quantity;
+
+      // Apply yield multiplier from effect system (equipped tools with traits)
+      if (player) {
+        const yieldEffects = effectEvaluator.getCraftingYieldMultiplier(
+          player,
+          recipe.skill,
+          recipe
+        );
+
+        // Apply yield modifiers
+        finalQuantity = Math.floor(
+          effectEvaluator.calculateFinalValue(finalQuantity, {
+            flatBonus: yieldEffects.flat,
+            percentageBonus: yieldEffects.percentage,
+            multiplier: yieldEffects.multiplier,
+            appliedEffects: [],
+            skippedEffects: []
+          })
+        );
+
+        // Ensure at least 1 item
+        finalQuantity = Math.max(1, finalQuantity);
+      }
+
       const output: any = {
         itemId: outputDef.itemId,
-        quantity: outputDef.quantity,
+        quantity: finalQuantity,
         qualities: new Map(),
         traits: new Map()
       };
@@ -269,14 +298,34 @@ class RecipeService {
           }
         }
 
-        // Skill bonus: Every 10 skill levels = +1 quality level bonus (max +2)
-        const skillBonus = Math.min(2, Math.floor(playerSkillLevel / 10));
+        // Skill bonus: Base bonus (every 10 skill levels = +1, max +2)
+        let totalQualityBonus = Math.min(2, Math.floor(playerSkillLevel / 10));
 
-        if (skillBonus > 0 && output.qualities.size > 0) {
-          // Apply skill bonus to the primary quality (first one)
+        // Add effect system quality bonuses (traits/qualities on equipped tools)
+        if (player) {
+          const qualityEffects = effectEvaluator.getCraftingQualityBonus(
+            player,
+            recipe.skill,
+            recipe
+          );
+
+          // Add flat bonus from effects (e.g., Masterwork trait could add +1)
+          totalQualityBonus += Math.floor(qualityEffects.flat);
+
+          // Apply percentage modifier if any (e.g., +50% quality bonus)
+          if (qualityEffects.percentage !== 0) {
+            totalQualityBonus = Math.floor(totalQualityBonus * (1 + qualityEffects.percentage));
+          }
+
+          // Apply multiplier if any
+          totalQualityBonus = Math.floor(totalQualityBonus * qualityEffects.multiplier);
+        }
+
+        if (totalQualityBonus > 0 && output.qualities.size > 0) {
+          // Apply total quality bonus to the primary quality (first one)
           const primaryQuality = Array.from(output.qualities.keys())[0];
           const currentLevel = output.qualities.get(primaryQuality)!;
-          const newLevel = Math.min(5, currentLevel + skillBonus); // Cap at level 5
+          const newLevel = Math.min(5, currentLevel + totalQualityBonus); // Cap at level 5
           output.qualities.set(primaryQuality, newLevel);
         }
 

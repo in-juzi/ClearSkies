@@ -458,15 +458,32 @@ export default function (io: Server): void {
               playerNextAttackTime: player.activeCombat!.playerNextAttackTime,
               monsterNextAttackTime: player.activeCombat!.monsterNextAttackTime,
               abilityCooldowns: Object.fromEntries(player.activeCombat!.abilityCooldowns),
-              availableAbilities: availableAbilities.map((ability: any) => ({
-                abilityId: ability.abilityId,
-                name: ability.name,
-                description: ability.description,
-                manaCost: ability.manaCost,
-                cooldown: ability.cooldown,
-                powerMultiplier: ability.powerMultiplier,
-                icon: ability.icon
-              })),
+              availableAbilities: availableAbilities.map((ability: any) => {
+                // Calculate damage range for this ability
+                const damageRange = combatService.calculateAbilityDamageRange(player, ability, itemService);
+
+                // Generate effect explanations
+                const effectExplanations = combatService.generateAbilityEffectExplanations(ability);
+
+                return {
+                  abilityId: ability.abilityId,
+                  name: ability.name,
+                  description: ability.description,
+                  type: ability.type,
+                  targetType: ability.targetType,
+                  manaCost: ability.manaCost,
+                  cooldown: ability.cooldown,
+                  powerMultiplier: ability.powerMultiplier,
+                  icon: ability.icon,
+                  effects: ability.effects,
+                  requirements: ability.requirements,
+                  // Pre-calculated tooltip data
+                  tooltipData: {
+                    damageRange: damageRange ? `${damageRange.min}-${damageRange.max} damage` : null,
+                    effectExplanations: effectExplanations.length > 0 ? effectExplanations : null
+                  }
+                };
+              }),
               combatLog,
               activityId: player.activeCombat!.activityId,
               activeBuffs: serializeActiveBuffs(player)

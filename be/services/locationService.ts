@@ -267,53 +267,17 @@ class LocationService {
   }
 
   /**
-   * Calculate scaled XP based on player level vs activity level
-   * Uses polynomial decay with grace range (0-1 levels over = full XP)
-   */
-  calculateScaledXP(rawXP: number, playerLevel: number, activityLevel: number): number {
-    const levelDiff = playerLevel - activityLevel;
-
-    // Grace range: 0-1 levels over = full XP
-    if (levelDiff <= 1) {
-      return rawXP;
-    }
-
-    // Polynomial decay: 1 / (1 + 0.3 * (diff - 1))
-    // Smoother than linear, gentler than exponential
-    const effectiveDiff = levelDiff - 1; // Subtract grace level
-    const scalingFactor = 1 / (1 + 0.3 * effectiveDiff);
-
-    // Apply floor of 1 XP
-    return Math.max(1, Math.floor(rawXP * scalingFactor));
-  }
-
-  /**
-   * Calculate activity rewards with XP scaling
+   * Calculate activity rewards (no XP scaling - activities give fixed XP)
    */
   calculateActivityRewards(activity: any, options: any = {}): any {
-    const { player } = options;
-
     const rewards: any = {
-      experience: {},
-      rawExperience: activity.rewards.experience || {}, // Keep raw values for UI
+      experience: activity.rewards.experience || {},
       items: [],
       gold: 0
     };
 
-    // Apply XP scaling if player context provided
-    if (activity.rewards.experience) {
-      for (const [skillName, rawXP] of Object.entries(activity.rewards.experience)) {
-        if (player && player.skills && player.skills[skillName]) {
-          const playerLevel = player.skills[skillName].level;
-          const activityLevel = activity.requirements?.skills?.[skillName] || 1;
-
-          rewards.experience[skillName] = this.calculateScaledXP(rawXP as number, playerLevel, activityLevel);
-        } else {
-          // No player context or skill not found - use raw XP
-          rewards.experience[skillName] = rawXP;
-        }
-      }
-    }
+    // XP rewards are now fixed per activity (no scaling)
+    // Players should progress to higher-tier activities for more XP
 
     // Roll on drop tables (new system)
     if (activity.rewards.dropTables && Array.isArray(activity.rewards.dropTables)) {

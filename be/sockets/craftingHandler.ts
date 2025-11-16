@@ -89,7 +89,8 @@ function scheduleCraftingCompletion(
         recipe,
         ingredientInstances,
         playerSkillLevel,
-        itemService
+        itemService,
+        freshPlayer  // Pass player for effect system integration
       );
 
       // Add crafted items to inventory

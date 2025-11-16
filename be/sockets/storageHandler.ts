@@ -80,7 +80,6 @@ export default function storageHandler(io: Server): void {
         // Emit update to other players viewing the same container (for guild storage)
         socket.to(`storage:${containerId}`).emit('storage:itemAdded', {
           containerId,
-          item: result.item,
           userId
         });
       } catch (error: any) {

@@ -1127,6 +1127,187 @@ class CombatService {
       convertedFromHoT: totalHealing - (effects.healthRestore || 0)
     };
   }
+
+  /**
+   * Calculate expected damage range for an ability (for tooltip display)
+   * Returns min and max damage based on weapon dice, skill/attribute bonuses, and ability multiplier
+   */
+  calculateAbilityDamageRange(player: any, ability: Ability, itemService: any): { min: number; max: number } | null {
+    if (!ability.effects?.damage) return null;
+
+    const weapon = this.getEquippedWeapon(player, itemService);
+    if (!weapon) {
+      return { min: 0, max: 0 }; // No weapon equipped
+    }
+
+    // Parse weapon damage dice (e.g., "1d6" -> numDice: 1, numFaces: 6)
+    const match = weapon.damageRoll.match(/^(\d+)d(\d+)([+-]\d+)?$/);
+    if (!match) return null;
+
+    const numDice = parseInt(match[1]);
+    const numFaces = parseInt(match[2]);
+    const diceModifier = match[3] ? parseInt(match[3]) : 0;
+
+    // Calculate base min/max from dice
+    const baseMin = numDice + diceModifier; // Minimum roll (all 1s)
+    const baseMax = numDice * numFaces + diceModifier; // Maximum roll (all max)
+
+    // Apply ability multiplier
+    const multiplier = ability.effects.damage.multiplier;
+    let min = Math.floor(baseMin * multiplier);
+    let max = Math.floor(baseMax * multiplier);
+
+    // Get skill level for scaling
+    const skillScalar = weapon.skillScalar;
+    const skill = player.skills[skillScalar];
+    const skillLevel = skill ? skill.level : 1;
+
+    // Get main attribute level
+    const mainAttr = skill ? skill.mainAttribute : 'strength';
+    const attribute = player.attributes[mainAttr];
+    const attrLevel = attribute ? attribute.level : 1;
+
+    // Calculate level bonuses (same as calculateDamage)
+    const skillBonus = Math.min(
+      COMBAT_FORMULAS.SKILL_BONUS_MAX,
+      Math.floor(skillLevel / COMBAT_FORMULAS.SKILL_BONUS_PER_LEVELS)
+    );
+    const attrBonus = Math.min(
+      COMBAT_FORMULAS.ATTR_BONUS_MAX,
+      Math.floor(attrLevel / COMBAT_FORMULAS.ATTR_BONUS_PER_LEVELS)
+    );
+    const totalLevelBonus = skillBonus + attrBonus;
+
+    // Add level bonus to range
+    min += totalLevelBonus;
+    max += totalLevelBonus;
+
+    // Apply trait/quality bonuses from equipment
+    const currentHP = player.stats?.health?.current || 0;
+    const maxHP = player.maxHP || 1;
+    const hpPercent = currentHP / maxHP;
+
+    const traitEffects = effectEvaluator.evaluatePlayerEffects(
+      player,
+      EffectContext.COMBAT_DAMAGE,
+      { hpPercent, inCombat: true }
+    );
+
+    // Apply flat damage bonus
+    min += traitEffects.flatBonus;
+    max += traitEffects.flatBonus;
+
+    // Apply percentage damage bonus
+    if (traitEffects.percentageBonus !== 0) {
+      min = Math.floor(min * (1 + traitEffects.percentageBonus));
+      max = Math.floor(max * (1 + traitEffects.percentageBonus));
+    }
+
+    // Ensure minimum damage
+    min = Math.max(COMBAT_FORMULAS.MIN_DAMAGE, min);
+    max = Math.max(COMBAT_FORMULAS.MIN_DAMAGE, max);
+
+    return { min, max };
+  }
+
+  /**
+   * Generate effect explanations for an ability (for tooltip display)
+   * Returns array of human-readable effect descriptions
+   */
+  generateAbilityEffectExplanations(ability: Ability): string[] {
+    const explanations: string[] = [];
+
+    if (!ability.effects) return explanations;
+
+    // Handle applyBuff effects (buffs, debuffs, DoTs, HoTs)
+    if (ability.effects.applyBuff) {
+      const buff = ability.effects.applyBuff;
+      const target = buff.target === 'self' ? 'you' : 'the enemy';
+      const buffType = buff.target === 'self' ? 'Buff' : 'Debuff';
+
+      // Damage over time
+      if (buff.damageOverTime) {
+        const totalDamage = buff.damageOverTime * buff.duration;
+        explanations.push(
+          `${buffType}: ${buff.name} - ${buff.damageOverTime} damage/turn × ${buff.duration} turns = ${totalDamage} total damage`
+        );
+      }
+
+      // Healing over time
+      if (buff.healOverTime) {
+        const totalHealing = buff.healOverTime * buff.duration;
+        explanations.push(
+          `${buffType}: ${buff.name} - ${buff.healOverTime} healing/turn × ${buff.duration} turns = ${totalHealing} total healing`
+        );
+      }
+
+      // Mana regeneration
+      if (buff.manaRegen) {
+        const totalMana = buff.manaRegen * buff.duration;
+        explanations.push(
+          `${buffType}: ${buff.name} - ${buff.manaRegen} mana/turn × ${buff.duration} turns = ${totalMana} total mana`
+        );
+      }
+
+      // Mana drain
+      if (buff.manaDrain) {
+        const totalDrain = buff.manaDrain * buff.duration;
+        explanations.push(
+          `${buffType}: ${buff.name} - ${buff.manaDrain} mana drain/turn × ${buff.duration} turns = ${totalDrain} total drain`
+        );
+      }
+
+      // Stat modifiers
+      if (buff.statModifiers && buff.statModifiers.length > 0) {
+        const effectParts: string[] = [];
+        for (const mod of buff.statModifiers) {
+          const statName = this.formatStatName(mod.stat);
+          if (mod.type === ModifierType.FLAT) {
+            effectParts.push(`${mod.value >= 0 ? '+' : ''}${mod.value} ${statName}`);
+          } else if (mod.type === ModifierType.PERCENTAGE) {
+            const percent = Math.round(mod.value * 100);
+            effectParts.push(`${percent >= 0 ? '+' : ''}${percent}% ${statName}`);
+          } else if (mod.type === ModifierType.MULTIPLIER) {
+            effectParts.push(`${mod.value}x ${statName}`);
+          }
+        }
+
+        if (effectParts.length > 0) {
+          const effectList = effectParts.join(', ');
+          explanations.push(
+            `${buffType}: ${buff.name} - ${effectList} for ${buff.duration} turns on ${target}`
+          );
+        }
+      }
+    }
+
+    // Critical chance bonus
+    if (ability.effects.critChanceBonus) {
+      const bonus = Math.round(ability.effects.critChanceBonus * 100);
+      explanations.push(`+${bonus}% critical hit chance for this attack`);
+    }
+
+    return explanations;
+  }
+
+  /**
+   * Format stat name for display
+   */
+  private formatStatName(stat: BuffableStat | string): string {
+    const formatted: Record<string, string> = {
+      [BuffableStat.ARMOR]: 'Armor',
+      [BuffableStat.EVASION]: 'Evasion',
+      [BuffableStat.DAMAGE]: 'Damage',
+      [BuffableStat.CRIT_CHANCE]: 'Crit Chance',
+      [BuffableStat.ATTACK_SPEED]: 'Attack Speed',
+      [BuffableStat.HEALTH_REGEN]: 'Health Regen',
+      [BuffableStat.MANA_REGEN]: 'Mana Regen',
+      [BuffableStat.RESISTANCE]: 'Resistance',
+      [BuffableStat.LIFESTEAL]: 'Lifesteal'
+    };
+
+    return formatted[stat] || stat;
+  }
 }
 
 export default new CombatService();

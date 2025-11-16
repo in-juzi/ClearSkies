@@ -279,7 +279,8 @@ export default function (io: Server): void {
         const durationModifiers = effectEvaluator.getActivityDurationModifier(
           player,
           activity.type, // Activity type (e.g., 'gathering', 'woodcutting')
-          player.currentLocation // Current location
+          player.currentLocation, // Current location
+          activity // Pass the activity definition for requirement checking
         );
 
         // Calculate final duration: (base + flat) * (1 + percentage) * multiplier

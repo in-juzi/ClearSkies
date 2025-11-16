@@ -1,6 +1,7 @@
 import itemService from './itemService';
 import { Vendor, StockItem, ItemInstance } from '@shared/types';
 import { VendorRegistry } from '../data/vendors/VendorRegistry';
+import effectEvaluator from './effectEvaluator';
 
 /**
  * VendorService - Manages vendor data and transactions
@@ -41,8 +42,9 @@ class VendorService {
 
   /**
    * Calculate the price a player pays to buy an item from a vendor
+   * Now integrates effect system for player-based price modifiers (e.g., Charisma attribute bonus)
    */
-  calculateBuyPrice(vendorId: string, itemId: string): number | null {
+  calculateBuyPrice(vendorId: string, itemId: string, player?: any): number | null {
     const vendor = this.getVendor(vendorId);
     if (!vendor) {
       return null;
@@ -53,27 +55,69 @@ class VendorService {
       return null;
     }
 
-    // Use buyPrice field (primary) or fall back to price field (legacy)
-    return stockItem.buyPrice ?? stockItem.price ?? null;
+    // Get base buy price from vendor stock
+    let buyPrice = stockItem.buyPrice ?? stockItem.price ?? null;
+    if (buyPrice === null) {
+      return null;
+    }
+
+    // Apply effect system modifiers from player's equipped items (e.g., Merchant trait, high charisma)
+    if (player) {
+      const priceEffects = effectEvaluator.getVendorBuyPriceModifier(
+        player,
+        itemId,
+        vendor
+      );
+
+      // Apply modifiers: (base + flat) * (1 + percentage) * multiplier
+      buyPrice = effectEvaluator.calculateFinalValue(buyPrice, {
+        flatBonus: priceEffects.flat,
+        percentageBonus: priceEffects.percentage,
+        multiplier: priceEffects.multiplier,
+        appliedEffects: [],
+        skippedEffects: []
+      });
+    }
+
+    return Math.floor(buyPrice);
   }
 
   /**
    * Calculate the price a player receives when selling an item to a vendor
    * Uses the item's calculated vendor price (from ItemService) multiplied by vendor's sell multiplier
+   * Now integrates effect system for player-based price modifiers (e.g., Merchant trait)
    */
-  calculateSellPrice(vendorId: string, itemInstance: any): number {
+  calculateSellPrice(vendorId: string, itemInstance: any, player?: any): number {
     const vendor = this.getVendor(vendorId);
     if (!vendor) {
       return 0;
     }
 
-    // Get the item's full vendor price (with quality/trait bonuses)
-    const vendorPrice = itemService.calculateVendorPrice(itemInstance);
+    // Get the item's full vendor price (with quality/trait bonuses from the item itself)
+    const baseVendorPrice = itemService.calculateVendorPrice(itemInstance);
 
     // Apply vendor's sell multiplier (default 0.5 = 50%)
-    const sellPrice = Math.floor(vendorPrice * vendor.sellPriceMultiplier);
+    let sellPrice = baseVendorPrice * vendor.sellPriceMultiplier;
 
-    return sellPrice;
+    // Apply effect system modifiers from player's equipped items (e.g., Merchant trait)
+    if (player) {
+      const priceEffects = effectEvaluator.getVendorSellPriceModifier(
+        player,
+        itemInstance,
+        vendor
+      );
+
+      // Apply modifiers: (base + flat) * (1 + percentage) * multiplier
+      sellPrice = effectEvaluator.calculateFinalValue(sellPrice, {
+        flatBonus: priceEffects.flat,
+        percentageBonus: priceEffects.percentage,
+        multiplier: priceEffects.multiplier,
+        appliedEffects: [],
+        skippedEffects: []
+      });
+    }
+
+    return Math.floor(sellPrice);
   }
 
   /**
