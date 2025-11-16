@@ -47,6 +47,10 @@ export interface Location {
   facilities: Facility[]; // Backend populates full facility objects (not just IDs)
   navigationLinks: any[];
   isStartingLocation?: boolean;
+  mapPosition?: {
+    x: number;
+    y: number;
+  };
 }
 
 // Export shared activity types for type guards

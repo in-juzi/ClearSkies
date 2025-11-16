@@ -25,6 +25,10 @@ export interface Location {
   facilities: string[]; // facilityIds
   navigationLinks: NavigationLink[];
   isStartingLocation?: boolean;
+  mapPosition?: {
+    x: number;
+    y: number;
+  };
 }
 
 /**

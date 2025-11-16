@@ -9,6 +9,7 @@ router.use(protect);
 
 // Location endpoints
 router.get('/', locationController.getDiscoveredLocations);
+router.get('/all', locationController.getAllLocations);
 router.get('/current', locationController.getCurrentLocation);
 router.get('/:locationId', locationController.getLocation);
 

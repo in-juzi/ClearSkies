@@ -45,5 +45,9 @@ export const ForestClearing: Location = {
       "encounters": []
     }
   ],
-  "isStartingLocation": false
+  "isStartingLocation": false,
+  "mapPosition": {
+    "x": 500,
+    "y": 300
+  }
 } as const;

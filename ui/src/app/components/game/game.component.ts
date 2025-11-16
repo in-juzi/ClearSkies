@@ -14,12 +14,14 @@ import { Equipment } from './equipment/equipment.component';
 import { CharacterStatus } from './character-status/character-status.component';
 import { ChatComponent } from './chat/chat.component';
 import { BankComponent } from './bank/bank.component';
+import { WorldMap } from './world-map/world-map';
 import { ALL_SKILLS, ALL_ATTRIBUTES } from '../../constants/game-data.constants';
+import { LocationService } from '../../services/location.service';
 
 @Component({
   selector: 'app-game',
   standalone: true,
-  imports: [CommonModule, RouterModule, ManualComponent, Skills, AttributesComponent, InventoryComponent, LocationComponent, Equipment, CharacterStatus, ChatComponent, BankComponent],
+  imports: [CommonModule, RouterModule, ManualComponent, Skills, AttributesComponent, InventoryComponent, LocationComponent, Equipment, CharacterStatus, ChatComponent, BankComponent, WorldMap],
   templateUrl: './game.component.html',
   styleUrl: './game.component.scss'
 })
@@ -27,6 +29,7 @@ export class GameComponent implements OnInit {
   private authService = inject(AuthService);
   private attributesService = inject(AttributesService);
   private combatService = inject(CombatService);
+  private locationService = inject(LocationService);
   private router = inject(Router);
 
   manualDialogService = inject(ManualDialogService);
@@ -44,6 +47,9 @@ export class GameComponent implements OnInit {
   // Track collapse state of sidebars
   leftSidebarCollapsed = signal(false);
   rightSidebarCollapsed = signal(false);
+
+  // Track map dialog state
+  mapDialogOpen = signal(false);
 
   ngOnInit(): void {
     // Fetch latest player data
@@ -167,5 +173,27 @@ export class GameComponent implements OnInit {
 
   toggleRightSidebar(): void {
     this.rightSidebarCollapsed.update(collapsed => !collapsed);
+  }
+
+  // Open full map dialog
+  openMapDialog(): void {
+    this.mapDialogOpen.set(true);
+  }
+
+  // Close full map dialog
+  closeMapDialog(): void {
+    this.mapDialogOpen.set(false);
+  }
+
+  // Handle travel request from map
+  async handleTravelRequest(targetLocationId: string): Promise<void> {
+    try {
+      await this.locationService.startTravel(targetLocationId);
+      // Close dialog after starting travel
+      this.closeMapDialog();
+    } catch (error: any) {
+      console.error('Travel failed:', error);
+      // Keep dialog open on error so user can see what's wrong
+    }
   }
 }

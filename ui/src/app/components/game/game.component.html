@@ -83,6 +83,14 @@
           }
 
           @if (!rightSidebarCollapsed()) {
+            <!-- World Map Minimap -->
+            <div class="minimap-wrapper">
+              <app-world-map mode="minimap" (travelRequested)="handleTravelRequest($event)"></app-world-map>
+              <button class="expand-map-btn" (click)="openMapDialog()" title="Open full map">
+                <span class="material-symbols-outlined">map</span>
+              </button>
+            </div>
+
             <!-- Tab Navigation -->
             <div class="sidebar-nav">
               <!-- Collapse Button (inside nav when expanded) -->
@@ -201,4 +209,22 @@
 
   <!-- Bank Modal (rendered when bank is open) -->
   <app-bank></app-bank>
+
+  <!-- World Map Dialog (fullscreen) -->
+  @if (mapDialogOpen()) {
+    <div class="map-dialog-overlay" (click)="closeMapDialog()">
+      <div class="map-dialog-content" (click)="$event.stopPropagation()">
+        <div class="dialog-header">
+          <h2>World Map</h2>
+          <button class="close-btn" (click)="closeMapDialog()" title="Close map">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+        <app-world-map
+          mode="fullscreen"
+          (travelRequested)="handleTravelRequest($event)"
+        ></app-world-map>
+      </div>
+    </div>
+  }
 </div>

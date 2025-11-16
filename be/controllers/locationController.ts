@@ -48,6 +48,34 @@ export const getDiscoveredLocations = async (req: Request, res: Response): Promi
       .filter(l => l);
 
     res.json({ locations });
+  } catch (error: any) {
+    console.error('Error getting discovered locations:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+/**
+ * GET /api/locations/all
+ * Get all locations (including undiscovered)
+ */
+export const getAllLocations = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const allLocationDefs = locationService.getAllLocations();
+
+    const locations = allLocationDefs.map(location => ({
+      locationId: location.locationId,
+      name: location.name,
+      description: location.description,
+      biome: location.biome,
+      mapPosition: location.mapPosition,
+      navigationLinks: location.navigationLinks,
+      facilities: location.facilities.map(facilityId => {
+        const facility = locationService.getFacilityDetails(facilityId);
+        return facility || null;
+      }).filter(f => f)
+    }));
+
+    res.json({ locations });
   } catch (error) {
     console.error('Error fetching discovered locations:', error);
     res.status(500).json({ message: 'Server error', error: (error as Error).message });

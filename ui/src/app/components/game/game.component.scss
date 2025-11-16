@@ -550,3 +550,163 @@
   color: var(--color-secondary);
   padding: 100px var(--spacing-xl);
 }
+
+// Minimap wrapper styling
+.minimap-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-s);
+  align-items: flex-start;
+
+  .expand-map-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-s) var(--spacing-m);
+    background: var(--color-bg-elevated);
+    color: var(--color-text-primary);
+    border: var(--border-default);
+    border-radius: var(--radius-button);
+    cursor: pointer;
+    font-size: var(--font-size-s);
+    font-weight: var(--font-weight-medium);
+    transition: all var(--transition-fast);
+    position: absolute;
+    top: var(--spacing-l);
+    left: var(--spacing-l);
+
+    &:hover {
+      background: var(--color-bg-tertiary);
+      border-color: var(--color-secondary);
+      color: var(--color-secondary);
+    }
+
+    .material-symbols-outlined {
+      font-size: 18px;
+    }
+  }
+
+  app-world-map {
+    width: 100%;
+    aspect-ratio: 1.5;
+  }
+}
+
+// World map dialog (fullscreen overlay)
+.map-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--color-bg-overlay-strong);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: var(--spacing-xl);
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.map-dialog-content {
+  background: var(--color-bg-secondary);
+  border: var(--border-default);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-xl);
+  width: 90vw;
+  max-width: 1200px;
+  height: 85vh;
+  max-height: 900px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideIn 0.3s ease-out;
+
+  .dialog-header {
+    padding: var(--spacing-l) var(--spacing-xl);
+    border-bottom: var(--border-default);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--gradient-surface);
+
+    h2 {
+      margin: 0;
+      color: var(--color-text-primary);
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-bold);
+    }
+
+    .close-btn {
+      background: transparent;
+      border: none;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      padding: var(--spacing-xs);
+      border-radius: var(--radius-button);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition-fast);
+
+      &:hover {
+        background: var(--color-bg-elevated);
+        color: var(--color-text-primary);
+      }
+
+      .material-symbols-outlined {
+        font-size: 24px;
+      }
+    }
+  }
+
+  app-world-map {
+    flex: 1;
+    overflow: hidden;
+  }
+}
+
+// Animations
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 767px) {
+  .minimap-wrapper {
+    margin-top: var(--spacing-m);
+  }
+
+  .map-dialog-content {
+    width: 95vw;
+    height: 90vh;
+
+    .dialog-header {
+      padding: var(--spacing-m);
+
+      h2 {
+        font-size: var(--font-size-l);
+      }
+    }
+  }
+}

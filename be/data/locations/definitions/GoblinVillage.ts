@@ -23,5 +23,9 @@ export const GoblinVillage: Location = {
       "encounters": []
     }
   ],
-  "isStartingLocation": false
+  "isStartingLocation": false,
+  "mapPosition": {
+    "x": 650,
+    "y": 450
+  }
 } as const;

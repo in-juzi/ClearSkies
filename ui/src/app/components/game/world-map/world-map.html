@@ -1,0 +1,50 @@
+<div class="world-map-container" [class.minimap]="mode === 'minimap'" [class.fullscreen]="mode === 'fullscreen'">
+  @if (nodes().length && edges().length) {
+  <vflow view="auto" [nodes]="nodes()" [edges]="edges()" [connection]="{ mode: 'loose' }"
+    (onNodesChange)="handleNodeChanges($event)">
+    <!-- Custom node template -->
+    <ng-template let-ctx nodeHtml>
+      <div class="location-node" [class.current]="ctx.node.data().isCurrent"
+        [style.background-color]="getBiomeColor(ctx.node.data().biome)" [title]="ctx.node.data().location.name"
+        selectable>
+        <div class="location-name">{{ ctx.node.data().location.name }}</div>
+      </div>
+      <handle type="source" position="top" [template]="handleTemplate" />
+      <handle type="source" position="right" [template]="handleTemplate" />
+      <handle type="source" position="bottom" [template]="handleTemplate" />
+      <handle type="source" position="left" [template]="handleTemplate" />
+    </ng-template>
+
+    <!-- Custom edge template -->
+    <ng-template let-ctx edge>
+      <svg:g customTemplateEdge>
+        <!-- Edge path -->
+        <svg:path [attr.d]="ctx.path()" class="travel-path" [class.available]="ctx.edge.data?.available"
+          [class.unavailable]="!ctx.edge.data?.available" [attr.stroke-width]="mode === 'minimap' ? 2 : 3" fill="none">
+        </svg:path>
+      </svg:g>
+    </ng-template>
+  </vflow>
+
+  <ng-template #handleTemplate let-ctx></ng-template>
+  }
+
+  <!-- Map legend (fullscreen only) -->
+  @if (mode === 'fullscreen') {
+  <div class="map-legend">
+    <h4>Legend</h4>
+    <div class="legend-item">
+      <span class="legend-color current"></span>
+      <span>Current Location</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-color available"></span>
+      <span>Available Path</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-color unavailable"></span>
+      <span>Locked Path</span>
+    </div>
+  </div>
+  }
+</div>

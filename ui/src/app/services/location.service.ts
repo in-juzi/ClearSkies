@@ -320,6 +320,13 @@ export class LocationService {
   }
 
   /**
+   * Get all locations (including undiscovered)
+   */
+  getAllLocations(): Observable<{ locations: Location[] }> {
+    return this.http.get<{ locations: Location[] }>(`${this.apiUrl}/all`);
+  }
+
+  /**
    * Get current location with full details
    */
   getCurrentLocation(): Observable<{ location: Location; currentActivity: ActiveActivity; travelState: TravelState }> {

@@ -29,5 +29,9 @@ export const Kennik: Location = {
       "encounters": []
     }
   ],
-  "isStartingLocation": true
+  "isStartingLocation": true,
+  "mapPosition": {
+    "x": 200,
+    "y": 400
+  }
 } as const;
