@@ -182,8 +182,12 @@ export class LocationService {
       this.inventoryService.getInventory().subscribe();
 
       // Emit completion event for UI notifications
+      // Merge attributeUpdates into rewards for consistent structure
       this.activityCompleted$.next({
-        rewards: data.rewards,
+        rewards: {
+          ...data.rewards,
+          attributes: data.attributeUpdates || {}
+        },
         activityName: data.activity
       });
 

@@ -71,6 +71,7 @@ export interface TravelState {
 export interface ActivityRewards {
   experience: { [key: string]: any };
   rawExperience?: { [key: string]: number }; // Raw XP values before scaling
+  attributes?: { [key: string]: any }; // Attribute XP from skill passthrough
   items: Array<{
     itemId: string;
     quantity: number;

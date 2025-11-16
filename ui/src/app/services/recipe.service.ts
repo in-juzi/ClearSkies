@@ -1,14 +1,16 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Recipe } from '@shared/types';
+import { InventoryService } from './inventory.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RecipeService {
   private apiUrl = `${environment.apiUrl}/crafting`;
+  private inventoryService = inject(InventoryService);
 
   // Signals for reactive state
   recipes = signal<Recipe[]>([]);
@@ -69,10 +71,11 @@ export class RecipeService {
 
       if (ingredient.itemId) {
         // Specific item requirement
-        totalQuantity = playerInventory
-          .filter(item => item.itemId === ingredient.itemId)
-          .reduce((sum, item) => sum + item.quantity, 0);
-        ingredientName = ingredient.itemId;
+        const matchingItems = playerInventory.filter(item => item.itemId === ingredient.itemId);
+        totalQuantity = matchingItems.reduce((sum, item) => sum + item.quantity, 0);
+        // Get name from inventory item definition, or lookup from item service
+        const itemDef = matchingItems[0]?.definition || this.inventoryService.getItemDefinitionSync(ingredient.itemId);
+        ingredientName = itemDef?.name || ingredient.itemId;
       } else if (ingredient.subcategory) {
         // Subcategory requirement (e.g., "any herb")
         totalQuantity = playerInventory

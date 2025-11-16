@@ -4,8 +4,7 @@ import { LocationService } from '../../../../services/location.service';
 import { SkillsService } from '../../../../services/skills.service';
 import { ConfirmDialogService } from '../../../../services/confirm-dialog.service';
 import { ChatService } from '../../../../services/chat.service';
-import { ItemMiniComponent } from '../../../shared/item-mini/item-mini.component';
-import { XpMiniComponent } from '../../../shared/xp-mini/xp-mini.component';
+import { ActivityLogComponent, ActivityLogEntry } from '../../../shared/activity-log/activity-log.component';
 import { SkillWithProgress, SkillName } from '../../../../models/user.model';
 import { ActivityRewards } from '../../../../models/location.model';
 import { SKILL_ICONS, SKILL_DISPLAY_NAMES } from '../../../../constants/game-data.constants';
@@ -13,7 +12,7 @@ import { SKILL_ICONS, SKILL_DISPLAY_NAMES } from '../../../../constants/game-dat
 @Component({
   selector: 'app-location-activity-progress',
   standalone: true,
-  imports: [CommonModule, ItemMiniComponent, XpMiniComponent],
+  imports: [CommonModule, ActivityLogComponent],
   templateUrl: './location-activity-progress.component.html',
   styleUrl: './location-activity-progress.component.scss'
 })
@@ -35,7 +34,7 @@ export class LocationActivityProgressComponent {
 
   // Local state
   lastRewards: ActivityRewards | null = null;
-  activityLog: Array<{ timestamp: Date; rewards: ActivityRewards; activityName: string }> = [];
+  activityLog: ActivityLogEntry[] = [];
 
   // Computed signal to get the skill being trained by current activity
   activeSkill = computed<{ name: string; skill: SkillWithProgress } | null>(() => {
@@ -94,11 +93,33 @@ export class LocationActivityProgressComponent {
   constructor() {
     // Subscribe to activity completion events
     this.locationService.activityCompleted$.subscribe(completion => {
-      this.activityLog.unshift({
+      // Transform ActivityRewards to ActivityLogEntry format
+      const logEntry: ActivityLogEntry = {
         timestamp: new Date(),
-        rewards: completion.rewards,
-        activityName: completion.activityName
-      });
+        activityName: completion.activityName,
+        rewards: {
+          items: completion.rewards.items || [],
+          experience: completion.rewards.experience
+            ? Object.entries(completion.rewards.experience).map(([skill, data]: [string, any]) => ({
+                skill,
+                xp: data.experience,
+                leveledUp: data.leveledUp,
+                newLevel: data.newLevel
+              }))
+            : [],
+          attributes: completion.rewards.attributes
+            ? Object.entries(completion.rewards.attributes).map(([attribute, data]: [string, any]) => ({
+                attribute,
+                xp: data.experience,
+                leveledUp: data.leveledUp,
+                newLevel: data.newLevel
+              }))
+            : [],
+          gold: completion.rewards.gold
+        }
+      };
+
+      this.activityLog.unshift(logEntry);
 
       // Keep only the last 10 entries
       if (this.activityLog.length > 10) {

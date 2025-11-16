@@ -38,35 +38,12 @@
 
     <!-- Activity Log -->
     @if (activityLog.length > 0) {
-      <div class="activity-log">
-        <h3>Recent Completions</h3>
-        <div class="log-entries">
-          @for (entry of activityLog; track entry.timestamp) {
-            <div class="log-entry">
-              <div class="log-timestamp">{{ entry.timestamp | date:'HH:mm:ss' }}</div>
-              <div class="log-content">
-                <div class="log-rewards">
-                  @if (entry.rewards.gold > 0) {
-                    <span class="reward-mini gold">💰 {{ entry.rewards.gold }}</span>
-                  }
-                  @for (item of entry.rewards.items; track item.instanceId) {
-                    <app-item-mini [item]="item"></app-item-mini>
-                  }
-                  @for (exp of entry.rewards.experience | keyvalue; track exp.key) {
-                    <app-xp-mini [skillName]="exp.key" [xp]="exp.value.experience"
-                      [rawXp]="entry.rewards.rawExperience?.[exp.key]" [showIcon]="true" [showSkillName]="true"
-                      [showScaling]="true">
-                    </app-xp-mini>
-                    @if (exp.value.leveledUp) {
-                      <span class="level-up-mini">{{ getSkillDisplayName(exp.key) }} ↑</span>
-                    }
-                  }
-                </div>
-              </div>
-            </div>
-          }
-        </div>
-      </div>
+      <app-activity-log
+        [entries]="activityLog"
+        [maxEntries]="10"
+        [showTimestamp]="true"
+        [title]="'Recent Completions'">
+      </app-activity-log>
     }
 
     <!-- Rewards Display -->
