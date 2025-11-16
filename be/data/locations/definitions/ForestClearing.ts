@@ -29,11 +29,7 @@ export const ForestClearing: Location = {
       "name": "Mountain Trail",
       "description": "A steep rocky trail climbing towards the mountains",
       "travelTime": 12,
-      "requirements": {
-        "attributes": {
-          "endurance": 3
-        }
-      },
+      "requirements": {},
       "encounters": []
     },
     {

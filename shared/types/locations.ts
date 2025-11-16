@@ -130,11 +130,16 @@ export interface GatheringRewards {
 
 /**
  * Combat activity
+ * Note: Combat XP is awarded dynamically based on equipped weapon's skillScalar (oneHanded, twoHanded, etc.)
+ * Experience is NOT defined in the activity - it comes from the Monster definition
  */
 export interface CombatActivity extends Activity {
   type: 'combat';
   duration?: number; // Optional duration for stub activities
-  rewards?: any; // Optional rewards for stub activities
+  rewards?: {
+    // Note: NO experience field - XP awarded based on Monster.experience and weapon skillScalar
+    dropTables?: string[]; // Optional legacy field for activity-specific drops (Monster has lootTables)
+  };
   stub?: boolean; // Flag for stub activities
   stubMessage?: string; // Message for stub activities
   combatConfig?: {

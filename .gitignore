@@ -28,5 +28,3 @@ npm-debug.log*
 # OS
 .DS_Store
 Thumbs.db
-
-clearskies-dev-ec2.pem

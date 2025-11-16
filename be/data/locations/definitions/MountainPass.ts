@@ -28,7 +28,7 @@ export const MountainPass: Location = {
   ],
   "isStartingLocation": false,
   "mapPosition": {
-    "x": 800,
-    "y": 150
+    "x": 250,
+    "y": 200
   }
 } as const;

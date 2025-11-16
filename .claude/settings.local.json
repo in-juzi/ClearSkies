@@ -15,7 +15,10 @@
       "Bash(find:*)",
       "Bash(npm run migrate:*)",
       "Bash(npm run validate:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(timeout 90 npx ng build:*)",
+      "Bash(npm run update:activity-xp:*)",
+      "Bash(npm run survey:activity-xp:*)"
     ],
     "deny": [],
     "ask": []

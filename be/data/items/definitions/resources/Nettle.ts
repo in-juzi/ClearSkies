@@ -28,7 +28,7 @@ export const Nettle: ResourceItem = {
   "allowedQualities": QUALITY_SETS.HERB,
   "allowedTraits": TRAIT_SETS.HERB_INVIGORATING,
   "icon": {
-    "path": "item-categories/item_cat_mushroom.svg",
-    "material": "herb"
+    "path": "items/curled-leaf.svg",
+    "material": "nettle"
   }
 } as const;

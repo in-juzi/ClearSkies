@@ -31,7 +31,7 @@ export const Kennik: Location = {
   ],
   "isStartingLocation": true,
   "mapPosition": {
-    "x": 200,
-    "y": 400
+    "x": 800,
+    "y": 150
   }
 } as const;

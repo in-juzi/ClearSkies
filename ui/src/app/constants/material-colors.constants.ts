@@ -464,6 +464,12 @@ export const MATERIAL_COLORS: Record<string, ColorChannels> = {
     secondary: '#7A9B76', // Darker sage (upper right leaf)
     detail: '#B8C9A8'     // Lighter silvery-green (lower left leaf)
   },
+  nettle: {
+    primary: '#6B8E23',   // Olive drab green (stinging leaf body)
+    secondary: '#556B2F', // Dark olive green (leaf shadows/veins)
+    edge: '#9ACD32',      // Yellow-green (leaf highlights/edges)
+    detail: '#8FBC8F'     // Dark sea green (medicinal essence)
+  },
 
   // Flowers
   chamomile: {
