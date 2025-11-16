@@ -22,7 +22,7 @@
       </div>
 
       <div class="progress-container">
-        <div class="progress-bar" [style.width.%]="skills()![skillKey].progress">
+        <div class="progress-bar" [style.width.%]="getProgressPercent(skills()![skillKey])">
         </div>
       </div>
 
@@ -39,15 +39,15 @@
         <div class="hover-stats">
           <div class="stat-row">
             <span class="stat-label">Experience:</span>
-            <span class="stat-value">{{ skills()![skillKey].experience % 1000 }} / 1000</span>
+            <span class="stat-value">{{ skills()![skillKey].experience }} / {{ skills()![skillKey].xpToNextLevel }}</span>
           </div>
           <div class="stat-row">
             <span class="stat-label">Progress:</span>
-            <span class="stat-value">{{ skills()![skillKey].progress.toFixed(1) }}%</span>
+            <span class="stat-value">{{ getProgressPercent(skills()![skillKey]).toFixed(1) }}%</span>
           </div>
           <div class="stat-row">
             <span class="stat-label">To Next Level:</span>
-            <span class="stat-value">{{ getExperienceToNext(skills()![skillKey].experience) }} XP</span>
+            <span class="stat-value">{{ skills()![skillKey].xpToNextLevel - skills()![skillKey].experience }} XP</span>
           </div>
           @if (skills()![skillKey].mainAttribute) {
           <div class="stat-row highlight">
@@ -58,7 +58,7 @@
         </div>
 
         <div class="hover-footer">
-          <div class="total-xp">Total XP: {{ skills()![skillKey].experience }}</div>
+          <div class="total-xp">Total XP: {{ getTotalXP(skills()![skillKey]) }}</div>
         </div>
       </div>
     </div>

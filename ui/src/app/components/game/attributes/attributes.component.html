@@ -24,7 +24,7 @@
 
       <div class="progress-container">
         <div class="progress-bar">
-          <div class="progress-fill" [style.width.%]="attributes()![attributeName].progress">
+          <div class="progress-fill" [style.width.%]="getProgressPercent(attributes()![attributeName])">
           </div>
         </div>
       </div>
@@ -42,16 +42,20 @@
 
         <div class="hover-stats">
           <div class="stat-row">
-            <span class="stat-label">Total Experience:</span>
-            <span class="stat-value">{{ attributes()![attributeName].experience }} XP</span>
+            <span class="stat-label">Experience:</span>
+            <span class="stat-value">{{ attributes()![attributeName].experience }} / {{ attributes()![attributeName].xpToNextLevel }}</span>
           </div>
           <div class="stat-row">
             <span class="stat-label">Progress:</span>
-            <span class="stat-value">{{ attributes()![attributeName].progress.toFixed(1) }}%</span>
+            <span class="stat-value">{{ getProgressPercent(attributes()![attributeName]).toFixed(1) }}%</span>
           </div>
           <div class="stat-row highlight">
             <span class="stat-label">To Next Level:</span>
-            <span class="stat-value">{{ attributes()![attributeName].xpToNextLevel }} XP</span>
+            <span class="stat-value">{{ attributes()![attributeName].xpToNextLevel - attributes()![attributeName].experience }} XP</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Total XP:</span>
+            <span class="stat-value">{{ getTotalXP(attributes()![attributeName]) }}</span>
           </div>
         </div>
 

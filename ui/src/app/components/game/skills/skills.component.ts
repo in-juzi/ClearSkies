@@ -45,8 +45,16 @@ export class Skills implements OnInit {
     return [...ALL_SKILLS];
   }
 
-  getExperienceToNext(experience: number): number {
-    return this.skillsService.getExperienceToNext(experience);
+  getExperienceToNext(skill: SkillWithProgress): number {
+    return this.skillsService.getExperienceToNext(skill);
+  }
+
+  getProgressPercent(skill: SkillWithProgress): number {
+    return this.skillsService.getSkillProgressPercent(skill);
+  }
+
+  getTotalXP(skill: SkillWithProgress): number {
+    return this.skillsService.getTotalXP(skill);
   }
 
   // For testing purposes - can be removed later

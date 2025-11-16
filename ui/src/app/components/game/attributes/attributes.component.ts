@@ -1,7 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AttributesService } from '../../../services/attributes.service';
-import { AttributesResponse, AttributeName } from '../../../models/user.model';
+import { AttributesResponse, AttributeName, AttributeWithProgress } from '../../../models/user.model';
 import { ALL_ATTRIBUTES, ATTRIBUTE_ICONS } from '../../../constants/game-data.constants';
 
 @Component({
@@ -47,6 +47,14 @@ export class AttributesComponent implements OnInit {
 
   capitalizeFirst(str: string): string {
     return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
+  getProgressPercent(attribute: AttributeWithProgress): number {
+    return this.attributesService.getAttributeProgressPercent(attribute);
+  }
+
+  getTotalXP(attribute: AttributeWithProgress): number {
+    return this.attributesService.getTotalXP(attribute);
   }
 
   // Testing method - adds 100 XP to an attribute
