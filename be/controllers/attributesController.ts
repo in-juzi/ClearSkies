@@ -27,20 +27,10 @@ export const getAllAttributes = async (req: Request, res: Response): Promise<voi
       return;
     }
 
-    // Build response with all attributes and their progress
-    const attributes: Record<string, any> = {};
-    const attributeNames: AttributeName[] = ['strength', 'endurance', 'wisdom', 'perception', 'dexterity', 'will', 'charisma'];
+    // Get enriched attribute data with XP progression info
+    const enrichedAttributes = player.getEnrichedAttributes();
 
-    for (const name of attributeNames) {
-      attributes[name] = {
-        level: player.attributes[name].level,
-        experience: player.attributes[name].experience,
-        progress: player.getAttributeProgress(name),
-        xpToNextLevel: 1000 - (player.attributes[name].experience % 1000)
-      };
-    }
-
-    res.json(attributes);
+    res.json(enrichedAttributes);
   } catch (error) {
     console.error('Error fetching attributes:', error);
     res.status(500).json({ message: 'Server error', error: (error as Error).message });
@@ -71,14 +61,12 @@ export const getAttribute = async (
       return;
     }
 
-    const attribute = player.attributes[attributeName];
+    const enrichedAttributes = player.getEnrichedAttributes();
+    const attributeData = enrichedAttributes[attributeName];
 
     res.json({
       name: attributeName,
-      level: attribute.level,
-      experience: attribute.experience,
-      progress: player.getAttributeProgress(attributeName),
-      xpToNextLevel: 1000 - (attribute.experience % 1000)
+      ...attributeData
     });
   } catch (error) {
     console.error('Error fetching attribute:', error);
@@ -121,9 +109,7 @@ export const addAttributeExperience = async (
       attribute: {
         name: attributeName,
         level: attribute.level,
-        experience: attribute.experience,
-        progress: player.getAttributeProgress(attributeName),
-        xpToNextLevel: 1000 - (attribute.experience % 1000)
+        experience: attribute.experience
       },
       leveledUp: result.leveledUp,
       oldLevel: result.oldLevel,

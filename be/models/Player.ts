@@ -144,9 +144,25 @@ export interface IPlayer extends Document {
       newLevel?: number;
       level?: number;
       attribute: AttributeName;
+      experience: number;
     };
   }>;
   getSkillProgress(skillName: SkillName): number;
+  getEnrichedSkills(): Record<string, {
+    level: number;
+    experience: number;
+    xpToNextLevel: number;
+    percentToNextLevel: number;
+    totalXP: number;
+    mainAttribute: AttributeName;
+  }>;
+  getEnrichedAttributes(): Record<string, {
+    level: number;
+    experience: number;
+    xpToNextLevel: number;
+    percentToNextLevel: number;
+    totalXP: number;
+  }>;
   addItem(itemInstance: any): any;
   removeItem(instanceId: string, quantity?: number | null): InventoryItem;
   getItem(instanceId: string): InventoryItem | undefined;
@@ -608,6 +624,7 @@ playerSchema.methods.addAttributeExperience = async function(
   level?: number;
   attribute: AttributeName;
 }> {
+  const { getXPForLevel } = require('@shared/constants/attribute-constants');
   const validAttributes: AttributeName[] = ['strength', 'endurance', 'wisdom', 'perception', 'dexterity', 'will', 'charisma'];
 
   if (!validAttributes.includes(attributeName)) {
@@ -618,10 +635,17 @@ playerSchema.methods.addAttributeExperience = async function(
   const oldLevel = attribute.level;
   attribute.experience += amount;
 
-  // Level up every 1000 XP
-  const newLevel = Math.floor(attribute.experience / 1000) + 1;
+  // Check for level up using new XP curve
+  let leveledUp = false;
+  let newLevel = oldLevel;
 
-  if (newLevel > oldLevel) {
+  while (attribute.experience >= getXPForLevel(newLevel)) {
+    attribute.experience -= getXPForLevel(newLevel);
+    newLevel++;
+    leveledUp = true;
+  }
+
+  if (leveledUp) {
     attribute.level = newLevel;
     await this.save();
     return { leveledUp: true, oldLevel, newLevel, attribute: attributeName };
@@ -633,6 +657,7 @@ playerSchema.methods.addAttributeExperience = async function(
 
 // Get progress to next attribute level (0-100%)
 playerSchema.methods.getAttributeProgress = function(this: IPlayer, attributeName: AttributeName): number {
+  const { getPercentToNextLevel } = require('@shared/constants/attribute-constants');
   const validAttributes: AttributeName[] = ['strength', 'endurance', 'wisdom', 'perception', 'dexterity', 'will', 'charisma'];
 
   if (!validAttributes.includes(attributeName)) {
@@ -640,8 +665,7 @@ playerSchema.methods.getAttributeProgress = function(this: IPlayer, attributeNam
   }
 
   const attribute = this.attributes[attributeName];
-  const xpInCurrentLevel = attribute.experience % 1000;
-  return (xpInCurrentLevel / 1000) * 100;
+  return getPercentToNextLevel(attribute.level, attribute.experience);
 };
 
 // Add skill experience and handle skill leveling
@@ -664,8 +688,10 @@ playerSchema.methods.addSkillExperience = async function(
     newLevel?: number;
     level?: number;
     attribute: AttributeName;
+    experience: number;
   };
 }> {
+  const { getXPForLevel } = require('@shared/constants/attribute-constants');
   const validSkills: SkillName[] = [
     'woodcutting', 'mining', 'fishing', 'gathering', 'smithing', 'cooking', 'alchemy',
     'oneHanded', 'dualWield', 'twoHanded', 'ranged', 'casting', 'gun'
@@ -679,22 +705,27 @@ playerSchema.methods.addSkillExperience = async function(
   const oldLevel = skill.level;
   skill.experience += amount;
 
-  // Level up every 1000 XP
-  const newLevel = Math.floor(skill.experience / 1000) + 1;
+  // Check for level up using new XP curve
+  let leveledUp = false;
+  let newLevel = oldLevel;
+
+  while (skill.experience >= getXPForLevel(newLevel)) {
+    skill.experience -= getXPForLevel(newLevel);
+    newLevel++;
+    leveledUp = true;
+  }
+
+  if (leveledUp) {
+    skill.level = newLevel;
+  }
 
   const skillResult = {
     skill: skillName,
-    leveledUp: false,
+    leveledUp,
     level: skill.level,
     oldLevel,
     newLevel: skill.level
   };
-
-  if (newLevel > oldLevel) {
-    skill.level = newLevel;
-    skillResult.leveledUp = true;
-    skillResult.newLevel = newLevel;
-  }
 
   // Award attribute XP (50% of skill XP to main attribute)
   const mainAttribute = skill.mainAttribute as AttributeName;
@@ -703,12 +734,16 @@ playerSchema.methods.addSkillExperience = async function(
 
   return {
     skill: skillResult,
-    attribute: attributeResult
+    attribute: {
+      ...attributeResult,
+      experience: attributeXP
+    }
   };
 };
 
 // Get progress to next skill level (0-100%)
 playerSchema.methods.getSkillProgress = function(this: IPlayer, skillName: SkillName): number {
+  const { getPercentToNextLevel } = require('@shared/constants/attribute-constants');
   const validSkills: SkillName[] = [
     'woodcutting', 'mining', 'fishing', 'gathering', 'smithing', 'cooking', 'alchemy',
     'oneHanded', 'dualWield', 'twoHanded', 'ranged', 'casting', 'gun'
@@ -719,8 +754,40 @@ playerSchema.methods.getSkillProgress = function(this: IPlayer, skillName: Skill
   }
 
   const skill = this.skills[skillName];
-  const xpInCurrentLevel = skill.experience % 1000;
-  return (xpInCurrentLevel / 1000) * 100;
+  return getPercentToNextLevel(skill.level, skill.experience);
+};
+
+// Get enriched skill data with progression info for UI
+playerSchema.methods.getEnrichedSkills = function(this: IPlayer) {
+  const { getXPForLevel } = require('@shared/constants/attribute-constants');
+  const enriched: Record<string, any> = {};
+
+  for (const [skillName, skillData] of Object.entries(this.skills)) {
+    enriched[skillName] = {
+      level: skillData.level,
+      experience: skillData.experience,
+      xpToNextLevel: getXPForLevel(skillData.level),
+      mainAttribute: skillData.mainAttribute
+    };
+  }
+
+  return enriched;
+};
+
+// Get enriched attribute data with progression info for UI
+playerSchema.methods.getEnrichedAttributes = function(this: IPlayer) {
+  const { getXPForLevel } = require('@shared/constants/attribute-constants');
+  const enriched: Record<string, any> = {};
+
+  for (const [attributeName, attributeData] of Object.entries(this.attributes)) {
+    enriched[attributeName] = {
+      level: attributeData.level,
+      experience: attributeData.experience,
+      xpToNextLevel: getXPForLevel(attributeData.level)
+    };
+  }
+
+  return enriched;
 };
 
 // ============================================================================
@@ -986,8 +1053,8 @@ playerSchema.methods.getContainer = function(this: IPlayer, containerId: string)
 
 // Get container items with Map serialization and item details
 playerSchema.methods.getContainerItems = function(this: IPlayer, containerId: string): any[] {
-  const itemService = require('../services/itemService').default;
   const container = this.getContainer(containerId);
+  // Return minimal instance data only - frontend will enrich with definitions
   return container.items.map((item: any) => {
     const plainItem = item.toObject ? item.toObject() : item;
     if (plainItem.qualities instanceof Map) {
@@ -996,8 +1063,15 @@ playerSchema.methods.getContainerItems = function(this: IPlayer, containerId: st
     if (plainItem.traits instanceof Map) {
       plainItem.traits = Object.fromEntries(plainItem.traits);
     }
-    // Enrich with item definition details (same as inventory)
-    return itemService.getItemDetails(plainItem);
+    return {
+      instanceId: plainItem.instanceId,
+      itemId: plainItem.itemId,
+      quantity: plainItem.quantity,
+      qualities: plainItem.qualities,
+      traits: plainItem.traits,
+      equipped: plainItem.equipped || false,
+      acquiredAt: plainItem.acquiredAt
+    };
   });
 };
 

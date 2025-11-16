@@ -31,25 +31,13 @@ export const getSkills = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // Calculate progress for each skill
-    const skillNames: SkillName[] = [
-      'woodcutting', 'mining', 'fishing', 'gathering', 'smithing', 'cooking', 'alchemy',
-      'oneHanded', 'dualWield', 'twoHanded', 'ranged', 'casting', 'gun'
-    ];
-
-    const skillsWithProgress: Record<string, any> = {};
-
-    for (const skillName of skillNames) {
-      skillsWithProgress[skillName] = {
-        ...player.skills[skillName],
-        progress: player.getSkillProgress(skillName)
-      };
-    }
+    // Get enriched skill data with XP progression info
+    const enrichedSkills = player.getEnrichedSkills();
 
     res.status(200).json({
       success: true,
       data: {
-        skills: skillsWithProgress
+        skills: enrichedSkills
       }
     });
 
@@ -115,7 +103,6 @@ export const addSkillExperience = async (
           name: skillName,
           level: player.skills[skillName].level,
           experience: player.skills[skillName].experience,
-          progress: player.getSkillProgress(skillName),
           leveledUp: result.skill.leveledUp,
           oldLevel: result.skill.oldLevel,
           newLevel: result.skill.newLevel,
@@ -125,7 +112,6 @@ export const addSkillExperience = async (
           name: result.attribute.attribute,
           level: player.attributes[result.attribute.attribute].level,
           experience: player.attributes[result.attribute.attribute].experience,
-          progress: player.getAttributeProgress(result.attribute.attribute),
           leveledUp: result.attribute.leveledUp,
           oldLevel: result.attribute.oldLevel,
           newLevel: result.attribute.leveledUp ? result.attribute.newLevel : result.attribute.level
@@ -176,17 +162,14 @@ export const getSkill = async (
       return;
     }
 
-    const skill = player.skills[skillName];
-    const progress = player.getSkillProgress(skillName);
+    const enrichedSkills = player.getEnrichedSkills();
+    const skillData = enrichedSkills[skillName];
 
     res.status(200).json({
       success: true,
       data: {
         name: skillName,
-        level: skill.level,
-        experience: skill.experience,
-        progress: progress,
-        experienceToNext: 1000 - (skill.experience % 1000)
+        ...skillData
       }
     });
 
