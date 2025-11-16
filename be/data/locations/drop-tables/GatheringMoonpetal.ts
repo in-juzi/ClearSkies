@@ -28,7 +28,7 @@ export const GatheringMoonpetal: DropTable = {
       "weight": 35,
       "quantity": {
         "min": 2,
-        "max": 4
+        "max": 3
       },
       "qualityBonus": {
         "freshness": 0.35,
@@ -40,8 +40,8 @@ export const GatheringMoonpetal: DropTable = {
       "itemId": "moonpetal",
       "weight": 10,
       "quantity": {
-        "min": 4,
-        "max": 6
+        "min": 3,
+        "max": 5
       },
       "qualityBonus": {
         "freshness": 0.45,

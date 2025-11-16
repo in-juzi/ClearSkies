@@ -14,8 +14,8 @@ export const GatheringChamomile: DropTable = {
       "itemId": "chamomile",
       "weight": 65,
       "quantity": {
-        "min": 3,
-        "max": 6
+        "min": 2,
+        "max": 4
       },
       "qualityBonus": {
         "freshness": 0.1,
@@ -27,8 +27,8 @@ export const GatheringChamomile: DropTable = {
       "itemId": "chamomile",
       "weight": 25,
       "quantity": {
-        "min": 6,
-        "max": 10
+        "min": 4,
+        "max": 6
       },
       "qualityBonus": {
         "freshness": 0.2,
@@ -40,8 +40,8 @@ export const GatheringChamomile: DropTable = {
       "itemId": "chamomile",
       "weight": 5,
       "quantity": {
-        "min": 10,
-        "max": 15
+        "min": 6,
+        "max": 9
       },
       "qualityBonus": {
         "freshness": 0.3,

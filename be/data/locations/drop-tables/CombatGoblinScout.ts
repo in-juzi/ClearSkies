@@ -55,7 +55,7 @@ export const CombatGoblinScout: DropTable = {
       "weight": 45,
       "quantity": {
         "min": 1,
-        "max": 3
+        "max": 2
       }
     }
   ]

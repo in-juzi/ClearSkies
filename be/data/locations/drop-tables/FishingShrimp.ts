@@ -14,8 +14,8 @@ export const FishingShrimp: DropTable = {
       "itemId": "shrimp",
       "weight": 70,
       "quantity": {
-        "min": 2,
-        "max": 5
+        "min": 1,
+        "max": 2
       },
       "qualityBonus": {
         "freshness": 0.1
@@ -26,8 +26,8 @@ export const FishingShrimp: DropTable = {
       "itemId": "shrimp",
       "weight": 20,
       "quantity": {
-        "min": 5,
-        "max": 8
+        "min": 2,
+        "max": 4
       },
       "qualityBonus": {
         "freshness": 0.2
@@ -38,8 +38,8 @@ export const FishingShrimp: DropTable = {
       "itemId": "shrimp",
       "weight": 5,
       "quantity": {
-        "min": 8,
-        "max": 12
+        "min": 4,
+        "max": 6
       },
       "qualityBonus": {
         "freshness": 0.3

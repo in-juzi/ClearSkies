@@ -14,8 +14,8 @@ export const GatheringNettle: DropTable = {
       "itemId": "nettle",
       "weight": 60,
       "quantity": {
-        "min": 2,
-        "max": 4
+        "min": 1,
+        "max": 3
       },
       "qualityBonus": {
         "freshness": 0.15,
@@ -27,8 +27,8 @@ export const GatheringNettle: DropTable = {
       "itemId": "nettle",
       "weight": 30,
       "quantity": {
-        "min": 4,
-        "max": 7
+        "min": 3,
+        "max": 5
       },
       "qualityBonus": {
         "freshness": 0.25,
@@ -40,8 +40,8 @@ export const GatheringNettle: DropTable = {
       "itemId": "nettle",
       "weight": 5,
       "quantity": {
-        "min": 7,
-        "max": 10
+        "min": 5,
+        "max": 7
       },
       "qualityBonus": {
         "freshness": 0.35,

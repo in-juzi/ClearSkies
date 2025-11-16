@@ -16,7 +16,7 @@ export const MiningTin: DropTable = {
       "weight": 80,
       "quantity": {
         "min": 1,
-        "max": 3
+        "max": 2
       },
       "qualityBonus": 0,
       "comment": "Standard tin ore drop"
@@ -27,7 +27,7 @@ export const MiningTin: DropTable = {
       "weight": 15,
       "quantity": {
         "min": 2,
-        "max": 4
+        "max": 3
       },
       "qualityBonus": 1,
       "comment": "Higher quality tin ore"

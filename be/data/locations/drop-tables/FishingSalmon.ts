@@ -15,27 +15,40 @@ export const FishingSalmon: DropTable = {
       "weight": 70,
       "quantity": {
         "min": 1,
-        "max": 1
+        "max": 2
       },
       "qualityBonus": {
         "freshness": 0.1
-      }
+      },
+      "comment": "Common salmon catch"
     },
     {
       "itemId": "salmon",
       "weight": 20,
       "quantity": {
-        "min": 1,
-        "max": 1
+        "min": 2,
+        "max": 3
+      },
+      "qualityBonus": {
+        "freshness": 0.2
+      },
+      "comment": "Good salmon catch"
+    },
+    {
+      "itemId": "salmon",
+      "weight": 5,
+      "quantity": {
+        "min": 3,
+        "max": 4
       },
       "qualityBonus": {
         "freshness": 0.3
       },
-      "comment": "Premium fresh catch"
+      "comment": "Exceptional salmon bounty"
     },
     {
       "itemId": "trout",
-      "weight": 8,
+      "weight": 3,
       "quantity": {
         "min": 1,
         "max": 2

@@ -14,8 +14,8 @@ export const CombatGoblinBasic: DropTable = {
       "itemId": "scrap_metal",
       "weight": 70,
       "quantity": {
-        "min": 2,
-        "max": 4
+        "min": 1,
+        "max": 3
       }
     },
     {
@@ -31,7 +31,7 @@ export const CombatGoblinBasic: DropTable = {
       "weight": 40,
       "quantity": {
         "min": 1,
-        "max": 3
+        "max": 2
       }
     },
     {

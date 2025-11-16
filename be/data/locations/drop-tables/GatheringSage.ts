@@ -14,8 +14,8 @@ export const GatheringSage: DropTable = {
       "itemId": "sage",
       "weight": 70,
       "quantity": {
-        "min": 2,
-        "max": 5
+        "min": 1,
+        "max": 3
       },
       "qualityBonus": {
         "freshness": 0.1,
@@ -27,8 +27,8 @@ export const GatheringSage: DropTable = {
       "itemId": "sage",
       "weight": 20,
       "quantity": {
-        "min": 5,
-        "max": 8
+        "min": 3,
+        "max": 5
       },
       "qualityBonus": {
         "freshness": 0.2,
@@ -40,8 +40,8 @@ export const GatheringSage: DropTable = {
       "itemId": "sage",
       "weight": 7,
       "quantity": {
-        "min": 8,
-        "max": 12
+        "min": 5,
+        "max": 7
       },
       "qualityBonus": {
         "freshness": 0.3,

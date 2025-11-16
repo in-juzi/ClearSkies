@@ -15,7 +15,7 @@ export const GatheringMandrake: DropTable = {
       "weight": 55,
       "quantity": {
         "min": 1,
-        "max": 3
+        "max": 2
       },
       "qualityBonus": {
         "freshness": 0.2,
@@ -27,8 +27,8 @@ export const GatheringMandrake: DropTable = {
       "itemId": "mandrake_root",
       "weight": 30,
       "quantity": {
-        "min": 3,
-        "max": 5
+        "min": 2,
+        "max": 4
       },
       "qualityBonus": {
         "freshness": 0.3,
@@ -40,8 +40,8 @@ export const GatheringMandrake: DropTable = {
       "itemId": "mandrake_root",
       "weight": 10,
       "quantity": {
-        "min": 5,
-        "max": 8
+        "min": 4,
+        "max": 6
       },
       "qualityBonus": {
         "freshness": 0.4,

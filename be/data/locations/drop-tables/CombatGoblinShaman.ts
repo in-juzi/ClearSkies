@@ -22,16 +22,16 @@ export const CombatGoblinShaman: DropTable = {
       "itemId": "sage",
       "weight": 55,
       "quantity": {
-        "min": 2,
-        "max": 4
+        "min": 1,
+        "max": 3
       }
     },
     {
       "itemId": "nettle",
       "weight": 50,
       "quantity": {
-        "min": 2,
-        "max": 4
+        "min": 1,
+        "max": 3
       }
     },
     {
@@ -39,7 +39,7 @@ export const CombatGoblinShaman: DropTable = {
       "weight": 45,
       "quantity": {
         "min": 1,
-        "max": 3
+        "max": 2
       }
     },
     {
@@ -64,7 +64,7 @@ export const CombatGoblinShaman: DropTable = {
       "weight": 35,
       "quantity": {
         "min": 1,
-        "max": 3
+        "max": 2
       }
     },
     {
