@@ -61,14 +61,18 @@
     } @else {
       <div class="summary-content">
         <!-- Offensive Stats -->
-        @if (equipmentSummary().weaponCount > 0) {
+        @if (equipmentSummary().weaponCount > 0 || equipmentSummary().totalDamage.length > 0) {
           <div class="stat-group offensive">
             <h4 class="stat-group-title">Offensive</h4>
             <div class="stat-items">
               @if (equipmentSummary().totalDamage.length > 0) {
                 <div class="stat-item">
                   <span class="stat-label">Damage:</span>
-                  <span class="stat-value">{{ equipmentSummary().totalDamage.join(', ') }}</span>
+                  <span
+                    class="stat-value damage-hover"
+                    [title]="getDamageRangeTooltip(equipmentSummary().totalDamage)">
+                    {{ equipmentSummary().totalDamage.join(', ') }}
+                  </span>
                 </div>
               }
               @if (equipmentSummary().averageAttackSpeed > 0) {
@@ -120,16 +124,17 @@
   </div>
 
   <!-- Item Details Panel (Shared Component) -->
-  <app-item-details-panel
-    *ngIf="selectedItem"
-    [item]="selectedItem"
-    [showActions]="true"
-    [showDropControls]="false"
-    (close)="closeItemDetails()"
-    (equipItem)="equipItem($event)"
-    (unequipItem)="unequipItem($event)"
-    (useItem)="useItem($event)"
-    (removeItem)="removeItem($event.instanceId)"
-    (removeAllItems)="removeAllItems($event)">
-  </app-item-details-panel>
+  @if (selectedItem) {
+    <app-item-details-panel
+      [item]="selectedItem"
+      [showActions]="true"
+      [showDropControls]="false"
+      (close)="closeItemDetails()"
+      (equipItem)="equipItem($event)"
+      (unequipItem)="unequipItem($event)"
+      (useItem)="useItem($event)"
+      (removeItem)="removeItem($event.instanceId)"
+      (removeAllItems)="removeAllItems($event)">
+    </app-item-details-panel>
+  }
 </div>

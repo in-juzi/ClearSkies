@@ -134,8 +134,15 @@ export class LocationActivityProgressComponent {
   /**
    * Get XP needed to reach next level
    */
-  getExperienceToNext(experience: number): number {
-    return this.skillsService.getExperienceToNext(experience);
+  getExperienceToNext(skill: SkillWithProgress): number {
+    return this.skillsService.getExperienceToNext(skill);
+  }
+
+  /**
+   * Get skill progress as a percentage (0-100)
+   */
+  getSkillProgressPercent(skill: SkillWithProgress): number {
+    return this.skillsService.getSkillProgressPercent(skill);
   }
 
   /**

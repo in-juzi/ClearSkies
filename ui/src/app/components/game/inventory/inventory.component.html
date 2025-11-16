@@ -29,16 +29,22 @@
     </div>
   </div>
 
-  <!-- Category Filter -->
-  <div class="category-filter">
-    @for (category of categories; track category.value) {
-      <button
-        [class.active]="selectedCategory === category.value"
-        (click)="selectedCategory = category.value"
-        class="category-btn">
-        {{ category.shortLabel }}
-      </button>
-    }
+  <!-- Filters -->
+  <div class="filters">
+    <select [(ngModel)]="selectedCategory" class="category-filter">
+      @for (category of categories; track category.value) {
+        <option [value]="category.value">
+          {{ category.label }}
+        </option>
+      }
+    </select>
+
+    <input
+      type="text"
+      [(ngModel)]="searchQuery"
+      placeholder="Search items..."
+      class="search-input"
+    />
   </div>
 
   <!-- List View (Original) -->

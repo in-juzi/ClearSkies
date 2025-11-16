@@ -190,7 +190,7 @@
           @for (item of consumables(); track item.instanceId) {
             <app-item-button
               [item]="item"
-              [disabled]="combatEnded() || isUsingItem() || isExecutingAction()"
+              [disabled]="isUsingItem() || isExecutingAction()"
               [size]="'medium'"
               (itemClick)="useConsumable($event)">
             </app-item-button>

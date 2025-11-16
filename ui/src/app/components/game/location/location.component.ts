@@ -215,16 +215,24 @@ export class LocationComponent implements OnInit, OnDestroy {
 
     // Subscribe to activity completion events
     this.locationService.activityCompleted$.subscribe(completion => {
-      this.activityLog.unshift({
+      console.log('Activity completion in location component:', completion);
+
+      const logEntry = {
         timestamp: new Date(),
         rewards: completion.rewards,
         activityName: completion.activityName
-      });
+      };
+
+      console.log('Log entry created:', logEntry);
+
+      this.activityLog.unshift(logEntry);
 
       // Keep only the last 10 entries
       if (this.activityLog.length > 10) {
         this.activityLog = this.activityLog.slice(0, 10);
       }
+
+      console.log('Activity log after update:', this.activityLog);
 
       // Refresh skills after activity completion to update XP display
       this.skillsService.getSkills().subscribe();
@@ -248,8 +256,8 @@ export class LocationComponent implements OnInit, OnDestroy {
   /**
    * Get XP needed to reach next level
    */
-  getExperienceToNext(experience: number): number {
-    return this.skillsService.getExperienceToNext(experience);
+  getExperienceToNext(skill: SkillWithProgress): number {
+    return this.skillsService.getExperienceToNext(skill);
   }
 
   /**

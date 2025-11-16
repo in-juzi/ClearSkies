@@ -305,5 +305,16 @@
     &.negative {
       color: var(--color-danger);
     }
+
+    &.damage-hover {
+      cursor: help;
+      border-bottom: 1px dotted var(--color-text-tertiary);
+      transition: all var(--transition-fast);
+
+      &:hover {
+        color: var(--color-warning);
+        border-bottom-color: var(--color-warning);
+      }
+    }
   }
 }

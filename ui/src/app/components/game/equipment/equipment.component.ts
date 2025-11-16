@@ -44,70 +44,8 @@ export class Equipment {
   // Computed signal for equipped items
   equippedItems = computed(() => this.equipmentService.equippedItems());
 
-  // Computed signal for equipment summary stats
-  equipmentSummary = computed(() => {
-    const items = this.equippedItems();
-    const summary = {
-      // Offensive stats
-      totalDamage: [] as string[], // Array of damage rolls
-      averageAttackSpeed: 0,
-      totalCritChance: 0,
-      weaponCount: 0,
-      // Defensive stats
-      totalArmor: 0,
-      totalEvasion: 0,
-      totalBlockChance: 0,
-      armorCount: 0,
-      // Other stats
-      totalWeight: 0,
-      requiredLevel: 0,
-      itemCount: 0
-    };
-
-    Object.values(items).forEach((item: ItemDetails | null) => {
-      if (!item) return;
-
-      const props = item.definition.properties;
-      summary.itemCount++;
-
-      // Accumulate weight
-      summary.totalWeight += props.weight || 0;
-
-      // Track highest required level
-      summary.requiredLevel = Math.max(summary.requiredLevel, props['requiredLevel'] || 0);
-
-      // Weapon stats
-      if (props['damageRoll']) {
-        summary.totalDamage.push(props['damageRoll']);
-        summary.weaponCount++;
-      }
-      if (props['attackSpeed']) {
-        summary.averageAttackSpeed += props['attackSpeed'];
-      }
-      if (props['critChance']) {
-        summary.totalCritChance += props['critChance'];
-      }
-
-      // Armor stats
-      if (props['armor']) {
-        summary.totalArmor += props['armor'];
-        summary.armorCount++;
-      }
-      if (props['evasion']) {
-        summary.totalEvasion += props['evasion'];
-      }
-      if (props['blockChance']) {
-        summary.totalBlockChance += props['blockChance'];
-      }
-    });
-
-    // Calculate average attack speed
-    if (summary.weaponCount > 0) {
-      summary.averageAttackSpeed = summary.averageAttackSpeed / summary.weaponCount;
-    }
-
-    return summary;
-  });
+  // Computed signal for equipment summary stats (from backend with quality/trait effects)
+  equipmentSummary = computed(() => this.equipmentService.equipmentStats());
 
   // Drag-over state for visual feedback
   dragOverSlot: EquipmentSlot | null = null;
@@ -276,5 +214,41 @@ export class Equipment {
    */
   removeAllItems(instanceId: string): void {
     console.log('Cannot drop equipped items. Unequip first.');
+  }
+
+  /**
+   * Calculate damage range tooltip for display
+   * Parses damage rolls like "2d6 +4" and returns min/max/avg
+   * Also handles unarmed damage like "1 (Unarmed)"
+   */
+  getDamageRangeTooltip(damageRolls: string[]): string {
+    if (!damageRolls || damageRolls.length === 0) {
+      return '';
+    }
+
+    const ranges = damageRolls.map(roll => {
+      // Check for unarmed damage format: "1 (Unarmed)"
+      const unarmedMatch = roll.match(/^(\d+)\s*\(Unarmed\)$/);
+      if (unarmedMatch) {
+        const damage = parseInt(unarmedMatch[1]);
+        return `Unarmed: ${damage} fixed damage`;
+      }
+
+      // Parse damage roll format: "2d6 +4" or "1d8" or "2d6"
+      const match = roll.match(/(\d+)d(\d+)(?:\s*\+(\d+))?/);
+      if (!match) return null;
+
+      const numDice = parseInt(match[1]);
+      const dieSize = parseInt(match[2]);
+      const bonus = match[3] ? parseInt(match[3]) : 0;
+
+      const min = numDice * 1 + bonus;
+      const max = numDice * dieSize + bonus;
+      const avg = ((numDice * (dieSize + 1) / 2) + bonus).toFixed(1);
+
+      return `${roll}: ${min}-${max} (avg ${avg})`;
+    });
+
+    return ranges.filter(r => r !== null).join('\n');
   }
 }

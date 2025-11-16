@@ -14,43 +14,52 @@
   </div>
 
   <!-- Chat Body -->
-  <div class="chat-body" *ngIf="!isCollapsed()">
-    <!-- Message List -->
-    <div class="message-list" #messageList>
-      <div class="no-messages" *ngIf="chatService.messages().length === 0">
-        No messages yet. Start the conversation!
+  @if (!isCollapsed()) {
+    <div class="chat-body">
+      <!-- Message List -->
+      <div class="message-list" #messageList>
+        @if (chatService.messages().length === 0) {
+          <div class="no-messages">
+            No messages yet. Start the conversation!
+          </div>
+        }
+
+        @for (msg of chatService.messages(); track msg._id) {
+          <div
+            class="message"
+            [class.own-message]="isOwnMessage(msg)"
+          >
+            <span class="message-time">{{ formatTime(msg.createdAt) }}</span>
+            <span class="message-username">{{ msg.username }}:</span>
+            <span class="message-text" [innerHTML]="msg.message | messageFormat"></span>
+          </div>
+        }
       </div>
 
-      <div
-        class="message"
-        *ngFor="let msg of chatService.messages()"
-        [class.own-message]="isOwnMessage(msg)"
-      >
-        <span class="message-time">{{ formatTime(msg.createdAt) }}</span>
-        <span class="message-username">{{ msg.username }}:</span>
-        <span class="message-text" [innerHTML]="msg.message | messageFormat"></span>
-      </div>
-    </div>
-
-    <!-- Error Message -->
-    <div class="error-message" *ngIf="errorMessage()">
-      {{ errorMessage() }}
-    </div>
-
-    <!-- Input Area -->
-    <div class="chat-input-area">
-      <!-- Command Autocomplete Dropdown -->
-      <div class="autocomplete-dropdown" *ngIf="showSuggestions()">
-        <div
-          class="suggestion-item"
-          *ngFor="let suggestion of commandSuggestions(); let i = index"
-          [class.selected]="i === selectedSuggestionIndex()"
-          (click)="selectSuggestion(i)"
-        >
-          <span class="suggestion-name">{{ suggestion.name }}</span>
-          <span class="suggestion-description">{{ suggestion.description }}</span>
+      <!-- Error Message -->
+      @if (errorMessage()) {
+        <div class="error-message">
+          {{ errorMessage() }}
         </div>
-      </div>
+      }
+
+      <!-- Input Area -->
+      <div class="chat-input-area">
+        <!-- Command Autocomplete Dropdown -->
+        @if (showSuggestions()) {
+          <div class="autocomplete-dropdown">
+            @for (suggestion of commandSuggestions(); track suggestion.name; let i = $index) {
+              <div
+                class="suggestion-item"
+                [class.selected]="i === selectedSuggestionIndex()"
+                (click)="selectSuggestion(i)"
+              >
+                <span class="suggestion-name">{{ suggestion.name }}</span>
+                <span class="suggestion-description">{{ suggestion.description }}</span>
+              </div>
+            }
+          </div>
+        }
 
       <input
         type="text"
@@ -63,14 +72,15 @@
         [disabled]="sendingMessage() || chatService.connectionStatus() !== 'connected'"
         maxlength="500"
       />
-      <button
-        class="send-btn"
-        type="button"
-        (click)="sendMessage()"
-        [disabled]="!messageInput().trim() || sendingMessage() || chatService.connectionStatus() !== 'connected'"
-      >
-        {{ sendingMessage() ? '...' : 'Send' }}
-      </button>
+        <button
+          class="send-btn"
+          type="button"
+          (click)="sendMessage()"
+          [disabled]="!messageInput().trim() || sendingMessage() || chatService.connectionStatus() !== 'connected'"
+        >
+          {{ sendingMessage() ? '...' : 'Send' }}
+        </button>
+      </div>
     </div>
-  </div>
+  }
 </div>

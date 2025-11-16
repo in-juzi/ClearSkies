@@ -39,6 +39,7 @@ export class InventoryComponent implements OnInit {
 
   selectedItem: ItemDetails | null = null;
   selectedCategory: string = 'all';
+  searchQuery: string = ''; // Search filter
   isAltKeyHeld: boolean = false; // Track Alt key state for visual feedback
   viewMode: 'list' | 'grouped' = 'list'; // Toggle between list and grouped view
 
@@ -99,10 +100,25 @@ export class InventoryComponent implements OnInit {
   }
 
   getFilteredInventory(): ItemDetails[] {
+    let items: ItemDetails[];
+
+    // Filter by category
     if (this.selectedCategory === 'all') {
-      return this.inventoryService.getSortedInventory();
+      items = this.inventoryService.getSortedInventory();
+    } else {
+      items = this.inventoryService.getSortedItemsByCategory(this.selectedCategory);
     }
-    return this.inventoryService.getSortedItemsByCategory(this.selectedCategory);
+
+    // Filter by search query
+    if (this.searchQuery.trim()) {
+      const query = this.searchQuery.toLowerCase();
+      items = items.filter(item =>
+        item.definition?.name.toLowerCase().includes(query) ||
+        item.itemId.toLowerCase().includes(query)
+      );
+    }
+
+    return items;
   }
 
   /**

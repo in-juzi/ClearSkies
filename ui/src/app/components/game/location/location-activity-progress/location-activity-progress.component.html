@@ -27,10 +27,10 @@
         <div class="skill-info">
           <div class="skill-header">
             <span class="skill-level">Level {{ activeSkill()!.skill.level }}</span>
-            <span class="skill-xp">{{ getExperienceToNext(activeSkill()!.skill.experience) }} XP to level</span>
+            <span class="skill-xp">{{ activeSkill()!.skill.xpToNextLevel - activeSkill()!.skill.experience }} XP to level</span>
           </div>
           <div class="xp-bar">
-            <div class="xp-fill" [style.width.%]="activeSkill()!.skill.progress"></div>
+            <div class="xp-fill" [style.width.%]="getSkillProgressPercent(activeSkill()!.skill)"></div>
           </div>
         </div>
       </div>
