@@ -1,6 +1,6 @@
 # Quality & Trait System Redesign
 
-**Date**: 2025-01-14
+**Date**: 2025-11-14
 **Status**: Completed
 **Related Docs**: [036-quality-trait-discussion.md](036-quality-trait-discussion.md), [037-herb-trait-mapping.md](037-herb-trait-mapping.md)
 

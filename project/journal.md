@@ -84,7 +84,7 @@ Medieval fantasy browser game built with:
 
 ## UI/UX Design Decisions
 
-### Inventory Item Layout (2025-01-09)
+### Inventory Item Layout (2025-11-09)
 
 **Implemented: Vertical Stack Layout**
 
@@ -145,7 +145,7 @@ Current implementation uses a vertical stack layout for inventory items to preve
 - Similar to successful inventory systems (Diablo, Path of Exile)
 - Badges can wrap naturally if needed
 
-## Skill System Implementation Status (2025-01-09)
+## Skill System Implementation Status (2025-11-09)
 
 ### Overview: 12 Skills Defined, 5 Actively Used
 

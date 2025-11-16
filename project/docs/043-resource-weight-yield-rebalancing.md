@@ -1,6 +1,6 @@
 # Resource Weight and Gathering Yield Rebalancing
 
-**Date**: 2025-01-15
+**Date**: 2025-11-15
 **Status**: Completed
 
 ## Overview

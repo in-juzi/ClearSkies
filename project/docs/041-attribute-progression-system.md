@@ -1,6 +1,6 @@
 # Attribute-Based Progression System
 
-**Date**: 2025-01-15
+**Date**: 2025-11-15
 **Status**: Planned
 
 ## Overview
