@@ -64,30 +64,36 @@
 - ✅ Resource weight/yield rebalancing (completed - 20-60% weight reduction, yield normalization across all skills)
 - ✅ Inventory grouped view mode (completed - toggle between list and grouped item display)
 - ✅ Storage system with WebSocket (completed - 200-slot bank, bulk operations, real-time updates for future guild storage)
+- ✅ Data-driven effect system (completed - flexible modifier system for traits/qualities/affixes)
+- ✅ Effect system combat integration (completed - trait bonuses for damage/armor/evasion/crit/attack speed)
+- ✅ Effect system activity integration (completed - trait bonuses for activity duration/XP/yield)
+- ✅ World map with SVG visualization (completed - interactive map with location discovery and travel)
 
 **Recent Changes** (Last 10 commits):
-- docs: add comprehensive resource weight and yield rebalancing guide
-- feat: add Material Symbols Outlined font for UI icons
-- refactor: enhance activity progress display and service methods
-- refactor: improve game component layout and panel organization
-- feat: add grouped view mode to inventory UI
-- balance: normalize gathering yields across all skills (-55% to +60%)
-- balance: reduce resource weights by 20-60% across all gathering skills
-- chore: clean up development utilities and add UI-specific build check
-- feat: add custom icons for Sage and Tattered Cloth items
-- refactor: simplify navigation link labels for cleaner travel UI
+- docs: update existing documentation with cross-references
+- refactor: expand allowed traits for bronze/iron equipment
+- feat: add interactive world map with SVG visualization
+- docs: add phase 1 and 2 effect system integration completion reports
+- docs: add effect system design and implementation guides
+- feat: integrate effect system into activity duration calculations
+- feat: integrate effect system into combat calculations
+- refactor: migrate equipment traits to new effect system
+- feat: add data-driven effect system for modifiers
+- docs: update CLAUDE.md with storage system information
 
 **Known Issues**:
 - None currently identified
 
 **Next Priorities**:
+- Complete effect system migration (migrate all remaining traits/qualities to new system)
+- Effect system crafting integration (quality bonuses, success rates, yield multipliers)
+- Effect system vendor integration (sell/buy price modifiers)
 - Steel tier equipment (requires steel ingots from iron + coal)
 - More alchemy recipes (debuff potions, stat potions, transmutation)
 - Combat system enhancements (more monsters, abilities, boss fights)
-- Vendor enhancements (restocking, skill-based pricing, buy orders)
 - Player housing system
 - Guild/party system
-- Enchanting/runecarving skill
+- Enchanting/runecarving skill with affix system
 
 > **Maintenance Note**: Update this section regularly so AI has context without needing to explore
 
@@ -124,7 +130,7 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 **Backend Core:**
 - Controllers: [be/controllers/inventoryController.js](be/controllers/inventoryController.js), [be/controllers/locationController.js](be/controllers/locationController.js), [be/controllers/skillsController.js](be/controllers/skillsController.js), [be/controllers/attributesController.js](be/controllers/attributesController.js), [be/controllers/authController.js](be/controllers/authController.js), [be/controllers/manualController.js](be/controllers/manualController.js), [be/controllers/vendorController.js](be/controllers/vendorController.js), [be/controllers/craftingController.js](be/controllers/craftingController.js), [be/controllers/combatController.js](be/controllers/combatController.js), [be/controllers/storageController.ts](be/controllers/storageController.ts)
 - Models: [be/models/Player.ts](be/models/Player.ts), [be/models/User.js](be/models/User.js), [be/models/ChatMessage.js](be/models/ChatMessage.js)
-- Services (TypeScript): [be/services/itemService.ts](be/services/itemService.ts), [be/services/locationService.ts](be/services/locationService.ts), [be/services/dropTableService.ts](be/services/dropTableService.ts), [be/services/vendorService.ts](be/services/vendorService.ts), [be/services/recipeService.ts](be/services/recipeService.ts), [be/services/combatService.ts](be/services/combatService.ts), [be/services/storageService.ts](be/services/storageService.ts)
+- Services (TypeScript): [be/services/itemService.ts](be/services/itemService.ts), [be/services/locationService.ts](be/services/locationService.ts), [be/services/dropTableService.ts](be/services/dropTableService.ts), [be/services/vendorService.ts](be/services/vendorService.ts), [be/services/recipeService.ts](be/services/recipeService.ts), [be/services/combatService.ts](be/services/combatService.ts), [be/services/storageService.ts](be/services/storageService.ts), [be/services/effectEvaluator.ts](be/services/effectEvaluator.ts)
 - Routes: [be/routes/inventory.js](be/routes/inventory.js), [be/routes/locations.js](be/routes/locations.js), [be/routes/skills.js](be/routes/skills.js), [be/routes/attributes.js](be/routes/attributes.js), [be/routes/auth.js](be/routes/auth.js), [be/routes/manual.js](be/routes/manual.js), [be/routes/vendors.js](be/routes/vendors.js), [be/routes/crafting.js](be/routes/crafting.js), [be/routes/combat.js](be/routes/combat.js), [be/routes/storage.ts](be/routes/storage.ts)
 - Sockets: [be/sockets/chatHandler.js](be/sockets/chatHandler.js), [be/sockets/activityHandler.ts](be/sockets/activityHandler.ts), [be/sockets/craftingHandler.ts](be/sockets/craftingHandler.ts), [be/sockets/combatHandler.ts](be/sockets/combatHandler.ts), [be/sockets/storageHandler.ts](be/sockets/storageHandler.ts)
 
@@ -142,6 +148,7 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 - Crafting: [ui/src/app/components/game/crafting/crafting.component.ts](ui/src/app/components/game/crafting/crafting.component.ts), [ui/src/app/components/game/crafting/crafting.component.html](ui/src/app/components/game/crafting/crafting.component.html)
 - Combat: [ui/src/app/components/game/combat/combat.component.ts](ui/src/app/components/game/combat/combat.component.ts), [ui/src/app/components/game/combat/combat.component.html](ui/src/app/components/game/combat/combat.component.html)
 - Bank: [ui/src/app/components/game/bank/bank.component.ts](ui/src/app/components/game/bank/bank.component.ts), [ui/src/app/components/game/bank/bank.component.html](ui/src/app/components/game/bank/bank.component.html)
+- World Map: [ui/src/app/components/game/world-map/world-map.ts](ui/src/app/components/game/world-map/world-map.ts), [ui/src/app/components/game/world-map/world-map.html](ui/src/app/components/game/world-map/world-map.html)
 - Manual: [ui/src/app/components/manual/manual.component.ts](ui/src/app/components/manual/manual.component.ts), [ui/src/app/components/manual/sections/](ui/src/app/components/manual/sections/)
 - Shared Components: [ui/src/app/components/shared/item-mini/item-mini.component.ts](ui/src/app/components/shared/item-mini/item-mini.component.ts), [ui/src/app/components/shared/item-modifiers/item-modifiers.component.ts](ui/src/app/components/shared/item-modifiers/item-modifiers.component.ts), [ui/src/app/components/shared/item-details-panel/item-details-panel.component.ts](ui/src/app/components/shared/item-details-panel/item-details-panel.component.ts), [ui/src/app/components/shared/icon/icon.component.ts](ui/src/app/components/shared/icon/icon.component.ts), [ui/src/app/components/shared/xp-mini/xp-mini.component.ts](ui/src/app/components/shared/xp-mini/xp-mini.component.ts), [ui/src/app/components/shared/ability-button/ability-button.component.ts](ui/src/app/components/shared/ability-button/ability-button.component.ts), [ui/src/app/components/shared/item-button/item-button.component.ts](ui/src/app/components/shared/item-button/item-button.component.ts), [ui/src/app/components/shared/buff-icon/buff-icon.ts](ui/src/app/components/shared/buff-icon/buff-icon.ts), [ui/src/app/components/shared/activity-log/activity-log.component.ts](ui/src/app/components/shared/activity-log/activity-log.component.ts)
 - Services: [ui/src/app/services/inventory.service.ts](ui/src/app/services/inventory.service.ts), [ui/src/app/services/location.service.ts](ui/src/app/services/location.service.ts), [ui/src/app/services/skills.service.ts](ui/src/app/services/skills.service.ts), [ui/src/app/services/auth.service.ts](ui/src/app/services/auth.service.ts), [ui/src/app/services/manual.service.ts](ui/src/app/services/manual.service.ts), [ui/src/app/services/chat.service.ts](ui/src/app/services/chat.service.ts), [ui/src/app/services/vendor.service.ts](ui/src/app/services/vendor.service.ts), [ui/src/app/services/recipe.service.ts](ui/src/app/services/recipe.service.ts), [ui/src/app/services/crafting.service.ts](ui/src/app/services/crafting.service.ts), [ui/src/app/services/combat.service.ts](ui/src/app/services/combat.service.ts), [ui/src/app/services/icon.service.ts](ui/src/app/services/icon.service.ts), [ui/src/app/services/storage.service.ts](ui/src/app/services/storage.service.ts)
@@ -150,6 +157,7 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 **Game Data (TypeScript):**
 - Shared Types: [shared/types/](shared/types/) - Shared type definitions used by both frontend and backend
 - Shared Constants: [shared/constants/item-constants.ts](shared/constants/item-constants.ts), [shared/constants/attribute-constants.ts](shared/constants/attribute-constants.ts) - Type-safe game constants (source of truth)
+- Effect System Types: [shared/types/effect-system.ts](shared/types/effect-system.ts) - Data-driven effect system for modifiers
 - Item Registry: [be/data/items/ItemRegistry.ts](be/data/items/ItemRegistry.ts) - All items in [definitions/](be/data/items/definitions/)
 - Item Constants (BE): [be/data/constants/item-constants.ts](be/data/constants/item-constants.ts) - Re-exports from shared/constants
 - Combat Constants: [be/data/constants/combat-constants.ts](be/data/constants/combat-constants.ts) - Combat formulas and balance tuning
@@ -850,13 +858,54 @@ Bidirectional real-time communication replacing HTTP polling for activities, cra
 
 **Key Features:**
 - Server-authoritative timing (prevents client manipulation)
-- Client-driven auto-restart (requires active player, prevents AFK grinding)  
+- Client-driven auto-restart (requires active player, prevents AFK grinding)
 - Reconnection handling (restores state after disconnect)
 - Performance: 99% reduction in network operations (eliminated 1000+ requests/min)
 
 **Systems:** Activities, Crafting, Combat, Chat (all use Socket.io)
 
 **Full Documentation:** [project/docs/033-socketio-architecture.md](project/docs/033-socketio-architecture.md)
+
+## Data-Driven Effect System
+
+Flexible, declarative system for defining how modifiers (traits, qualities, affixes) affect different game systems without hardcoding logic in services.
+
+**Quick Facts:**
+- **22 effect contexts** across combat, activities, crafting, and vendor systems
+- **16 condition types** for conditional effects (HP thresholds, combat state, equipment requirements, skill levels)
+- **3 modifier types**: FLAT (+5 damage), PERCENTAGE (+20% damage), MULTIPLIER (2x damage)
+- **Generic evaluator** applies all relevant effects from equipped items and active buffs
+- **Legacy compatibility** layer enables gradual migration of existing traits/qualities
+
+**Design Principles:**
+1. Modifiers declare their effects, not services (data-driven)
+2. Services use generic evaluators to apply all relevant effects
+3. New modifiers = just data, no code changes required
+4. Supports future complexity (abilities, stacking rules, conditional effects)
+
+**Integration Status:**
+- ✅ Combat: Damage, armor, evasion, crit chance, attack speed (Phase 1)
+- ✅ Activities: Duration, XP gain, yield bonuses (Phase 2)
+- 🔄 Crafting: Quality bonuses, success rates, yield multipliers (Phase 3)
+- 🔄 Vendor: Sell/buy price modifiers (Phase 4)
+
+**Migrated Traits:**
+- Balanced (tool/weapon): -1/-2/-4 seconds activity time
+- Hardened (weapon): +2/+4/+7 flat damage
+- Reinforced (armor): +armor bonuses
+
+**Key Files:**
+- Effect Evaluator: [be/services/effectEvaluator.ts](be/services/effectEvaluator.ts)
+- Type Definitions: [shared/types/effect-system.ts](shared/types/effect-system.ts)
+- Combat Integration: [be/services/combatService.ts](be/services/combatService.ts) ~L259, ~L493
+- Activity Integration: [be/sockets/activityHandler.ts](be/sockets/activityHandler.ts) ~L275
+
+**Full Documentation:**
+- [046-modifier-audit-and-consolidation.md](project/docs/046-modifier-audit-and-consolidation.md)
+- [047-data-driven-effect-system-implementation.md](project/docs/047-data-driven-effect-system-implementation.md)
+- [048-creating-traits-and-affixes-guide.md](project/docs/048-creating-traits-and-affixes-guide.md)
+- [049-phase-1-combat-integration-complete.md](project/docs/049-phase-1-combat-integration-complete.md)
+- [050-phase-2-activity-integration-complete.md](project/docs/050-phase-2-activity-integration-complete.md)
 
 ## Vendor/NPC Trading System
 
@@ -988,18 +1037,52 @@ Turn-based combat with abilities, buffs/debuffs, and real-time Socket.io events
 
 **Full Documentation:** [project/docs/017-combat-system.md](project/docs/017-combat-system.md)
 
+## World Map System
+
+Interactive SVG-based world map with location discovery and travel functionality.
+
+**Quick Facts:**
+- SVG rendering with custom paths and viewBox
+- Interactive location markers with hover states
+- Discovered/undiscovered location visualization
+- Current location highlighting
+- Click-to-travel functionality
+- Responsive design with smooth animations
+- Biome-based location grouping
+
+**Technical Implementation:**
+- Standalone Angular component: [world-map.ts](ui/src/app/components/game/world-map/world-map.ts)
+- Location coordinates stored in location definitions
+- Backend API endpoint: `/api/locations/coordinates`
+- Material Symbols icons for location markers
+- Modal overlay with CSS Grid layout
+
+**Location Coordinates:**
+- Kennik: (30, 50) - Starting village
+- Forest Clearing: (20, 35) - Gathering location
+- Goblin Village: (55, 25) - Combat area
+- Mountain Pass: (70, 60) - Mining location
+
+**UI Integration:**
+- "World Map" button in location facility list
+- Modal overlay for full-screen map display
+- Seamless integration with existing travel system
+
+**Key Files:**
+- Frontend Component: [world-map.ts](ui/src/app/components/game/world-map/world-map.ts), [world-map.html](ui/src/app/components/game/world-map/world-map.html), [world-map.scss](ui/src/app/components/game/world-map/world-map.scss)
+- Backend Route: [be/routes/locations.ts](be/routes/locations.ts) `/coordinates` endpoint
+- Location Types: [shared/types/locations.ts](shared/types/locations.ts) - Added `coordinates` field
+
 ## Next Steps / Ideas
 
 See `project/journal.md` for detailed development possibilities including:
-- Combat system
-- Quest system
-- Crafting system (using inventory items)
-- Alchemy system (quality-based recipes)
-- Item enchantments
+- Quest system with narrative progression
+- Item enchantments with affix system
 - Trading and auction house
-- World map
-- Real-time multiplayer features
-- NPC interactions and vendors
+- Real-time multiplayer features (party system, PvP)
+- Advanced world map features (fog of war, region unlocks)
+- Player housing with construction skill
+- Guild system with shared storage and activities
 
 ## TypeScript Type System
 
