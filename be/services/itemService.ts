@@ -394,6 +394,7 @@ class ItemService {
 
     return {
       ...plainInstance,
+      name: itemDef.name, // Add top-level name for convenience
       definition: itemDef,
       vendorPrice,
       qualityDetails,
