@@ -24,6 +24,9 @@ export * from './crafting';
 // ===== TYPE GUARDS =====
 export * from './guards';
 
+// ===== EFFECT SYSTEM =====
+export * from './effect-system';
+
 // ===== CONSTANTS =====
 export * from '../constants/item-constants';
 
