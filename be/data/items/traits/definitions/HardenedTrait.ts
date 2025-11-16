@@ -4,6 +4,7 @@
  */
 
 import { TraitDefinition as Trait } from '../../../../types/items';
+import { EffectContext, ModifierType, ConditionType } from '@shared/types/effect-system';
 
 export const HardenedTrait: Trait = {
   "traitId": "hardened",
@@ -18,38 +19,56 @@ export const HardenedTrait: Trait = {
   "levels": {
     "1": {
       "name": "Hardened",
-      "description": "Basic tempering provides modest damage increase",
+      "description": "Basic tempering provides +2 damage",
       "effects": {
         "vendorPrice": {
           "modifier": 1.2
         },
-        "combat": {
-          "damageBonus": 2
-        }
+        "applicators": [
+          {
+            context: EffectContext.COMBAT_DAMAGE,
+            modifierType: ModifierType.FLAT,
+            value: 2,
+            condition: { type: ConditionType.ALWAYS },
+            description: "+2 flat damage"
+          }
+        ]
       }
     },
     "2": {
       "name": "Tempered",
-      "description": "Expert tempering grants significant combat advantage",
+      "description": "Expert tempering grants +4 damage",
       "effects": {
         "vendorPrice": {
           "modifier": 1.4
         },
-        "combat": {
-          "damageBonus": 4
-        }
+        "applicators": [
+          {
+            context: EffectContext.COMBAT_DAMAGE,
+            modifierType: ModifierType.FLAT,
+            value: 4,
+            condition: { type: ConditionType.ALWAYS },
+            description: "+4 flat damage"
+          }
+        ]
       }
     },
     "3": {
       "name": "Battle-Forged",
-      "description": "Legendary forging creates a devastating weapon",
+      "description": "Legendary forging creates a devastating weapon (+7 damage)",
       "effects": {
         "vendorPrice": {
           "modifier": 1.6
         },
-        "combat": {
-          "damageBonus": 7
-        }
+        "applicators": [
+          {
+            context: EffectContext.COMBAT_DAMAGE,
+            modifierType: ModifierType.FLAT,
+            value: 7,
+            condition: { type: ConditionType.ALWAYS },
+            description: "+7 flat damage"
+          }
+        ]
       }
     }
   }
