@@ -296,7 +296,8 @@ export const completeCrafting = async (req: Request, res: Response): Promise<voi
       recipe,
       ingredientInstances,
       playerSkillLevel,
-      itemService
+      itemService,
+      player  // Pass player for effect system integration
     );
 
     // Add all outputs to inventory

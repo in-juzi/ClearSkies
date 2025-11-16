@@ -33,6 +33,7 @@ router.post('/reload', inventoryController.reloadDefinitions);
 
 // Equipment routes
 router.get('/equipment', inventoryController.getEquippedItems);
+router.get('/equipment/stats', inventoryController.getEquipmentStats);
 router.post('/equipment/equip', inventoryController.equipItem);
 router.post('/equipment/unequip', inventoryController.unequipItem);
 

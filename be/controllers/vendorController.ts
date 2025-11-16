@@ -100,21 +100,21 @@ export const buyItem = async (
       return;
     }
 
-    // Get buy price
-    const buyPrice = vendorService.calculateBuyPrice(vendorId, itemId);
+    // Get player (needed for effect-based price modifiers)
+    const player = await Player.findOne({ userId });
+    if (!player) {
+      res.status(404).json({ message: 'Player not found' });
+      return;
+    }
+
+    // Get buy price with player modifiers
+    const buyPrice = vendorService.calculateBuyPrice(vendorId, itemId, player);
     if (buyPrice === null) {
       res.status(400).json({ message: 'Failed to calculate buy price' });
       return;
     }
 
     const totalCost = buyPrice * quantity;
-
-    // Get player
-    const player = await Player.findOne({ userId });
-    if (!player) {
-      res.status(404).json({ message: 'Player not found' });
-      return;
-    }
 
     // Check if player has enough gold
     if (player.gold < totalCost) {
@@ -237,8 +237,8 @@ export const sellItem = async (
       return;
     }
 
-    // Calculate sell price (per item)
-    const sellPricePerItem = vendorService.calculateSellPrice(vendorId, itemInstance);
+    // Calculate sell price (per item) with player modifiers
+    const sellPricePerItem = vendorService.calculateSellPrice(vendorId, itemInstance, player);
     const totalSellPrice = sellPricePerItem * quantity;
 
     // Remove items from inventory

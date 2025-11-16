@@ -3,6 +3,8 @@ import Player from '../models/Player';
 import itemService from '../services/itemService';
 import { QualityMap, TraitMap, ItemCategory, ConsumableItem } from '@shared/types';
 import { isWeaponItem, isArmorItem } from '../types/guards';
+import effectEvaluator from '../services/effectEvaluator';
+import { EffectContext } from '@shared/types/effect-system';
 
 // ============================================================================
 // Type Definitions for Request Bodies
@@ -56,12 +58,158 @@ function convertMapsToObjects(item: any): any {
   return plainItem;
 }
 
+/**
+ * Calculate equipment stats with quality/trait effects
+ */
+function calculateEquipmentStats(player: any, equippedItems: Record<string, any>) {
+  const stats = {
+    // Offensive stats
+    totalDamage: [] as string[],
+    averageAttackSpeed: 0,
+    totalCritChance: 0,
+    weaponCount: 0,
+    // Defensive stats
+    totalArmor: 0,
+    totalEvasion: 0,
+    totalBlockChance: 0,
+    armorCount: 0,
+    // Other stats
+    totalWeight: 0,
+    requiredLevel: 0,
+    itemCount: 0
+  };
+
+  // Iterate through equipped items
+  for (const item of Object.values(equippedItems)) {
+    const itemDef = itemService.getItemDefinition(item.itemId);
+    if (!itemDef) continue;
+
+    const props = itemDef.properties;
+    stats.itemCount++;
+
+    // Accumulate weight
+    stats.totalWeight += props.weight || 0;
+
+    // Track highest required level
+    stats.requiredLevel = Math.max(stats.requiredLevel, props['requiredLevel'] || 0);
+
+    // Weapon stats
+    if (isWeaponItem(itemDef)) {
+      if (props.damageRoll) {
+        // Get damage bonus from traits/qualities for this specific item
+        const damageBonus = effectEvaluator.evaluateSingleItemEffects(
+          item,
+          EffectContext.COMBAT_DAMAGE
+        );
+
+        // Format damage as "2d6" or "2d6 +4" if there's a bonus
+        let damageDisplay = props.damageRoll;
+        if (damageBonus.flatBonus > 0) {
+          damageDisplay += `+${damageBonus.flatBonus}`;
+        }
+
+        stats.totalDamage.push(damageDisplay);
+        stats.weaponCount++;
+      }
+      if (props.attackSpeed) {
+        stats.averageAttackSpeed += props.attackSpeed;
+      }
+      if (props.critChance) {
+        stats.totalCritChance += props.critChance;
+      }
+    }
+
+    // Armor stats - accumulate base values
+    if (isArmorItem(itemDef)) {
+      if (props.armor) {
+        stats.totalArmor += props.armor;
+        stats.armorCount++;
+      }
+      if (props.evasion) {
+        stats.totalEvasion += props.evasion;
+      }
+      if (props.blockChance) {
+        stats.totalBlockChance += props.blockChance;
+      }
+    }
+  }
+
+  // Apply effect bonuses to accumulated base stats
+  const armorBonus = effectEvaluator.getCombatStatBonus(player, 'armor');
+  stats.totalArmor = effectEvaluator.calculateFinalValue(stats.totalArmor, {
+    flatBonus: armorBonus.flat,
+    percentageBonus: armorBonus.percentage,
+    multiplier: armorBonus.multiplier,
+    appliedEffects: [],
+    skippedEffects: []
+  });
+
+  // Apply effect bonuses to evasion
+  const evasionBonus = effectEvaluator.getCombatStatBonus(player, 'evasion');
+  stats.totalEvasion = effectEvaluator.calculateFinalValue(stats.totalEvasion, {
+    flatBonus: evasionBonus.flat,
+    percentageBonus: evasionBonus.percentage,
+    multiplier: evasionBonus.multiplier,
+    appliedEffects: [],
+    skippedEffects: []
+  });
+
+  // Apply effect bonuses to crit chance
+  const critBonus = effectEvaluator.getCombatStatBonus(player, 'critChance');
+  stats.totalCritChance = effectEvaluator.calculateFinalValue(stats.totalCritChance, {
+    flatBonus: critBonus.flat,
+    percentageBonus: critBonus.percentage,
+    multiplier: critBonus.multiplier,
+    appliedEffects: [],
+    skippedEffects: []
+  });
+
+  // Apply effect bonuses to attack speed and calculate average
+  if (stats.weaponCount > 0) {
+    const baseAvgSpeed = stats.averageAttackSpeed / stats.weaponCount;
+    const attackSpeedBonus = effectEvaluator.getCombatStatBonus(player, 'attackSpeed');
+    stats.averageAttackSpeed = effectEvaluator.calculateFinalValue(baseAvgSpeed, {
+      flatBonus: attackSpeedBonus.flat,
+      percentageBonus: attackSpeedBonus.percentage,
+      multiplier: attackSpeedBonus.multiplier,
+      appliedEffects: [],
+      skippedEffects: []
+    });
+  } else {
+    // No weapons equipped - calculate unarmed stats
+    const damageBonus = effectEvaluator.getCombatStatBonus(player, 'damage');
+    const unarmedDamage = effectEvaluator.calculateFinalValue(1, {
+      flatBonus: damageBonus.flat,
+      percentageBonus: damageBonus.percentage,
+      multiplier: damageBonus.multiplier,
+      appliedEffects: [],
+      skippedEffects: []
+    });
+
+    // Format as fixed damage (not a roll)
+    stats.totalDamage.push(`${Math.floor(unarmedDamage)} (Unarmed)`);
+
+    // Unarmed attack speed: 3.0 seconds base (same as combatService.ts:764)
+    const attackSpeedBonus = effectEvaluator.getCombatStatBonus(player, 'attackSpeed');
+    stats.averageAttackSpeed = effectEvaluator.calculateFinalValue(3.0, {
+      flatBonus: attackSpeedBonus.flat,
+      percentageBonus: attackSpeedBonus.percentage,
+      multiplier: attackSpeedBonus.multiplier,
+      appliedEffects: [],
+      skippedEffects: []
+    });
+  }
+
+  return stats;
+}
+
 // ============================================================================
 // Controller Functions
 // ============================================================================
 
 /**
- * Get player's inventory with full item details
+ * Get player's inventory with minimal instance data
+ * Frontend enriches with definitions from ItemDataService (no duplication needed)
  */
 export const getInventory = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -72,15 +220,22 @@ export const getInventory = async (req: Request, res: Response): Promise<void> =
       return;
     }
 
-    // Enhance inventory with item details
-    const enhancedInventory = player.inventory.map(item => {
+    // Return minimal instance data only - frontend will enrich with definitions
+    const minimalInventory = player.inventory.map(item => {
       const plainItem = convertMapsToObjects(item);
-      const details = itemService.getItemDetails(plainItem);
-      return details;
+      return {
+        instanceId: plainItem.instanceId,
+        itemId: plainItem.itemId,
+        quantity: plainItem.quantity,
+        qualities: plainItem.qualities,
+        traits: plainItem.traits,
+        equipped: plainItem.equipped || false,
+        acquiredAt: plainItem.acquiredAt
+      };
     });
 
     res.json({
-      inventory: enhancedInventory,
+      inventory: minimalInventory,
       capacity: player.inventoryCapacity, // DEPRECATED: use carryingCapacity instead
       carryingCapacity: player.carryingCapacity, // in kg
       currentWeight: player.currentWeight, // in kg
@@ -268,13 +423,48 @@ export const getItemCombatStats = async (req: Request<{ instanceId: string }>, r
 
     // Handle armor items
     if (isArmorItem(itemDef)) {
+      // Get base armor stats
+      let armor = itemDef.properties.armor || 0;
+      let evasion = itemDef.properties.evasion || 0;
+
+      // Get armor trait effects (only from THIS item)
+      const armorEffects = effectEvaluator.evaluateSingleItemEffects(
+        item,
+        EffectContext.COMBAT_ARMOR
+      );
+
+      armor += armorEffects.flatBonus;
+      if (armorEffects.percentageBonus !== 0) {
+        armor = Math.floor(armor * (1 + armorEffects.percentageBonus));
+      }
+      if (armorEffects.multiplier !== 1.0) {
+        armor = Math.floor(armor * armorEffects.multiplier);
+      }
+
+      // Get evasion trait effects (only from THIS item)
+      const evasionEffects = effectEvaluator.evaluateSingleItemEffects(
+        item,
+        EffectContext.COMBAT_EVASION
+      );
+
+      evasion += evasionEffects.flatBonus;
+      if (evasionEffects.percentageBonus !== 0) {
+        evasion = Math.floor(evasion * (1 + evasionEffects.percentageBonus));
+      }
+      if (evasionEffects.multiplier !== 1.0) {
+        evasion = Math.floor(evasion * evasionEffects.multiplier);
+      }
+
       res.json({
         success: true,
         stats: {
-          armor: itemDef.properties.armor || 0,
-          evasion: itemDef.properties.evasion || 0,
+          armor,
+          evasion,
           blockChance: itemDef.properties.blockChance || 0,
-          requiredLevel: itemDef.properties.requiredLevel || 1
+          requiredLevel: itemDef.properties.requiredLevel || 1,
+          // Include trait bonus details
+          armorTraitBonus: armorEffects.flatBonus,
+          evasionTraitBonus: evasionEffects.flatBonus
         }
       });
       return;
@@ -318,26 +508,52 @@ export const getItemCombatStats = async (req: Request<{ instanceId: string }>, r
     const maxBaseDamage = (numDice * numFaces) + modifier;
     const avgBaseDamage = (numDice * (numFaces + 1) / 2) + modifier;
 
-    const minScaledDamage = Math.max(1, minBaseDamage + totalLevelBonus);
-    const maxScaledDamage = maxBaseDamage + totalLevelBonus;
-    const avgScaledDamage = avgBaseDamage + totalLevelBonus;
+    // Get trait bonuses for damage (only from THIS item)
+    const damageEffects = effectEvaluator.evaluateSingleItemEffects(
+      item,
+      EffectContext.COMBAT_DAMAGE
+    );
 
-    // Get crit chance (base + passive bonuses)
+    const traitDamageBonus = damageEffects.flatBonus;
+
+    // Add skill/attribute bonus + trait bonus
+    const totalBonus = totalLevelBonus + traitDamageBonus;
+
+    const minScaledDamage = Math.max(1, minBaseDamage + totalBonus);
+    const maxScaledDamage = maxBaseDamage + totalBonus;
+    const avgScaledDamage = avgBaseDamage + totalBonus;
+
+    // Get crit chance (base + trait bonuses from THIS item only)
     let critChance = itemDef.properties.critChance || 0.05;
-    // TODO: Add passive abilities support when implemented
-    // if (player.passiveAbilities) {
-    //   for (const ability of player.passiveAbilities) {
-    //     if (ability.effects && ability.effects.critChanceBonus) {
-    //       critChance += ability.effects.critChanceBonus;
-    //     }
-    //   }
-    // }
+
+    const critEffects = effectEvaluator.evaluateSingleItemEffects(
+      item,
+      EffectContext.COMBAT_CRIT_CHANCE
+    );
+
+    critChance += critEffects.flatBonus;
+    if (critEffects.percentageBonus !== 0) {
+      critChance = critChance * (1 + critEffects.percentageBonus);
+    }
+
+    // Get attack speed (base + trait bonuses from THIS item only)
+    let attackSpeed = itemDef.properties.attackSpeed || 3.0;
+
+    const attackSpeedEffects = effectEvaluator.evaluateSingleItemEffects(
+      item,
+      EffectContext.COMBAT_ATTACK_SPEED
+    );
+
+    attackSpeed += attackSpeedEffects.flatBonus;
+    if (attackSpeedEffects.percentageBonus !== 0) {
+      attackSpeed = attackSpeed * (1 + attackSpeedEffects.percentageBonus);
+    }
 
     // Format scaled damage roll notation (e.g., "1d6+3")
-    const scaledDamageRoll = totalLevelBonus > 0
-      ? `${damageRoll}+${totalLevelBonus}`
-      : totalLevelBonus < 0
-        ? `${damageRoll}${totalLevelBonus}`
+    const scaledDamageRoll = totalBonus > 0
+      ? `${damageRoll}+${totalBonus}`
+      : totalBonus < 0
+        ? `${damageRoll}${totalBonus}`
         : damageRoll;
 
     res.json({
@@ -354,7 +570,7 @@ export const getItemCombatStats = async (req: Request<{ instanceId: string }>, r
         avgScaledDamage: avgScaledDamage.toFixed(1),
 
         // Other combat stats
-        attackSpeed: itemDef.properties.attackSpeed || 3.0,
+        attackSpeed: attackSpeed,
         critChance: critChance,
 
         // Level breakdown
@@ -363,7 +579,12 @@ export const getItemCombatStats = async (req: Request<{ instanceId: string }>, r
         attrLevel,
         attrBonus,
         totalLevelBonus,
-        skillScalar
+        skillScalar,
+
+        // Trait bonuses
+        traitDamageBonus,
+        traitCritBonus: critEffects.flatBonus,
+        traitAttackSpeedBonus: attackSpeedEffects.flatBonus
       }
     });
   } catch (error) {
@@ -510,7 +731,7 @@ export const unequipItem = async (req: Request<{}, {}, UnequipItemRequest>, res:
 };
 
 /**
- * Get all equipped items
+ * Get all equipped items with calculated stats
  */
 export const getEquippedItems = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -534,13 +755,39 @@ export const getEquippedItems = async (req: Request, res: Response): Promise<voi
       allSlots[slot] = instanceId;
     }
 
+    // Calculate equipment stats with quality/trait effects
+    const stats = calculateEquipmentStats(player, equippedItems);
+
     res.json({
       equippedItems: enhancedEquipped,
-      slots: allSlots
+      slots: allSlots,
+      stats
     });
   } catch (error) {
     console.error('Get equipped items error:', error);
     res.status(500).json({ message: 'Error fetching equipped items', error: (error as Error).message });
+  }
+};
+
+/**
+ * Get equipment summary stats with quality/trait effects applied
+ * (Standalone endpoint - getEquippedItems also returns stats)
+ */
+export const getEquipmentStats = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const player = await Player.findOne({ userId: req.user._id });
+    if (!player) {
+      res.status(404).json({ message: 'Player not found' });
+      return;
+    }
+
+    const equippedItems = player.getEquippedItems();
+    const stats = calculateEquipmentStats(player, equippedItems);
+
+    res.json(stats);
+  } catch (error) {
+    console.error('Get equipment stats error:', error);
+    res.status(500).json({ message: 'Error calculating equipment stats', error: (error as Error).message });
   }
 };
 
