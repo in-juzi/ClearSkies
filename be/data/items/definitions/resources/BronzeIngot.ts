@@ -16,7 +16,7 @@ export const BronzeIngot: ResourceItem = {
   "rarity": RARITY.COMMON,
   "stackable": true,
   "properties": {
-    "weight": 8,
+    "weight": 4.5,
     "material": MATERIAL.BRONZE,
     "tier": TIER.T1,
     "skillSource": SKILL_SOURCE.SMITHING

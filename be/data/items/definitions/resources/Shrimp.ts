@@ -16,7 +16,7 @@ export const Shrimp: ConsumableItem = {
   "rarity": RARITY.COMMON,
   "stackable": true,
   "properties": {
-    "weight": 0.5,
+    "weight": 0.2,
     "material": MATERIAL.GENERIC,
     "tier": TIER.T1,
     "skillSource": SKILL_SOURCE.FISHING

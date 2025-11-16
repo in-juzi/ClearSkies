@@ -16,7 +16,7 @@ export const Cod: ConsumableItem = {
   "rarity": RARITY.UNCOMMON,
   "stackable": true,
   "properties": {
-    "weight": 2.0,
+    "weight": 1.5,
     "material": MATERIAL.GENERIC,
     "tier": TIER.T3,
     "skillSource": SKILL_SOURCE.FISHING

@@ -16,7 +16,7 @@ export const Trout: ConsumableItem = {
   "rarity": RARITY.COMMON,
   "stackable": true,
   "properties": {
-    "weight": 1,
+    "weight": 0.8,
     "material": MATERIAL.GENERIC,
     "tier": TIER.T1,
     "skillSource": SKILL_SOURCE.FISHING

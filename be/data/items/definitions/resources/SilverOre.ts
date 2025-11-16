@@ -21,7 +21,7 @@ export const SilverOre: ResourceItem = {
   "rarity": RARITY.UNCOMMON,
   "stackable": true,
   "properties": {
-    "weight": 5.5,
+    "weight": 3.5,
     "material": MATERIAL.GENERIC,
     "tier": TIER.T3,
     "skillSource": SKILL_SOURCE.MINING

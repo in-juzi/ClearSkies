@@ -16,7 +16,7 @@ export const IronIngot: ResourceItem = {
   "rarity": RARITY.COMMON,
   "stackable": true,
   "properties": {
-    "weight": 10,
+    "weight": 7,
     "material": MATERIAL.IRON,
     "tier": TIER.T2,
     "skillSource": SKILL_SOURCE.SMITHING

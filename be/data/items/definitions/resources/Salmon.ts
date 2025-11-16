@@ -16,7 +16,7 @@ export const Salmon: ConsumableItem = {
   "rarity": RARITY.UNCOMMON,
   "stackable": true,
   "properties": {
-    "weight": 1.5,
+    "weight": 1.2,
     "material": MATERIAL.GENERIC,
     "tier": TIER.T2,
     "skillSource": SKILL_SOURCE.FISHING

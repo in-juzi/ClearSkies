@@ -16,7 +16,7 @@ export const TinOre: ResourceItem = {
   "rarity": RARITY.COMMON,
   "stackable": true,
   "properties": {
-    "weight": 4,
+    "weight": 2.5,
     "material": MATERIAL.GENERIC,
     "tier": TIER.T1,
     "skillSource": SKILL_SOURCE.MINING

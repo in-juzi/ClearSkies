@@ -16,7 +16,7 @@ export const CopperOre: ResourceItem = {
   "rarity": RARITY.COMMON,
   "stackable": true,
   "properties": {
-    "weight": 5,
+    "weight": 2.5,
     "material": MATERIAL.GENERIC,
     "tier": TIER.T1,
     "skillSource": SKILL_SOURCE.MINING

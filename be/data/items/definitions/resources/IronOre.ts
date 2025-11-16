@@ -16,7 +16,7 @@ export const IronOre: ResourceItem = {
   "rarity": RARITY.COMMON,
   "stackable": true,
   "properties": {
-    "weight": 6,
+    "weight": 4,
     "material": MATERIAL.GENERIC,
     "tier": TIER.T2,
     "skillSource": SKILL_SOURCE.MINING
