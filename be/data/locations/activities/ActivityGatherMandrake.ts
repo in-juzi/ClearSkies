@@ -18,7 +18,7 @@ export const ActivityGatherMandrake: ActivityUnion = {
   },
   "rewards": {
     "experience": {
-      "gathering": 45
+      "gathering": 20
     },
     "dropTables": [
       "gathering-mandrake"

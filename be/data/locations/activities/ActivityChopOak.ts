@@ -23,7 +23,7 @@ export const ActivityChopOak: ActivityUnion = {
   },
   "rewards": {
     "experience": {
-      "woodcutting": 30
+      "woodcutting": 20
     },
     "dropTables": [
       "woodcutting-oak",

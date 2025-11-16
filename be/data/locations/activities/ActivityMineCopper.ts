@@ -23,7 +23,7 @@ export const ActivityMineCopper: ActivityUnion = {
   },
   "rewards": {
     "experience": {
-      "mining": 25
+      "mining": 20
     },
     "dropTables": [
       "mining-copper"

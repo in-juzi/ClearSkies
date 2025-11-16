@@ -18,7 +18,7 @@ export const ActivityGatherNettle: ActivityUnion = {
   },
   "rewards": {
     "experience": {
-      "gathering": 35
+      "gathering": 20
     },
     "dropTables": [
       "gathering-nettle"

@@ -21,7 +21,7 @@ export const ActivityFishShrimp: ActivityUnion = {
   },
   "rewards": {
     "experience": {
-      "fishing": 15
+      "fishing": 20
     },
     "dropTables": [
       "fishing-shrimp",

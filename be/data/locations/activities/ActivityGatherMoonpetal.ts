@@ -18,7 +18,7 @@ export const ActivityGatherMoonpetal: ActivityUnion = {
   },
   "rewards": {
     "experience": {
-      "gathering": 60
+      "gathering": 50
     },
     "dropTables": [
       "gathering-moonpetal"

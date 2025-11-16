@@ -18,7 +18,7 @@ export const ActivityGatherDragonsBreath: ActivityUnion = {
   },
   "rewards": {
     "experience": {
-      "gathering": 75
+      "gathering": 50
     },
     "dropTables": [
       "gathering-dragons-breath"

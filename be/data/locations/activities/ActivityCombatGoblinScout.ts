@@ -14,4 +14,5 @@ export const ActivityCombatGoblinScout: ActivityUnion = {
   "combatConfig": {
     "monsterId": "goblin_scout"
   }
+  // Note: XP awarded dynamically based on Monster.experience and equipped weapon's skillScalar
 } as const;

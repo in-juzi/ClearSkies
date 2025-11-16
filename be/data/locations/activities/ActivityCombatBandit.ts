@@ -14,4 +14,5 @@ export const ActivityCombatBandit: ActivityUnion = {
   "combatConfig": {
     "monsterId": "bandit_thug"
   }
+  // Note: XP awarded dynamically based on Monster.experience and equipped weapon's skillScalar
 } as const;

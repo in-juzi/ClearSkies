@@ -14,4 +14,5 @@ export const ActivityCombatGoblinWarriorVillage: ActivityUnion = {
   "combatConfig": {
     "monsterId": "goblin_warrior"
   }
+  // Note: XP awarded dynamically based on Monster.experience and equipped weapon's skillScalar
 } as const;

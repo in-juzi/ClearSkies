@@ -23,7 +23,7 @@ export const ActivityFishSalmon: ActivityUnion = {
   },
   "rewards": {
     "experience": {
-      "fishing": 40
+      "fishing": 20
     },
     "dropTables": [
       "fishing-salmon",

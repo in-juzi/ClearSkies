@@ -23,7 +23,7 @@ export const ActivityFishCod: ActivityUnion = {
   },
   "rewards": {
     "experience": {
-      "fishing": 25
+      "fishing": 20
     },
     "items": [
       {

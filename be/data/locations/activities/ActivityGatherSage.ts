@@ -18,7 +18,7 @@ export const ActivityGatherSage: ActivityUnion = {
   },
   "rewards": {
     "experience": {
-      "gathering": 25
+      "gathering": 20
     },
     "dropTables": [
       "gathering-sage"

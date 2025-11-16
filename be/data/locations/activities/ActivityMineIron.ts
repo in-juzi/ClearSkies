@@ -23,7 +23,7 @@ export const ActivityMineIron: ActivityUnion = {
   },
   "rewards": {
     "experience": {
-      "mining": 45
+      "mining": 20
     },
     "items": [
       {
