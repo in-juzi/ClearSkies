@@ -63,6 +63,7 @@
 - ✅ HP/MP schema cleanup (completed - removed legacy max fields, use virtual properties exclusively)
 - ✅ Resource weight/yield rebalancing (completed - 20-60% weight reduction, yield normalization across all skills)
 - ✅ Inventory grouped view mode (completed - toggle between list and grouped item display)
+- ✅ Storage system with WebSocket (completed - 200-slot bank, bulk operations, real-time updates for future guild storage)
 
 **Recent Changes** (Last 10 commits):
 - docs: add comprehensive resource weight and yield rebalancing guide
@@ -121,11 +122,11 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 ### Frequently Modified Files
 
 **Backend Core:**
-- Controllers: [be/controllers/inventoryController.js](be/controllers/inventoryController.js), [be/controllers/locationController.js](be/controllers/locationController.js), [be/controllers/skillsController.js](be/controllers/skillsController.js), [be/controllers/attributesController.js](be/controllers/attributesController.js), [be/controllers/authController.js](be/controllers/authController.js), [be/controllers/manualController.js](be/controllers/manualController.js), [be/controllers/vendorController.js](be/controllers/vendorController.js), [be/controllers/craftingController.js](be/controllers/craftingController.js), [be/controllers/combatController.js](be/controllers/combatController.js)
+- Controllers: [be/controllers/inventoryController.js](be/controllers/inventoryController.js), [be/controllers/locationController.js](be/controllers/locationController.js), [be/controllers/skillsController.js](be/controllers/skillsController.js), [be/controllers/attributesController.js](be/controllers/attributesController.js), [be/controllers/authController.js](be/controllers/authController.js), [be/controllers/manualController.js](be/controllers/manualController.js), [be/controllers/vendorController.js](be/controllers/vendorController.js), [be/controllers/craftingController.js](be/controllers/craftingController.js), [be/controllers/combatController.js](be/controllers/combatController.js), [be/controllers/storageController.ts](be/controllers/storageController.ts)
 - Models: [be/models/Player.ts](be/models/Player.ts), [be/models/User.js](be/models/User.js), [be/models/ChatMessage.js](be/models/ChatMessage.js)
-- Services (TypeScript): [be/services/itemService.ts](be/services/itemService.ts), [be/services/locationService.ts](be/services/locationService.ts), [be/services/dropTableService.ts](be/services/dropTableService.ts), [be/services/vendorService.ts](be/services/vendorService.ts), [be/services/recipeService.ts](be/services/recipeService.ts), [be/services/combatService.ts](be/services/combatService.ts)
-- Routes: [be/routes/inventory.js](be/routes/inventory.js), [be/routes/locations.js](be/routes/locations.js), [be/routes/skills.js](be/routes/skills.js), [be/routes/attributes.js](be/routes/attributes.js), [be/routes/auth.js](be/routes/auth.js), [be/routes/manual.js](be/routes/manual.js), [be/routes/vendors.js](be/routes/vendors.js), [be/routes/crafting.js](be/routes/crafting.js), [be/routes/combat.js](be/routes/combat.js)
-- Sockets: [be/sockets/chatHandler.js](be/sockets/chatHandler.js), [be/sockets/activityHandler.ts](be/sockets/activityHandler.ts), [be/sockets/craftingHandler.ts](be/sockets/craftingHandler.ts), [be/sockets/combatHandler.ts](be/sockets/combatHandler.ts)
+- Services (TypeScript): [be/services/itemService.ts](be/services/itemService.ts), [be/services/locationService.ts](be/services/locationService.ts), [be/services/dropTableService.ts](be/services/dropTableService.ts), [be/services/vendorService.ts](be/services/vendorService.ts), [be/services/recipeService.ts](be/services/recipeService.ts), [be/services/combatService.ts](be/services/combatService.ts), [be/services/storageService.ts](be/services/storageService.ts)
+- Routes: [be/routes/inventory.js](be/routes/inventory.js), [be/routes/locations.js](be/routes/locations.js), [be/routes/skills.js](be/routes/skills.js), [be/routes/attributes.js](be/routes/attributes.js), [be/routes/auth.js](be/routes/auth.js), [be/routes/manual.js](be/routes/manual.js), [be/routes/vendors.js](be/routes/vendors.js), [be/routes/crafting.js](be/routes/crafting.js), [be/routes/combat.js](be/routes/combat.js), [be/routes/storage.ts](be/routes/storage.ts)
+- Sockets: [be/sockets/chatHandler.js](be/sockets/chatHandler.js), [be/sockets/activityHandler.ts](be/sockets/activityHandler.ts), [be/sockets/craftingHandler.ts](be/sockets/craftingHandler.ts), [be/sockets/combatHandler.ts](be/sockets/combatHandler.ts), [be/sockets/storageHandler.ts](be/sockets/storageHandler.ts)
 
 **Frontend Core:**
 - Game Component: [ui/src/app/components/game/game.component.ts](ui/src/app/components/game/game.component.ts), [ui/src/app/components/game/game.component.html](ui/src/app/components/game/game.component.html)
@@ -140,9 +141,10 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 - Vendor: [ui/src/app/components/game/vendor/vendor.component.ts](ui/src/app/components/game/vendor/vendor.component.ts), [ui/src/app/components/game/vendor/vendor.component.html](ui/src/app/components/game/vendor/vendor.component.html)
 - Crafting: [ui/src/app/components/game/crafting/crafting.component.ts](ui/src/app/components/game/crafting/crafting.component.ts), [ui/src/app/components/game/crafting/crafting.component.html](ui/src/app/components/game/crafting/crafting.component.html)
 - Combat: [ui/src/app/components/game/combat/combat.component.ts](ui/src/app/components/game/combat/combat.component.ts), [ui/src/app/components/game/combat/combat.component.html](ui/src/app/components/game/combat/combat.component.html)
+- Bank: [ui/src/app/components/game/bank/bank.component.ts](ui/src/app/components/game/bank/bank.component.ts), [ui/src/app/components/game/bank/bank.component.html](ui/src/app/components/game/bank/bank.component.html)
 - Manual: [ui/src/app/components/manual/manual.component.ts](ui/src/app/components/manual/manual.component.ts), [ui/src/app/components/manual/sections/](ui/src/app/components/manual/sections/)
 - Shared Components: [ui/src/app/components/shared/item-mini/item-mini.component.ts](ui/src/app/components/shared/item-mini/item-mini.component.ts), [ui/src/app/components/shared/item-modifiers/item-modifiers.component.ts](ui/src/app/components/shared/item-modifiers/item-modifiers.component.ts), [ui/src/app/components/shared/item-details-panel/item-details-panel.component.ts](ui/src/app/components/shared/item-details-panel/item-details-panel.component.ts), [ui/src/app/components/shared/icon/icon.component.ts](ui/src/app/components/shared/icon/icon.component.ts), [ui/src/app/components/shared/xp-mini/xp-mini.component.ts](ui/src/app/components/shared/xp-mini/xp-mini.component.ts), [ui/src/app/components/shared/ability-button/ability-button.component.ts](ui/src/app/components/shared/ability-button/ability-button.component.ts), [ui/src/app/components/shared/item-button/item-button.component.ts](ui/src/app/components/shared/item-button/item-button.component.ts), [ui/src/app/components/shared/buff-icon/buff-icon.ts](ui/src/app/components/shared/buff-icon/buff-icon.ts), [ui/src/app/components/shared/activity-log/activity-log.component.ts](ui/src/app/components/shared/activity-log/activity-log.component.ts)
-- Services: [ui/src/app/services/inventory.service.ts](ui/src/app/services/inventory.service.ts), [ui/src/app/services/location.service.ts](ui/src/app/services/location.service.ts), [ui/src/app/services/skills.service.ts](ui/src/app/services/skills.service.ts), [ui/src/app/services/auth.service.ts](ui/src/app/services/auth.service.ts), [ui/src/app/services/manual.service.ts](ui/src/app/services/manual.service.ts), [ui/src/app/services/chat.service.ts](ui/src/app/services/chat.service.ts), [ui/src/app/services/vendor.service.ts](ui/src/app/services/vendor.service.ts), [ui/src/app/services/recipe.service.ts](ui/src/app/services/recipe.service.ts), [ui/src/app/services/crafting.service.ts](ui/src/app/services/crafting.service.ts), [ui/src/app/services/combat.service.ts](ui/src/app/services/combat.service.ts), [ui/src/app/services/icon.service.ts](ui/src/app/services/icon.service.ts)
+- Services: [ui/src/app/services/inventory.service.ts](ui/src/app/services/inventory.service.ts), [ui/src/app/services/location.service.ts](ui/src/app/services/location.service.ts), [ui/src/app/services/skills.service.ts](ui/src/app/services/skills.service.ts), [ui/src/app/services/auth.service.ts](ui/src/app/services/auth.service.ts), [ui/src/app/services/manual.service.ts](ui/src/app/services/manual.service.ts), [ui/src/app/services/chat.service.ts](ui/src/app/services/chat.service.ts), [ui/src/app/services/vendor.service.ts](ui/src/app/services/vendor.service.ts), [ui/src/app/services/recipe.service.ts](ui/src/app/services/recipe.service.ts), [ui/src/app/services/crafting.service.ts](ui/src/app/services/crafting.service.ts), [ui/src/app/services/combat.service.ts](ui/src/app/services/combat.service.ts), [ui/src/app/services/icon.service.ts](ui/src/app/services/icon.service.ts), [ui/src/app/services/storage.service.ts](ui/src/app/services/storage.service.ts)
 - Constants: [ui/src/app/constants/material-colors.constants.ts](ui/src/app/constants/material-colors.constants.ts), [ui/src/app/constants/game-data.constants.ts](ui/src/app/constants/game-data.constants.ts)
 
 **Game Data (TypeScript):**
@@ -445,6 +447,7 @@ See [project/docs/005-content-generator-agent.md](project/docs/005-content-gener
 - Attributes schema: ~L42-55
 - Inventory schema: ~L57-75
 - Equipment slots: ~L77-85
+- Storage containers schema: ~L242-263 (bank and future housing containers)
 - Stats schema: ~L196-203 (health.current, mana.current - max values are virtual properties)
 - Virtual properties: `maxHP` ~L460, `maxMP` ~L469, `carryingCapacity` ~L481, `currentWeight` ~L490
 - Pre-save hook: ~L498-510 (initializes HP/MP for new players)
@@ -456,6 +459,9 @@ See [project/docs/005-content-generator-agent.md](project/docs/005-content-gener
 - `unequipItem()`: ~L312-330
 - `hasEquippedSubtype()`: ~L350-365
 - `hasInventoryItem()`: ~L367-380
+- `getContainer()`: ~L965-975 (get storage container by ID)
+- `depositToContainer()`: ~L1005-1075 (deposit items with stacking)
+- `withdrawFromContainer()`: ~L1077-1133 (withdraw items to inventory)
 
 ### Item Service (be/services/itemService.ts)
 - Item registry loading: Loads from ItemRegistry.ts
@@ -517,7 +523,8 @@ See [project/docs/005-content-generator-agent.md](project/docs/005-content-gener
 
 **Core Systems**: Auth/JWT, Player/User models, MongoDB with migrations, Socket.io real-time communication
 **Game Mechanics**: Skills (13), Attributes (7), XP scaling with 50% skill→attribute passthrough
-**Inventory**: Items (68+), Quality/Trait (5-tier/3-tier), Stacking, Equipment slots (10), Consumables (potions)
+**Inventory**: Items (68+), Quality/Trait (5-tier/3-tier), Stacking, Equipment slots (10), Consumables (potions), Storage system (WebSocket, 200 slots, bulk operations)
+**Storage**: WebSocket real-time system, Container abstraction (bank/guild/housing), Bulk deposit operations, Room-based multi-user updates, 200-slot bank, Drag-and-drop UI
 **World**: Locations, Activities (Socket.io), Drop tables, Travel, Server-authoritative timing
 **Combat**: Turn-based combat (Socket.io), Monsters (5), Abilities (6), Combat stats tracking, Restart encounters, Real-time events
 **Crafting**: Cooking (4 recipes) + Smithing (16 recipes) + Alchemy (6 recipes, Socket.io), Quality inheritance, Instance selection, Recipe filtering, Subcategory ingredients, Recipe unlocks, Auto-restart
@@ -539,6 +546,7 @@ See [project/docs/012-completed-features.md](project/docs/012-completed-features
 - Skill-Attribute links: woodcutting/mining→strength, fishing/smithing→endurance, gathering/cooking/alchemy→will, oneHanded/twoHanded→strength, dualWield/ranged→dexterity, casting→wisdom, gun→perception
 - Inventory: items with qualities (Map), traits (Map), quantities, equipped flag
 - Equipment slots (Map): 10 default slots (head, body, mainHand, offHand, belt, gloves, boots, necklace, ringRight, ringLeft)
+- Storage containers: Array of containers (bank + future housing), each with containerId, type, name, capacity, items
 - Location state: currentLocation, discoveredLocations, activeActivity, travelState
 - Combat state: activeCombat (monster instance, turn tracking, cooldowns, combat log, activityId), combatStats (defeats, damage, deaths, crits, dodges), lastCombatActivityId
 - Character: characterName (optional display name), gold, questProgress, achievements
@@ -546,6 +554,7 @@ See [project/docs/012-completed-features.md](project/docs/012-completed-features
 
 **Key Methods:** See [be/models/Player.ts](be/models/Player.ts) for full list
 - Skills/Inventory: `addSkillExperience()` ~L145, `addItem()` ~L200, `equipItem()` ~L280
+- Storage: `getContainer()` ~L965, `depositToContainer()` ~L1005, `withdrawFromContainer()` ~L1077
 - Combat: `takeDamage()` ~L610, `heal()` ~L620, `useMana()` ~L628, `isInCombat()` ~L650, `addCombatLog()` ~L655
 
 ### API Routes Reference
@@ -562,6 +571,7 @@ All endpoints require JWT authentication except `/api/auth/register` and `/api/a
 - Vendors: `/api/vendors` → [be/routes/vendors.js](be/routes/vendors.js)
 - Crafting: `/api/crafting` → [be/routes/crafting.js](be/routes/crafting.js)
 - Combat: `/api/combat` → [be/routes/combat.js](be/routes/combat.js)
+- Bank: `/api/bank` → [be/routes/bank.ts](be/routes/bank.ts)
 - Manual: `/api/manual` → [be/routes/manual.js](be/routes/manual.js)
 
 ## Development Quick Rules
@@ -637,7 +647,7 @@ Schema changes require migrations to update existing records
 
 **Commands:** `npm run migrate` | `npm run migrate:status` | `npm run migrate:down`
 
-**Location:** `be/migrations/NNN-description.js` (11 existing migrations)
+**Location:** `be/migrations/NNN-description.js` (16 existing migrations)
 
 **Full Documentation:** [project/docs/034-database-migrations.md](project/docs/034-database-migrations.md)
 
@@ -892,6 +902,74 @@ When crafting with multiple ingredients, all traits from all ingredients are com
 This allows complex potion effects when combining different herbs. Higher trait levels (determined by herb quality during gathering) result in stronger effects when consumed in combat.
 
 **Full Documentation:** [project/docs/020-alchemy-subcategory-implementation.md](project/docs/020-alchemy-subcategory-implementation.md), [project/docs/037-herb-trait-mapping.md](project/docs/037-herb-trait-mapping.md)
+
+## Storage System (Bank, Guild Storage, Housing)
+
+Container-based item storage system using WebSocket real-time communication. Supports multiple storage types: bank, future guild storage, and player housing.
+
+**Quick Facts:**
+- **Real-time WebSocket communication** (replaces HTTP polling)
+- **Bulk deposit operations** - single WebSocket event instead of N HTTP requests
+- 200-slot capacity per bank container (expandable per container type)
+- Container abstraction for multiple storage types (bank, guild, housing)
+- Automatic stacking with matching items (same itemId + qualities + traits)
+- Cannot deposit equipped items
+- Weight capacity validation on withdrawal
+- Drag-and-drop UI with category filters and search
+- Dual-pane modal (storage on left, inventory on right)
+- **Real-time multi-user updates** - see items appear/disappear as others interact (guild storage)
+- Room-based WebSocket subscriptions per container
+- Migration: 016-add-storage-containers.js initializes bank for all players
+
+**Key Files:**
+- Storage Service: [storageService.ts](be/services/storageService.ts)
+- Storage Controller: [storageController.ts](be/controllers/storageController.ts) - HTTP endpoints for backward compatibility
+- Storage Routes: [storage.ts](be/routes/storage.ts)
+- Storage Handler: [storageHandler.ts](be/sockets/storageHandler.ts) - WebSocket events
+- Storage Service (Frontend): [storage.service.ts](ui/src/app/services/storage.service.ts)
+- Bank Component: [bank.component.ts](ui/src/app/components/game/bank/bank.component.ts), [bank.component.html](ui/src/app/components/game/bank/bank.component.html)
+- Bank Facility: [BankFacility.ts](be/data/locations/facilities/BankFacility.ts)
+
+**WebSocket Events:**
+- `storage:getItems` - Get container items
+- `storage:deposit` - Deposit single item
+- `storage:withdraw` - Withdraw single item
+- `storage:bulkDeposit` - Deposit multiple items (batch operation)
+- `storage:join` / `storage:leave` - Subscribe/unsubscribe to container updates
+- `storage:items` / `storage:deposited` / `storage:withdrawn` - Success responses
+- `storage:itemAdded` / `storage:itemRemoved` - Real-time updates from other users
+- `storage:bulkUpdate` - Notification of bulk operations
+- `storage:error` - Error responses
+
+**Legacy HTTP Endpoints** (backward compatibility):
+- GET `/api/storage/items/:containerId` - Get container items
+- POST `/api/storage/deposit` - Deposit item (requires containerId in body)
+- POST `/api/storage/withdraw` - Withdraw item (requires containerId in body)
+- GET `/api/storage/capacity/:containerId` - Get container capacity
+- GET `/api/storage/bank/items` - Legacy bank-specific endpoint
+
+**Player Model Methods** ([Player.ts](be/models/Player.ts)):
+- `getContainer(containerId)` ~L965 - Get storage container by ID
+- `getContainerItems(containerId)` ~L977 - Get all items in container
+- `depositToContainer(containerId, instanceId, quantity)` ~L1005 - Deposit with stacking
+- `withdrawFromContainer(containerId, instanceId, quantity)` ~L1077 - Withdraw to inventory
+
+**Container Schema** (Player model ~L242-263):
+```typescript
+storageContainers: [{
+  containerId: string,      // 'bank', future: 'house-bedroom-001'
+  containerType: string,    // 'bank', future: 'house-storage'
+  name: string,             // 'Bank', 'Bedroom Chest'
+  capacity: number,         // 200 for bank
+  items: InventoryItem[]    // Same structure as inventory
+}]
+```
+
+**Future Expansion:**
+- Player housing with construction skill
+- Multiple container types (chests, wardrobes, vaults)
+- Per-location container instances
+- Upgradeable capacity via construction levels
 
 ## Combat System
 
