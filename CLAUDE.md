@@ -61,18 +61,20 @@
 - ✅ Activity log component (completed - reusable component for crafting/gathering/combat completions)
 - ✅ Trait combination system (completed - multi-ingredient crafting combines all traits at max levels)
 - ✅ HP/MP schema cleanup (completed - removed legacy max fields, use virtual properties exclusively)
+- ✅ Resource weight/yield rebalancing (completed - 20-60% weight reduction, yield normalization across all skills)
+- ✅ Inventory grouped view mode (completed - toggle between list and grouped item display)
 
 **Recent Changes** (Last 10 commits):
+- docs: add comprehensive resource weight and yield rebalancing guide
+- feat: add Material Symbols Outlined font for UI icons
+- refactor: enhance activity progress display and service methods
+- refactor: improve game component layout and panel organization
+- feat: add grouped view mode to inventory UI
+- balance: normalize gathering yields across all skills (-55% to +60%)
+- balance: reduce resource weights by 20-60% across all gathering skills
 - chore: clean up development utilities and add UI-specific build check
 - feat: add custom icons for Sage and Tattered Cloth items
 - refactor: simplify navigation link labels for cleaner travel UI
-- fix: improve location UI rendering and travel destination display
-- refactor: reorganize combat UI layout and improve action bar presentation
-- fix: remove legacy HP/MP max fields from Player schema and add initialization hook
-- feat: implement trait combination system for multi-ingredient crafting
-- refactor: migrate crafting UI to use activity log component and improve instance display
-- feat: enhance item details panel with consumable effects and improved layout
-- feat: add badge-name display mode to item modifiers component
 
 **Known Issues**:
 - None currently identified
@@ -676,6 +678,8 @@ Three-tier architecture: Item Definitions → Quality/Trait Definitions → Item
 - Items stack if same itemId + quality levels + trait levels
 - Multi-channel SVG icon colorization (40+ materials)
 - Right-click inventory items for quick actions (equip/unequip/use)
+- View modes: List (individual instances) or Grouped (organized by item definition)
+- Resource balancing: 20-60% lighter weights, normalized gathering yields (1-2 base, 2-3 quality)
 
 **Key Files:**
 - Item Registry: [ItemRegistry.ts](be/data/items/ItemRegistry.ts)
@@ -683,7 +687,7 @@ Three-tier architecture: Item Definitions → Quality/Trait Definitions → Item
 - Trait Registry: [TraitRegistry.ts](be/data/items/traits/TraitRegistry.ts)
 - Item Service: [itemService.ts](be/services/itemService.ts)
 
-**Full Documentation:** [project/docs/015-inventory-system.md](project/docs/015-inventory-system.md), [project/docs/011-level-based-quality-trait-system.md](project/docs/011-level-based-quality-trait-system.md), [project/docs/040-context-aware-trait-system.md](project/docs/040-context-aware-trait-system.md), [project/docs/042-potency-quality-consumable-fix.md](project/docs/042-potency-quality-consumable-fix.md)
+**Full Documentation:** [project/docs/015-inventory-system.md](project/docs/015-inventory-system.md), [project/docs/011-level-based-quality-trait-system.md](project/docs/011-level-based-quality-trait-system.md), [project/docs/040-context-aware-trait-system.md](project/docs/040-context-aware-trait-system.md), [project/docs/042-potency-quality-consumable-fix.md](project/docs/042-potency-quality-consumable-fix.md), [project/docs/043-resource-weight-yield-rebalancing.md](project/docs/043-resource-weight-yield-rebalancing.md)
 
 ## Location System
 
