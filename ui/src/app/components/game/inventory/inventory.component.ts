@@ -11,14 +11,24 @@ import { ItemDetails } from '../../../models/inventory.model';
 import { ItemModifiersComponent } from '../../shared/item-modifiers/item-modifiers.component';
 import { IconComponent } from '../../shared/icon/icon.component';
 import { ItemDetailsPanelComponent } from '../../shared/item-details-panel/item-details-panel.component';
+import { ItemMiniComponent } from '../../shared/item-mini/item-mini.component';
 import { isEquipmentItem, isConsumableItem } from '@shared/types';
+
+// Interface for grouped items
+interface ItemGroup {
+  itemId: string;
+  definition: any;
+  instances: ItemDetails[];
+  totalQuantity: number;
+  isExpanded: boolean;
+}
 
 @Component({
   selector: 'app-inventory',
   standalone: true,
-  imports: [CommonModule, FormsModule, ItemModifiersComponent, IconComponent, ItemDetailsPanelComponent],
+  imports: [CommonModule, FormsModule, ItemModifiersComponent, IconComponent, ItemDetailsPanelComponent, ItemMiniComponent],
   templateUrl: './inventory.component.html',
-  styleUrl: './inventory.component.css'
+  styleUrl: './inventory.component.scss'
 })
 export class InventoryComponent implements OnInit {
   private confirmDialog = inject(ConfirmDialogService);
@@ -30,6 +40,7 @@ export class InventoryComponent implements OnInit {
   selectedItem: ItemDetails | null = null;
   selectedCategory: string = 'all';
   isAltKeyHeld: boolean = false; // Track Alt key state for visual feedback
+  viewMode: 'list' | 'grouped' = 'list'; // Toggle between list and grouped view
 
   categories = [
     { value: 'all', label: 'All Items', shortLabel: 'All' },
@@ -92,6 +103,52 @@ export class InventoryComponent implements OnInit {
       return this.inventoryService.getSortedInventory();
     }
     return this.inventoryService.getSortedItemsByCategory(this.selectedCategory);
+  }
+
+  /**
+   * Toggle between list and grouped view modes
+   */
+  toggleViewMode(): void {
+    this.viewMode = this.viewMode === 'list' ? 'grouped' : 'list';
+  }
+
+  /**
+   * Get grouped inventory items organized by item definition
+   */
+  getGroupedInventory(): ItemGroup[] {
+    const filteredItems = this.getFilteredInventory();
+    const groups = new Map<string, ItemGroup>();
+
+    // Group items by itemId
+    for (const item of filteredItems) {
+      const itemId = item.itemId;
+
+      if (!groups.has(itemId)) {
+        groups.set(itemId, {
+          itemId: itemId,
+          definition: item.definition,
+          instances: [],
+          totalQuantity: 0,
+          isExpanded: true // Default to expanded
+        });
+      }
+
+      const group = groups.get(itemId)!;
+      group.instances.push(item);
+      group.totalQuantity += item.quantity;
+    }
+
+    // Convert map to array and sort by item name
+    return Array.from(groups.values()).sort((a, b) =>
+      a.definition.name.localeCompare(b.definition.name)
+    );
+  }
+
+  /**
+   * Toggle expansion state of a group
+   */
+  toggleGroup(group: ItemGroup): void {
+    group.isExpanded = !group.isExpanded;
   }
 
   /**
