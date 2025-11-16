@@ -8,7 +8,7 @@ import { ExperienceRewards, QuantityRange, SkillName } from './common';
 
 export type Biome = 'sea' | 'forest' | 'mountain' | 'plains' | 'desert' | 'swamp';
 
-export type FacilityType = 'gathering' | 'resource-gathering' | 'trading' | 'crafting' | 'combat';
+export type FacilityType = 'gathering' | 'resource-gathering' | 'trading' | 'crafting' | 'combat' | 'bank';
 
 export type ActivityType = 'resource-gathering' | 'combat' | 'social';
 

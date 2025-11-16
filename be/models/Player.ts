@@ -51,6 +51,14 @@ export interface ActiveCrafting {
   selectedIngredients?: Map<string, string[]>;
 }
 
+export interface StorageContainer {
+  containerId: string;
+  containerType: string;
+  name: string;
+  capacity: number;
+  items: InventoryItem[];
+}
+
 // CombatLogEntry, ActiveCombat, and CombatStats imported from @shared/types
 
 export interface QuestProgress {
@@ -85,6 +93,7 @@ export interface IPlayer extends Document {
   gold: number;
   inventory: InventoryItem[];
   inventoryCapacity: number;
+  storageContainers: StorageContainer[];
   equipmentSlots: Map<string, string | null>;
   currentLocation: string;
   discoveredLocations: string[];
@@ -152,6 +161,10 @@ export interface IPlayer extends Document {
   hasEquippedSubtype(subtype: string, itemService: any): boolean;
   hasInventoryItem(itemId: string, minQuantity?: number): boolean;
   getInventoryItemQuantity(itemId: string): number;
+  getContainer(containerId: string): StorageContainer;
+  getContainerItems(containerId: string): any[];
+  depositToContainer(containerId: string, instanceId: string, quantity?: number | null): any;
+  withdrawFromContainer(containerId: string, instanceId: string, quantity?: number | null): any;
   takeDamage(amount: number): boolean;
   heal(amount: number): void;
   useMana(amount: number): void;
@@ -239,6 +252,28 @@ const playerSchema = new Schema<IPlayer>({
     default: 100,
     min: 1
   },
+  storageContainers: [{
+    containerId: { type: String, required: true },
+    containerType: { type: String, required: true }, // 'bank', 'housing_chest', etc.
+    name: { type: String, required: true },
+    capacity: { type: Number, required: true, min: 1 },
+    items: [{
+      instanceId: { type: String, required: true },
+      itemId: { type: String, required: true },
+      quantity: { type: Number, default: 1, min: 1 },
+      qualities: {
+        type: Map,
+        of: Number,
+        default: {}
+      },
+      traits: {
+        type: Map,
+        of: Number,
+        default: {}
+      },
+      depositedAt: { type: Date, default: Date.now }
+    }]
+  }],
   equipmentSlots: {
     type: Map,
     of: String,
@@ -934,6 +969,183 @@ playerSchema.methods.hasInventoryItem = function(this: IPlayer, itemId: string, 
 playerSchema.methods.getInventoryItemQuantity = function(this: IPlayer, itemId: string): number {
   const items = this.inventory.filter(item => item.itemId === itemId);
   return items.reduce((sum, item) => sum + (item.quantity || 1), 0);
+};
+
+// ============================================================================
+// Storage Container Management Methods
+// ============================================================================
+
+// Get a storage container by ID
+playerSchema.methods.getContainer = function(this: IPlayer, containerId: string): any {
+  const container = this.storageContainers.find(c => c.containerId === containerId);
+  if (!container) {
+    throw new Error(`Container not found: ${containerId}`);
+  }
+  return container;
+};
+
+// Get container items with Map serialization and item details
+playerSchema.methods.getContainerItems = function(this: IPlayer, containerId: string): any[] {
+  const itemService = require('../services/itemService').default;
+  const container = this.getContainer(containerId);
+  return container.items.map((item: any) => {
+    const plainItem = item.toObject ? item.toObject() : item;
+    if (plainItem.qualities instanceof Map) {
+      plainItem.qualities = Object.fromEntries(plainItem.qualities);
+    }
+    if (plainItem.traits instanceof Map) {
+      plainItem.traits = Object.fromEntries(plainItem.traits);
+    }
+    // Enrich with item definition details (same as inventory)
+    return itemService.getItemDetails(plainItem);
+  });
+};
+
+// Deposit item from inventory to container
+playerSchema.methods.depositToContainer = function(
+  this: IPlayer,
+  containerId: string,
+  instanceId: string,
+  quantity: number | null = null
+): any {
+  const itemService = require('../services/itemService').default;
+
+  // Find item in inventory
+  const inventoryItem = this.getItem(instanceId);
+  if (!inventoryItem) {
+    throw new Error('Item not found in inventory');
+  }
+
+  // Prevent depositing equipped items
+  if (inventoryItem.equipped) {
+    throw new Error('Cannot deposit equipped items');
+  }
+
+  // Get container
+  const container = this.getContainer(containerId);
+
+  // Determine quantity to deposit
+  const depositQuantity = quantity === null ? inventoryItem.quantity : quantity;
+  if (depositQuantity > inventoryItem.quantity) {
+    throw new Error('Cannot deposit more than you have');
+  }
+
+  // Check container capacity (count unique item stacks)
+  const currentSlots = container.items.length;
+
+  // Try to find stackable item in container
+  const itemDef = itemService.getItemDefinition(inventoryItem.itemId);
+  const existingContainerItem = container.items.find((item: any) =>
+    itemService.canStack(item, inventoryItem)
+  );
+
+  if (existingContainerItem) {
+    // Stack with existing item
+    existingContainerItem.quantity += depositQuantity;
+  } else {
+    // Check if we have space for a new stack
+    if (currentSlots >= container.capacity) {
+      throw new Error(`Container is full (${container.capacity} slots used)`);
+    }
+
+    // Create new item in container
+    const newItem: InventoryItem = {
+      instanceId: inventoryItem.instanceId,
+      itemId: inventoryItem.itemId,
+      quantity: depositQuantity,
+      qualities: inventoryItem.qualities,
+      traits: inventoryItem.traits,
+      equipped: false,
+      acquiredAt: new Date()
+    };
+    container.items.push(newItem);
+  }
+
+  // Remove from inventory
+  if (depositQuantity === inventoryItem.quantity) {
+    // Remove entire stack
+    const itemIndex = this.inventory.findIndex(item => item.instanceId === instanceId);
+    this.inventory.splice(itemIndex, 1);
+  } else {
+    // Reduce quantity
+    inventoryItem.quantity -= depositQuantity;
+  }
+
+  return { depositQuantity, itemId: inventoryItem.itemId };
+};
+
+// Withdraw item from container to inventory
+playerSchema.methods.withdrawFromContainer = function(
+  this: IPlayer,
+  containerId: string,
+  instanceId: string,
+  quantity: number | null = null
+): any {
+  const itemService = require('../services/itemService').default;
+
+  // Get container
+  const container = this.getContainer(containerId);
+
+  // Find item in container
+  const containerItemIndex = container.items.findIndex((item: any) => item.instanceId === instanceId);
+  if (containerItemIndex === -1) {
+    throw new Error('Item not found in container');
+  }
+
+  const containerItem = container.items[containerItemIndex];
+  const itemDef = itemService.getItemDefinition(containerItem.itemId);
+
+  // Determine quantity to withdraw
+  const withdrawQuantity = quantity === null ? containerItem.quantity : quantity;
+  if (withdrawQuantity > containerItem.quantity) {
+    throw new Error('Cannot withdraw more than you have');
+  }
+
+  // Check weight capacity
+  const itemWeight = itemDef?.properties?.weight || 0;
+  const totalItemWeight = itemWeight * withdrawQuantity;
+  const currentWeight = this.currentWeight;
+  const capacity = this.carryingCapacity;
+
+  if (currentWeight + totalItemWeight > capacity) {
+    const available = capacity - currentWeight;
+    throw new Error(
+      `Cannot carry ${totalItemWeight.toFixed(1)}kg (${available.toFixed(1)}kg capacity remaining)`
+    );
+  }
+
+  // Try to stack with existing inventory item
+  const existingInventoryItem = this.inventory.find(inv =>
+    itemService.canStack(inv, containerItem)
+  );
+
+  if (existingInventoryItem && itemDef.stackable) {
+    // Stack with existing inventory item
+    existingInventoryItem.quantity += withdrawQuantity;
+  } else {
+    // Add as new item to inventory
+    const newItem = {
+      instanceId: containerItem.instanceId,
+      itemId: containerItem.itemId,
+      quantity: withdrawQuantity,
+      qualities: containerItem.qualities,
+      traits: containerItem.traits,
+      equipped: false,
+      acquiredAt: new Date()
+    };
+    this.inventory.push(newItem);
+  }
+
+  // Remove from container
+  if (withdrawQuantity === containerItem.quantity) {
+    // Remove entire stack
+    container.items.splice(containerItemIndex, 1);
+  } else {
+    // Reduce quantity
+    containerItem.quantity -= withdrawQuantity;
+  }
+
+  return { withdrawQuantity, itemId: containerItem.itemId };
 };
 
 // ============================================================================
