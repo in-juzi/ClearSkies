@@ -67,27 +67,32 @@
 - ✅ Data-driven effect system (completed - flexible modifier system for traits/qualities/affixes)
 - ✅ Effect system combat integration (completed - trait bonuses for damage/armor/evasion/crit/attack speed)
 - ✅ Effect system activity integration (completed - trait bonuses for activity duration/XP/yield)
+- ✅ Effect system crafting integration (completed - quality bonuses, success rates, yield multipliers)
+- ✅ Effect system vendor integration (completed - sell/buy price modifiers)
 - ✅ World map with SVG visualization (completed - interactive map with location discovery and travel)
+- ✅ Tiered XP curve system (completed - 5-tier progression replacing flat 1000 XP/level)
+- ✅ Enriched skill/attribute data (completed - totalXP tracking, variable XP requirements, improved UI)
+- ✅ Item inspection system (completed - detailed effect preview, item comparison endpoints)
 
 **Recent Changes** (Last 10 commits):
-- docs: update existing documentation with cross-references
-- refactor: expand allowed traits for bronze/iron equipment
-- feat: add interactive world map with SVG visualization
-- docs: add phase 1 and 2 effect system integration completion reports
-- docs: add effect system design and implementation guides
-- feat: integrate effect system into activity duration calculations
-- feat: integrate effect system into combat calculations
-- refactor: migrate equipment traits to new effect system
-- feat: add data-driven effect system for modifiers
-- docs: update CLAUDE.md with storage system information
+- chore: update locations, assets, and add effect system documentation
+- ui: improve game components with visual polish and UX enhancements
+- feat: enhance item details panel with comprehensive effect display
+- feat: redesign XP UI components for tiered leveling system
+- feat: update frontend services for tiered XP and enriched data
+- feat: add controller endpoints for item inspection and effect preview
+- feat: integrate effect system across all backend services
+- feat: extend effect system with crafting and vendor contexts
+- balance: adjust activity XP for tiered leveling curve
+- feat: implement tiered XP curve system
 
 **Known Issues**:
 - None currently identified
 
 **Next Priorities**:
-- Complete effect system migration (migrate all remaining traits/qualities to new system)
-- Effect system crafting integration (quality bonuses, success rates, yield multipliers)
-- Effect system vendor integration (sell/buy price modifiers)
+- Affix system implementation (enchanting/runecarving skill)
+- More trait variety (conditional effects, passive triggers)
+- Quality system effects (crafting quality bonuses)
 - Steel tier equipment (requires steel ingots from iron + coal)
 - More alchemy recipes (debuff potions, stat potions, transmutation)
 - Combat system enhancements (more monsters, abilities, boss fights)
@@ -746,18 +751,35 @@ Four-tier hierarchy: Locations → Facilities → Activities → Drop Tables
 
 ## XP System
 
-Skills → Attributes with 50% XP passthrough and progressive scaling
+Skills → Attributes with 50% XP passthrough and tiered leveling curve
 
 **Key Facts:**
-- 1000 XP per level (flat, no exponential curve)
+- **Tiered XP curve** (5 tiers, 50 levels total):
+  - Levels 1-10: 100 XP/level (early game tutorial)
+  - Levels 11-20: 500 XP/level (mid-early progression)
+  - Levels 21-30: 1500 XP/level (mid-game grind)
+  - Levels 31-40: 3000 XP/level (late-mid game)
+  - Levels 41-50: 5000 XP/level (endgame)
+- XP curve defined in `shared/constants/attribute-constants.ts`
+- Helper functions: `getXPForLevel()`, `getTotalXPForLevel()`, `getPercentToNextLevel()`
 - 50% of skill XP awarded to linked attribute (woodcutting → strength)
-- Scaling formula: `1 / (1 + 0.3 * (levelDiff - 1))` with 0-1 level grace range
+- Activity XP scaling formula: `1 / (1 + 0.3 * (levelDiff - 1))` with 0-1 level grace range
 - Minimum 1 XP floor (no hard blocks)
+- Migration: `017-convert-to-new-xp-curve.js` converts existing players to new system
 
-**Scaling Example** (L5 activity, 45 base XP):
-- L5-6: 45 XP (100%) | L7: 34 XP (75%) | L10: 20 XP (44%) | L15: 12 XP (26%)
+**Enriched Skill/Attribute Data:**
+- Controllers now return: `level`, `experience`, `xpToNextLevel`, `percentToNextLevel`, `totalXP`
+- UI displays variable XP requirements (e.g., "45/500 XP" instead of static "45/1000")
+- Total cumulative XP tracking for lifetime progression stats
 
-**Full Documentation:** [project/docs/032-xp-system.md](project/docs/032-xp-system.md)
+**Activity XP Balancing:**
+- All activities rebalanced for tiered curve
+- Early activities: 15-40 XP (6-8 completions per level)
+- Mid activities: 75-150 XP
+- Late activities: proportionally scaled
+- Utility scripts: `generate-xp-curve.ts`, `survey-activity-xp.ts`, `update-activity-xp.ts`
+
+**Full Documentation:** [project/docs/032-xp-system.md](project/docs/032-xp-system.md), [project/docs/051-tiered-xp-system-implementation.md](project/docs/051-tiered-xp-system-implementation.md)
 
 ## Attribute Progression System
 
@@ -886,19 +908,31 @@ Flexible, declarative system for defining how modifiers (traits, qualities, affi
 **Integration Status:**
 - ✅ Combat: Damage, armor, evasion, crit chance, attack speed (Phase 1)
 - ✅ Activities: Duration, XP gain, yield bonuses (Phase 2)
-- 🔄 Crafting: Quality bonuses, success rates, yield multipliers (Phase 3)
-- 🔄 Vendor: Sell/buy price modifiers (Phase 4)
+- ✅ Crafting: Quality bonuses, success rates, yield multipliers (Phase 3)
+- ✅ Vendor: Sell/buy price modifiers (Phase 4)
+
+**New Condition Types:**
+- ITEM_REQUIRED_FOR_ACTIVITY: Tools only apply bonuses when actually being used
 
 **Migrated Traits:**
-- Balanced (tool/weapon): -1/-2/-4 seconds activity time
+- Balanced (tool/weapon): -1/-2/-4 seconds activity time (conditional on item being required)
 - Hardened (weapon): +2/+4/+7 flat damage
 - Reinforced (armor): +armor bonuses
+
+**Item Inspection System:**
+- GET `/api/inventory/inspect/:instanceId` - Detailed item stats with all effect bonuses
+- GET `/api/inventory/compare/:instanceId1/:instanceId2` - Side-by-side item comparison
+- `evaluateSingleItemEffects()` - Preview item effects without equipping
+- Enhanced item details panel shows all applicable effects
 
 **Key Files:**
 - Effect Evaluator: [be/services/effectEvaluator.ts](be/services/effectEvaluator.ts)
 - Type Definitions: [shared/types/effect-system.ts](shared/types/effect-system.ts)
 - Combat Integration: [be/services/combatService.ts](be/services/combatService.ts) ~L259, ~L493
 - Activity Integration: [be/sockets/activityHandler.ts](be/sockets/activityHandler.ts) ~L275
+- Crafting Integration: [be/services/recipeService.ts](be/services/recipeService.ts) ~L180
+- Vendor Integration: [be/services/vendorService.ts](be/services/vendorService.ts) ~L95
+- Item Inspection: [be/controllers/inventoryController.ts](be/controllers/inventoryController.ts) ~L370
 
 **Full Documentation:**
 - [046-modifier-audit-and-consolidation.md](project/docs/046-modifier-audit-and-consolidation.md)
@@ -906,6 +940,7 @@ Flexible, declarative system for defining how modifiers (traits, qualities, affi
 - [048-creating-traits-and-affixes-guide.md](project/docs/048-creating-traits-and-affixes-guide.md)
 - [049-phase-1-combat-integration-complete.md](project/docs/049-phase-1-combat-integration-complete.md)
 - [050-phase-2-activity-integration-complete.md](project/docs/050-phase-2-activity-integration-complete.md)
+- [051-effect-system-complete.md](project/docs/051-effect-system-complete.md)
 
 ## Vendor/NPC Trading System
 
