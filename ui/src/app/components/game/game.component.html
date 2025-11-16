@@ -22,17 +22,15 @@
       <div class="game-layout">
         <!-- Left Sidebar: Inventory -->
         <aside class="left-sidebar" [class.collapsed]="leftSidebarCollapsed()">
-          <!-- Collapse Toggle Button -->
-          <button
-            class="collapse-toggle left-toggle"
-            (click)="toggleLeftSidebar()"
-            [attr.aria-label]="leftSidebarCollapsed() ? 'Expand inventory' : 'Collapse inventory'">
-            @if (leftSidebarCollapsed()) {
-              <span class="toggle-icon">&#9654;</span>
-            } @else {
-              <span class="toggle-icon">&#9664;</span>
-            }
-          </button>
+          <!-- Expand Button (when collapsed) -->
+          @if (leftSidebarCollapsed()) {
+            <button
+              class="expand-toggle left-toggle"
+              (click)="toggleLeftSidebar()"
+              [attr.aria-label]="'Expand inventory'">
+              <span class="material-symbols-outlined">left_panel_open</span>
+            </button>
+          }
 
           @if (!leftSidebarCollapsed()) {
             <!-- Tab Navigation -->
@@ -42,6 +40,14 @@
                 [class.active]="leftSidebarTab() === 'inventory'"
                 (click)="leftSidebarTab.set('inventory')">
                 Inventory
+              </button>
+
+              <!-- Collapse Button (inside nav when expanded) -->
+              <button
+                class="sidebar-collapse-btn"
+                (click)="toggleLeftSidebar()"
+                title="Collapse sidebar">
+                <span class="material-symbols-outlined">left_panel_close</span>
               </button>
             </div>
 
@@ -66,21 +72,27 @@
 
         <!-- Right Sidebar: Character/Skills/Attributes/Status -->
         <aside class="right-sidebar" [class.collapsed]="rightSidebarCollapsed()">
-          <!-- Collapse Toggle Button -->
-          <button
-            class="collapse-toggle right-toggle"
-            (click)="toggleRightSidebar()"
-            [attr.aria-label]="rightSidebarCollapsed() ? 'Expand character panel' : 'Collapse character panel'">
-            @if (rightSidebarCollapsed()) {
-              <span class="toggle-icon">&#9664;</span>
-            } @else {
-              <span class="toggle-icon">&#9654;</span>
-            }
-          </button>
+          <!-- Expand Button (when collapsed) -->
+          @if (rightSidebarCollapsed()) {
+            <button
+              class="expand-toggle right-toggle"
+              (click)="toggleRightSidebar()"
+              [attr.aria-label]="'Expand character panel'">
+              <span class="material-symbols-outlined">right_panel_open</span>
+            </button>
+          }
 
           @if (!rightSidebarCollapsed()) {
             <!-- Tab Navigation -->
             <div class="sidebar-nav">
+              <!-- Collapse Button (inside nav when expanded) -->
+              <button
+                class="sidebar-collapse-btn"
+                (click)="toggleRightSidebar()"
+                title="Collapse sidebar">
+                <span class="material-symbols-outlined">right_panel_close</span>
+              </button>
+
               <button
                 class="nav-tab"
                 [class.active]="rightSidebarTab() === 'character'"

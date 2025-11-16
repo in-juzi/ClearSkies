@@ -100,43 +100,37 @@
   }
 }
 
-// Collapse toggle button
-.collapse-toggle {
+// Expand toggle button (when sidebar is collapsed)
+.expand-toggle {
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 10;
-  width: var(--spacing-l);
-  height: 60px;
-  background: var(--color-bg-tertiary);
-  border: var(--border-width-thin) solid var(--color-surface-border);
-  color: var(--color-accent-purple);
+  padding: var(--spacing-s);
+  background: transparent;
+  border: none;
+  color: var(--color-text-label);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all var(--transition-normal);
-  padding: 0;
+  transition: all var(--transition-fast);
+  border-radius: var(--radius-s);
 
   &:hover {
-    background: var(--color-accent-purple-dark);
-    color: var(--color-text-primary);
-    box-shadow: var(--shadow-m);
+    background: var(--color-bg-tertiary);
+    color: var(--color-accent-purple);
   }
 
   &.left-toggle {
+    top: 0;
     right: 0px;
-    border-radius: var(--radius-m) 0 0 var(--radius-m);
   }
 
   &.right-toggle {
+    top: 0;
     left: 0px;
-    border-radius: 0 var(--radius-m) var(--radius-m) 0;
   }
 
-  .toggle-icon {
-    font-size: var(--font-size-m);
-    line-height: 1;
+  .material-symbols-outlined {
+    font-size: 20px;
   }
 }
 
@@ -191,6 +185,7 @@
     background: var(--color-bg-overlay-strong);
     border-bottom: var(--border-width-medium) solid var(--color-bg-tertiary);
     flex-shrink: 0;
+    align-items: center;
 
     .nav-tab {
       flex: 1;
@@ -224,6 +219,28 @@
         }
       }
     }
+
+    .sidebar-collapse-btn {
+      padding: var(--spacing-s);
+      background: transparent;
+      border: none;
+      color: var(--color-text-label);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition-fast);
+      border-radius: var(--radius-s);
+
+      .material-icons {
+        font-size: 20px;
+      }
+
+      &:hover {
+        background: var(--color-bg-tertiary);
+        color: var(--color-accent-purple);
+      }
+    }
   }
 
   // Tab Content
@@ -244,7 +261,6 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  padding: var(--spacing-m);
 
   // Ensure the app-location component takes available height
   app-location {
@@ -347,6 +363,29 @@
     background: var(--color-bg-overlay-strong);
     border-bottom: var(--border-width-medium) solid var(--color-bg-tertiary);
     flex-shrink: 0;
+    align-items: center;
+
+    .sidebar-collapse-btn {
+      padding: var(--spacing-s);
+      background: transparent;
+      border: none;
+      color: var(--color-text-label);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition-fast);
+      border-radius: var(--radius-s);
+
+      .material-icons {
+        font-size: 20px;
+      }
+
+      &:hover {
+        background: var(--color-bg-tertiary);
+        color: var(--color-accent-purple);
+      }
+    }
 
     .nav-tab {
       flex: 1;
