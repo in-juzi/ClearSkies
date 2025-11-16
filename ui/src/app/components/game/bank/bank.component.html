@@ -1,0 +1,188 @@
+@if (storageService.isOpen()) {
+  <div
+    class="bank-overlay"
+    (click)="close()"
+    (mousemove)="onDrag($event)"
+    (mouseup)="onDragEnd()"
+  >
+    <div
+      class="bank-modal"
+      (click)="$event.stopPropagation()"
+      [ngStyle]="getModalStyle()"
+    >
+      <!-- Header -->
+      <div
+        class="bank-header draggable-header"
+        (mousedown)="onDragStart($event)"
+      >
+        <h2>
+          <app-icon [path]="'ui/ui_bank.svg'" [size]="24"></app-icon>
+          {{ storageService.containerName() }}
+        </h2>
+        <button class="close-button" (click)="close()" (mousedown)="$event.stopPropagation()">×</button>
+      </div>
+
+      <!-- Capacity Bar -->
+      <div class="capacity-section">
+        <div class="capacity-label">
+          <span>Storage: {{ storageService.containerUsedSlots() }} / {{ storageService.containerCapacity() }} slots</span>
+          <span class="capacity-percentage">{{ capacityPercentage().toFixed(0) }}%</span>
+        </div>
+        <div class="capacity-bar">
+          <div
+            class="capacity-fill"
+            [class.capacity-normal]="capacityColorClass() === 'capacity-normal'"
+            [class.capacity-warning]="capacityColorClass() === 'capacity-warning'"
+            [class.capacity-critical]="capacityColorClass() === 'capacity-critical'"
+            [style.width.%]="capacityPercentage()"
+          ></div>
+        </div>
+      </div>
+
+      <!-- Bank Actions -->
+      <div class="bank-actions">
+        <button
+          class="btn-action"
+          (click)="storeStacks()"
+          [disabled]="storingStacks()"
+          title="Deposit all stackable items that already exist in the bank"
+        >
+          <span class="action-icon">📦</span>
+          <span class="action-text">{{ storingStacks() ? 'Storing...' : 'Store Stacks' }}</span>
+        </button>
+      </div>
+
+      <!-- Main Content Area -->
+      <div class="bank-content">
+        <!-- Bank Items (Left Side) -->
+        <div class="bank-items-section">
+          <div class="section-header">
+            <h3>Bank Storage</h3>
+          </div>
+
+          <!-- Filters -->
+          <div class="filters">
+            <select [ngModel]="selectedBankCategory()" (ngModelChange)="selectedBankCategory.set($event)" class="category-filter">
+              @for (cat of categories; track cat.value) {
+                <option [value]="cat.value">
+                  {{ cat.label }}
+                </option>
+              }
+            </select>
+
+            <input
+              type="text"
+              [ngModel]="bankSearchQuery()"
+              (ngModelChange)="bankSearchQuery.set($event)"
+              placeholder="Search items..."
+              class="search-input"
+            />
+          </div>
+
+          <!-- Bank Items Grid -->
+          <div
+            class="items-grid bank-storage"
+            [class.empty]="!filteredBankItems().length"
+            (drop)="onBankDrop($event)"
+            (dragover)="onDragOver($event)"
+          >
+            @for (item of filteredBankItems(); track item.instanceId) {
+              <div
+                class="item-wrapper"
+                draggable="true"
+                (dragstart)="onBankItemDragStart($event, item)"
+                (dblclick)="onBankItemDoubleClick(item)"
+                (contextmenu)="onBankItemRightClick($event, item)"
+                title="Double-click or right-click to withdraw, or drag to inventory"
+              >
+                <app-item-mini [item]="item"></app-item-mini>
+              </div>
+            }
+
+            <!-- Empty state -->
+            @if (filteredBankItems().length === 0) {
+              <div class="empty-state">
+                @if (storageService.containerItems().length === 0) {
+                  <p>No items in bank</p>
+                  <p class="hint">Drag items from your inventory to deposit them</p>
+                } @else {
+                  <p>No items match filters</p>
+                }
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Inventory Items (Right Side) -->
+        <div class="inventory-items-section">
+          <div class="section-header">
+            <h3>Your Inventory</h3>
+            <span class="weight-info">
+              {{ inventoryService.currentWeight().toFixed(1) }}kg /
+              {{ inventoryService.carryingCapacity().toFixed(1) }}kg
+            </span>
+          </div>
+
+          <!-- Inventory Filters -->
+          <div class="filters">
+            <select [ngModel]="selectedInventoryCategory()" (ngModelChange)="selectedInventoryCategory.set($event)" class="category-filter">
+              @for (cat of categories; track cat.value) {
+                <option [value]="cat.value">
+                  {{ cat.label }}
+                </option>
+              }
+            </select>
+
+            <input
+              type="text"
+              [ngModel]="inventorySearchQuery()"
+              (ngModelChange)="inventorySearchQuery.set($event)"
+              placeholder="Search items..."
+              class="search-input"
+            />
+          </div>
+
+          <!-- Inventory Items Grid -->
+          <div
+            class="items-grid"
+            (drop)="onInventoryDrop($event)"
+            (dragover)="onDragOver($event)"
+          >
+            @for (item of filteredInventoryItems(); track item.instanceId) {
+              <div
+                class="item-wrapper"
+                [class.equipped]="item.equipped"
+                draggable="true"
+                (dragstart)="onInventoryItemDragStart($event, item)"
+                (dblclick)="onInventoryItemDoubleClick(item)"
+                (contextmenu)="onInventoryItemRightClick($event, item)"
+                title="Double-click or right-click to deposit, or drag to bank"
+              >
+                <app-item-mini [item]="item"></app-item-mini>
+                @if (item.equipped) {
+                  <span class="equipped-badge">E</span>
+                }
+              </div>
+            }
+
+            <!-- Empty state -->
+            @if (filteredInventoryItems().length === 0) {
+              <div class="empty-state">
+                @if (inventoryService.inventory().length === 0) {
+                  <p>Inventory is empty</p>
+                } @else {
+                  <p>No items match filters</p>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer Help Text -->
+      <div class="bank-footer">
+        <p>💡 <strong>Tip:</strong> Drag items between bank and inventory, double-click, or right-click to deposit/withdraw</p>
+      </div>
+    </div>
+  </div>
+}
