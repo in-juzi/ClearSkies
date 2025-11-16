@@ -13,12 +13,13 @@ import { LocationComponent } from './location/location.component';
 import { Equipment } from './equipment/equipment.component';
 import { CharacterStatus } from './character-status/character-status.component';
 import { ChatComponent } from './chat/chat.component';
+import { BankComponent } from './bank/bank.component';
 import { ALL_SKILLS, ALL_ATTRIBUTES } from '../../constants/game-data.constants';
 
 @Component({
   selector: 'app-game',
   standalone: true,
-  imports: [CommonModule, RouterModule, ManualComponent, Skills, AttributesComponent, InventoryComponent, LocationComponent, Equipment, CharacterStatus, ChatComponent],
+  imports: [CommonModule, RouterModule, ManualComponent, Skills, AttributesComponent, InventoryComponent, LocationComponent, Equipment, CharacterStatus, ChatComponent, BankComponent],
   templateUrl: './game.component.html',
   styleUrl: './game.component.scss'
 })

@@ -3,14 +3,16 @@ import { CommonModule } from '@angular/common';
 import { LocationService } from '../../../../services/location.service';
 import { VendorService } from '../../../../services/vendor.service';
 import { CombatService } from '../../../../services/combat.service';
+import { StorageService } from '../../../../services/storage.service';
 import { CraftingComponent } from '../../crafting/crafting.component';
+import { IconComponent } from '../../../shared/icon/icon.component';
 import { Facility, Activity } from '../../../../models/location.model';
 import { Vendor } from '../../../../models/vendor.model';
 
 @Component({
   selector: 'app-location-facility-detail',
   standalone: true,
-  imports: [CommonModule, CraftingComponent],
+  imports: [CommonModule, CraftingComponent, IconComponent],
   templateUrl: './location-facility-detail.component.html',
   styleUrl: './location-facility-detail.component.scss'
 })
@@ -18,6 +20,7 @@ export class LocationFacilityDetailComponent {
   private locationService = inject(LocationService);
   vendorService = inject(VendorService);
   combatService = inject(CombatService);
+  storageService = inject(StorageService);
 
   // Inputs
   selectedFacility = input<Facility | null>(null);
@@ -88,5 +91,12 @@ export class LocationFacilityDetailComponent {
    */
   selectActivity(activity: Activity) {
     this.activitySelected.emit(activity);
+  }
+
+  /**
+   * Open bank interface
+   */
+  openBank() {
+    this.storageService.openStorage('bank');
   }
 }

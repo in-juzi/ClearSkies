@@ -145,3 +145,51 @@
     color: var(--color-text-tertiary);
   }
 }
+
+// Bank section
+.bank-section {
+  margin: var(--spacing-2xl) 0;
+  padding: var(--spacing-l);
+  background: var(--color-bg-elevated);
+  border: var(--border-default);
+  border-radius: var(--radius-card);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-m);
+
+  .btn-bank {
+    padding: var(--spacing-l);
+    background: var(--gradient-purple);
+    border: none;
+    color: var(--color-text-primary);
+    border-radius: var(--radius-button);
+    font-size: var(--font-size-l);
+    font-weight: var(--font-weight-bold);
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-m);
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-glow-purple);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+
+    .bank-icon {
+      filter: brightness(1.2);
+    }
+  }
+
+  .bank-info {
+    text-align: center;
+    color: var(--color-text-label);
+    font-size: var(--font-size-m);
+    margin: 0;
+  }
+}

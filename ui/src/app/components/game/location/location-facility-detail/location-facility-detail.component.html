@@ -28,6 +28,19 @@
       </div>
     }
 
+    <!-- Bank Section (for bank-type facilities) -->
+    @if (selectedFacility()?.type === 'bank') {
+      <div class="bank-section">
+        <button class="btn-bank" (click)="openBank()">
+          <app-icon class="bank-icon" [path]="'ui/ui_bank.svg'" [size]="28"></app-icon>
+          Access Bank Storage
+        </button>
+        <p class="bank-info">
+          Store your items safely in the bank vault. 200 storage slots available.
+        </p>
+      </div>
+    }
+
     <!-- Crafting Section (for crafting-type facilities) -->
     @if (selectedFacility()?.type === 'crafting') {
       <div class="crafting-section">
