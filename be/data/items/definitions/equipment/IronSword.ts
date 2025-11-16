@@ -4,7 +4,7 @@
  */
 
 import { EquipmentItem } from '../../../../types/items';
-import { SUBCATEGORY, CATEGORY, RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL, SLOT, WEAPON_SUBTYPE, SKILL_SOURCE } from '../../../constants/item-constants';
+import { SUBCATEGORY, CATEGORY, RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL, SLOT, WEAPON_SUBTYPE, SKILL_SOURCE, TRAIT_IDS } from '../../../constants/item-constants';
 
 export const IronSword: EquipmentItem = {
   "itemId": "iron_sword",
@@ -37,5 +37,5 @@ export const IronSword: EquipmentItem = {
     "requiredLevel": 5
   },
   "allowedQualities": QUALITY_SETS.NONE,
-  "allowedTraits": TRAIT_SETS.EQUIPMENT_PRISTINE
+  "allowedTraits": [...TRAIT_SETS.EQUIPMENT_PRISTINE, TRAIT_IDS.HARDENED, TRAIT_IDS.BALANCED]
 } as const;

@@ -1,9 +1,12 @@
+// Register tsconfig-paths for @shared imports
+require('tsconfig-paths/register');
+
 const mongoose = require('mongoose');
 require('dotenv').config();
 
-const connectDB = require('../dist/config/database').default;
-const Player = require('../dist/models/Player').default;
-const itemService = require('../dist/services/itemService').default;
+const connectDB = require('../dist/be/config/database').default;
+const Player = require('../dist/be/models/Player').default;
+const itemService = require('../dist/be/services/itemService').default;
 
 // ============================================================================
 // ITEM PRESETS - Reusable item sets for testing and development
@@ -53,6 +56,14 @@ const ITEM_PRESETS = {
   smithingMaterials: [
     { itemId: 'oak_log', quantity: 10 },
     { itemId: 'leather_scraps', quantity: 10 }
+  ],
+
+  // Test items for new trait system
+  testBalancedTrait: [
+    { itemId: 'bronze_woodcutting_axe', quantity: 1, qualities: {}, traits: { balanced: 3 } }, // Balanced L3
+    { itemId: 'bronze_woodcutting_axe', quantity: 1, qualities: {}, traits: { balanced: 1 } }, // Balanced L1
+    { itemId: 'iron_sword', quantity: 1, qualities: {}, traits: { hardened: 3 } }, // Hardened L3
+    { itemId: 'bronze_helm', quantity: 1, qualities: {}, traits: { reinforced: 3 } } // Reinforced L3
   ]
 };
 
@@ -61,7 +72,7 @@ const ITEM_PRESETS = {
 // ============================================================================
 
 // Which preset to use (change this to use different item sets)
-const ACTIVE_PRESET = 'smithingOres';
+const ACTIVE_PRESET = 'testBalancedTrait';
 
 // Target player character name
 const TARGET_PLAYER = 'Juzi';
@@ -97,13 +108,15 @@ async function addItemToPlayer() {
     console.log(`Using preset: ${ACTIVE_PRESET}`);
 
     const instances = [];
-    for (const { itemId, quantity } of itemsToAdd) {
-      // Generate random qualities and traits
-      const qualities = itemService.generateRandomQualities(itemId);
-      const traits = itemService.generateRandomTraits(itemId);
+    for (const item of itemsToAdd) {
+      const { itemId, quantity, qualities: customQualities, traits: customTraits } = item;
+
+      // Use custom qualities/traits if provided, otherwise generate random
+      const qualities = customQualities !== undefined ? customQualities : itemService.generateRandomQualities(itemId);
+      const traits = customTraits !== undefined ? customTraits : itemService.generateRandomTraits(itemId);
 
       const instance = itemService.createItemInstance(itemId, quantity, qualities, traits);
-      instances.push({ itemId, quantity, instance });
+      instances.push({ itemId, quantity, traits, instance });
       player.addItem(instance);
     }
 

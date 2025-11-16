@@ -4,7 +4,7 @@
  */
 
 import { EquipmentItem } from '../../../../types/items';
-import { SUBCATEGORY, CATEGORY, RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL, SLOT, ARMOR_SUBTYPE } from '../../../constants/item-constants';
+import { SUBCATEGORY, CATEGORY, RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL, SLOT, ARMOR_SUBTYPE, TRAIT_IDS } from '../../../constants/item-constants';
 
 export const BronzeHelm: EquipmentItem = {
   "itemId": "bronze_helm",
@@ -35,5 +35,5 @@ export const BronzeHelm: EquipmentItem = {
     "requiredLevel": 7
   },
   "allowedQualities": QUALITY_SETS.NONE,
-  "allowedTraits": TRAIT_SETS.EQUIPMENT_PRISTINE
+  "allowedTraits": [...TRAIT_SETS.EQUIPMENT_PRISTINE, TRAIT_IDS.REINFORCED]
 } as const;
