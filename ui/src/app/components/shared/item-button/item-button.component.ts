@@ -1,5 +1,5 @@
 import { Component, input, output, computed } from '@angular/core';
-import { IconComponent } from '../icon/icon.component';
+import { ItemMiniComponent } from '../item-mini/item-mini.component';
 
 /**
  * Item instance with definition for display
@@ -34,7 +34,7 @@ export interface ItemInstance {
  */
 @Component({
   selector: 'app-item-button',
-  imports: [IconComponent],
+  imports: [ItemMiniComponent],
   templateUrl: './item-button.component.html',
   styleUrls: ['./item-button.component.scss']
 })
@@ -44,7 +44,6 @@ export class ItemButtonComponent {
   disabled = input<boolean>(false);
   size = input<'small' | 'medium' | 'large'>('medium');
   showTooltip = input<boolean>(true);
-  showQuantity = input<boolean>(true);
 
   // Outputs
   itemClick = output<ItemInstance>();

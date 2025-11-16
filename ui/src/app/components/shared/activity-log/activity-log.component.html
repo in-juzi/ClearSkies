@@ -44,7 +44,9 @@
 
             <!-- Attribute Experience -->
             @if (entry.rewards.attributes && entry.rewards.attributes.length > 0) {
+              DEBUG: {{ entry.rewards.attributes | json }}
               @for (attrReward of entry.rewards.attributes; track attrReward.attribute) {
+                DEBUG: {{ attrReward | json }}
                 <app-xp-mini
                   [skillName]="attrReward.attribute"
                   [xp]="attrReward.xp"

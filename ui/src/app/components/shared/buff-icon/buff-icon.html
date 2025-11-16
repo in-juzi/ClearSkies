@@ -1,17 +1,20 @@
 <div class="buff-icon-container" [attr.title]="getTooltip()" [style.width.px]="size" [style.height.px]="size">
   <!-- Icon with border color based on target -->
   <div class="buff-icon" [style.border-color]="getBorderColor()">
-    <app-icon
-      *ngIf="buff.icon"
-      [path]="buff.icon.path"
-      [material]="buff.icon.material"
-      [size]="size - 8"
-    ></app-icon>
+    @if (buff.icon) {
+      <app-icon
+        [path]="buff.icon.path"
+        [material]="buff.icon.material"
+        [size]="size - 8"
+      ></app-icon>
+    }
   </div>
 
   <!-- Duration overlay (bottom-right corner) -->
   <div class="buff-duration">{{ buff.duration }}</div>
 
   <!-- Stack count overlay (top-right corner) if > 1 -->
-  <div class="buff-stack" *ngIf="buff.stackCount && buff.stackCount > 1">{{ buff.stackCount }}</div>
+  @if (buff.stackCount && buff.stackCount > 1) {
+    <div class="buff-stack">{{ buff.stackCount }}</div>
+  }
 </div>

@@ -1,4 +1,4 @@
-import { Component, input, output, computed, inject } from '@angular/core';
+import { Component, input, output, computed } from '@angular/core';
 import { IconComponent } from '../icon/icon.component';
 
 /**
@@ -35,7 +35,31 @@ export interface BaseAbility {
       amount: number;
       duration: number;
     };
+    applyBuff?: {
+      target: 'self' | 'enemy';
+      name: string;
+      description: string;
+      duration: number;
+      icon?: {
+        path: string;
+        material: string;
+      };
+      statModifiers?: Array<{
+        stat: string;
+        type: 'flat' | 'percentage' | 'multiplier';
+        value: number;
+      }>;
+      damageOverTime?: number;
+      healOverTime?: number;
+      manaRegen?: number;
+      manaDrain?: number;
+    };
     critChanceBonus?: number;
+  };
+  // Pre-calculated tooltip data from backend
+  tooltipData?: {
+    damageRange: string | null;
+    effectExplanations: string[] | null;
   };
 }
 
@@ -221,6 +245,30 @@ export class AbilityButtonComponent {
     };
 
     return labels[target] || target;
+  });
+
+  /**
+   * Get damage range from pre-calculated backend data
+   */
+  damageRangeText = computed(() => {
+    const ability = this.ability();
+    return ability.tooltipData?.damageRange || null;
+  });
+
+  /**
+   * Get healing range from pre-calculated backend data
+   * TODO: Backend doesn't calculate this yet, can be added later
+   */
+  healingRangeText = computed(() => {
+    return null; // Not implemented yet
+  });
+
+  /**
+   * Get effect explanations from pre-calculated backend data
+   */
+  effectExplanations = computed(() => {
+    const ability = this.ability();
+    return ability.tooltipData?.effectExplanations || null;
   });
 
   /**

@@ -63,78 +63,134 @@
       </div>
 
       <!-- Effects Section -->
-      @if (damageText() || healingText() || buffText()) {
-        <div class="tooltip-effects">
-          <div class="section-label">Effects</div>
-          @if (damageText()) {
-            <div class="effect-item effect-damage">
-              <span class="effect-icon">⚔️</span>
-              <span class="effect-text">{{ damageText() }}</span>
-            </div>
-          }
-          @if (healingText()) {
-            <div class="effect-item effect-heal">
-              <span class="effect-icon">💚</span>
-              <span class="effect-text">{{ healingText() }}</span>
-            </div>
-          }
-          @if (buffText()) {
-            <div class="effect-item effect-buff">
-              <span class="effect-icon">✨</span>
-              <span class="effect-text">{{ buffText() }}</span>
-            </div>
-          }
-          @if (ability().effects?.critChanceBonus) {
-            <div class="effect-item effect-crit">
-              <span class="effect-icon">💥</span>
-              <span class="effect-text">+{{ ability().effects!.critChanceBonus }}% critical chance</span>
-            </div>
-          }
+      @if (damageText() || healingText() || buffText() || ability().effects?.critChanceBonus || ability().effects?.applyBuff) {
+        <div class="tooltip-section">
+          <h4 class="section-title">Effects</h4>
+          <div class="effects-grid">
+            @if (damageText()) {
+              <div class="detail-row">
+                <span class="label">Damage:</span>
+                <span class="text-red-400">{{ damageText() }}</span>
+              </div>
+            }
+            @if (healingText()) {
+              <div class="detail-row">
+                <span class="label">Healing:</span>
+                <span class="text-green-400">{{ healingText() }}</span>
+              </div>
+            }
+            @if (buffText()) {
+              <div class="detail-row">
+                <span class="label">Buff:</span>
+                <span class="text-purple-400">{{ buffText() }}</span>
+              </div>
+            }
+            @if (ability().effects?.applyBuff) {
+              <div class="detail-row">
+                <span class="label">{{ ability().effects!.applyBuff!.target === 'self' ? 'Buff' : 'Debuff' }}:</span>
+                <span [class]="ability().effects!.applyBuff!.target === 'self' ? 'text-purple-400' : 'text-red-400'">
+                  {{ ability().effects!.applyBuff!.name }}: {{ ability().effects!.applyBuff!.description }}
+                </span>
+              </div>
+            }
+            @if (ability().effects?.critChanceBonus) {
+              <div class="detail-row">
+                <span class="label">Crit Bonus:</span>
+                <span class="text-gold-400">+{{ (ability().effects!.critChanceBonus! * 100) }}%</span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Expected Result Section -->
+      @if (damageRangeText() || healingRangeText()) {
+        <div class="tooltip-section">
+          <h4 class="section-title">Expected Result</h4>
+          <div class="effects-grid">
+            @if (damageRangeText()) {
+              <div class="detail-row">
+                <span class="label">Damage:</span>
+                <span class="text-red-400">{{ damageRangeText() }}</span>
+              </div>
+            }
+            @if (healingRangeText()) {
+              <div class="detail-row">
+                <span class="label">Healing:</span>
+                <span class="text-green-400">{{ healingRangeText() }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Effect Explanations Section -->
+      @if (effectExplanations()) {
+        <div class="tooltip-section">
+          <h4 class="section-title">Effect Details</h4>
+          <div class="effect-explanations">
+            @for (explanation of effectExplanations(); track $index) {
+              <div class="explanation-row">
+                {{ explanation }}
+              </div>
+            }
+          </div>
         </div>
       }
 
       <!-- Requirements Section -->
       @if (weaponRequirementsText() || skillRequirementText()) {
-        <div class="tooltip-requirements">
-          <div class="section-label">Requirements</div>
-          @if (weaponRequirementsText()) {
-            <div class="requirement-item">
-              <span class="requirement-icon">🗡️</span>
-              <span class="requirement-text">{{ weaponRequirementsText() }}</span>
-            </div>
-          }
-          @if (skillRequirementText()) {
-            <div class="requirement-item">
-              <span class="requirement-icon">📊</span>
-              <span class="requirement-text">{{ skillRequirementText() }}</span>
-            </div>
-          }
+        <div class="tooltip-section">
+          <h4 class="section-title">Requirements</h4>
+          <div class="effects-grid">
+            @if (weaponRequirementsText()) {
+              <div class="detail-row">
+                <span class="label">Weapon:</span>
+                <span class="text-purple-400">{{ weaponRequirementsText() }}</span>
+              </div>
+            }
+            @if (skillRequirementText()) {
+              <div class="detail-row">
+                <span class="label">Level:</span>
+                <span class="text-blue-400">{{ skillRequirementText() }}</span>
+              </div>
+            }
+          </div>
         </div>
       }
 
       <!-- Stats Section -->
-      <div class="tooltip-stats">
-        @if ((ability().manaCost ?? 0) > 0) {
-          <div class="tooltip-stat">
-            <span class="stat-label">Cost:</span>
-            <span class="stat-value">{{ ability().manaCost }} {{ resourceLabel() }}</span>
-          </div>
-        }
+      @if ((ability().manaCost ?? 0) > 0 || (ability().cooldown ?? 0) > 0 || (ability().powerMultiplier && ability().powerMultiplier !== 1)) {
+        <div class="tooltip-section">
+          <h4 class="section-title">Stats</h4>
+          <div class="effects-grid">
+            @if ((ability().manaCost ?? 0) > 0) {
+              <div class="detail-row">
+                <span class="label">Cost:</span>
+                <span class="text-blue-400">{{ ability().manaCost }} {{ resourceLabel() }}</span>
+              </div>
+            }
 
-        @if ((ability().cooldown ?? 0) > 0) {
-          <div class="tooltip-stat">
-            <span class="stat-label">Cooldown:</span>
-            <span class="stat-value">{{ ability().cooldown }} turns</span>
-          </div>
-        }
+            @if ((ability().cooldown ?? 0) > 0) {
+              <div class="detail-row">
+                <span class="label">Cooldown:</span>
+                @if (isOnCooldown()) {
+                  <span class="text-red-400">{{ cooldownRemaining() }}s remaining ({{ ability().cooldown }} turns)</span>
+                } @else {
+                  <span class="text-purple-400">{{ ability().cooldown }} turns</span>
+                }
+              </div>
+            }
 
-        @if (ability().powerMultiplier && ability().powerMultiplier !== 1) {
-          <div class="tooltip-stat">
-            <span class="stat-label">Power:</span>
-            <span class="stat-value">{{ ability().powerMultiplier }}x</span>
+            @if (ability().powerMultiplier && ability().powerMultiplier !== 1) {
+              <div class="detail-row">
+                <span class="label">Power:</span>
+                <span class="text-gold-400">{{ ability().powerMultiplier }}x</span>
+              </div>
+            }
           </div>
-        }
-      </div>
+        </div>
+      }
 
       <!-- Disabled reason -->
       @if (!canUse() && disabledReasonText()) {

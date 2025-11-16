@@ -34,6 +34,7 @@ export class ItemDetailsPanelComponent implements OnChanges {
   dragOffsetY: number = 0;
   currentX: number = 0;
   currentY: number = 0;
+  hasDragged: boolean = false; // Track if panel has been dragged
 
   constructor(public inventoryService: InventoryService) {}
 
@@ -54,6 +55,14 @@ export class ItemDetailsPanelComponent implements OnChanges {
         // Reset isUsingItem flag when item changes (after use completes)
         this.isUsingItem = false;
 
+        // Reset drag position when a new item is displayed
+        if (!changes['item'].previousValue ||
+            changes['item'].previousValue.instanceId !== this.item.instanceId) {
+          this.hasDragged = false;
+          this.currentX = 0;
+          this.currentY = 0;
+        }
+
         // Load combat stats if it's a weapon or armor
         this.combatStats = null;
         const isWeapon = this.item.definition.subcategories?.includes('weapon');
@@ -65,6 +74,9 @@ export class ItemDetailsPanelComponent implements OnChanges {
         // Item cleared
         this.dropQuantity = 1;
         this.isUsingItem = false;
+        this.hasDragged = false;
+        this.currentX = 0;
+        this.currentY = 0;
       }
     }
   }
@@ -140,6 +152,51 @@ export class ItemDetailsPanelComponent implements OnChanges {
   getQualityKeys(qualities: any): string[] {
     if (!qualities) return [];
     return Object.keys(qualities);
+  }
+
+  /**
+   * Get legacy effect keys (excludes 'applicators')
+   */
+  getLegacyEffectKeys(effects: any): string[] {
+    if (!effects) return [];
+    return Object.keys(effects).filter(key => key !== 'applicators');
+  }
+
+  /**
+   * Get applicators as an array
+   */
+  getApplicators(effects: any): any[] {
+    if (!effects || !effects.applicators) return [];
+    // If it's already an array, return it
+    if (Array.isArray(effects.applicators)) {
+      return effects.applicators;
+    }
+    // If it's an object, convert to array
+    return Object.values(effects.applicators);
+  }
+
+  /**
+   * Get label for applicators based on their contexts
+   */
+  getApplicatorsLabel(effects: any): string {
+    const applicators = this.getApplicators(effects);
+    if (applicators.length === 0) return 'Effects';
+
+    // Check the context of the first applicator to determine label
+    const firstContext = applicators[0]?.context;
+    if (firstContext) {
+      if (firstContext.startsWith('combat.')) {
+        return 'Combat Effects';
+      } else if (firstContext.startsWith('activity.')) {
+        return 'Activity Effects';
+      } else if (firstContext.startsWith('crafting.')) {
+        return 'Crafting Effects';
+      } else if (firstContext.startsWith('vendor.')) {
+        return 'Vendor Effects';
+      }
+    }
+
+    return 'Effects';
   }
 
   formatEffectType(effectKey: string): string {
@@ -324,6 +381,7 @@ export class ItemDetailsPanelComponent implements OnChanges {
    */
   onDragStart(event: MouseEvent): void {
     this.isDragging = true;
+    this.hasDragged = true; // Mark that the panel has been dragged
     const panel = (event.target as HTMLElement).closest('.item-details-panel') as HTMLElement;
     if (panel) {
       const rect = panel.getBoundingClientRect();
@@ -356,7 +414,7 @@ export class ItemDetailsPanelComponent implements OnChanges {
    * Get the transform style for the panel position
    */
   getPanelStyle(): any {
-    if (this.isDragging || (this.currentX !== 0 || this.currentY !== 0)) {
+    if (this.hasDragged) {
       return {
         transform: 'none',
         left: `${this.currentX}px`,

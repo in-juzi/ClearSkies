@@ -5,36 +5,13 @@
   (mouseenter)="handleHover()"
   type="button">
 
-  <!-- Item Icon -->
-  <div class="item-icon-container">
-    @if (item().definition.icon) {
-      <app-icon
-        [path]="item().definition.icon!.path"
-        [material]="item().definition.icon!.material"
-        [autoSize]="true"
-        class="item-icon">
-      </app-icon>
-    } @else {
-      <div class="item-icon-placeholder">
-        <span class="item-icon-text">{{ item().definition.name.charAt(0) }}</span>
-      </div>
-    }
+  <!-- Item Display (delegated to item-mini) -->
+  <div class="item-display-wrapper">
+    <app-item-mini [item]="item()"></app-item-mini>
   </div>
 
-  <!-- Item Name (for larger sizes) -->
-  @if (size() === 'large') {
-    <div class="item-name">{{ item().definition.name }}</div>
-  }
-
-  <!-- Quantity Badge -->
-  @if (showQuantity() && item().quantity > 0) {
-    <div class="item-quantity">
-      {{ item().quantity }}
-    </div>
-  }
-
   <!-- Tooltip -->
-  @if (showTooltip()) {
+  @if (showTooltip() || true) {
     <div class="item-tooltip">
       <div class="tooltip-header">
         <div class="tooltip-name">{{ item().definition.name }}</div>
