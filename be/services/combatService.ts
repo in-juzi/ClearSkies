@@ -9,12 +9,14 @@ import {
   BuffApplication,
   StatModifier,
   BuffableStat,
-  ModifierType
+  ModifierType,
+  EffectContext
 } from '@shared/types';
 import { MonsterRegistry } from '../data/monsters/MonsterRegistry';
 import { AbilityRegistry } from '../data/abilities/AbilityRegistry';
 import { COMBAT_FORMULAS } from '../data/constants/combat-constants';
 import { ICombatEntity, PlayerCombatEntity, MonsterCombatEntity, WeaponData } from './combat/CombatEntity';
+import effectEvaluator from './effectEvaluator';
 
 /**
  * Cached passive ability effects for an entity
@@ -257,10 +259,47 @@ class CombatService {
     if (entity.inventory && entity.equipmentSlots) {
       const equippedItems = this.getEquippedItems(entity);
 
+      // 3a. Base item property bonuses
       for (const item of equippedItems) {
         const itemDef = itemService.getItemDefinition(item.itemId);
         if (itemDef && itemDef.properties && itemDef.properties[itemPropertyKey] !== undefined) {
           total += itemDef.properties[itemPropertyKey];
+        }
+      }
+
+      // 3b. Trait/quality/affix bonuses (new effect system)
+      const contextMap: Record<string, EffectContext> = {
+        'damage': EffectContext.COMBAT_DAMAGE,
+        'armor': EffectContext.COMBAT_ARMOR,
+        'evasion': EffectContext.COMBAT_EVASION,
+        'critChance': EffectContext.COMBAT_CRIT_CHANCE,
+        'attackSpeed': EffectContext.COMBAT_ATTACK_SPEED,
+      };
+
+      const effectContext = contextMap[statName as string];
+      if (effectContext) {
+        // Calculate current HP percentage for conditional effects
+        const currentHP = entity.stats?.health?.current || 0;
+        const maxHP = entity.maxHP || 1;
+        const hpPercent = currentHP / maxHP;
+
+        const traitEffects = effectEvaluator.evaluatePlayerEffects(
+          entity,
+          effectContext,
+          { hpPercent, inCombat: true }
+        );
+
+        // Apply flat bonuses from traits/qualities
+        total += traitEffects.flatBonus;
+
+        // Apply percentage bonuses
+        if (traitEffects.percentageBonus !== 0) {
+          total = Math.floor(total * (1 + traitEffects.percentageBonus));
+        }
+
+        // Apply multipliers
+        if (traitEffects.multiplier !== 1.0) {
+          total = Math.floor(total * traitEffects.multiplier);
         }
       }
     }
@@ -451,6 +490,32 @@ class CombatService {
           }
         }
         // Add more trigger conditions here as needed
+      }
+    }
+
+    // Apply trait/quality/affix damage bonuses (players only)
+    if (attacker.inventory && attacker.equipmentSlots) {
+      const currentHP = attacker.stats?.health?.current || 0;
+      const maxHP = attacker.maxHP || 1;
+      const hpPercent = currentHP / maxHP;
+
+      const traitEffects = effectEvaluator.evaluatePlayerEffects(
+        attacker,
+        EffectContext.COMBAT_DAMAGE,
+        { hpPercent, inCombat: true }
+      );
+
+      // Apply flat damage bonus from traits
+      finalDamage += traitEffects.flatBonus;
+
+      // Apply percentage damage bonus from traits
+      if (traitEffects.percentageBonus !== 0) {
+        finalDamage = Math.floor(finalDamage * (1 + traitEffects.percentageBonus));
+      }
+
+      // Apply multiplier from traits
+      if (traitEffects.multiplier !== 1.0) {
+        finalDamage = Math.floor(finalDamage * traitEffects.multiplier);
       }
     }
 
