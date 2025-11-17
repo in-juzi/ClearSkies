@@ -31,7 +31,7 @@
 - ✅ Bronze/Iron equipment crafting (completed - 8 armor pieces + 6 tools via smithing)
 - ✅ Equipment stats summary (completed - total armor/evasion/damage display in equipment panel)
 - ✅ Durability system removal (completed - simplified item system by removing unused durability mechanic)
-- ✅ Signal-based reactivity (completed - location component uses computed signals for better change detection)
+- ✅ Signal-based reactivity (completed - location/crafting/inventory/chat/item-details-panel decomposed, shared components migrated to signals)
 - ✅ Socket.io migration (completed - activities, crafting, and combat migrated from HTTP polling to real-time events)
 - ✅ Shared type system (completed - @shared/types package eliminates duplicate type definitions)
 - ✅ CATEGORY/SUBCATEGORY constants (completed - type-safe constants for all 90+ item definitions)
@@ -86,6 +86,8 @@
 - ✅ Skill system refactor (completed - removed gun skill, added protection skill for tanks)
 
 **Recent Changes** (Last 10 commits):
+- refactor: migrate shared components to Angular signals API
+- docs: update CLAUDE.md with item-details-panel decomposition
 - refactor: decompose item-details-panel into sub-components
 - feat: add item-details-panel sub-components for better modularity
 - docs: update CLAUDE.md with chat component decomposition
@@ -94,8 +96,6 @@
 - docs: update CLAUDE.md with inventory component decomposition
 - docs: add backup of refactored inventory template
 - refactor: remove unused crafting component styles
-- refactor: decompose inventory component into sub-components
-- feat: add inventory sub-components for better modularity
 
 **Known Issues**:
 - None currently identified
