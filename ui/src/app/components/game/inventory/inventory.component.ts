@@ -8,25 +8,17 @@ import { ChatService } from '../../../services/chat.service';
 import { AuthService } from '../../../services/auth.service';
 import { ConfirmDialogService } from '../../../services/confirm-dialog.service';
 import { ItemDetails } from '../../../models/inventory.model';
-import { ItemModifiersComponent } from '../../shared/item-modifiers/item-modifiers.component';
-import { IconComponent } from '../../shared/icon/icon.component';
 import { ItemDetailsPanelComponent } from '../../shared/item-details-panel/item-details-panel.component';
-import { ItemMiniComponent } from '../../shared/item-mini/item-mini.component';
 import { isEquipmentItem, isConsumableItem } from '@shared/types';
-
-// Interface for grouped items
-interface ItemGroup {
-  itemId: string;
-  definition: ItemDetails['definition'];
-  instances: ItemDetails[];
-  totalQuantity: number;
-  isExpanded: boolean;
-}
+import { InventoryHeaderComponent } from './inventory-header/inventory-header.component';
+import { InventoryListViewComponent } from './inventory-list-view/inventory-list-view.component';
+import { InventoryGroupedViewComponent, ItemGroup } from './inventory-grouped-view/inventory-grouped-view.component';
+import { InventoryStatsComponent } from './inventory-stats/inventory-stats.component';
 
 @Component({
   selector: 'app-inventory',
   standalone: true,
-  imports: [CommonModule, FormsModule, ItemModifiersComponent, IconComponent, ItemDetailsPanelComponent, ItemMiniComponent],
+  imports: [CommonModule, FormsModule, ItemDetailsPanelComponent, InventoryHeaderComponent, InventoryListViewComponent, InventoryGroupedViewComponent, InventoryStatsComponent],
   templateUrl: './inventory.component.html',
   styleUrl: './inventory.component.scss'
 })
