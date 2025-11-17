@@ -50,6 +50,7 @@
 - ✅ Documentation reorganization (completed - numbered naming convention for 39 docs)
 - ✅ Angular component naming standardization (completed - all components use .component.* convention)
 - ✅ Location component decomposition (completed - split into 5 specialized sub-components)
+- ✅ Crafting component decomposition (completed - split into 3 specialized sub-components)
 - ✅ Equipment subtype display system (completed - human-readable labels for all equipment types)
 - ✅ Legacy potion cleanup (completed - removed old item definitions, added migration script)
 - ✅ Context-aware trait system (completed - dual validation/display for crafting vs random generation)
@@ -82,16 +83,16 @@
 - ✅ Skill system refactor (completed - removed gun skill, added protection skill for tanks)
 
 **Recent Changes** (Last 10 commits):
+- docs: add backup of refactored crafting template
+- refactor: decompose crafting component into sub-components
+- feat: add crafting sub-components for better modularity
+- docs: update CLAUDE.md with latest component refactoring
 - docs: add UI refactoring plan documentation
 - chore: remove deprecated bank.service.ts
 - refactor: update component imports to use standardized file paths
 - refactor: standardize component file naming to .component.* convention
 - docs: update CLAUDE.md with quest system and recent features
 - chore: remove duplicate XP system documentation
-- docs: add documentation for quest system and recent features
-- refactor: update equipment, abilities, and frontend models
-- refactor: improve TypeScript types and service integrations
-- feat: replace gun skill with protection skill
 
 **Known Issues**:
 - None currently identified
@@ -160,6 +161,7 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 - Chat: [ui/src/app/components/game/chat/chat.component.ts](ui/src/app/components/game/chat/chat.component.ts)
 - Vendor: [ui/src/app/components/game/vendor/vendor.component.ts](ui/src/app/components/game/vendor/vendor.component.ts), [ui/src/app/components/game/vendor/vendor.component.html](ui/src/app/components/game/vendor/vendor.component.html)
 - Crafting: [ui/src/app/components/game/crafting/crafting.component.ts](ui/src/app/components/game/crafting/crafting.component.ts), [ui/src/app/components/game/crafting/crafting.component.html](ui/src/app/components/game/crafting/crafting.component.html)
+  - Crafting Sub-components: [recipe-list/](ui/src/app/components/game/crafting/recipe-list/), [ingredient-selector/](ui/src/app/components/game/crafting/ingredient-selector/), [crafting-progress/](ui/src/app/components/game/crafting/crafting-progress/)
 - Combat: [ui/src/app/components/game/combat/combat.component.ts](ui/src/app/components/game/combat/combat.component.ts), [ui/src/app/components/game/combat/combat.component.html](ui/src/app/components/game/combat/combat.component.html)
 - Bank: [ui/src/app/components/game/bank/bank.component.ts](ui/src/app/components/game/bank/bank.component.ts), [ui/src/app/components/game/bank/bank.component.html](ui/src/app/components/game/bank/bank.component.html)
 - World Map: [ui/src/app/components/game/world-map/world-map.component.ts](ui/src/app/components/game/world-map/world-map.component.ts), [ui/src/app/components/game/world-map/world-map.component.html](ui/src/app/components/game/world-map/world-map.component.html)
