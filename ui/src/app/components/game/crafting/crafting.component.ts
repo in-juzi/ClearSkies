@@ -12,6 +12,7 @@ import { ItemInstance, RecipeIngredient } from '@shared/types';
 import { RecipeListComponent } from './recipe-list/recipe-list.component';
 import { CraftingProgressComponent } from './crafting-progress/crafting-progress.component';
 import { IngredientSelectorComponent } from './ingredient-selector/ingredient-selector.component';
+import { calculateItemScore } from '../../../utils/item-sort.utils';
 
 // Extended item instance with crafting-specific properties (uses any for flexibility with ItemDetails)
 type CraftingItemInstance = ItemInstance | any;
@@ -620,9 +621,8 @@ export class CraftingComponent implements OnInit {
    * Calculate quality score for sorting
    */
   getQualityScore(item: CraftingItemInstance): number {
-    if (!item.qualities) return 0;
-    const qualities = Object.values(item.qualities) as number[];
-    return qualities.reduce((sum, level) => sum + level, 0);
+    // Use centralized utility function for consistent scoring
+    return calculateItemScore(item, 10); // trait weight = 10 for crafting (prioritize traits)
   }
 
   /**

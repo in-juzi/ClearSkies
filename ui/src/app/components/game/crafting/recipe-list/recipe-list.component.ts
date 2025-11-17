@@ -1,7 +1,8 @@
-import { Component, Input, Output, EventEmitter, computed, signal } from '@angular/core';
+import { Component, Input, Output, EventEmitter, computed, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Recipe } from '../../../../models/recipe.model';
 import { RecipeIngredient } from '@shared/types';
+import { RecipeService } from '../../../../services/recipe.service';
 
 @Component({
   selector: 'app-recipe-list',
@@ -11,6 +12,8 @@ import { RecipeIngredient } from '@shared/types';
   styleUrls: ['./recipe-list.component.scss']
 })
 export class RecipeListComponent {
+  private recipeService = inject(RecipeService);
+
   @Input() skill: string = '';
   @Input() recipes: Recipe[] = [];
   @Input() loading: boolean = false;
@@ -84,20 +87,8 @@ export class RecipeListComponent {
   }
 
   canCraft(recipe: Recipe): { canCraft: boolean; message: string } {
-    // Check level requirement
-    if (this.isRecipeLocked(recipe)) {
-      return { canCraft: false, message: this.getUnlockHint(recipe) };
-    }
-
-    // Check ingredients
-    for (const ingredient of recipe.ingredients) {
-      const lookupKey = this.getIngredientLookupKey(ingredient);
-      if (!this.hasEnoughIngredientByLookupKey(lookupKey, ingredient, ingredient.quantity)) {
-        return { canCraft: false, message: `Missing ingredient: ${this.getIngredientLabel(ingredient)}` };
-      }
-    }
-
-    return { canCraft: true, message: '' };
+    // Delegate to RecipeService for centralized validation logic
+    return this.recipeService.canCraft(recipe, this.playerSkills, this.playerInventory);
   }
 
   getIngredientLookupKey(ingredient: RecipeIngredient): string {

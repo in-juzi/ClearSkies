@@ -4,6 +4,7 @@ import { IconComponent } from '../../../shared/icon/icon.component';
 import { ItemModifiersComponent } from '../../../shared/item-modifiers/item-modifiers.component';
 import { Recipe } from '../../../../models/recipe.model';
 import { RecipeIngredient } from '@shared/types';
+import { calculateItemScore } from '../../../../utils/item-sort.utils';
 
 type CraftingItemInstance = any; // Simplified type for brevity
 
@@ -83,18 +84,8 @@ export class IngredientSelectorComponent {
   }
 
   private getQualityScore(item: CraftingItemInstance): number {
-    let score = 0;
-    if (item.qualities) {
-      for (const [_, level] of Object.entries(item.qualities)) {
-        score += (level as number) || 0;
-      }
-    }
-    if (item.traits) {
-      for (const [_, level] of Object.entries(item.traits)) {
-        score += ((level as number) || 0) * 10;
-      }
-    }
-    return score;
+    // Use centralized utility function for consistent scoring
+    return calculateItemScore(item, 10); // trait weight = 10 for crafting (prioritize traits)
   }
 
   toggleInstanceSelection(lookupKey: string, instanceId: string, maxQuantity: number, required: number): void {
