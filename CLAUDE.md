@@ -87,8 +87,11 @@
 - ✅ Centralized rarity utilities (completed - 3 standalone pipes for rarity styling)
 - ✅ Centralized item utilities (completed - item-filter service and item-sort utils)
 - ✅ Component utility migration (completed - all components use shared rarity/filter/sort utilities)
+- ✅ Frontend logging cleanup (completed - removed debug console.log statements, kept console.error for production)
 
 **Recent Changes** (Last 10 commits):
+- refactor: remove debug console.log statements from frontend
+- docs: update CLAUDE.md with centralized utility documentation
 - refactor: migrate item-details-panel sub-components to use rarity pipes
 - refactor: migrate crafting components to use rarity pipes
 - refactor: migrate bank, vendor, and equipment to use rarity pipes
@@ -97,8 +100,6 @@
 - feat: add centralized item filtering service
 - feat: add centralized item sorting utilities
 - feat: add rarity transformation pipes for consistent styling
-- refactor: migrate shared components to Angular signals API
-- docs: update CLAUDE.md with item-details-panel decomposition
 
 **Known Issues**:
 - None currently identified
