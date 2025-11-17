@@ -73,32 +73,41 @@
 - ✅ Tiered XP curve system (completed - 5-tier progression replacing flat 1000 XP/level)
 - ✅ Enriched skill/attribute data (completed - totalXP tracking, variable XP requirements, improved UI)
 - ✅ Item inspection system (completed - detailed effect preview, item comparison endpoints)
+- ✅ Quest system (completed - tutorial chain, objective tracking, auto-accept, WebSocket real-time updates)
+- ✅ Woodcutting expansion (completed - birch/pine trees, rare drops, 3 wood types total)
+- ✅ Farming seed items (completed - 9 seed types for future gardening skill)
+- ✅ Two-handed weapons (completed - Iron Battleaxe, Iron Greatsword with Defensive Stance ability)
+- ✅ Drop table preview UI (completed - expandable reward viewer in activity details)
+- ✅ Notification system (completed - toast-style notifications for quest events)
+- ✅ Skill system refactor (completed - removed gun skill, added protection skill for tanks)
 
 **Recent Changes** (Last 10 commits):
-- chore: update locations, assets, and add effect system documentation
-- ui: improve game components with visual polish and UX enhancements
-- feat: enhance item details panel with comprehensive effect display
-- feat: redesign XP UI components for tiered leveling system
-- feat: update frontend services for tiered XP and enriched data
-- feat: add controller endpoints for item inspection and effect preview
-- feat: integrate effect system across all backend services
-- feat: extend effect system with crafting and vendor contexts
-- balance: adjust activity XP for tiered leveling curve
-- feat: implement tiered XP curve system
+- chore: remove duplicate XP system documentation
+- docs: add documentation for quest system and recent features
+- refactor: update equipment, abilities, and frontend models
+- refactor: improve TypeScript types and service integrations
+- feat: replace gun skill with protection skill
+- ui: enhance location and world map components
+- feat: add drop table preview in activity details
+- refactor: improve drop table references in activities
+- feat: add two-handed weapons and defensive stance ability
+- feat: add farming seed items for future gardening system
 
 **Known Issues**:
 - None currently identified
 
 **Next Priorities**:
+- Farming/gardening skill implementation (plant seeds, grow crops, harvest produce)
+- More quest content (main story quests, optional side quests, quest chains)
 - Affix system implementation (enchanting/runecarving skill)
 - More trait variety (conditional effects, passive triggers)
 - Quality system effects (crafting quality bonuses)
 - Steel tier equipment (requires steel ingots from iron + coal)
 - More alchemy recipes (debuff potions, stat potions, transmutation)
 - Combat system enhancements (more monsters, abilities, boss fights)
-- Player housing system
+- Player housing system (uses farming seeds for gardens)
 - Guild/party system
-- Enchanting/runecarving skill with affix system
+- Achievement system (linked to quest system)
 
 > **Maintenance Note**: Update this section regularly so AI has context without needing to explore
 
@@ -133,17 +142,17 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 ### Frequently Modified Files
 
 **Backend Core:**
-- Controllers: [be/controllers/inventoryController.js](be/controllers/inventoryController.js), [be/controllers/locationController.js](be/controllers/locationController.js), [be/controllers/skillsController.js](be/controllers/skillsController.js), [be/controllers/attributesController.js](be/controllers/attributesController.js), [be/controllers/authController.js](be/controllers/authController.js), [be/controllers/manualController.js](be/controllers/manualController.js), [be/controllers/vendorController.js](be/controllers/vendorController.js), [be/controllers/craftingController.js](be/controllers/craftingController.js), [be/controllers/combatController.js](be/controllers/combatController.js), [be/controllers/storageController.ts](be/controllers/storageController.ts)
+- Controllers: [be/controllers/inventoryController.js](be/controllers/inventoryController.js), [be/controllers/locationController.js](be/controllers/locationController.js), [be/controllers/skillsController.js](be/controllers/skillsController.js), [be/controllers/attributesController.js](be/controllers/attributesController.js), [be/controllers/authController.js](be/controllers/authController.js), [be/controllers/manualController.js](be/controllers/manualController.js), [be/controllers/vendorController.js](be/controllers/vendorController.js), [be/controllers/craftingController.js](be/controllers/craftingController.js), [be/controllers/combatController.js](be/controllers/combatController.js), [be/controllers/storageController.ts](be/controllers/storageController.ts), [be/controllers/questController.ts](be/controllers/questController.ts)
 - Models: [be/models/Player.ts](be/models/Player.ts), [be/models/User.js](be/models/User.js), [be/models/ChatMessage.js](be/models/ChatMessage.js)
-- Services (TypeScript): [be/services/itemService.ts](be/services/itemService.ts), [be/services/locationService.ts](be/services/locationService.ts), [be/services/dropTableService.ts](be/services/dropTableService.ts), [be/services/vendorService.ts](be/services/vendorService.ts), [be/services/recipeService.ts](be/services/recipeService.ts), [be/services/combatService.ts](be/services/combatService.ts), [be/services/storageService.ts](be/services/storageService.ts), [be/services/effectEvaluator.ts](be/services/effectEvaluator.ts)
-- Routes: [be/routes/inventory.js](be/routes/inventory.js), [be/routes/locations.js](be/routes/locations.js), [be/routes/skills.js](be/routes/skills.js), [be/routes/attributes.js](be/routes/attributes.js), [be/routes/auth.js](be/routes/auth.js), [be/routes/manual.js](be/routes/manual.js), [be/routes/vendors.js](be/routes/vendors.js), [be/routes/crafting.js](be/routes/crafting.js), [be/routes/combat.js](be/routes/combat.js), [be/routes/storage.ts](be/routes/storage.ts)
-- Sockets: [be/sockets/chatHandler.js](be/sockets/chatHandler.js), [be/sockets/activityHandler.ts](be/sockets/activityHandler.ts), [be/sockets/craftingHandler.ts](be/sockets/craftingHandler.ts), [be/sockets/combatHandler.ts](be/sockets/combatHandler.ts), [be/sockets/storageHandler.ts](be/sockets/storageHandler.ts)
+- Services (TypeScript): [be/services/itemService.ts](be/services/itemService.ts), [be/services/locationService.ts](be/services/locationService.ts), [be/services/dropTableService.ts](be/services/dropTableService.ts), [be/services/vendorService.ts](be/services/vendorService.ts), [be/services/recipeService.ts](be/services/recipeService.ts), [be/services/combatService.ts](be/services/combatService.ts), [be/services/storageService.ts](be/services/storageService.ts), [be/services/effectEvaluator.ts](be/services/effectEvaluator.ts), [be/services/questService.ts](be/services/questService.ts)
+- Routes: [be/routes/inventory.js](be/routes/inventory.js), [be/routes/locations.js](be/routes/locations.js), [be/routes/skills.js](be/routes/skills.js), [be/routes/attributes.js](be/routes/attributes.js), [be/routes/auth.js](be/routes/auth.js), [be/routes/manual.js](be/routes/manual.js), [be/routes/vendors.js](be/routes/vendors.js), [be/routes/crafting.js](be/routes/crafting.js), [be/routes/combat.js](be/routes/combat.js), [be/routes/storage.ts](be/routes/storage.ts), [be/routes/quests.ts](be/routes/quests.ts)
+- Sockets: [be/sockets/chatHandler.js](be/sockets/chatHandler.js), [be/sockets/activityHandler.ts](be/sockets/activityHandler.ts), [be/sockets/craftingHandler.ts](be/sockets/craftingHandler.ts), [be/sockets/combatHandler.ts](be/sockets/combatHandler.ts), [be/sockets/storageHandler.ts](be/sockets/storageHandler.ts), [be/sockets/questHandler.ts](be/sockets/questHandler.ts)
 
 **Frontend Core:**
 - Game Component: [ui/src/app/components/game/game.component.ts](ui/src/app/components/game/game.component.ts), [ui/src/app/components/game/game.component.html](ui/src/app/components/game/game.component.html)
 - Inventory: [ui/src/app/components/game/inventory/inventory.component.ts](ui/src/app/components/game/inventory/inventory.component.ts), [ui/src/app/components/game/inventory/inventory.component.html](ui/src/app/components/game/inventory/inventory.component.html)
 - Location: [ui/src/app/components/game/location/location.component.ts](ui/src/app/components/game/location/location.component.ts), [ui/src/app/components/game/location/location.component.html](ui/src/app/components/game/location/location.component.html)
-  - Location Sub-components: [location-activity-detail/](ui/src/app/components/game/location/location-activity-detail/), [location-activity-progress/](ui/src/app/components/game/location/location-activity-progress/), [location-facility-detail/](ui/src/app/components/game/location/location-facility-detail/), [location-facility-list/](ui/src/app/components/game/location/location-facility-list/), [location-travel/](ui/src/app/components/game/location/location-travel/)
+  - Location Sub-components: [location-activity-detail/](ui/src/app/components/game/location/location-activity-detail/), [location-activity-progress/](ui/src/app/components/game/location/location-activity-progress/), [location-facility-detail/](ui/src/app/components/game/location/location-facility-detail/), [location-facility-list/](ui/src/app/components/game/location/location-facility-list/), [location-travel/](ui/src/app/components/game/location/location-travel/), [activity-drop-table/](ui/src/app/components/game/location/activity-drop-table/)
 - Skills: [ui/src/app/components/game/skills/skills.component.ts](ui/src/app/components/game/skills/skills.component.ts)
 - Attributes: [ui/src/app/components/game/attributes/attributes.component.ts](ui/src/app/components/game/attributes/attributes.component.ts)
 - Character Status: [ui/src/app/components/game/character-status/character-status.component.ts](ui/src/app/components/game/character-status/character-status.component.ts)
@@ -154,9 +163,10 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 - Combat: [ui/src/app/components/game/combat/combat.component.ts](ui/src/app/components/game/combat/combat.component.ts), [ui/src/app/components/game/combat/combat.component.html](ui/src/app/components/game/combat/combat.component.html)
 - Bank: [ui/src/app/components/game/bank/bank.component.ts](ui/src/app/components/game/bank/bank.component.ts), [ui/src/app/components/game/bank/bank.component.html](ui/src/app/components/game/bank/bank.component.html)
 - World Map: [ui/src/app/components/game/world-map/world-map.ts](ui/src/app/components/game/world-map/world-map.ts), [ui/src/app/components/game/world-map/world-map.html](ui/src/app/components/game/world-map/world-map.html)
+- Quest Components: [quest-tracker/](ui/src/app/components/game/quest-tracker/), [quest-journal/](ui/src/app/components/game/quest-journal/)
 - Manual: [ui/src/app/components/manual/manual.component.ts](ui/src/app/components/manual/manual.component.ts), [ui/src/app/components/manual/sections/](ui/src/app/components/manual/sections/)
-- Shared Components: [ui/src/app/components/shared/item-mini/item-mini.component.ts](ui/src/app/components/shared/item-mini/item-mini.component.ts), [ui/src/app/components/shared/item-modifiers/item-modifiers.component.ts](ui/src/app/components/shared/item-modifiers/item-modifiers.component.ts), [ui/src/app/components/shared/item-details-panel/item-details-panel.component.ts](ui/src/app/components/shared/item-details-panel/item-details-panel.component.ts), [ui/src/app/components/shared/icon/icon.component.ts](ui/src/app/components/shared/icon/icon.component.ts), [ui/src/app/components/shared/xp-mini/xp-mini.component.ts](ui/src/app/components/shared/xp-mini/xp-mini.component.ts), [ui/src/app/components/shared/ability-button/ability-button.component.ts](ui/src/app/components/shared/ability-button/ability-button.component.ts), [ui/src/app/components/shared/item-button/item-button.component.ts](ui/src/app/components/shared/item-button/item-button.component.ts), [ui/src/app/components/shared/buff-icon/buff-icon.ts](ui/src/app/components/shared/buff-icon/buff-icon.ts), [ui/src/app/components/shared/activity-log/activity-log.component.ts](ui/src/app/components/shared/activity-log/activity-log.component.ts)
-- Services: [ui/src/app/services/inventory.service.ts](ui/src/app/services/inventory.service.ts), [ui/src/app/services/location.service.ts](ui/src/app/services/location.service.ts), [ui/src/app/services/skills.service.ts](ui/src/app/services/skills.service.ts), [ui/src/app/services/auth.service.ts](ui/src/app/services/auth.service.ts), [ui/src/app/services/manual.service.ts](ui/src/app/services/manual.service.ts), [ui/src/app/services/chat.service.ts](ui/src/app/services/chat.service.ts), [ui/src/app/services/vendor.service.ts](ui/src/app/services/vendor.service.ts), [ui/src/app/services/recipe.service.ts](ui/src/app/services/recipe.service.ts), [ui/src/app/services/crafting.service.ts](ui/src/app/services/crafting.service.ts), [ui/src/app/services/combat.service.ts](ui/src/app/services/combat.service.ts), [ui/src/app/services/icon.service.ts](ui/src/app/services/icon.service.ts), [ui/src/app/services/storage.service.ts](ui/src/app/services/storage.service.ts)
+- Shared Components: [ui/src/app/components/shared/item-mini/item-mini.component.ts](ui/src/app/components/shared/item-mini/item-mini.component.ts), [ui/src/app/components/shared/item-modifiers/item-modifiers.component.ts](ui/src/app/components/shared/item-modifiers/item-modifiers.component.ts), [ui/src/app/components/shared/item-details-panel/item-details-panel.component.ts](ui/src/app/components/shared/item-details-panel/item-details-panel.component.ts), [ui/src/app/components/shared/icon/icon.component.ts](ui/src/app/components/shared/icon/icon.component.ts), [ui/src/app/components/shared/xp-mini/xp-mini.component.ts](ui/src/app/components/shared/xp-mini/xp-mini.component.ts), [ui/src/app/components/shared/ability-button/ability-button.component.ts](ui/src/app/components/shared/ability-button/ability-button.component.ts), [ui/src/app/components/shared/item-button/item-button.component.ts](ui/src/app/components/shared/item-button/item-button.component.ts), [ui/src/app/components/shared/buff-icon/buff-icon.ts](ui/src/app/components/shared/buff-icon/buff-icon.ts), [ui/src/app/components/shared/activity-log/activity-log.component.ts](ui/src/app/components/shared/activity-log/activity-log.component.ts), [notification-display/](ui/src/app/components/shared/notification-display/)
+- Services: [ui/src/app/services/inventory.service.ts](ui/src/app/services/inventory.service.ts), [ui/src/app/services/location.service.ts](ui/src/app/services/location.service.ts), [ui/src/app/services/skills.service.ts](ui/src/app/services/skills.service.ts), [ui/src/app/services/auth.service.ts](ui/src/app/services/auth.service.ts), [ui/src/app/services/manual.service.ts](ui/src/app/services/manual.service.ts), [ui/src/app/services/chat.service.ts](ui/src/app/services/chat.service.ts), [ui/src/app/services/vendor.service.ts](ui/src/app/services/vendor.service.ts), [ui/src/app/services/recipe.service.ts](ui/src/app/services/recipe.service.ts), [ui/src/app/services/crafting.service.ts](ui/src/app/services/crafting.service.ts), [ui/src/app/services/combat.service.ts](ui/src/app/services/combat.service.ts), [ui/src/app/services/icon.service.ts](ui/src/app/services/icon.service.ts), [ui/src/app/services/storage.service.ts](ui/src/app/services/storage.service.ts), [ui/src/app/services/quest.service.ts](ui/src/app/services/quest.service.ts), [ui/src/app/services/notification.service.ts](ui/src/app/services/notification.service.ts)
 - Constants: [ui/src/app/constants/material-colors.constants.ts](ui/src/app/constants/material-colors.constants.ts), [ui/src/app/constants/game-data.constants.ts](ui/src/app/constants/game-data.constants.ts)
 
 **Game Data (TypeScript):**
@@ -176,6 +186,7 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 - Recipe Registry: [be/data/recipes/RecipeRegistry.ts](be/data/recipes/RecipeRegistry.ts) - All recipes by skill
 - Monster Registry: [be/data/monsters/MonsterRegistry.ts](be/data/monsters/MonsterRegistry.ts) - All monsters in [definitions/](be/data/monsters/definitions/)
 - Ability Registry: [be/data/abilities/AbilityRegistry.ts](be/data/abilities/AbilityRegistry.ts) - All abilities in [definitions/](be/data/abilities/definitions/)
+- Quest Registry: [be/data/quests/QuestRegistry.ts](be/data/quests/QuestRegistry.ts) - All quests in [definitions/](be/data/quests/definitions/) (tutorial + optional)
 - Quality Registry: [be/data/items/qualities/QualityRegistry.ts](be/data/items/qualities/QualityRegistry.ts)
 - Trait Registry: [be/data/items/traits/TraitRegistry.ts](be/data/items/traits/TraitRegistry.ts)
 
@@ -535,15 +546,16 @@ See [project/docs/005-content-generator-agent.md](project/docs/005-content-gener
 ### Completed Features
 
 **Core Systems**: Auth/JWT, Player/User models, MongoDB with migrations, Socket.io real-time communication
-**Game Mechanics**: Skills (13), Attributes (7), XP scaling with 50% skill→attribute passthrough
-**Inventory**: Items (68+), Quality/Trait (5-tier/3-tier), Stacking, Equipment slots (10), Consumables (potions), Storage system (WebSocket, 200 slots, bulk operations)
+**Game Mechanics**: Skills (13), Attributes (7), XP scaling with 50% skill→attribute passthrough, Tiered XP curve (5 tiers, 50 levels)
+**Inventory**: Items (95), Quality/Trait (5-tier/3-tier), Stacking, Equipment slots (10), Consumables (potions), Storage system (WebSocket, 200 slots, bulk operations)
 **Storage**: WebSocket real-time system, Container abstraction (bank/guild/housing), Bulk deposit operations, Room-based multi-user updates, 200-slot bank, Drag-and-drop UI
-**World**: Locations, Activities (Socket.io), Drop tables, Travel, Server-authoritative timing
-**Combat**: Turn-based combat (Socket.io), Monsters (5), Abilities (6), Combat stats tracking, Restart encounters, Real-time events
-**Crafting**: Cooking (4 recipes) + Smithing (16 recipes) + Alchemy (6 recipes, Socket.io), Quality inheritance, Instance selection, Recipe filtering, Subcategory ingredients, Recipe unlocks, Auto-restart
-**UI**: IconComponent (multi-channel colorization), ItemMiniComponent, AbilityButtonComponent, ItemButtonComponent, Manual/help system
+**World**: Locations (4), Activities (22), Drop tables (20+), Travel, World map (SVG visualization), Server-authoritative timing
+**Combat**: Turn-based combat (Socket.io), Monsters (5), Abilities (11), Combat stats tracking, Restart encounters, Real-time events, Buff/debuff system
+**Crafting**: Cooking (4 recipes) + Smithing (16 recipes) + Alchemy (10 recipes, Socket.io), Quality inheritance, Instance selection, Recipe filtering, Subcategory ingredients, Recipe unlocks, Auto-restart
+**Quests**: Tutorial chain (5 quests), Optional side quests (7 quests), Auto-accept mechanics, Objective tracking, Real-time progress updates, Toast notifications
+**UI**: IconComponent (multi-channel colorization), ItemMiniComponent, AbilityButtonComponent, ItemButtonComponent, Manual/help system, Quest tracker, Quest journal, Notification system, Drop table preview
 **Social**: Real-time chat (Socket.io), Vendor trading, Gold system
-**Architecture**: Full Socket.io migration (activities, crafting, combat) - eliminated HTTP polling, server-authoritative timing, client-driven auto-restart
+**Architecture**: Full Socket.io migration (activities, crafting, combat, quests) - eliminated HTTP polling, server-authoritative timing, client-driven auto-restart, Shared TypeScript types, Effect system
 
 See [project/docs/012-completed-features.md](project/docs/012-completed-features.md) for full list.
 
@@ -554,15 +566,16 @@ See [project/docs/012-completed-features.md](project/docs/012-completed-features
 **ChatMessage** ([be/models/ChatMessage.js](be/models/ChatMessage.js) ~L10-20): Chat history (userId, username, message, channel)
 
 **Player** ([be/models/Player.ts](be/models/Player.ts) ~L15-500): Game data
-- Skills (13): woodcutting, mining, fishing, gathering (renamed from herbalism), smithing, cooking, alchemy (new), oneHanded, dualWield, twoHanded, ranged, casting, gun
+- Skills (13): woodcutting, mining, fishing, gathering (renamed from herbalism), smithing, cooking, alchemy, oneHanded, dualWield, twoHanded, ranged, casting, protection (new - replaced gun)
 - Attributes (7): strength, endurance, wisdom (renamed from magic), perception, dexterity, will, charisma
-- Skill-Attribute links: woodcutting/mining→strength, fishing/smithing→endurance, gathering/cooking/alchemy→will, oneHanded/twoHanded→strength, dualWield/ranged→dexterity, casting→wisdom, gun→perception
+- Skill-Attribute links: woodcutting/mining→strength, fishing/smithing→endurance, gathering/cooking/alchemy→will, oneHanded/twoHanded→strength, dualWield/ranged→dexterity, casting→wisdom, protection→endurance
 - Inventory: items with qualities (Map), traits (Map), quantities, equipped flag
 - Equipment slots (Map): 10 default slots (head, body, mainHand, offHand, belt, gloves, boots, necklace, ringRight, ringLeft)
 - Storage containers: Array of containers (bank + future housing), each with containerId, type, name, capacity, items
 - Location state: currentLocation, discoveredLocations, activeActivity, travelState
 - Combat state: activeCombat (monster instance, turn tracking, cooldowns, combat log, activityId), combatStats (defeats, damage, deaths, crits, dodges), lastCombatActivityId
-- Character: characterName (optional display name), gold, questProgress, achievements
+- Quest state: activeQuests (Array of quest progress), completedQuests (Array of questIds)
+- Character: characterName (optional display name), gold, achievements (Array)
 - Virtual properties: maxHP (STR×3 + END×2 + WILL×1 + 10), maxMP (WIS×6 + WILL×3 + 10), carryingCapacity (STR×2kg + END×1kg + 50kg), currentWeight
 
 **Key Methods:** See [be/models/Player.ts](be/models/Player.ts) for full list
@@ -585,6 +598,7 @@ All endpoints require JWT authentication except `/api/auth/register` and `/api/a
 - Crafting: `/api/crafting` → [be/routes/crafting.js](be/routes/crafting.js)
 - Combat: `/api/combat` → [be/routes/combat.js](be/routes/combat.js)
 - Bank: `/api/bank` → [be/routes/bank.ts](be/routes/bank.ts)
+- Quests: `/api/quests` → [be/routes/quests.ts](be/routes/quests.ts)
 - Manual: `/api/manual` → [be/routes/manual.js](be/routes/manual.js)
 
 ## Development Quick Rules
@@ -1107,6 +1121,76 @@ Interactive SVG-based world map with location discovery and travel functionality
 - Frontend Component: [world-map.ts](ui/src/app/components/game/world-map/world-map.ts), [world-map.html](ui/src/app/components/game/world-map/world-map.html), [world-map.scss](ui/src/app/components/game/world-map/world-map.scss)
 - Backend Route: [be/routes/locations.ts](be/routes/locations.ts) `/coordinates` endpoint
 - Location Types: [shared/types/locations.ts](shared/types/locations.ts) - Added `coordinates` field
+
+## Quest System
+
+Comprehensive quest system with objective tracking, auto-accept mechanics, and WebSocket real-time updates for seamless player progression.
+
+**Quick Facts:**
+- Tutorial quest chain (5 quests) + optional side quests (7 quests)
+- Auto-accept mechanics for tutorial quests (seamless onboarding)
+- Real-time progress updates via Socket.io
+- Objective types: GATHER, CRAFT, EQUIP, DEFEAT, VISIT, LEVEL_UP
+- Quest prerequisites and unlocking system
+- Gold and XP rewards on completion
+- Toast-style notifications for quest events
+
+**Quest Structure:**
+- Quest Registry: [QuestRegistry.ts](be/data/quests/QuestRegistry.ts)
+- Tutorial quests: [definitions/tutorial/](be/data/quests/definitions/tutorial/)
+- Optional quests: [definitions/optional/](be/data/quests/definitions/optional/)
+
+**Tutorial Chain:**
+1. Welcome to Kennik (auto-accept on first login)
+2. Into the Woods (gather oak logs)
+3. Herb Gathering 101 (gather chamomile)
+4. First Catch (catch cod)
+5. Healing Hands (craft healing potion)
+
+**Optional Quests:**
+- First Blood (defeat 5 monsters)
+- Tool Time (equip a tool)
+- Ore You Ready (mine 10 ore)
+- Fully Equipped (equip 5 items)
+- Sharpening Your Skills (reach level 5 in any skill)
+- Culinary Basics (cook 5 meals)
+- Alchemist's Apprentice (craft 3 potions)
+
+**Technical Implementation:**
+- Quest service: [questService.ts](be/services/questService.ts) - Quest logic and objective tracking
+- Quest controller: [questController.ts](be/controllers/questController.ts) - Quest state management
+- Quest handler: [questHandler.ts](be/sockets/questHandler.ts) - WebSocket real-time events
+- Quest types: [shared/types/quests.ts](shared/types/quests.ts)
+- Player quest schema: activeQuests (Array), completedQuests (Array of questIds)
+
+**Quest Objective Tracking:**
+- Automatic progress updates when players perform actions
+- Location service integration for activity/crafting/combat completions
+- Inventory service integration for equipment changes
+- Real-time notifications via notification service
+
+**UI Components:**
+- Quest Tracker: [quest-tracker/](ui/src/app/components/game/quest-tracker/) - Compact quest display in game view
+- Quest Journal: [quest-journal/](ui/src/app/components/game/quest-journal/) - Full quest list with filters
+- Notification Display: [notification-display/](ui/src/app/components/shared/notification-display/) - Toast notifications
+
+**Socket Events:**
+- `quest:getActive` - Fetch active quests
+- `quest:getAvailable` - Fetch available quests
+- `quest:getCompleted` - Fetch completed quests
+- `quest:accept` - Accept a quest
+- `quest:abandon` - Abandon a quest
+- `quest:turnIn` - Turn in completed quest for rewards
+- `quest:progressUpdated` - Real-time progress update
+- `quest:completed` - Quest completion notification
+- `quest:newAvailable` - New quest became available
+
+**Migration:**
+- 020-add-quest-system.js: Initializes quest state for existing players, auto-accepts tutorial quests
+
+**Full Documentation:**
+- [055-quest-system-design.md](project/docs/055-quest-system-design.md) - Architecture and design
+- [053-quest-system-testing-guide.md](project/docs/053-quest-system-testing-guide.md) - Testing guide
 
 ## Next Steps / Ideas
 
