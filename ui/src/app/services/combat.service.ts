@@ -98,8 +98,6 @@ export class CombatService {
   private setupSocketListeners(): void {
     // Combat started event (when combat begins via activity system)
     this.socketService.on('combat:started', (data: any) => {
-      console.log('Combat started event:', data);
-
       // Create initial combat log with start message
       const initialLog: CombatLogEntry[] = [{
         timestamp: new Date(),

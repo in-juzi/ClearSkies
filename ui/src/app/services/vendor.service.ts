@@ -9,6 +9,7 @@ import {
   SellItemRequest,
   TransactionResponse
 } from '../models/vendor.model';
+import { ItemInstance } from '@shared/types';
 
 @Injectable({
   providedIn: 'root'
@@ -67,5 +68,15 @@ export class VendorService {
   setCurrentVendor(vendor: Vendor): void {
     this.currentVendorSignal.set(vendor);
     this.isVendorOpenSignal.set(true);
+  }
+
+  /**
+   * Calculate sell price for an item (50% of vendor price)
+   * Vendors buy items at 50% of their vendor price (which already includes quality/trait bonuses)
+   */
+  calculateSellPrice(item: ItemInstance | { vendorPrice?: number }): number {
+    // Use vendorPrice from ItemDetails (already calculated with quality/trait bonuses)
+    const vendorPrice = 'vendorPrice' in item ? item.vendorPrice : 0;
+    return Math.floor((vendorPrice || 0) * 0.5);
   }
 }

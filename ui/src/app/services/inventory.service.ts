@@ -12,6 +12,7 @@ import {
 import { AuthService } from './auth.service';
 import { ItemDataService } from './item-data.service';
 import { environment } from '../../environments/environment';
+import { calculateItemScore } from '../utils/item-sort.utils';
 
 @Injectable({
   providedIn: 'root'
@@ -189,20 +190,6 @@ export class InventoryService {
   }
 
   /**
-   * Helper: Get rarity color class
-   */
-  getRarityColor(rarity: string): string {
-    const rarityColors: { [key: string]: string } = {
-      common: 'text-gray-400',
-      uncommon: 'text-green-400',
-      rare: 'text-blue-400',
-      epic: 'text-purple-400',
-      legendary: 'text-orange-400'
-    };
-    return rarityColors[rarity] || 'text-gray-400';
-  }
-
-  /**
    * Helper: Format quality level (now returns level number, not percentage)
    */
   formatQuality(level: number): string {
@@ -251,25 +238,11 @@ export class InventoryService {
 
   /**
    * Calculate total quality+trait score for an item (for sorting)
+   * Uses centralized utility function for consistent scoring across the app
    */
   calculateItemScore(item: ItemDetails): number {
-    let score = 0;
-
-    // Sum all quality levels
-    if (item.qualities) {
-      Object.values(item.qualities).forEach(level => {
-        score += level;
-      });
-    }
-
-    // Sum all trait levels
-    if (item.traits) {
-      Object.values(item.traits).forEach(level => {
-        score += level;
-      });
-    }
-
-    return score;
+    // Use utility function with trait weight = 1 (original InventoryService behavior)
+    return calculateItemScore(item, 1);
   }
 
   /**
