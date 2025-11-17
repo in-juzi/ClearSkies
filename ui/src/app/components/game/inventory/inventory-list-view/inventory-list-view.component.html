@@ -2,7 +2,7 @@
   @for (item of items; track item.instanceId) {
     <div
       class="inventory-item"
-      [class]="getRarityClass(item.definition.rarity)"
+      [class]="item.definition.rarity | rarityClass"
       [class.equipped]="item.equipped"
       [class.alt-sell-mode]="isAltKeyHeld && isVendorOpen"
       [class.alt-drop-mode]="isAltKeyHeld && !isVendorOpen"
@@ -29,7 +29,7 @@
       <div class="item-content">
         <!-- Top row: Name + Quantity -->
         <div class="item-header">
-          <div class="item-name" [class]="inventoryService.getRarityColor(item.definition.rarity)">
+          <div class="item-name" [class]="item.definition.rarity | rarityColor">
             {{ item.definition.name }}
           </div>
           @if (item.quantity > 1) {

@@ -4,11 +4,13 @@ import { ItemModifiersComponent } from '../../../shared/item-modifiers/item-modi
 import { IconComponent } from '../../../shared/icon/icon.component';
 import { ItemDetails } from '../../../../models/inventory.model';
 import { InventoryService } from '../../../../services/inventory.service';
+import { RarityClassPipe } from '../../../../pipes/rarity-class.pipe';
+import { RarityColorPipe } from '../../../../pipes/rarity-color.pipe';
 
 @Component({
   selector: 'app-inventory-list-view',
   standalone: true,
-  imports: [CommonModule, ItemModifiersComponent, IconComponent],
+  imports: [CommonModule, ItemModifiersComponent, IconComponent, RarityClassPipe, RarityColorPipe],
   templateUrl: './inventory-list-view.component.html',
   styleUrls: ['./inventory-list-view.component.scss']
 })
@@ -23,10 +25,6 @@ export class InventoryListViewComponent {
   @Output() itemDragEnd = new EventEmitter<DragEvent>();
 
   constructor(public inventoryService: InventoryService) {}
-
-  getRarityClass(rarity: string): string {
-    return `rarity-${rarity.toLowerCase()}`;
-  }
 
   getItemTooltip(item: ItemDetails): string {
     return `Right-click: ${this.getQuickActionLabel(item)}\nAlt+Click: ${this.isVendorOpen ? 'Quick sell' : 'Quick drop'}`;

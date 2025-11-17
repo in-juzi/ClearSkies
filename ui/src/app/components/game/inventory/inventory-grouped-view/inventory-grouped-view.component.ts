@@ -4,6 +4,8 @@ import { IconComponent } from '../../../shared/icon/icon.component';
 import { ItemMiniComponent } from '../../../shared/item-mini/item-mini.component';
 import { ItemDetails } from '../../../../models/inventory.model';
 import { InventoryService } from '../../../../services/inventory.service';
+import { RarityClassPipe } from '../../../../pipes/rarity-class.pipe';
+import { RarityColorPipe } from '../../../../pipes/rarity-color.pipe';
 
 // Interface for grouped items
 export interface ItemGroup {
@@ -17,7 +19,7 @@ export interface ItemGroup {
 @Component({
   selector: 'app-inventory-grouped-view',
   standalone: true,
-  imports: [CommonModule, IconComponent, ItemMiniComponent],
+  imports: [CommonModule, IconComponent, ItemMiniComponent, RarityClassPipe, RarityColorPipe],
   templateUrl: './inventory-grouped-view.component.html',
   styleUrls: ['./inventory-grouped-view.component.scss']
 })
@@ -33,10 +35,6 @@ export class InventoryGroupedViewComponent {
   @Output() itemDragEnd = new EventEmitter<DragEvent>();
 
   constructor(public inventoryService: InventoryService) {}
-
-  getRarityClass(rarity: string): string {
-    return `rarity-${rarity.toLowerCase()}`;
-  }
 
   getItemTooltip(item: ItemDetails): string {
     return `Right-click: ${this.getQuickActionLabel(item)}\nAlt+Click: ${this.isVendorOpen ? 'Quick sell' : 'Quick drop'}`;

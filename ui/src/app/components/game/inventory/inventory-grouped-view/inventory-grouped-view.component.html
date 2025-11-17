@@ -4,7 +4,7 @@
       <!-- Group Header (Item Definition) -->
       <div
         class="group-header"
-        [class]="getRarityClass(group.definition.rarity)"
+        [class]="group.definition.rarity | rarityClass"
         (click)="onGroupToggle(group)">
         <!-- Item icon -->
         <div class="item-icon">
@@ -21,7 +21,7 @@
 
         <!-- Group info -->
         <div class="group-info">
-          <div class="group-name" [class]="inventoryService.getRarityColor(group.definition.rarity)">
+          <div class="group-name" [class]="group.definition.rarity | rarityColor">
             {{ group.definition.name }}
           </div>
           <div class="group-meta">

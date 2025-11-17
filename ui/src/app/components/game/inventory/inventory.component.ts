@@ -295,16 +295,6 @@ export class InventoryComponent implements OnInit {
     });
   }
 
-  getRarityClass(rarity: string): string {
-    const rarityClasses: { [key: string]: string } = {
-      common: 'border-gray-500',
-      uncommon: 'border-green-500',
-      rare: 'border-blue-500',
-      epic: 'border-purple-500',
-      legendary: 'border-orange-500'
-    };
-    return rarityClasses[rarity] || 'border-gray-500';
-  }
 
   /**
    * Get tooltip text for item based on its category
