@@ -1,0 +1,119 @@
+// Styles extracted from inventory.component.scss - grouped view section
+
+/* Grouped View Styles */
+.item-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: var(--spacing-m);
+  border-radius: var(--radius-s);
+}
+
+.group-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-m);
+  padding: var(--spacing-m);
+  background: var(--color-bg-elevated);
+  border: var(--border-width-medium) solid;
+  border-radius: var(--radius-s);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  min-height: 60px;
+
+  &:hover {
+    transform: translateX(2px);
+    box-shadow: var(--shadow-m);
+    background: var(--color-bg-tertiary);
+  }
+}
+
+.group-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  flex: 1;
+  min-width: 0;
+}
+
+.group-name {
+  font-size: var(--font-size-m);
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.group-meta {
+  display: flex;
+  gap: var(--spacing-m);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-label);
+}
+
+.group-count {
+  font-weight: var(--font-weight-medium);
+}
+
+.group-quantity {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-tertiary);
+}
+
+.expand-indicator {
+  font-size: var(--font-size-s);
+  color: var(--color-text-label);
+  flex-shrink: 0;
+  transition: transform var(--transition-fast);
+}
+
+.group-instances {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: var(--spacing-s);
+  padding: var(--spacing-m);
+  background: var(--color-bg-secondary);
+  border-left: var(--border-width-medium) solid var(--color-surface-border);
+  border-right: var(--border-width-medium) solid var(--color-surface-border);
+  border-bottom: var(--border-width-medium) solid var(--color-surface-border);
+  border-radius: 0 0 var(--radius-s) var(--radius-s);
+  margin-top: var(--spacing-xs);
+
+  /* Style item-mini components within group instances */
+  app-item-mini {
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    border: var(--border-light);
+    border-radius: var(--radius-s);
+    position: relative;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-s);
+    }
+
+    &.equipped {
+      border-color: var(--color-accent-purple);
+      background: linear-gradient(135deg, var(--color-accent-purple-dark) 0%, transparent 100%);
+
+      &::after {
+        content: "⚔️";
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        font-size: var(--font-size-xs);
+      }
+    }
+
+    /* Alt+Click visual feedback for item-mini instances */
+    &.alt-drop-mode {
+      border-color: #ef4444 !important;
+      box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+    }
+
+    &.alt-sell-mode {
+      border-color: #10b981 !important;
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+    }
+  }
+}

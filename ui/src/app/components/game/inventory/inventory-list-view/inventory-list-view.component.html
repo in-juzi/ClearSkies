@@ -1,0 +1,54 @@
+<div class="inventory-grid">
+  @for (item of items; track item.instanceId) {
+    <div
+      class="inventory-item"
+      [class]="getRarityClass(item.definition.rarity)"
+      [class.equipped]="item.equipped"
+      [class.alt-sell-mode]="isAltKeyHeld && isVendorOpen"
+      [class.alt-drop-mode]="isAltKeyHeld && !isVendorOpen"
+      [draggable]="true"
+      (click)="onItemClick($event, item)"
+      (contextmenu)="onItemRightClick($event, item)"
+      (dragstart)="onItemDragStart($event, item)"
+      (dragend)="onItemDragEnd($event)"
+      [title]="getItemTooltip(item)">
+      <!-- Item icon (left side) -->
+      <div class="item-icon">
+        @if (item.definition.icon) {
+          <app-icon
+            [icon]="item.definition.icon"
+            [size]="40"
+            [alt]="item.definition.name">
+          </app-icon>
+        } @else {
+          <span class="item-tier">T{{ item.definition.properties.tier }}</span>
+        }
+      </div>
+
+      <!-- Item content (right side - vertical stack) -->
+      <div class="item-content">
+        <!-- Top row: Name + Quantity -->
+        <div class="item-header">
+          <div class="item-name" [class]="inventoryService.getRarityColor(item.definition.rarity)">
+            {{ item.definition.name }}
+          </div>
+          @if (item.quantity > 1) {
+            <div class="item-quantity">x{{ item.quantity }}</div>
+          }
+        </div>
+
+        <!-- Bottom row: Quality/Trait badges -->
+        <div class="item-badges">
+          <app-item-modifiers [item]="item" displayMode="badge-level" size="normal"></app-item-modifiers>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Empty slots -->
+  @if (items.length === 0) {
+    <div class="empty-message">
+      <p>No items in this category</p>
+    </div>
+  }
+</div>

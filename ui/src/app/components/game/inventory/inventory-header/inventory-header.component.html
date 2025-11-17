@@ -1,0 +1,51 @@
+<!-- Header -->
+<div class="inventory-header">
+  <h2 class="text-2xl font-bold text-gold-400">Inventory</h2>
+  <div class="header-actions">
+    <!-- View Mode Toggle -->
+    <div class="view-toggle-group">
+      <button
+        class="view-toggle-btn"
+        [class.active]="viewMode === 'list'"
+        (click)="onViewModeChange('list')"
+        title="List View">
+        <span class="material-symbols-outlined">list</span>
+      </button>
+      <button
+        class="view-toggle-btn"
+        [class.active]="viewMode === 'grouped'"
+        (click)="onViewModeChange('grouped')"
+        title="Grouped View">
+        <span class="material-symbols-outlined">view_compact_alt</span>
+      </button>
+    </div>
+    @if (isAltKeyHeld) {
+      <div class="alt-hint">
+        <span class="hint-icon">⚡</span>
+        <span class="hint-text">{{ isVendorOpen ? 'Quick Sell Mode' : 'Quick Drop Mode' }}</span>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- Filters -->
+<div class="filters">
+  <select
+    [ngModel]="selectedCategory"
+    (ngModelChange)="onCategoryChange($event)"
+    class="category-filter">
+    @for (category of categories; track category.value) {
+      <option [value]="category.value">
+        {{ category.label }}
+      </option>
+    }
+  </select>
+
+  <input
+    type="text"
+    [ngModel]="searchQuery"
+    (ngModelChange)="onSearchQueryChange($event)"
+    placeholder="Search items..."
+    class="search-input"
+  />
+</div>

@@ -1,0 +1,40 @@
+<!-- Inventory Stats (at bottom) -->
+<div class="inventory-stats-container">
+  <div class="inventory-stats">
+    <div class="stat-item">
+      <span class="stat-icon">⚖️</span>
+      <div class="stat-content">
+        <span class="stat-label">Carrying Capacity</span>
+        <span class="stat-value"
+              [class.weight-normal]="getWeightPercent() < 80"
+              [class.weight-warning]="getWeightPercent() >= 80 && getWeightPercent() < 95"
+              [class.weight-critical]="getWeightPercent() >= 95">
+          {{ currentWeight.toFixed(1) }} / {{ carryingCapacity.toFixed(1) }} kg
+        </span>
+      </div>
+    </div>
+    <div class="stat-item">
+      <span class="stat-icon">📦</span>
+      <div class="stat-content">
+        <span class="stat-label">Item Count</span>
+        <span class="stat-value">{{ inventorySize }}</span>
+      </div>
+    </div>
+    <div class="stat-item gold-stat-item">
+      <!-- Floating Gold Notifications -->
+      <div class="floating-gold-container">
+        @for (goldNotif of floatingGold(); track goldNotif.id) {
+          <div class="floating-gold">
+            +{{ goldNotif.amount }}g
+          </div>
+        }
+      </div>
+
+      <span class="stat-icon">💰</span>
+      <div class="stat-content">
+        <span class="stat-label">Gold</span>
+        <span class="stat-value text-gold-400">{{ gold }} g</span>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,141 @@
+// Styles extracted from inventory.component.scss - stats section
+
+.inventory-stats-container {
+  margin-top: auto;
+  padding-top: var(--spacing-l);
+  border-top: var(--border-width-medium) solid var(--color-surface-border);
+  flex-shrink: 0;
+}
+
+.inventory-stats {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--spacing-s);
+  font-size: var(--font-size-m);
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-width: 0;
+  padding: var(--spacing-s) var(--spacing-xs);
+  background: var(--color-bg-elevated);
+  border: var(--border-light);
+  border-radius: var(--radius-button);
+  transition: all var(--transition-fast);
+
+  &:hover {
+    background: var(--color-bg-tertiary);
+    border-color: var(--color-surface-border);
+    transform: translateY(-1px);
+  }
+}
+
+.stat-icon {
+  font-size: var(--font-size-xl);
+  line-height: 1;
+  margin-bottom: var(--spacing-xs);
+}
+
+.stat-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.125rem;
+  min-width: 0;
+  width: 100%;
+}
+
+.stat-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-label);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+}
+
+.stat-value {
+  font-size: var(--font-size-s);
+  color: var(--color-text-tertiary);
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+
+  /* Weight capacity color coding */
+  &.weight-normal {
+    color: var(--color-green-400);
+  }
+
+  &.weight-warning {
+    color: var(--color-yellow-400);
+  }
+
+  &.weight-critical {
+    color: var(--color-red-400);
+    animation: pulse-warning 2s ease-in-out infinite;
+  }
+}
+
+@keyframes pulse-warning {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Floating Gold Notifications */
+.gold-stat-item {
+  position: relative;
+}
+
+.floating-gold-container {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 100;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.floating-gold {
+  position: absolute;
+  font-size: 1.4rem;
+  font-weight: bold;
+  font-family: monospace;
+  color: var(--color-secondary-dark);
+  opacity: 0;
+  animation: floatUpGold 1s ease-out forwards;
+  text-shadow:
+    0 0 8px currentColor,
+    0 0 16px rgba(255, 215, 0, 0.6),
+    0 2px 4px rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+}
+
+@keyframes floatUpGold {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  20% {
+    transform: translateY(-10px) scale(1.15);
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-60px) scale(0.9);
+  }
+}

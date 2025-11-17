@@ -1,0 +1,155 @@
+// Styles extracted from inventory.component.scss - list view section
+
+.inventory-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-s);
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--spacing-s);
+  min-height: 0;
+
+  /* Scrollbar styling */
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--color-bg-primary);
+    border-radius: var(--radius-s);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-surface-border);
+    border-radius: var(--radius-s);
+
+    &:hover {
+      background: var(--color-bg-tertiary);
+    }
+  }
+}
+
+.inventory-item {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--spacing-m);
+  padding: var(--spacing-s);
+  background: var(--color-bg-elevated);
+  border: var(--border-width-medium) solid;
+  border-radius: var(--radius-s);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+
+  &:hover {
+    transform: translateX(2px);
+    box-shadow: var(--shadow-m);
+  }
+
+  /* Alt+Click visual feedback */
+  &.alt-drop-mode {
+    border-color: #ef4444 !important; /* Red for drop */
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+  }
+
+  &.alt-sell-mode {
+    border-color: #10b981 !important; /* Green for sell */
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+  }
+
+  /* Drag and drop styles */
+  &[draggable="true"] {
+    cursor: grab;
+  }
+
+  &.dragging-item {
+    opacity: var(--opacity-disabled);
+    cursor: grabbing;
+  }
+
+  &.equipped {
+    border-color: var(--color-accent-purple);
+    background: linear-gradient(135deg, var(--color-accent-purple-dark) 0%, var(--color-bg-elevated) 100%);
+
+    &::after {
+      content: "⚔️";
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      font-size: var(--font-size-m);
+    }
+  }
+}
+
+.item-icon {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  background: radial-gradient(circle, var(--color-bg-tertiary) 0%, var(--color-bg-elevated) 100%);
+  border-radius: var(--radius-s);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-2xl);
+}
+
+.item-tier {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-label);
+  font-weight: var(--font-weight-bold);
+}
+
+.item-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  flex: 1;
+  min-width: 0;
+}
+
+.item-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-s);
+  flex-wrap: nowrap;
+}
+
+.item-name {
+  font-size: var(--font-size-s);
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+
+.item-quantity {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-label);
+  flex-shrink: 0;
+}
+
+.item-badges {
+  display: flex;
+  gap: var(--spacing-xs);
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.quality-badge,
+.trait-badge {
+  font-size: var(--font-size-s);
+  font-weight: var(--font-weight-bold);
+  padding: 2px 4px;
+}
+
+.empty-message {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: var(--spacing-4xl);
+  color: var(--color-text-label);
+}
