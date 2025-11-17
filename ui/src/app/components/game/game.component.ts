@@ -15,13 +15,17 @@ import { CharacterStatus } from './character-status/character-status.component';
 import { ChatComponent } from './chat/chat.component';
 import { BankComponent } from './bank/bank.component';
 import { WorldMap } from './world-map/world-map';
+import { QuestTracker } from './quest-tracker/quest-tracker';
+import { QuestJournal } from './quest-journal/quest-journal';
+import { NotificationDisplay } from '../shared/notification-display/notification-display';
 import { ALL_SKILLS, ALL_ATTRIBUTES } from '../../constants/game-data.constants';
 import { LocationService } from '../../services/location.service';
+import { QuestService } from '../../services/quest.service';
 
 @Component({
   selector: 'app-game',
   standalone: true,
-  imports: [CommonModule, RouterModule, ManualComponent, Skills, AttributesComponent, InventoryComponent, LocationComponent, Equipment, CharacterStatus, ChatComponent, BankComponent, WorldMap],
+  imports: [CommonModule, RouterModule, ManualComponent, Skills, AttributesComponent, InventoryComponent, LocationComponent, Equipment, CharacterStatus, ChatComponent, BankComponent, WorldMap, QuestTracker, QuestJournal, NotificationDisplay],
   templateUrl: './game.component.html',
   styleUrl: './game.component.scss'
 })
@@ -30,6 +34,7 @@ export class GameComponent implements OnInit {
   private attributesService = inject(AttributesService);
   private combatService = inject(CombatService);
   private locationService = inject(LocationService);
+  private questService = inject(QuestService);
   private router = inject(Router);
 
   manualDialogService = inject(ManualDialogService);
@@ -51,12 +56,21 @@ export class GameComponent implements OnInit {
   // Track map dialog state
   mapDialogOpen = signal(false);
 
+  // Track quest journal dialog state
+  questJournalOpen = signal(false);
+
   ngOnInit(): void {
     // Fetch latest player data
     this.authService.getProfile().subscribe();
 
     // Fetch attributes data
     this.attributesService.getAllAttributes().subscribe();
+
+    // Initialize quest service socket
+    const token = localStorage.getItem('clearskies_token');
+    if (token) {
+      this.questService.initializeSocket(token);
+    }
 
     // Check combat status (restores combat state if player was in combat on page refresh)
     this.combatService.checkCombatStatus().catch((err: any) => {
@@ -183,6 +197,16 @@ export class GameComponent implements OnInit {
   // Close full map dialog
   closeMapDialog(): void {
     this.mapDialogOpen.set(false);
+  }
+
+  // Open quest journal dialog
+  openQuestJournal(): void {
+    this.questJournalOpen.set(true);
+  }
+
+  // Close quest journal dialog
+  closeQuestJournal(): void {
+    this.questJournalOpen.set(false);
   }
 
   // Handle travel request from map

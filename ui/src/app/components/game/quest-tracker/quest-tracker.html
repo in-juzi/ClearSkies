@@ -1,0 +1,40 @@
+<div class="quest-tracker" *ngIf="activeQuests.length > 0">
+  <h3 class="tracker-title">Active Quests</h3>
+
+  <div class="quest-list">
+    <div *ngFor="let quest of activeQuests"
+         class="quest-item"
+         [class.complete]="isQuestComplete(quest)">
+
+      <!-- Quest Header -->
+      <div class="quest-header">
+        <h4 class="quest-name">{{ getQuestName(quest) }}</h4>
+        <span class="quest-progress">{{ getCompletionPercentage(quest) }}%</span>
+      </div>
+
+      <!-- Quest Objectives -->
+      <div class="quest-objectives">
+        <div *ngFor="let objective of quest.objectives"
+             class="objective"
+             [class.completed]="objective.completed">
+          <span class="objective-icon">{{ objective.completed ? '✓' : '○' }}</span>
+          <span class="objective-description">
+            {{ objective.current }}/{{ objective.required }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Turn In Button -->
+      <button *ngIf="isQuestComplete(quest)"
+              class="turn-in-btn"
+              (click)="turnInQuest(quest.questId)">
+        Turn In Quest
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Empty State -->
+<div class="quest-tracker-empty" *ngIf="activeQuests.length === 0">
+  <p class="empty-message">No active quests</p>
+</div>

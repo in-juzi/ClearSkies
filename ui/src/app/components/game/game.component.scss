@@ -38,6 +38,7 @@
       font-size: var(--font-size-m);
     }
 
+    .quest-link,
     .manual-link {
       color: var(--color-accent-gold);
       background: transparent;
@@ -663,6 +664,75 @@
   }
 
   app-world-map {
+    flex: 1;
+    overflow: hidden;
+  }
+}
+
+// Quest journal dialog (fullscreen overlay)
+.quest-journal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--color-bg-overlay-strong);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: var(--spacing-xl);
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.quest-journal-content {
+  background: var(--color-bg-secondary);
+  border: 2px solid #ffd700;
+  border-radius: var(--radius-card);
+  box-shadow: 0 0 30px rgba(255, 215, 0, 0.3), var(--shadow-xl);
+  width: 90vw;
+  max-width: 1200px;
+  height: 85vh;
+  max-height: 900px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideIn 0.3s ease-out;
+
+  .dialog-header {
+    padding: var(--spacing-l) var(--spacing-xl);
+    border-bottom: 2px solid #ffd700;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, transparent 100%);
+
+    .close-btn {
+      background: transparent;
+      border: none;
+      color: #ffd700;
+      cursor: pointer;
+      padding: var(--spacing-xs);
+      border-radius: var(--radius-button);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition-fast);
+
+      &:hover {
+        background: rgba(255, 215, 0, 0.1);
+        color: #ffd700;
+        transform: scale(1.1);
+      }
+
+      .material-symbols-outlined {
+        font-size: 24px;
+      }
+    }
+  }
+
+  app-quest-journal {
     flex: 1;
     overflow: hidden;
   }

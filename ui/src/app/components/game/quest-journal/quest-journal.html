@@ -1,0 +1,138 @@
+<div class="quest-journal">
+  <div class="journal-header">
+    <h2 class="journal-title">Quest Journal</h2>
+    <p class="journal-subtitle">Track your adventures and progress</p>
+  </div>
+
+  <!-- Tab Navigation -->
+  <div class="journal-tabs">
+    <button
+      class="tab-button"
+      [class.active]="activeTab() === 'active'"
+      (click)="setTab('active')">
+      Active ({{ activeQuests.length }})
+    </button>
+    <button
+      class="tab-button"
+      [class.active]="activeTab() === 'available'"
+      (click)="setTab('available')">
+      Available ({{ availableQuests.length }})
+    </button>
+    <button
+      class="tab-button"
+      [class.active]="activeTab() === 'completed'"
+      (click)="setTab('completed')">
+      Completed ({{ completedQuests.length }})
+    </button>
+  </div>
+
+  <!-- Tab Content -->
+  <div class="journal-content">
+    <!-- Active Quests Tab -->
+    @if (activeTab() === 'active') {
+      <div class="quest-list">
+        @if (activeQuests.length === 0) {
+          <div class="empty-state">
+            <span class="material-symbols-outlined empty-icon">assignment</span>
+            <p>No active quests</p>
+            <p class="empty-hint">Check the Available tab to find new quests!</p>
+          </div>
+        }
+
+        @for (quest of activeQuests; track quest.questId) {
+          <div class="quest-card" [class.complete]="isQuestComplete(quest)">
+            <div class="quest-card-header">
+              <h3 class="quest-title">{{ getQuestName(quest) }}</h3>
+              <span class="quest-progress-badge">{{ getCompletionPercentage(quest) }}%</span>
+            </div>
+
+            <p class="quest-description">{{ getQuestDescription(quest) }}</p>
+
+            <div class="quest-objectives">
+              <h4 class="objectives-title">Objectives:</h4>
+              @for (objective of quest.objectives; track objective.objectiveId) {
+                <div class="objective-item" [class.completed]="objective.completed">
+                  <span class="material-symbols-outlined objective-icon">
+                    {{ objective.completed ? 'check_circle' : 'radio_button_unchecked' }}
+                  </span>
+                  <span class="objective-text">
+                    {{ getObjectiveDescription(objective) }}
+                    ({{ objective.current }}/{{ objective.required }})
+                  </span>
+                </div>
+              }
+            </div>
+
+            <div class="quest-actions">
+              @if (isQuestComplete(quest)) {
+                <button class="btn btn-primary" (click)="turnInQuest(quest.questId)">
+                  <span class="material-symbols-outlined">assignment_turned_in</span>
+                  Turn In Quest
+                </button>
+              }
+              <button class="btn btn-secondary" (click)="abandonQuest(quest.questId)">
+                <span class="material-symbols-outlined">close</span>
+                Abandon
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Available Quests Tab -->
+    @if (activeTab() === 'available') {
+      <div class="quest-list">
+        @if (availableQuests.length === 0) {
+          <div class="empty-state">
+            <span class="material-symbols-outlined empty-icon">task_alt</span>
+            <p>No available quests</p>
+            <p class="empty-hint">Complete more quests to unlock new ones!</p>
+          </div>
+        }
+
+        @for (quest of availableQuests; track quest.questId) {
+          <div class="quest-card available">
+            <div class="quest-card-header">
+              <h3 class="quest-title">{{ getQuestName(quest) }}</h3>
+              <span class="quest-category-badge">{{ quest.category }}</span>
+            </div>
+
+            <p class="quest-description">{{ getQuestDescription(quest) }}</p>
+
+            <div class="quest-actions">
+              <button class="btn btn-primary" (click)="acceptQuest(quest.questId)">
+                <span class="material-symbols-outlined">add_task</span>
+                Accept Quest
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Completed Quests Tab -->
+    @if (activeTab() === 'completed') {
+      <div class="quest-list">
+        @if (completedQuests.length === 0) {
+          <div class="empty-state">
+            <span class="material-symbols-outlined empty-icon">history</span>
+            <p>No completed quests</p>
+            <p class="empty-hint">Complete quests to see them here!</p>
+          </div>
+        }
+
+        @for (quest of completedQuests; track quest.questId) {
+          <div class="quest-card completed">
+            <div class="quest-card-header">
+              <h3 class="quest-title">{{ getQuestName(quest) }}</h3>
+              <span class="material-symbols-outlined completed-icon">verified</span>
+            </div>
+
+            <p class="quest-description">{{ getQuestDescription(quest) }}</p>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

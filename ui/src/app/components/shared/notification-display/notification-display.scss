@@ -1,0 +1,132 @@
+@use '../../../../design-tokens.scss';
+
+.notification-container {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 400px;
+  pointer-events: none;
+}
+
+.notification {
+  pointer-events: all;
+  background: rgba(30, 30, 50, 0.98);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  animation: slideIn 0.3s ease-out;
+  border-left: 4px solid;
+
+  &.notification-success {
+    border-left-color: var(--color-success);
+  }
+
+  &.notification-info {
+    border-left-color: var(--color-primary);
+  }
+
+  &.notification-warning {
+    border-left-color: var(--color-warning);
+  }
+
+  &.notification-error {
+    border-left-color: var(--color-error);
+  }
+
+  &.notification-quest {
+    border-left-color: var(--color-accent-blue);
+    background: linear-gradient(135deg, rgba(30, 30, 50, 0.98) 0%, rgba(60, 40, 80, 0.98) 100%);
+  }
+}
+
+.notification-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+}
+
+.notification-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+
+  .notification-success & {
+    color: var(--color-success);
+  }
+
+  .notification-info & {
+    color: var(--color-primary);
+  }
+
+  .notification-warning & {
+    color: var(--color-warning);
+  }
+
+  .notification-error & {
+    color: var(--color-error);
+  }
+
+  .notification-quest & {
+    color: var(--color-accent-blue);
+  }
+}
+
+.notification-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.notification-title {
+  color: var(--color-text-primary);
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0 0 0.25rem 0;
+}
+
+.notification-message {
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.notification-close {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--color-text-primary);
+  }
+
+  .material-symbols-outlined {
+    font-size: 1.25rem;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(120%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}

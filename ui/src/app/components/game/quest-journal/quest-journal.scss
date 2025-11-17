@@ -1,0 +1,255 @@
+@use '../../../../design-tokens.scss';
+
+.quest-journal {
+  background: rgba(20, 20, 40, 0.95);
+  border-radius: 8px;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: 600px;
+}
+
+.journal-header {
+  margin-bottom: 2rem;
+  text-align: center;
+
+  .journal-title {
+    color: var(--color-accent-blue);
+    font-size: 2rem;
+    margin: 0 0 0.5rem 0;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  .journal-subtitle {
+    color: var(--color-text-secondary);
+    font-size: 0.95rem;
+    margin: 0;
+    font-style: italic;
+  }
+}
+
+.journal-tabs {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 2px solid rgba(100, 150, 255, 0.2);
+  margin-bottom: 2rem;
+
+  .tab-button {
+    background: transparent;
+    border: none;
+    color: var(--color-text-secondary);
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    position: relative;
+    transition: all 0.3s ease;
+    border-bottom: 3px solid transparent;
+
+    &:hover {
+      color: var(--color-text-primary);
+      background: rgba(100, 150, 255, 0.1);
+    }
+
+    &.active {
+      color: var(--color-accent-blue);
+      border-bottom-color: var(--color-accent-blue);
+      background: rgba(255, 215, 0, 0.05);
+    }
+  }
+}
+
+.journal-content {
+  min-height: 400px;
+}
+
+.quest-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.quest-card {
+  background: rgba(30, 30, 50, 0.8);
+  border: 2px solid rgba(100, 150, 255, 0.3);
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(100, 150, 255, 0.2);
+  }
+
+  &.complete {
+    border-color: var(--color-success);
+    background: rgba(46, 204, 113, 0.05);
+  }
+
+  &.available {
+    border-color: rgba(255, 215, 0, 0.3);
+  }
+
+  &.completed {
+    opacity: 0.7;
+    border-color: rgba(100, 100, 100, 0.3);
+  }
+}
+
+.quest-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+
+  .quest-title {
+    color: var(--color-text-primary);
+    font-size: 1.3rem;
+    margin: 0;
+    flex: 1;
+  }
+
+  .quest-progress-badge {
+    background: var(--gradient-primary);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: bold;
+  }
+
+  .quest-category-badge {
+    background: rgba(255, 215, 0, 0.2);
+    color: var(--color-accent-blue);
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .completed-icon {
+    color: var(--color-success);
+    font-size: 2rem;
+  }
+}
+
+.quest-description {
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  margin: 0 0 1.5rem 0;
+  font-size: 0.95rem;
+}
+
+.quest-objectives {
+  background: rgba(0, 0, 0, 0.2);
+  border-left: 3px solid var(--color-primary);
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border-radius: 4px;
+
+  .objectives-title {
+    color: var(--color-text-primary);
+    font-size: 1rem;
+    margin: 0 0 0.75rem 0;
+    font-weight: 600;
+  }
+}
+
+.objective-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  color: var(--color-text-secondary);
+
+  &.completed {
+    color: var(--color-success);
+    text-decoration: line-through;
+  }
+
+  .objective-icon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+  }
+
+  .objective-text {
+    flex: 1;
+    font-size: 0.9rem;
+  }
+}
+
+.quest-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+
+  .btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.95rem;
+
+    .material-symbols-outlined {
+      font-size: 1.25rem;
+    }
+
+    &.btn-primary {
+      background: linear-gradient(135deg, var(--color-success) 0%, #3ab395 100%);
+      color: white;
+
+      &:hover {
+        background: linear-gradient(135deg, #5ed9c7 0%, var(--color-success) 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(46, 204, 113, 0.3);
+      }
+    }
+
+    &.btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--color-text-secondary);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.15);
+        color: var(--color-text-primary);
+      }
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--color-text-secondary);
+
+  .empty-icon {
+    font-size: 4rem;
+    color: rgba(255, 255, 255, 0.2);
+    margin-bottom: 1rem;
+  }
+
+  p {
+    margin: 0.5rem 0;
+    font-size: 1.1rem;
+
+    &.empty-hint {
+      font-size: 0.9rem;
+      font-style: italic;
+      color: rgba(255, 255, 255, 0.4);
+    }
+  }
+}

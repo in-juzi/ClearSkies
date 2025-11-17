@@ -6,6 +6,7 @@
     <div class="header-right">
       @if (currentUser()) {
         <span class="username">{{ currentUser()!.username }}</span>
+        <button class="quest-link" (click)="openQuestJournal()">Quests</button>
         <button class="manual-link" (click)="openManual()">Manual</button>
         <button class="logout-btn" (click)="onLogout()">Logout</button>
       }
@@ -16,6 +17,9 @@
   @if (manualDialogService.isOpen()) {
     <app-manual [dialogMode]="true" />
   }
+
+  <!-- Notification Display -->
+  <app-notification-display />
 
   <main class="game-main">
     @if (currentPlayer()) {
@@ -63,6 +67,11 @@
         <!-- Center: Main Game Area -->
         <section class="center-content">
           <app-location></app-location>
+
+          <!-- Quest Tracker -->
+          @if (currentPlayer()) {
+            <app-quest-tracker></app-quest-tracker>
+          }
 
           <!-- Chat Component (Bottom of Center Content) -->
           @if (currentPlayer()) {
@@ -224,6 +233,20 @@
           mode="fullscreen"
           (travelRequested)="handleTravelRequest($event)"
         ></app-world-map>
+      </div>
+    </div>
+  }
+
+  <!-- Quest Journal Dialog (fullscreen) -->
+  @if (questJournalOpen()) {
+    <div class="quest-journal-overlay" (click)="closeQuestJournal()">
+      <div class="quest-journal-content" (click)="$event.stopPropagation()">
+        <div class="dialog-header">
+          <button class="close-btn" (click)="closeQuestJournal()" title="Close quest journal">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+        <app-quest-journal></app-quest-journal>
       </div>
     </div>
   }
