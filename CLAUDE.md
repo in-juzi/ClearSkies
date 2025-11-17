@@ -52,6 +52,7 @@
 - ✅ Location component decomposition (completed - split into 5 specialized sub-components)
 - ✅ Crafting component decomposition (completed - split into 3 specialized sub-components)
 - ✅ Inventory component decomposition (completed - split into 4 specialized sub-components)
+- ✅ Chat component decomposition (completed - split into 3 specialized sub-components)
 - ✅ Equipment subtype display system (completed - human-readable labels for all equipment types)
 - ✅ Legacy potion cleanup (completed - removed old item definitions, added migration script)
 - ✅ Context-aware trait system (completed - dual validation/display for crafting vs random generation)
@@ -84,6 +85,9 @@
 - ✅ Skill system refactor (completed - removed gun skill, added protection skill for tanks)
 
 **Recent Changes** (Last 10 commits):
+- refactor: decompose chat component into sub-components
+- feat: add chat sub-components for better modularity
+- docs: update CLAUDE.md with inventory component decomposition
 - docs: add backup of refactored inventory template
 - refactor: remove unused crafting component styles
 - refactor: decompose inventory component into sub-components
@@ -91,9 +95,6 @@
 - docs: update CLAUDE.md with crafting component decomposition
 - docs: add backup of refactored crafting template
 - refactor: decompose crafting component into sub-components
-- feat: add crafting sub-components for better modularity
-- docs: update CLAUDE.md with latest component refactoring
-- docs: add UI refactoring plan documentation
 
 **Known Issues**:
 - None currently identified
@@ -161,6 +162,7 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 - Character Status: [ui/src/app/components/game/character-status/character-status.component.ts](ui/src/app/components/game/character-status/character-status.component.ts)
 - Equipment: [ui/src/app/components/game/equipment/equipment.component.ts](ui/src/app/components/game/equipment/equipment.component.ts)
 - Chat: [ui/src/app/components/game/chat/chat.component.ts](ui/src/app/components/game/chat/chat.component.ts)
+  - Chat Sub-components: [chat-header/](ui/src/app/components/game/chat/chat-header/), [chat-messages/](ui/src/app/components/game/chat/chat-messages/), [chat-input/](ui/src/app/components/game/chat/chat-input/)
 - Vendor: [ui/src/app/components/game/vendor/vendor.component.ts](ui/src/app/components/game/vendor/vendor.component.ts), [ui/src/app/components/game/vendor/vendor.component.html](ui/src/app/components/game/vendor/vendor.component.html)
 - Crafting: [ui/src/app/components/game/crafting/crafting.component.ts](ui/src/app/components/game/crafting/crafting.component.ts), [ui/src/app/components/game/crafting/crafting.component.html](ui/src/app/components/game/crafting/crafting.component.html)
   - Crafting Sub-components: [recipe-list/](ui/src/app/components/game/crafting/recipe-list/), [ingredient-selector/](ui/src/app/components/game/crafting/ingredient-selector/), [crafting-progress/](ui/src/app/components/game/crafting/crafting-progress/)
