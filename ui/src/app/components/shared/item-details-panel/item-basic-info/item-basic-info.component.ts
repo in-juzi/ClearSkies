@@ -2,11 +2,12 @@ import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IconComponent } from '../../icon/icon.component';
 import { InventoryService } from '../../../../services/inventory.service';
+import { RarityColorPipe } from '../../../../pipes/rarity-color.pipe';
 
 @Component({
   selector: 'app-item-basic-info',
   standalone: true,
-  imports: [CommonModule, IconComponent],
+  imports: [CommonModule, IconComponent, RarityColorPipe],
   templateUrl: './item-basic-info.component.html',
   styleUrl: './item-basic-info.component.scss'
 })

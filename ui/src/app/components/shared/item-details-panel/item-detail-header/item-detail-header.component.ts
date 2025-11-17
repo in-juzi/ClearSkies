@@ -1,11 +1,11 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { InventoryService } from '../../../../services/inventory.service';
+import { RarityColorPipe } from '../../../../pipes/rarity-color.pipe';
 
 @Component({
   selector: 'app-item-detail-header',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RarityColorPipe],
   templateUrl: './item-detail-header.component.html',
   styleUrl: './item-detail-header.component.scss'
 })
@@ -16,8 +16,6 @@ export class ItemDetailHeaderComponent {
 
   @Output() close = new EventEmitter<void>();
   @Output() dragStart = new EventEmitter<MouseEvent>();
-
-  constructor(public inventoryService: InventoryService) {}
 
   onClose(): void {
     this.close.emit();

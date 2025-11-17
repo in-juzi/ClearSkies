@@ -1,11 +1,12 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { InventoryService } from '../../../../services/inventory.service';
+import { RarityColorPipe } from '../../../../pipes/rarity-color.pipe';
 
 @Component({
   selector: 'app-item-modifiers-display',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RarityColorPipe],
   templateUrl: './item-modifiers-display.component.html',
   styleUrl: './item-modifiers-display.component.scss'
 })

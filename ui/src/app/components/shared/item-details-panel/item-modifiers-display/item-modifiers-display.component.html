@@ -44,11 +44,11 @@
       @for (traitId of getQualityKeys(traitDetails); track traitId) {
         <div class="trait-item" [class]="'trait-rarity-' + traitDetails[traitId].rarity">
           <div class="trait-header">
-            <span [class]="inventoryService.getRarityColor(traitDetails[traitId].rarity)" class="trait-name">
+            <span [class]="traitDetails[traitId].rarity | rarityColor" class="trait-name">
               {{ traitDetails[traitId].name }}
             </span>
             <div class="trait-badges">
-              <span class="trait-rarity-badge" [class]="inventoryService.getRarityColor(traitDetails[traitId].rarity)">
+              <span class="trait-rarity-badge" [class]="traitDetails[traitId].rarity | rarityColor">
                 {{ traitDetails[traitId].rarity }}
               </span>
               <span [class]="inventoryService.getTraitLevelColor(traitDetails[traitId].level)" class="trait-level-badge">
@@ -56,7 +56,7 @@
               </span>
             </div>
           </div>
-          <div class="trait-level-name" [class]="inventoryService.getRarityColor(traitDetails[traitId].rarity)">
+          <div class="trait-level-name" [class]="traitDetails[traitId].rarity | rarityColor">
             {{ traitDetails[traitId].levelData.name }}
           </div>
           <p class="trait-description">{{ traitDetails[traitId].levelData.description }}</p>

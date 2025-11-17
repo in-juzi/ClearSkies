@@ -34,7 +34,7 @@
   <div class="basic-info-grid">
     <div class="info-item">
       <span class="info-label">Rarity</span>
-      <span class="info-value" [class]="inventoryService.getRarityColor(rarity)">
+      <span class="info-value" [class]="rarity | rarityColor">
         {{ formatSubcategoryName(rarity) }}
       </span>
     </div>
