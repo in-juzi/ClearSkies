@@ -17,6 +17,7 @@ import { BattleFury } from './definitions/BattleFury';
 import { WeakenArmor } from './definitions/WeakenArmor';
 import { PoisonStrike } from './definitions/PoisonStrike';
 import { Regeneration } from './definitions/Regeneration';
+import { DefensiveStance } from './definitions/DefensiveStance';
 
 /**
  * Central registry for all abilities
@@ -33,6 +34,7 @@ export class AbilityRegistry {
     [WeakenArmor.abilityId, WeakenArmor],
     [PoisonStrike.abilityId, PoisonStrike],
     [Regeneration.abilityId, Regeneration],
+    [DefensiveStance.abilityId, DefensiveStance],
   ]);
 
   /**
