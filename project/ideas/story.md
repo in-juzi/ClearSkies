@@ -11,3 +11,4 @@ Roznia
 
 ## Gameplay binding
 - It would be interesting to allow players to "find" valuable or interesting instances. Maybe you can be gathering and you find a mirror, related to the activity or not, that contains some desirable, rewarding content. Maybe a two-way mirror that contains a pocket dimension with valuable resources or an interesting or desirable setup of monsters to fight, with a boss or something.
+
