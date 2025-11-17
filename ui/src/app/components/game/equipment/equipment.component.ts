@@ -21,7 +21,7 @@ interface SlotConfig {
   templateUrl: './equipment.component.html',
   styleUrl: './equipment.component.scss',
 })
-export class Equipment {
+export class EquipmentComponent {
   equipmentService = inject(EquipmentService);
   inventoryService = inject(InventoryService);
 

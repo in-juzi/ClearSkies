@@ -10,7 +10,7 @@ import { ALL_SKILLS, SKILL_DISPLAY_NAMES, SKILL_ICONS } from '../../../constants
   templateUrl: './skills.component.html',
   styleUrl: './skills.component.scss',
 })
-export class Skills implements OnInit {
+export class SkillsComponent implements OnInit {
   private skillsService = inject(SkillsService);
 
   skills = this.skillsService.skills;

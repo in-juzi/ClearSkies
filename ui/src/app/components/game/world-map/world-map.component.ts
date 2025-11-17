@@ -23,7 +23,7 @@ interface TravelEdgeData {
   templateUrl: './world-map.component.html',
   styleUrl: './world-map.component.scss',
 })
-export class WorldMap implements OnInit {
+export class WorldMapComponent implements OnInit {
   private locationService = inject(LocationService);
   private questService = inject(QuestService);
 

@@ -6,18 +6,18 @@ import { AttributesService } from '../../services/attributes.service';
 import { CombatService } from '../../services/combat.service';
 import { ManualDialogService } from '../../services/manual-dialog.service';
 import { ManualComponent } from '../manual/manual.component';
-import { Skills } from './skills/skills.component';
+import { SkillsComponent } from './skills/skills.component';
 import { AttributesComponent } from './attributes/attributes.component';
 import { InventoryComponent } from './inventory/inventory.component';
 import { LocationComponent } from './location/location.component';
-import { Equipment } from './equipment/equipment.component';
-import { CharacterStatus } from './character-status/character-status.component';
+import { EquipmentComponent } from './equipment/equipment.component';
+import { CharacterStatusComponent } from './character-status/character-status.component';
 import { ChatComponent } from './chat/chat.component';
 import { BankComponent } from './bank/bank.component';
-import { WorldMap } from './world-map/world-map.component';
-import { QuestTracker } from './quest-tracker/quest-tracker.component';
-import { QuestJournal } from './quest-journal/quest-journal.component';
-import { NotificationDisplay } from '../shared/notification-display/notification-display.component';
+import { WorldMapComponent } from './world-map/world-map.component';
+import { QuestTrackerComponent } from './quest-tracker/quest-tracker.component';
+import { QuestJournalComponent } from './quest-journal/quest-journal.component';
+import { NotificationDisplayComponent } from '../shared/notification-display/notification-display.component';
 import { ALL_SKILLS, ALL_ATTRIBUTES } from '../../constants/game-data.constants';
 import { LocationService } from '../../services/location.service';
 import { QuestService } from '../../services/quest.service';
@@ -25,7 +25,7 @@ import { QuestService } from '../../services/quest.service';
 @Component({
   selector: 'app-game',
   standalone: true,
-  imports: [CommonModule, RouterModule, ManualComponent, Skills, AttributesComponent, InventoryComponent, LocationComponent, Equipment, CharacterStatus, ChatComponent, BankComponent, WorldMap, QuestTracker, QuestJournal, NotificationDisplay],
+  imports: [CommonModule, RouterModule, ManualComponent, SkillsComponent, AttributesComponent, InventoryComponent, LocationComponent, EquipmentComponent, CharacterStatusComponent, ChatComponent, BankComponent, WorldMapComponent, QuestTrackerComponent, QuestJournalComponent, NotificationDisplayComponent],
   templateUrl: './game.component.html',
   styleUrl: './game.component.scss'
 })

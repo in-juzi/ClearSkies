@@ -13,7 +13,7 @@ type QuestTab = 'active' | 'available' | 'completed';
   templateUrl: './quest-journal.component.html',
   styleUrl: './quest-journal.component.scss',
 })
-export class QuestJournal implements OnInit, OnDestroy {
+export class QuestJournalComponent implements OnInit, OnDestroy {
   private questService = inject(QuestService);
 
   activeTab = signal<QuestTab>('active');

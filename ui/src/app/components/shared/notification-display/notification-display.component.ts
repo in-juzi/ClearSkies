@@ -9,7 +9,7 @@ import { NotificationService, Notification } from '../../../services/notificatio
   templateUrl: './notification-display.component.html',
   styleUrl: './notification-display.component.scss',
 })
-export class NotificationDisplay {
+export class NotificationDisplayComponent {
   private notificationService = inject(NotificationService);
 
   notifications = this.notificationService.notifications;
