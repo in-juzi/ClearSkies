@@ -2,8 +2,10 @@ import { Component, Input, Output, EventEmitter, inject, computed, effect, viewC
 import { CommonModule } from '@angular/common';
 import { DynamicNode, Edge, EdgeChange, NodeChange, Vflow, VflowComponent } from 'ngx-vflow';
 import { LocationService } from '../../../services/location.service';
+import { QuestService } from '../../../services/quest.service';
 import type { NavigationLink } from '@shared/types';
 import type { Location } from '../../../models/location.model';
+import type { ActiveQuest } from '@shared/types';
 
 // Edge data interface
 interface TravelEdgeData {
@@ -23,6 +25,7 @@ interface TravelEdgeData {
 })
 export class WorldMap implements OnInit {
   private locationService = inject(LocationService);
+  private questService = inject(QuestService);
 
   @Input() mode: 'minimap' | 'fullscreen' = 'fullscreen';
   @Output() travelRequested = new EventEmitter<string>();
@@ -38,9 +41,13 @@ export class WorldMap implements OnInit {
   // Signal for all locations (populated on init)
   allLocations = signal<Location[]>([]);
 
+  // Signal for active quests (populated from service)
+  activeQuests = signal<ActiveQuest[]>([]);
+
   // Computed: Transform locations to ngx-vflow nodes
   nodes = computed<any[]>(() => {
     const current = this.currentLocation();
+    const quests = this.activeQuests();
     const nodes = this.allLocations()
       .filter(loc => loc.mapPosition) // Only show locations with coordinates
       .map(loc => ({
@@ -51,7 +58,8 @@ export class WorldMap implements OnInit {
           customType: 'gradient',
           location: loc,
           isCurrent: loc.locationId === current?.locationId,
-          biome: loc.biome
+          biome: loc.biome,
+          hasQuestObjective: this.hasQuestObjectiveAt(loc.locationId, quests)
         }),
         draggable: signal(false),
       }));
@@ -160,6 +168,11 @@ export class WorldMap implements OnInit {
       },
       error: (err) => console.error('Failed to load all locations:', err)
     });
+
+    // Subscribe to active quests
+    this.questService.activeQuests$.subscribe(quests => {
+      this.activeQuests.set(quests);
+    });
   }
 
   /**
@@ -174,6 +187,31 @@ export class WorldMap implements OnInit {
     const hasRequirements = Object.keys(link.requirements).length > 0;
 
     return !hasRequirements; // Simplified for now
+  }
+
+  /**
+   * Check if a location has quest objectives
+   */
+  private hasQuestObjectiveAt(locationId: string, quests: ActiveQuest[]): boolean {
+    for (const quest of quests) {
+      // Check if quest definition has this location as a target
+      // This is a simplified check - in a full implementation, you'd check objective requirements
+      if ((quest as any).definition?.targetLocationId === locationId) {
+        return true;
+      }
+
+      // Check if any objective mentions this location
+      for (const objective of quest.objectives) {
+        // Check if objective ID references this location
+        const locationIdLower = locationId.toLowerCase();
+        const objectiveIdLower = objective.objectiveId.toLowerCase();
+
+        if (objectiveIdLower.includes(locationIdLower.replace(/_/g, ' '))) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   /**

@@ -5,8 +5,12 @@
     <!-- Custom node template -->
     <ng-template let-ctx nodeHtml>
       <div class="location-node" [class.current]="ctx.node.data().isCurrent"
+        [class.has-quest]="ctx.node.data().hasQuestObjective"
         [style.background-color]="getBiomeColor(ctx.node.data().biome)" [title]="ctx.node.data().location.name"
         selectable>
+        @if (ctx.node.data().hasQuestObjective) {
+          <span class="quest-marker material-symbols-outlined">assignment</span>
+        }
         <div class="location-name">{{ ctx.node.data().location.name }}</div>
       </div>
       <handle type="source" position="top" [template]="handleTemplate" />

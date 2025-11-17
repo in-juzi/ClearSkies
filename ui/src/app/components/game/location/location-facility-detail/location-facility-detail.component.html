@@ -11,7 +11,10 @@
         <h3>Merchants</h3>
         <div class="vendors-list">
           @for (vendorId of getVendorIds(selectedFacility()); track vendorId) {
-            <button class="vendor-card" (click)="openVendor(vendorId)">
+            <button class="vendor-card" [class.has-quest]="hasAvailableQuests(vendorId)" (click)="openVendor(vendorId)">
+              @if (hasAvailableQuests(vendorId)) {
+                <span class="quest-indicator material-symbols-outlined">priority_high</span>
+              }
               <div class="vendor-info">
                 <span class="vendor-name">
                   {{ getVendor(vendorId)?.name || 'Merchant' }}

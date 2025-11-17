@@ -624,6 +624,20 @@ export const MATERIAL_COLORS: Record<string, ColorChannels> = {
     ring: '#A0826D',      // Dark brown tree rings
     detail: '#DEB887'     // Mid burlywood bark detail/knot
   },
+  pine_log: {
+    primary: '#C19A6B',   // Camel (fallback)
+    body: '#A67B5B',      // Medium brown bark/cylinder
+    end: '#E8C5A5',       // Light tan cut end
+    ring: '#8B6F47',      // Darker tan tree rings
+    detail: '#C19A6B'     // Mid camel brown bark detail/knot
+  },
+  birch_log: {
+    primary: '#F5F5DC',   // Beige (fallback)
+    body: '#E8E8E8',      // Very light gray bark/cylinder (white bark)
+    end: '#FAEBD7',       // Antique white cut end
+    ring: '#D3D3D3',      // Light gray tree rings
+    detail: '#696969'     // Dim gray bark detail/knot (dark markings on white bark)
+  },
   gem_ruby: {
     primary: '#E0115F',   // Ruby
     secondary: '#9B111E', // Dark ruby

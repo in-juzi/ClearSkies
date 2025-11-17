@@ -43,12 +43,32 @@
   gap: var(--spacing-s);
   font-size: var(--spacing-m);
   color: var(--color-text-label);
+  position: relative;
 
   &:hover {
     background-color: var(--color-bg-tertiary);
     border-color: var(--color-secondary);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(138, 43, 226, 0.3);
+  }
+
+  &.has-quest {
+    border-color: rgba(255, 215, 0, 0.5);
+  }
+
+  .quest-indicator {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    color: #ffd700;
+    font-size: 28px;
+    background: rgba(20, 20, 40, 0.95);
+    border-radius: 50%;
+    padding: 6px;
+    box-shadow: 0 0 16px rgba(255, 215, 0, 0.7),
+                0 2px 8px rgba(0, 0, 0, 0.5);
+    animation: questIndicatorPulse 2s infinite;
+    z-index: 10;
   }
 
   .vendor-info {
@@ -191,5 +211,23 @@
     color: var(--color-text-label);
     font-size: var(--font-size-m);
     margin: 0;
+  }
+}
+
+// Quest indicator pulse animation
+@keyframes questIndicatorPulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 16px rgba(255, 215, 0, 0.7),
+                0 2px 8px rgba(0, 0, 0, 0.5);
+  }
+
+  50% {
+    transform: scale(1.15);
+    box-shadow: 0 0 24px rgba(255, 215, 0, 0.9),
+                0 0 12px rgba(255, 215, 0, 0.7),
+                0 2px 8px rgba(0, 0, 0, 0.5);
   }
 }
