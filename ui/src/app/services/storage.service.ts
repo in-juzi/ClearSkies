@@ -179,11 +179,11 @@ export class StorageService {
 
     // Join/leave room confirmations
     socket.on('storage:joined', (data: { containerId: string }) => {
-      console.log('Joined storage room:', data.containerId);
+      // Room joined successfully
     });
 
     socket.on('storage:left', (data: { containerId: string }) => {
-      console.log('Left storage room:', data.containerId);
+      // Room left successfully
     });
   }
 

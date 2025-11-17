@@ -63,7 +63,6 @@ export class WorldMap implements OnInit {
         }),
         draggable: signal(false),
       }));
-    console.log(`Nodes:`, nodes);
     return nodes;
   });
 
@@ -117,7 +116,6 @@ export class WorldMap implements OnInit {
       }
     }
 
-    console.log(`Edges:`, edges);
     return edges;
   });
 
@@ -257,10 +255,8 @@ export class WorldMap implements OnInit {
           );
 
           if (canTravel) {
-            console.log(targetLocationId)
             this.travelRequested.emit(targetLocationId);
           } else {
-            console.log('Cannot travel to this location from current position');
           }
         }
       }
@@ -288,7 +284,6 @@ export class WorldMap implements OnInit {
             this.travelRequested.emit(targetLocationId);
           } else {
             // TODO: Show requirements error
-            console.log('Travel requirements not met:', edge.data.requirements);
           }
         }
       }

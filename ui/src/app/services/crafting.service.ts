@@ -75,7 +75,6 @@ export class CraftingService {
   private setupSocketListeners(): void {
     // Crafting events
     this.socketService.on('crafting:started', (data: any) => {
-      console.log('Crafting started event:', data);
       const endTime = new Date(data.endTime);
       const remainingTime = Math.max(0, Math.floor((endTime.getTime() - Date.now()) / 1000));
 
@@ -94,8 +93,6 @@ export class CraftingService {
     });
 
     this.socketService.on('crafting:completed', (data: any) => {
-      console.log('Crafting completed event:', data);
-
       // Stop progress timer
       this.stopProgressTimer();
 
@@ -138,8 +135,6 @@ export class CraftingService {
     });
 
     this.socketService.on('crafting:cancelled', (data: any) => {
-      console.log('Crafting cancelled event:', data);
-
       // Stop progress timer
       this.stopProgressTimer();
 

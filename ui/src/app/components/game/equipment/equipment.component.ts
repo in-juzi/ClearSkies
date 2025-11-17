@@ -160,7 +160,6 @@ export class Equipment {
    */
   equipItem(instanceId: string): void {
     // The shared panel might emit this, but items are already equipped in this view
-    console.log('Item is already equipped:', instanceId);
   }
 
   /**
@@ -177,7 +176,6 @@ export class Equipment {
 
     this.equipmentService.unequipItem(slot).subscribe({
       next: () => {
-        console.log('Item unequipped');
         this.inventoryService.getInventory().subscribe();
         this.selectedItem = null;
       },
@@ -192,7 +190,6 @@ export class Equipment {
    * (Not applicable for equipped items, but included for interface completeness)
    */
   useItem(instanceId: string): void {
-    console.log('Cannot use equipped items directly');
   }
 
   /**
@@ -200,7 +197,6 @@ export class Equipment {
    * (Cannot drop equipped items)
    */
   removeItem(instanceId: string): void {
-    console.log('Cannot drop equipped items. Unequip first.');
   }
 
   /**
@@ -208,7 +204,6 @@ export class Equipment {
    * (Cannot drop equipped items)
    */
   removeAllItems(instanceId: string): void {
-    console.log('Cannot drop equipped items. Unequip first.');
   }
 
   /**

@@ -52,10 +52,6 @@ export class SocketService {
       baseUrl = baseUrl.slice(0, -4); // Remove last 4 characters ('/api')
     }
 
-    // Debug logging
-    console.log('Environment apiUrl:', environment.apiUrl);
-    console.log('Socket.io connecting to:', baseUrl);
-
     const socket = io(baseUrl, {
       auth: { token },
       transports: ['polling', 'websocket'], // Try polling first
@@ -64,7 +60,6 @@ export class SocketService {
 
     // Connection events
     socket.on('connect', () => {
-      console.log('✓ Connected to game server (Socket.io)');
       this.connectionStatus.set('connected');
       this.isConnected.set(true);
       this.errorMessage.set(null);
@@ -78,7 +73,6 @@ export class SocketService {
     });
 
     socket.on('disconnect', (reason) => {
-      console.log('✗ Disconnected from game server:', reason);
       this.connectionStatus.set('disconnected');
       this.isConnected.set(false);
 

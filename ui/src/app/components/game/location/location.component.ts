@@ -215,7 +215,6 @@ export class LocationComponent implements OnInit, OnDestroy {
 
     // Subscribe to activity completion events
     this.locationService.activityCompleted$.subscribe(completion => {
-      console.log('Activity completion in location component:', completion);
 
       const logEntry = {
         timestamp: new Date(),
@@ -223,7 +222,6 @@ export class LocationComponent implements OnInit, OnDestroy {
         activityName: completion.activityName
       };
 
-      console.log('Log entry created:', logEntry);
 
       this.activityLog.unshift(logEntry);
 
@@ -232,7 +230,6 @@ export class LocationComponent implements OnInit, OnDestroy {
         this.activityLog = this.activityLog.slice(0, 10);
       }
 
-      console.log('Activity log after update:', this.activityLog);
 
       // Refresh skills after activity completion to update XP display
       this.skillsService.getSkills().subscribe();
@@ -484,7 +481,6 @@ export class LocationComponent implements OnInit, OnDestroy {
   completeActivity() {
     // Activities now complete automatically via socket events
     // The activityCompleted$ observable in locationService handles rewards display
-    console.log('completeActivity() called but activities now auto-complete via sockets');
   }
 
   /**

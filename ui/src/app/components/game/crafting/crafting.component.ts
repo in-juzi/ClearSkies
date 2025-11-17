@@ -329,7 +329,6 @@ export class CraftingComponent implements OnInit {
   loadRecipes(): void {
     this.recipeService.getRecipesBySkill(this.skill).subscribe({
       next: () => {
-        console.log(`Loaded ${this.filteredRecipes().length} ${this.skill} recipes`);
       },
       error: (error) => {
         console.error('Error loading recipes:', error);

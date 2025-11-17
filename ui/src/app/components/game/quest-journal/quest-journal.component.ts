@@ -115,7 +115,7 @@ export class QuestJournal implements OnInit, OnDestroy {
    */
   acceptQuest(questId: string): void {
     this.questService.acceptQuest(questId).subscribe({
-      next: () => console.log('Quest accepted'),
+      next: () => {},
       error: (error) => console.error('Error accepting quest:', error)
     });
   }
@@ -126,7 +126,7 @@ export class QuestJournal implements OnInit, OnDestroy {
   abandonQuest(questId: string): void {
     if (confirm('Are you sure you want to abandon this quest?')) {
       this.questService.abandonQuest(questId).subscribe({
-        next: () => console.log('Quest abandoned'),
+        next: () => {},
         error: (error) => console.error('Error abandoning quest:', error)
       });
     }
@@ -137,7 +137,7 @@ export class QuestJournal implements OnInit, OnDestroy {
    */
   turnInQuest(questId: string): void {
     this.questService.completeQuest(questId).subscribe({
-      next: (response) => console.log('Quest completed:', response),
+      next: () => {},
       error: (error) => console.error('Error completing quest:', error)
     });
   }

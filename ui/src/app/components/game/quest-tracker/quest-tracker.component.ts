@@ -69,7 +69,6 @@ export class QuestTracker implements OnInit, OnDestroy {
   turnInQuest(questId: string): void {
     this.questService.completeQuest(questId).subscribe({
       next: (response) => {
-        console.log('Quest completed:', response);
       },
       error: (error) => {
         console.error('Error completing quest:', error);

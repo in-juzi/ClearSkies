@@ -47,8 +47,6 @@ export class ItemDataService {
         this.traits.set(id, trait);
       }
     });
-
-    console.log(`[ItemDataService] Loaded ${this.items.size} items, ${this.qualities.size} qualities, ${this.traits.size} traits`);
   }
 
   /**

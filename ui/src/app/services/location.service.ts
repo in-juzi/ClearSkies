@@ -148,7 +148,6 @@ export class LocationService {
   private setupSocketListeners(): void {
     // Activity events
     this.socketService.on('activity:started', (data: any) => {
-      console.log('Activity started event:', data);
       const endTime = new Date(data.endTime);
       const remainingTime = Math.max(0, Math.floor((endTime.getTime() - Date.now()) / 1000));
 
@@ -172,8 +171,6 @@ export class LocationService {
     });
 
     this.socketService.on('activity:completed', (data: any) => {
-      console.log('Activity completed event:', data);
-
       // Stop progress timer
       this.stopProgressTimer();
 
@@ -212,8 +209,6 @@ export class LocationService {
     });
 
     this.socketService.on('activity:cancelled', (data: any) => {
-      console.log('Activity cancelled event:', data);
-
       // Stop progress timer
       this.stopProgressTimer();
 
@@ -245,7 +240,6 @@ export class LocationService {
 
     // Travel events
     this.socketService.on('travel:started', (data: any) => {
-      console.log('Travel started event:', data);
       const endTime = new Date(data.endTime);
       const remainingTime = Math.max(0, Math.floor((endTime.getTime() - Date.now()) / 1000));
 
@@ -262,8 +256,6 @@ export class LocationService {
     });
 
     this.socketService.on('travel:completed', (data: any) => {
-      console.log('Travel completed event:', data);
-
       // Stop travel timer
       this.stopTravelTimer();
 
@@ -281,8 +273,6 @@ export class LocationService {
     });
 
     this.socketService.on('travel:cancelled', (data: any) => {
-      console.log('Travel cancelled event:', data);
-
       // Stop travel timer
       this.stopTravelTimer();
 
@@ -436,7 +426,6 @@ export class LocationService {
         });
       } else if (response.combat) {
         // Combat activities don't set activeActivity - combat service handles this
-        console.log('Combat started, combat service will handle state');
       }
 
       return response;

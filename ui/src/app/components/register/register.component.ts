@@ -57,7 +57,6 @@ export class RegisterComponent {
 
       this.authService.register(registerData).subscribe({
         next: (response) => {
-          console.log('Registration successful:', response);
           this.router.navigate(['/game']);
         },
         error: (error) => {

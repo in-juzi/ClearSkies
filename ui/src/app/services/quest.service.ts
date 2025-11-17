@@ -41,19 +41,16 @@ export class QuestService {
     });
 
     this.socket.on('connect', () => {
-      console.log('✓ Quest socket connected');
       this.loadAllQuests(); // Load initial data
     });
 
     // Listen for quest updates
     this.socket.on('quest:accepted', (data: any) => {
-      console.log('Quest accepted:', data);
       this.notificationService.quest('Quest Accepted', `You have accepted: ${data.quest?.questId || 'New Quest'}`);
       this.loadActiveQuests();
     });
 
     this.socket.on('quest:update', (data: any) => {
-      console.log('Quest updated:', data);
       // Show notification for objective progress
       if (data.objective) {
         const progressText = `${data.objective.current}/${data.objective.required}`;
@@ -63,20 +60,17 @@ export class QuestService {
     });
 
     this.socket.on('quest:completed', (data: any) => {
-      console.log('Quest completed:', data);
       this.notificationService.quest('Quest Complete!', 'All objectives completed. Return to quest giver for rewards!');
       this.loadActiveQuests();
     });
 
     this.socket.on('quest:rewarded', (data: any) => {
-      console.log('Quest rewarded:', data);
       const rewardText = data.rewards?.gold ? `${data.rewards.gold} gold` : 'rewards';
       this.notificationService.success('Quest Rewarded!', `You have received ${rewardText}!`, 8000);
       this.loadAllQuests(); // Reload all lists
     });
 
     this.socket.on('quest:abandoned', (data: any) => {
-      console.log('Quest abandoned:', data);
       this.notificationService.warning('Quest Abandoned', `You have abandoned the quest.`);
       this.loadActiveQuests();
     });

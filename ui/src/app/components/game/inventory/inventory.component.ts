@@ -83,7 +83,6 @@ export class InventoryComponent implements OnInit {
   loadInventory(): void {
     this.inventoryService.getInventory().subscribe({
       next: (response) => {
-        console.log('Inventory loaded:', response);
       },
       error: (error) => {
         console.error('Error loading inventory:', error);
@@ -228,7 +227,6 @@ export class InventoryComponent implements OnInit {
 
     this.inventoryService.removeItem({ instanceId: item.instanceId, quantity: quantityToDrop }).subscribe({
       next: () => {
-        console.log(`Quick dropped 1x ${item.definition.name}`);
         // Close panel if this was the selected item and all were dropped
         if (this.selectedItem?.instanceId === item.instanceId && quantityToDrop >= item.quantity) {
           this.selectedItem = null;
@@ -332,7 +330,6 @@ export class InventoryComponent implements OnInit {
   addTestItem(itemId: string): void {
     this.inventoryService.addRandomItem(itemId, 1).subscribe({
       next: (response) => {
-        console.log('Test item added:', response);
       },
       error: (error) => {
         console.error('Error adding test item:', error);
@@ -357,7 +354,6 @@ export class InventoryComponent implements OnInit {
 
     this.inventoryService.removeItem({ instanceId, quantity: quantityToRemove }).subscribe({
       next: () => {
-        console.log('Item removed');
         // Close panel if all items were dropped
         if (this.selectedItem && quantityToRemove >= this.selectedItem.quantity) {
           this.selectedItem = null;
@@ -397,7 +393,6 @@ export class InventoryComponent implements OnInit {
 
     this.inventoryService.removeItem({ instanceId }).subscribe({
       next: () => {
-        console.log('All items removed');
         this.selectedItem = null;
       },
       error: (error) => {
@@ -425,7 +420,6 @@ export class InventoryComponent implements OnInit {
 
     this.inventoryService.equipItem(instanceId, slot).subscribe({
       next: () => {
-        console.log('Item equipped');
         // Reload equipment service to update equipment display
         this.equipmentService.loadEquippedItems().subscribe();
         // Wait for inventory to reload, then update selected item if this was the selected item
@@ -461,7 +455,6 @@ export class InventoryComponent implements OnInit {
 
     this.inventoryService.unequipItem(slot).subscribe({
       next: () => {
-        console.log('Item unequipped');
         // Reload equipment service to update equipment display
         this.equipmentService.loadEquippedItems().subscribe();
         // Wait for inventory to reload, then update selected item if this was the selected item
@@ -484,7 +477,6 @@ export class InventoryComponent implements OnInit {
   useItem(instanceId: string): void {
     this.inventoryService.useItem(instanceId).subscribe({
       next: (response: { message: string }) => {
-        console.log('Item used successfully:', response);
 
         // Close the details panel if item quantity is now 0 and it was the selected item
         setTimeout(() => {
@@ -544,12 +536,10 @@ export class InventoryComponent implements OnInit {
 
     const items = this.inventoryService.inventory();
     if (items.length === 0) {
-      console.log('No items to drop');
       return;
     }
 
     // Remove all items sequentially to avoid race conditions
-    console.log(`Dropping ${items.length} items...`);
     let successCount = 0;
     let errorCount = 0;
 
@@ -563,7 +553,6 @@ export class InventoryComponent implements OnInit {
       }
     }
 
-    console.log(`Dropped ${successCount} items successfully${errorCount > 0 ? `, ${errorCount} failed` : ''}`);
     this.selectedItem = null;
   }
 

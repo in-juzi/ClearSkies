@@ -145,7 +145,6 @@ export class CombatService {
 
     // Player attack event
     this.socketService.on('combat:playerAttack', (data: any) => {
-      console.log('Player attack event:', data);
       const combat = this.activeCombat();
       if (!combat) return;
 
@@ -183,7 +182,6 @@ export class CombatService {
 
     // Monster attack event
     this.socketService.on('combat:monsterAttack', (data: any) => {
-      console.log('Monster attack event:', data);
       const combat = this.activeCombat();
       if (!combat) return;
 
@@ -221,7 +219,6 @@ export class CombatService {
 
     // Ability used event
     this.socketService.on('combat:abilityUsed', (data: any) => {
-      console.log('Ability used event:', data);
       const combat = this.activeCombat();
       if (!combat) return;
 
@@ -265,7 +262,6 @@ export class CombatService {
 
     // Item used event
     this.socketService.on('combat:itemUsed', (data: any) => {
-      console.log('Item used event:', data);
       const combat = this.activeCombat();
       if (!combat) return;
 
@@ -303,8 +299,6 @@ export class CombatService {
 
     // Combat victory event
     this.socketService.on('combat:victory', (data: any) => {
-      console.log('Combat victory event:', data);
-
       const rewards: CombatRewards = {
         victory: true,
         experience: data.rewards.experience,
@@ -328,8 +322,6 @@ export class CombatService {
 
     // Combat defeat event
     this.socketService.on('combat:defeat', (data: any) => {
-      console.log('Combat defeat event:', data);
-
       const rewards: CombatRewards = {
         victory: false,
         goldLost: 0 // No penalty in current implementation
@@ -345,7 +337,6 @@ export class CombatService {
 
     // Combat fled event
     this.socketService.on('combat:fled', (data: any) => {
-      console.log('Combat fled event:', data);
       this.clearCombat();
     });
   }
