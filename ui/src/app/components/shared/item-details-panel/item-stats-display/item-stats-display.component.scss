@@ -1,0 +1,30 @@
+/* Item Stats Display Component */
+.detail-section {
+  margin-bottom: var(--spacing-2xl);
+}
+
+.section-title {
+  color: var(--color-secondary-dark);
+  font-size: var(--font-size-l);
+  margin-bottom: var(--spacing-m);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--spacing-s) 0;
+  border-bottom: var(--border-width-thin) solid var(--color-bg-elevated);
+}
+
+.detail-row .label {
+  color: var(--color-text-label);
+  font-weight: var(--font-weight-semibold);
+}
+
+.weapon-stats-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}

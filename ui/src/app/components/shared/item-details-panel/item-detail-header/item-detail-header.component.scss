@@ -1,0 +1,28 @@
+/* Item Detail Header Component */
+.details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-l);
+  background: var(--color-bg-elevated);
+  border-bottom: var(--border-light);
+  flex-shrink: 0;
+}
+
+.details-header h3 {
+  margin: 0;
+  font-size: var(--font-size-xl);
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-text-label);
+  font-size: var(--font-size-2xl);
+  cursor: pointer;
+  padding: var(--spacing-xs) var(--spacing-s);
+}
+
+.close-btn:hover {
+  color: var(--color-text-primary);
+}

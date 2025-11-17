@@ -1,0 +1,96 @@
+<!-- Qualities -->
+@if (getQualityKeys(qualityDetails).length > 0) {
+  <div class="detail-section">
+    <h4 class="section-title">Qualities</h4>
+    <div class="quality-list">
+      @for (qualityId of getQualityKeys(qualityDetails); track qualityId) {
+        <div class="quality-item">
+          <div class="quality-header">
+            <span class="quality-name">{{ qualityDetails[qualityId].name }}</span>
+            <span [class]="inventoryService.getQualityColor(qualityDetails[qualityId].level)" class="quality-level-badge">
+              Level {{ qualityDetails[qualityId].level }}
+            </span>
+          </div>
+          <div class="quality-level-name" [class]="inventoryService.getQualityColor(qualityDetails[qualityId].level)">
+            {{ qualityDetails[qualityId].levelData.name }}
+          </div>
+          <p class="quality-description">{{ qualityDetails[qualityId].levelData.description }}</p>
+
+          <!-- Effects -->
+          @if (qualityDetails[qualityId].levelData.effects) {
+            <div class="effects-section">
+              <div class="effect-label">Effects:</div>
+              <div class="effects-grid">
+                @for (effect of getQualityKeys(qualityDetails[qualityId].levelData.effects); track effect) {
+                  <div class="effect-item">
+                    <span class="effect-type">{{ formatEffectType(effect) }}:</span>
+                    <span class="effect-value">{{ formatEffectValue(qualityDetails[qualityId].levelData.effects[effect]) }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+}
+
+<!-- Traits -->
+@if (getQualityKeys(traitDetails).length > 0) {
+  <div class="detail-section">
+    <h4 class="section-title">Traits</h4>
+    <div class="trait-list">
+      @for (traitId of getQualityKeys(traitDetails); track traitId) {
+        <div class="trait-item" [class]="'trait-rarity-' + traitDetails[traitId].rarity">
+          <div class="trait-header">
+            <span [class]="inventoryService.getRarityColor(traitDetails[traitId].rarity)" class="trait-name">
+              {{ traitDetails[traitId].name }}
+            </span>
+            <div class="trait-badges">
+              <span class="trait-rarity-badge" [class]="inventoryService.getRarityColor(traitDetails[traitId].rarity)">
+                {{ traitDetails[traitId].rarity }}
+              </span>
+              <span [class]="inventoryService.getTraitLevelColor(traitDetails[traitId].level)" class="trait-level-badge">
+                Level {{ traitDetails[traitId].level }}
+              </span>
+            </div>
+          </div>
+          <div class="trait-level-name" [class]="inventoryService.getRarityColor(traitDetails[traitId].rarity)">
+            {{ traitDetails[traitId].levelData.name }}
+          </div>
+          <p class="trait-description">{{ traitDetails[traitId].levelData.description }}</p>
+
+          <!-- Effects -->
+          @if (traitDetails[traitId].levelData.effects) {
+            <div class="effects-section">
+              <div class="effect-label">Effects:</div>
+              <div class="effects-grid">
+                <!-- Legacy effect format (vendorPrice, etc.) -->
+                @for (effect of getLegacyEffectKeys(traitDetails[traitId].levelData.effects); track effect) {
+                  <div class="effect-item">
+                    <span class="effect-type">{{ formatEffectType(effect) }}:</span>
+                    <span class="effect-value">{{ formatEffectValue(traitDetails[traitId].levelData.effects[effect]) }}</span>
+                  </div>
+                }
+                <!-- New applicators format -->
+                @if (getApplicators(traitDetails[traitId].levelData.effects).length > 0) {
+                  <div class="effect-item">
+                    <span class="effect-type">{{ getApplicatorsLabel(traitDetails[traitId].levelData.effects) }}:</span>
+                    <span class="effect-value">
+                      @for (applicator of getApplicators(traitDetails[traitId].levelData.effects); track applicator; let i = $index) {
+                        <span>
+                          {{ applicator.description }}@if (i < getApplicators(traitDetails[traitId].levelData.effects).length - 1) {<span>, </span>}
+                        </span>
+                      }
+                    </span>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+}

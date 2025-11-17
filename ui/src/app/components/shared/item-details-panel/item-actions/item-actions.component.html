@@ -1,0 +1,75 @@
+<!-- Actions Footer (only show if enabled) -->
+@if (showActions) {
+  <div class="details-footer">
+    <!-- Quantity Controls (only show if enabled and quantity > 1) -->
+    @if (showDropControls && quantity > 1) {
+      <div class="drop-quantity-controls">
+        <div class="quantity-header">
+          <label class="quantity-label">Drop Quantity:</label>
+          <div class="quantity-input-group">
+            <input
+              type="number"
+              class="quantity-input"
+              [(ngModel)]="dropQuantity"
+              (ngModelChange)="updateDropQuantity($event)"
+              [min]="1"
+              [max]="maxDropQuantity"
+              [disabled]="isEquipped"
+            />
+            <span class="quantity-max">/ {{ quantity }}</span>
+          </div>
+        </div>
+        <input
+          type="range"
+          class="quantity-slider"
+          [(ngModel)]="dropQuantity"
+          (ngModelChange)="updateDropQuantity($event)"
+          [min]="1"
+          [max]="maxDropQuantity"
+          [disabled]="isEquipped"
+        />
+      </div>
+    }
+
+    <div class="detail-actions">
+      @if (category === 'consumable') {
+        <button
+          class="btn-primary"
+          (click)="onUse()"
+          [disabled]="isUsingItem">
+          {{ isUsingItem ? 'Using...' : 'Use' }}
+        </button>
+      }
+      @if (category === 'equipment' && !isEquipped) {
+        <button
+          class="btn-primary"
+          (click)="onEquip()">
+          Equip
+        </button>
+      }
+      @if (category === 'equipment' && isEquipped) {
+        <button
+          class="btn-secondary"
+          (click)="onUnequip()">
+          Unequip
+        </button>
+      }
+      @if (showDropControls && quantity > 1) {
+        <button
+          class="btn-danger"
+          (click)="onRemove()"
+          [disabled]="isEquipped">
+          Drop ({{ dropQuantity }})
+        </button>
+      }
+      @if (showDropControls) {
+        <button
+          class="btn-danger"
+          (click)="onRemoveAll()"
+          [disabled]="isEquipped">
+          {{ quantity === 1 ? 'Drop' : 'Drop All' }}
+        </button>
+      }
+    </div>
+  </div>
+}

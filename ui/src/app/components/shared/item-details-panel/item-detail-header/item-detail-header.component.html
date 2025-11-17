@@ -1,0 +1,8 @@
+<div class="details-header"
+     (mousedown)="onDragStart($event)"
+     [style.cursor]="isDragging ? 'grabbing' : 'grab'">
+  <h3 [class]="inventoryService.getRarityColor(rarity)">
+    {{ itemName }}
+  </h3>
+  <button (click)="onClose()" class="close-btn close-button">✕</button>
+</div>
