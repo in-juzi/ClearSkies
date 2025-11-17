@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { QuestService } from '../../../services/quest.service';
 import { ActiveQuest, ObjectiveProgress } from '@shared/types';
@@ -11,11 +11,11 @@ import { Subscription } from 'rxjs';
   templateUrl: './quest-tracker.component.html',
   styleUrl: './quest-tracker.component.scss',
 })
-export class QuestTracker implements OnInit, OnDestroy {
+export class QuestTrackerComponent implements OnInit, OnDestroy {
+  private questService = inject(QuestService);
+
   activeQuests: ActiveQuest[] = [];
   private subscription?: Subscription;
-
-  constructor(private questService: QuestService) {}
 
   ngOnInit(): void {
     // Subscribe to active quests

@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IconComponent } from '../../../shared/icon/icon.component';
 import { ItemMiniComponent } from '../../../shared/item-mini/item-mini.component';
@@ -24,6 +24,8 @@ export interface ItemGroup {
   styleUrls: ['./inventory-grouped-view.component.scss']
 })
 export class InventoryGroupedViewComponent {
+  public inventoryService = inject(InventoryService);
+
   @Input() groups: ItemGroup[] = [];
   @Input() isAltKeyHeld: boolean = false;
   @Input() isVendorOpen: boolean = false;
@@ -33,8 +35,6 @@ export class InventoryGroupedViewComponent {
   @Output() itemRightClick = new EventEmitter<{ event: MouseEvent; item: ItemDetails }>();
   @Output() itemDragStart = new EventEmitter<{ event: DragEvent; item: ItemDetails }>();
   @Output() itemDragEnd = new EventEmitter<DragEvent>();
-
-  constructor(public inventoryService: InventoryService) {}
 
   getItemTooltip(item: ItemDetails): string {
     return `Right-click: ${this.getQuickActionLabel(item)}\nAlt+Click: ${this.isVendorOpen ? 'Quick sell' : 'Quick drop'}`;

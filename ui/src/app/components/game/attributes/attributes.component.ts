@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AttributesService } from '../../../services/attributes.service';
 import { AttributesResponse, AttributeName, AttributeWithProgress } from '../../../models/user.model';
@@ -12,14 +12,14 @@ import { ALL_ATTRIBUTES, ATTRIBUTE_ICONS } from '../../../constants/game-data.co
   styleUrls: ['./attributes.component.scss']
 })
 export class AttributesComponent implements OnInit {
+  private attributesService = inject(AttributesService);
+
   attributes = signal<AttributesResponse | null>(null);
   loading = signal<boolean>(true);
   error = signal<string | null>(null);
 
   // Use centralized constants
   attributeList: AttributeName[] = [...ALL_ATTRIBUTES];
-
-  constructor(private attributesService: AttributesService) {}
 
   ngOnInit(): void {
     this.loadAttributes();

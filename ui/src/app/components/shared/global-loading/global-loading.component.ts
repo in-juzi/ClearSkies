@@ -1,4 +1,4 @@
-import { Component, computed } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../services/auth.service';
 
@@ -10,8 +10,8 @@ import { AuthService } from '../../../services/auth.service';
   styleUrl: './global-loading.component.scss'
 })
 export class GlobalLoadingComponent {
+  private authService = inject(AuthService);
+
   // Show loading overlay during auth initialization
   isInitializing = computed(() => this.authService.initializing());
-
-  constructor(private authService: AuthService) {}
 }
