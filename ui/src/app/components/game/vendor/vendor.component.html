@@ -51,7 +51,7 @@
                       }
                     </div>
                     <div class="item-details">
-                      <h4 class="item-name" [ngClass]="getRarityClass(stockItem.itemDefinition.rarity)">
+                      <h4 class="item-name" [ngClass]="stockItem.itemDefinition.rarity | rarityName">
                         {{ stockItem.itemDefinition.name }}
                       </h4>
                       <p class="item-description">{{ stockItem.itemDefinition.description }}</p>
@@ -115,7 +115,7 @@
                   </div>
                   <div class="item-details">
                     <div class="item-header">
-                      <h4 class="item-name" [ngClass]="getRarityClass(item.definition.rarity)">
+                      <h4 class="item-name" [ngClass]="item.definition.rarity | rarityName">
                         {{ item.definition.name }}
                       </h4>
                       @if (item.quantity > 1) {

@@ -8,11 +8,12 @@ import { VendorStockItem } from '../../../models/vendor.model';
 import { ItemModifiersComponent } from '../../shared/item-modifiers/item-modifiers.component';
 import { IconComponent } from '../../shared/icon/icon.component';
 import { ItemInstance } from '@shared/types';
+import { RarityNamePipe } from '../../../pipes/rarity-name.pipe';
 
 @Component({
   selector: 'app-vendor',
   standalone: true,
-  imports: [CommonModule, ItemModifiersComponent, IconComponent],
+  imports: [CommonModule, ItemModifiersComponent, IconComponent, RarityNamePipe],
   templateUrl: './vendor.component.html',
   styleUrl: './vendor.component.scss'
 })
@@ -106,10 +107,8 @@ export class VendorComponent {
    * Calculate sell price for an item (50% of vendor price)
    */
   calculateSellPrice(item: ItemInstance | { vendorPrice?: number }): number {
-    // Use vendorPrice from ItemDetails (already calculated with quality/trait bonuses)
-    // Vendors buy items at 50% of their vendor price
-    const vendorPrice = 'vendorPrice' in item ? item.vendorPrice : 0;
-    return Math.floor((vendorPrice || 0) * 0.5);
+    // Delegate to service for centralized price calculation logic
+    return this.vendorService.calculateSellPrice(item);
   }
 
   /**
@@ -132,19 +131,6 @@ export class VendorComponent {
     });
   }
 
-  /**
-   * Get rarity color class for item display
-   */
-  getRarityClass(rarity: string): string {
-    const rarityMap: Record<string, string> = {
-      'common': 'rarity-common',
-      'uncommon': 'rarity-uncommon',
-      'rare': 'rarity-rare',
-      'epic': 'rarity-epic',
-      'legendary': 'rarity-legendary'
-    };
-    return rarityMap[rarity] || 'rarity-common';
-  }
 
   /**
    * Get sellable items sorted by quality+trait score (descending)

@@ -27,7 +27,7 @@
         @if (getItemInSlot(slot.name); as item) {
           <div
             class="slot-item"
-            [class]="getRarityClass(item.definition.rarity)"
+            [class]="item.definition.rarity | rarityName"
             (click)="onItemClick(slot.name)">
             @if (item.definition.icon) {
               <app-icon [icon]="item.definition.icon" [autoSize]="true" class="item-icon"></app-icon>

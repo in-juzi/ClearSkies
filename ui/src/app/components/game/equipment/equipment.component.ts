@@ -5,6 +5,7 @@ import { InventoryService } from '../../../services/inventory.service';
 import { ItemDetails, EquipmentSlot } from '../../../models/inventory.model';
 import { IconComponent } from '../../shared/icon/icon.component';
 import { ItemDetailsPanelComponent } from '../../shared/item-details-panel/item-details-panel.component';
+import { RarityNamePipe } from '../../../pipes/rarity-name.pipe';
 
 interface SlotConfig {
   name: EquipmentSlot;
@@ -16,7 +17,7 @@ interface SlotConfig {
 @Component({
   selector: 'app-equipment',
   standalone: true,
-  imports: [CommonModule, IconComponent, ItemDetailsPanelComponent],
+  imports: [CommonModule, IconComponent, ItemDetailsPanelComponent, RarityNamePipe],
   templateUrl: './equipment.component.html',
   styleUrl: './equipment.component.scss',
 })
@@ -135,12 +136,6 @@ export class Equipment {
     return this.dragOverSlot === slotName;
   }
 
-  /**
-   * Get rarity color class
-   */
-  getRarityClass(rarity: string): string {
-    return `rarity-${rarity}`;
-  }
 
   /**
    * Handle click on equipped item - show details panel

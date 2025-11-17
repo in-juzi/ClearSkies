@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { StorageService } from '../../../services/storage.service';
 import { InventoryService } from '../../../services/inventory.service';
+import { ItemFilterService } from '../../../services/item-filter.service';
 import { ItemDetails } from '../../../models/inventory.model';
 import { ItemMiniComponent } from '../../shared/item-mini/item-mini.component';
 import { IconComponent } from '../../shared/icon/icon.component';
@@ -17,6 +18,7 @@ import { IconComponent } from '../../shared/icon/icon.component';
 export class BankComponent implements OnInit, OnDestroy {
   public storageService = inject(StorageService);
   public inventoryService = inject(InventoryService);
+  private itemFilterService = inject(ItemFilterService);
 
   // Bank container ID (could be made dynamic for multi-container support)
   private readonly BANK_CONTAINER_ID = 'bank';
@@ -47,44 +49,24 @@ export class BankComponent implements OnInit, OnDestroy {
 
   // Computed filtered bank items
   filteredBankItems = computed(() => {
-    let items = this.storageService.containerItems();
-
-    // Filter by category
-    if (this.selectedBankCategory() !== 'all') {
-      items = items.filter(item => item.definition?.category === this.selectedBankCategory());
-    }
-
-    // Filter by search query
-    if (this.bankSearchQuery().trim()) {
-      const query = this.bankSearchQuery().toLowerCase();
-      items = items.filter(item =>
-        item.definition?.name.toLowerCase().includes(query) ||
-        item.itemId.toLowerCase().includes(query)
-      );
-    }
-
-    return items;
+    return this.itemFilterService.applyFilters(
+      this.storageService.containerItems(),
+      {
+        category: this.selectedBankCategory(),
+        searchQuery: this.bankSearchQuery()
+      }
+    );
   });
 
   // Computed filtered inventory items
   filteredInventoryItems = computed(() => {
-    let items = this.inventoryService.inventory();
-
-    // Filter by category
-    if (this.selectedInventoryCategory() !== 'all') {
-      items = items.filter(item => item.definition?.category === this.selectedInventoryCategory());
-    }
-
-    // Filter by search query
-    if (this.inventorySearchQuery().trim()) {
-      const query = this.inventorySearchQuery().toLowerCase();
-      items = items.filter(item =>
-        item.definition?.name.toLowerCase().includes(query) ||
-        item.itemId.toLowerCase().includes(query)
-      );
-    }
-
-    return items;
+    return this.itemFilterService.applyFilters(
+      this.inventoryService.inventory(),
+      {
+        category: this.selectedInventoryCategory(),
+        searchQuery: this.inventorySearchQuery()
+      }
+    );
   });
 
   // Capacity percentage for progress bar
