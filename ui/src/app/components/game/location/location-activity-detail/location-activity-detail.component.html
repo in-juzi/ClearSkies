@@ -93,5 +93,14 @@
       {{ startingActivity() ? 'Starting...' : (selectedActivity()?.available ? 'Start Activity' : 'Requirements Not
       Met') }}
     </button>
+
+    <!-- Drop Tables Section -->
+    @if (hasDropTables()) {
+      <div class="drop-tables-section">
+        <h3>Possible Drops</h3>
+        <app-activity-drop-table [activity]="selectedActivity()!" />
+      </div>
+    }
+
   </div>
 }

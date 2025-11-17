@@ -9,6 +9,7 @@ import {
   ActivityRewards,
   LocationState
 } from '../models/location.model';
+import { DropTable } from '@shared/types';
 import { SkillsService } from './skills.service';
 import { AttributesService } from './attributes.service';
 import { InventoryService } from './inventory.service';
@@ -495,6 +496,15 @@ export class LocationService {
    */
   getLocationState(): Observable<LocationState> {
     return this.http.get<LocationState>(`${this.apiUrl}/state`);
+  }
+
+  /**
+   * Get drop table with enriched item information
+   */
+  getDropTable(dropTableId: string): Observable<{ dropTable: DropTable & { enrichedDrops: any[] } }> {
+    return this.http.get<{ dropTable: DropTable & { enrichedDrops: any[] } }>(
+      `${this.apiUrl}/drop-tables/${dropTableId}`
+    );
   }
 
   /**

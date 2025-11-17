@@ -5,11 +5,12 @@ import { CombatService } from '../../../../services/combat.service';
 import { Activity } from '../../../../models/location.model';
 import { SkillName } from '../../../../models/user.model';
 import { SKILL_ICONS, SKILL_DISPLAY_NAMES, formatEquipmentSubtype } from '../../../../constants/game-data.constants';
+import { ActivityDropTableComponent } from '../activity-drop-table/activity-drop-table.component';
 
 @Component({
   selector: 'app-location-activity-detail',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ActivityDropTableComponent],
   templateUrl: './location-activity-detail.component.html',
   styleUrl: './location-activity-detail.component.scss'
 })
@@ -87,6 +88,14 @@ export class LocationActivityDetailComponent {
       return `Requires ${displayName} level ${level}`;
     }
     return failure;
+  }
+
+  /**
+   * Check if activity has drop tables
+   */
+  hasDropTables(): boolean {
+    const activity = this.selectedActivity();
+    return !!(activity?.rewards?.dropTables && activity.rewards.dropTables.length > 0);
   }
 
   /**

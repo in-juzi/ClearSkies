@@ -1,0 +1,108 @@
+<div class="activity-drop-table">
+  <!-- Loading State -->
+  <div *ngIf="loading()" class="loading">
+    <p>Loading drop table information...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error()" class="error">
+    <p>{{ error() }}</p>
+  </div>
+
+  <!-- Drop Table Display -->
+  <div *ngIf="!loading() && !error() && selectedDropTable()" class="drop-table-container">
+    <!-- Multi-table Switcher -->
+    <div *ngIf="hasMultipleTables()" class="table-switcher">
+      <button
+        *ngFor="let table of dropTables(); let i = index"
+        [class.active]="selectedTableIndex() === i"
+        (click)="selectTable(i)"
+        class="table-tab"
+      >
+        {{ table.name }}
+      </button>
+    </div>
+
+    <!-- Drop Table Header -->
+    <div class="drop-table-header">
+      <h3>{{ selectedDropTable()!.name }}</h3>
+      <p class="description">{{ selectedDropTable()!.description }}</p>
+    </div>
+
+    <!-- Drop Table Entries -->
+    <div class="drop-table-entries">
+      <div
+        *ngFor="let entry of selectedDropTable()!.entries"
+        class="drop-entry"
+        [class.drop-nothing]="entry.dropNothing"
+      >
+        <!-- Item Icon and Name -->
+        <div class="item-info">
+          <div *ngIf="entry.itemDef && !entry.dropNothing" class="item-icon-wrapper">
+            <app-item-mini
+              [item]="entry.itemDef"
+              [showQuantity]="false"
+              [showModifiers]="false"
+              [iconSize]="40"
+            />
+          </div>
+          <div *ngIf="entry.dropNothing" class="nothing-icon">
+            <span class="material-symbols-outlined">block</span>
+          </div>
+          <div class="item-details">
+            <p class="item-name">
+              {{ entry.dropNothing ? 'Nothing' : (entry.itemDef?.name || entry.itemId) }}
+            </p>
+            <p *ngIf="entry.comment" class="item-comment">{{ entry.comment }}</p>
+          </div>
+        </div>
+
+        <!-- Drop Chance -->
+        <div class="drop-chance" [ngClass]="getDropChanceColor(entry.dropChance)">
+          <span class="chance-value">{{ formatDropChance(entry.dropChance) }}%</span>
+        </div>
+
+        <!-- Quantity Range -->
+        <div class="quantity-range">
+          <span class="quantity-label">Qty:</span>
+          <span class="quantity-value">{{ entry.quantityRange }}</span>
+        </div>
+
+        <!-- Quality/Trait Information -->
+        <div *ngIf="entry.itemDef && !entry.dropNothing" class="modifiers-info">
+          <!-- Qualities -->
+          <div *ngIf="entry.possibleQualities.length > 0" class="qualities">
+            <span class="modifier-label">Qualities:</span>
+            <span class="modifier-values">
+              {{ entry.possibleQualities.join(', ') }}
+              <span *ngIf="entry.qualityBonus" class="quality-bonus">
+                (+{{ typeof entry.qualityBonus === 'number' ? entry.qualityBonus : 'bonus' }})
+              </span>
+            </span>
+          </div>
+
+          <!-- Traits -->
+          <div *ngIf="entry.possibleTraits.length > 0" class="traits">
+            <span class="modifier-label">Traits:</span>
+            <span class="modifier-values">{{ entry.possibleTraits.join(', ') }}</span>
+          </div>
+
+          <!-- No Modifiers -->
+          <div *ngIf="entry.possibleQualities.length === 0 && entry.possibleTraits.length === 0" class="no-modifiers">
+            <span class="modifier-label">No quality/trait variations</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="selectedDropTable()!.entries.length === 0" class="empty-state">
+      <p>No drop information available</p>
+    </div>
+  </div>
+
+  <!-- No Drop Tables -->
+  <div *ngIf="!loading() && !error() && dropTables().length === 0" class="no-drop-tables">
+    <p>No drop table information available for this activity</p>
+  </div>
+</div>
