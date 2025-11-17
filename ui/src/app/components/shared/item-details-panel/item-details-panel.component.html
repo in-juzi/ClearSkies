@@ -4,454 +4,65 @@
        (mousemove)="onDrag($event)"
        (mouseup)="onDragEnd()"
        (mouseleave)="onDragEnd()">
-    <div class="details-header"
-         (mousedown)="onDragStart($event)"
-         [style.cursor]="isDragging ? 'grabbing' : 'grab'">
-      <h3 [class]="inventoryService.getRarityColor(item.definition.rarity)">
-        {{ item.definition.name }}
-      </h3>
-      <button (click)="onClose()" class="close-btn close-button">✕</button>
+
+    <!-- Header (Decomposed Component) -->
+    <app-item-detail-header
+      [itemName]="item.definition.name"
+      [rarity]="item.definition.rarity"
+      [isDragging]="isDragging"
+      (close)="onClose()"
+      (dragStart)="onDragStart($event)">
+    </app-item-detail-header>
+
+    <div class="details-content">
+      <!-- Basic Info (Decomposed Component) -->
+      <app-item-basic-info
+        [icon]="item.definition.icon"
+        [itemName]="item.definition.name"
+        [description]="item.definition.description"
+        [category]="item.definition.category"
+        [subcategories]="item.definition.subcategories"
+        [rarity]="item.definition.rarity"
+        [quantity]="item.quantity"
+        [weight]="item.definition.properties.weight"
+        [vendorPrice]="item.vendorPrice">
+      </app-item-basic-info>
+
+      <!-- Stats Display (Decomposed Component) -->
+      <app-item-stats-display
+        [category]="item.definition.category"
+        [subcategories]="item.definition.subcategories"
+        [properties]="item.definition.properties"
+        [combatStats]="combatStats"
+        [loadingCombatStats]="loadingCombatStats"
+        [scaledHealthRestore]="getScaledHealthRestore()"
+        [scaledManaRestore]="getScaledManaRestore()"
+        [hasPotencyQuality]="hasPotencyQuality()">
+      </app-item-stats-display>
+
+      <!-- Modifiers Display (Decomposed Component) -->
+      <app-item-modifiers-display
+        [qualityDetails]="item.qualityDetails"
+        [traitDetails]="item.traitDetails">
+      </app-item-modifiers-display>
     </div>
 
-  <div class="details-content">
-    <!-- Item Icon and Description -->
-    <div class="detail-icon-description-section">
-
-      @if (item.definition.icon) {
-        <div class="detail-icon-wrapper">
-          <app-icon
-            [icon]="item.definition.icon"
-            [size]="80"
-            [alt]="item.definition.name">
-          </app-icon>
-        </div>
-      }
-      <p class="item-description">{{ item.definition.description }}</p>
-    </div>
-
-    <div class="category-display">
-      <span class="category-tag">{{ formatSubcategoryName(item.definition.category) }}</span>
-    </div>
-
-    <!-- Subcategories -->
-    @if (item.definition.subcategories && item.definition.subcategories.length > 0) {
-      <div class="subcategories-section">
-        <div class="subcategories-list">
-          @for (subcategory of item.definition.subcategories; track subcategory) {
-            <span class="subcategory-tag">
-              {{ formatSubcategoryName(subcategory) }}
-            </span>
-          }
-        </div>
-      </div>
-    }
-
-    <!-- Basic Info -->
-    <div class="detail-section">
-      <div class="basic-info-grid">
-        <div class="info-item">
-          <span class="info-label">Rarity</span>
-          <span class="info-value" [class]="inventoryService.getRarityColor(item.definition.rarity)">
-            {{ formatSubcategoryName(item.definition.rarity) }}
-          </span>
-        </div>
-        <div class="info-item">
-          <span class="info-label">Quantity</span>
-          <span class="info-value">{{ item.quantity }}</span>
-        </div>
-        <div class="info-item">
-          <span class="info-label">Weight</span>
-          <span class="info-value">{{ item.definition.properties.weight.toFixed(1) }} kg</span>
-        </div>
-        <div class="info-item">
-          <span class="info-label">Value</span>
-          <span class="info-value text-gold-400">{{ item.vendorPrice }}g</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Weapon Stats -->
-    @if (item.definition.category === 'equipment' && item.definition.subcategories.includes('weapon')) {
-      <div class="detail-section">
-        <h4 class="section-title">Weapon Stats</h4>
-        <div class="weapon-stats-grid">
-          @if (item.definition['slot']) {
-            <div class="detail-row">
-              <span class="label">Equipment Slot:</span>
-              <span class="text-purple-400">{{ item.definition['slot'] }}</span>
-            </div>
-          }
-          @if (item.definition.properties['damageRoll']) {
-            <div class="detail-row">
-              <span class="label">Damage Roll:</span>
-              <span class="text-red-400">{{ item.definition.properties['damageRoll'] }}</span>
-            </div>
-          }
-          @if (item.definition.properties['attackSpeed']) {
-            <div class="detail-row">
-              <span class="label">Attack Speed:</span>
-              <span>{{ item.definition.properties['attackSpeed'].toFixed(1) }}s</span>
-            </div>
-          }
-          @if (item.definition.properties['critChance'] !== undefined) {
-            <div class="detail-row">
-              <span class="label">Crit Chance:</span>
-              <span class="text-gold-400">{{ (item.definition.properties['critChance'] * 100).toFixed(1) }}%</span>
-            </div>
-          }
-          @if (item.definition.properties['skillScalar']) {
-            <div class="detail-row">
-              <span class="label">Skill:</span>
-              <span class="text-purple-400">{{ item.definition.properties['skillScalar'] }}</span>
-            </div>
-          }
-          @if (item.definition.properties['requiredLevel'] !== undefined) {
-            <div class="detail-row">
-              <span class="label">Required Level:</span>
-              <span class="text-blue-400">{{ item.definition.properties['requiredLevel'] }}</span>
-            </div>
-          }
-        </div>
-      </div>
-    }
-
-    <!-- Armor Stats -->
-    @if (item.definition.category === 'equipment' && item.definition.subcategories.includes('armor')) {
-      <div class="detail-section">
-        <h4 class="section-title">Armor Stats</h4>
-        <div class="weapon-stats-grid">
-          @if (item.definition['slot']) {
-            <div class="detail-row">
-              <span class="label">Equipment Slot:</span>
-              <span class="text-purple-400">{{ item.definition['slot'] }}</span>
-            </div>
-          }
-          @if (item.definition.properties['armor'] !== undefined) {
-            <div class="detail-row">
-              <span class="label">Armor:</span>
-              <span class="text-blue-400">{{ item.definition.properties['armor'] }}</span>
-            </div>
-          }
-          @if (item.definition.properties['evasion'] !== undefined) {
-            <div class="detail-row">
-              <span class="label">Evasion:</span>
-              <span class="text-yellow-400">{{ item.definition.properties['evasion'] }}</span>
-            </div>
-          }
-          @if (item.definition.properties['blockChance'] !== undefined) {
-            <div class="detail-row">
-              <span class="label">Block Chance:</span>
-              <span class="text-gold-400">{{ (item.definition.properties['blockChance'] * 100).toFixed(1) }}%</span>
-            </div>
-          }
-          @if (item.definition.properties['requiredLevel'] !== undefined) {
-            <div class="detail-row">
-              <span class="label">Required Level:</span>
-              <span class="text-blue-400">{{ item.definition.properties['requiredLevel'] }}</span>
-            </div>
-          }
-        </div>
-      </div>
-    }
-
-    <!-- Consumable Effects -->
-    @if (item.definition.category === 'consumable') {
-      <div class="detail-section">
-        <h4 class="section-title">Consumable Effects</h4>
-        <div class="consumable-effects">
-          @if (item.definition.properties['healthRestore']) {
-            <div class="detail-row">
-              <span class="label">Health Restore:</span>
-              <span class="text-green-400">+{{ getScaledHealthRestore() }} HP</span>
-            </div>
-          }
-          @if (item.definition.properties['manaRestore']) {
-            <div class="detail-row">
-              <span class="label">Mana Restore:</span>
-              <span class="text-blue-400">+{{ getScaledManaRestore() }} MP</span>
-            </div>
-          }
-          @if (hasPotencyQuality()) {
-            <p class="consumable-note">
-              <span class="text-purple-400">Quality bonus applied</span>
-            </p>
-          }
-        </div>
-      </div>
-    }
-
-    <!-- Scaled Weapon Stats (with player skill/attribute levels) -->
-    @if (combatStats && item.definition.subcategories.includes('weapon')) {
-      <div class="detail-section">
-        <h4 class="section-title">Scaled Combat Stats</h4>
-        @if (!loadingCombatStats) {
-          <div class="weapon-stats-grid">
-            <div class="detail-row">
-              <span class="label">Scaled Damage:</span>
-              <span class="text-red-400">{{ combatStats.scaledDamageRoll }} → {{ combatStats.scaledDamageRange }} (avg {{ combatStats.avgScaledDamage }})</span>
-            </div>
-            <div class="detail-row">
-              <span class="label">Attack Speed:</span>
-              <span>{{ combatStats.attackSpeed.toFixed(1) }}s</span>
-            </div>
-            <div class="detail-row">
-              <span class="label">Crit Chance:</span>
-              <span class="text-gold-400">{{ (combatStats.critChance * 100).toFixed(1) }}%</span>
-            </div>
-            <div class="detail-row">
-              <span class="label">Level Bonus:</span>
-              <span class="text-green-400">+{{ combatStats.totalLevelBonus }} (Skill L{{ combatStats.skillLevel }} + Attr L{{ combatStats.attrLevel }})</span>
-            </div>
-            @if (combatStats.traitDamageBonus) {
-              <div class="detail-row">
-                <span class="label">Trait Bonus:</span>
-                <span class="text-purple-400">+{{ combatStats.traitDamageBonus }} damage from traits</span>
-              </div>
-            }
-            @if (combatStats.traitCritBonus) {
-              <div class="detail-row">
-                <span class="label">Trait Crit Bonus:</span>
-                <span class="text-purple-400">+{{ (combatStats.traitCritBonus * 100).toFixed(1) }}% from traits</span>
-              </div>
-            }
-            @if (combatStats.traitAttackSpeedBonus) {
-              <div class="detail-row">
-                <span class="label">Trait Speed Bonus:</span>
-                <span class="text-purple-400">{{ combatStats.traitAttackSpeedBonus > 0 ? '+' : '' }}{{ combatStats.traitAttackSpeedBonus.toFixed(1) }}s from traits</span>
-              </div>
-            }
-          </div>
-        } @else {
-          <div class="text-gray-400 text-center">
-            Loading stats...
-          </div>
-        }
-      </div>
-    }
-
-    <!-- Scaled Armor Stats -->
-    @if (combatStats && item.definition.subcategories.includes('armor')) {
-      <div class="detail-section">
-        <h4 class="section-title">Scaled Armor Stats</h4>
-        @if (!loadingCombatStats) {
-          <div class="weapon-stats-grid">
-            @if (combatStats.armor !== undefined) {
-              <div class="detail-row">
-                <span class="label">Armor:</span>
-                <span class="text-blue-400">{{ combatStats.armor }}</span>
-              </div>
-            }
-            @if (combatStats.evasion !== undefined) {
-              <div class="detail-row">
-                <span class="label">Evasion:</span>
-                <span class="text-yellow-400">{{ combatStats.evasion }}</span>
-              </div>
-            }
-            @if (combatStats.blockChance !== undefined) {
-              <div class="detail-row">
-                <span class="label">Block Chance:</span>
-                <span class="text-gold-400">{{ (combatStats.blockChance * 100).toFixed(1) }}%</span>
-              </div>
-            }
-            @if (combatStats.requiredLevel !== undefined) {
-              <div class="detail-row">
-                <span class="label">Required Level:</span>
-                <span class="text-blue-400">{{ combatStats.requiredLevel }}</span>
-              </div>
-            }
-            @if (combatStats.armorTraitBonus) {
-              <div class="detail-row">
-                <span class="label">Trait Bonus:</span>
-                <span class="text-purple-400">+{{ combatStats.armorTraitBonus }} armor from traits</span>
-              </div>
-            }
-            @if (combatStats.evasionTraitBonus) {
-              <div class="detail-row">
-                <span class="label">Trait Evasion Bonus:</span>
-                <span class="text-purple-400">+{{ combatStats.evasionTraitBonus }} from traits</span>
-              </div>
-            }
-          </div>
-        } @else {
-          <div class="text-gray-400 text-center">
-            Loading stats...
-          </div>
-        }
-      </div>
-    }
-
-    <!-- Qualities -->
-    @if (getQualityKeys(item.qualityDetails).length > 0) {
-      <div class="detail-section">
-        <h4 class="section-title">Qualities</h4>
-        <div class="quality-list">
-          @for (qualityId of getQualityKeys(item.qualityDetails); track qualityId) {
-            <div class="quality-item">
-              <div class="quality-header">
-                <span class="quality-name">{{ item.qualityDetails[qualityId].name }}</span>
-                <span [class]="inventoryService.getQualityColor(item.qualityDetails[qualityId].level)" class="quality-level-badge">
-                  Level {{ item.qualityDetails[qualityId].level }}
-                </span>
-              </div>
-              <div class="quality-level-name" [class]="inventoryService.getQualityColor(item.qualityDetails[qualityId].level)">
-                {{ item.qualityDetails[qualityId].levelData.name }}
-              </div>
-              <p class="quality-description">{{ item.qualityDetails[qualityId].levelData.description }}</p>
-
-              <!-- Effects -->
-              @if (item.qualityDetails[qualityId].levelData.effects) {
-                <div class="effects-section">
-                  <div class="effect-label">Effects:</div>
-                  <div class="effects-grid">
-                    @for (effect of getQualityKeys(item.qualityDetails[qualityId].levelData.effects); track effect) {
-                      <div class="effect-item">
-                        <span class="effect-type">{{ formatEffectType(effect) }}:</span>
-                        <span class="effect-value">{{ formatEffectValue(item.qualityDetails[qualityId].levelData.effects[effect]) }}</span>
-                      </div>
-                    }
-                  </div>
-                </div>
-              }
-            </div>
-          }
-        </div>
-      </div>
-    }
-
-    <!-- Traits -->
-    @if (getQualityKeys(item.traitDetails).length > 0) {
-      <div class="detail-section">
-        <h4 class="section-title">Traits</h4>
-        <div class="trait-list">
-          @for (traitId of getQualityKeys(item.traitDetails); track traitId) {
-            <div class="trait-item" [class]="'trait-rarity-' + item.traitDetails[traitId].rarity">
-              <div class="trait-header">
-                <span [class]="inventoryService.getRarityColor(item.traitDetails[traitId].rarity)" class="trait-name">
-                  {{ item.traitDetails[traitId].name }}
-                </span>
-                <div class="trait-badges">
-                  <span class="trait-rarity-badge" [class]="inventoryService.getRarityColor(item.traitDetails[traitId].rarity)">
-                    {{ item.traitDetails[traitId].rarity }}
-                  </span>
-                  <span [class]="inventoryService.getTraitLevelColor(item.traitDetails[traitId].level)" class="trait-level-badge">
-                    Level {{ item.traitDetails[traitId].level }}
-                  </span>
-                </div>
-              </div>
-              <div class="trait-level-name" [class]="inventoryService.getRarityColor(item.traitDetails[traitId].rarity)">
-                {{ item.traitDetails[traitId].levelData.name }}
-              </div>
-              <p class="trait-description">{{ item.traitDetails[traitId].levelData.description }}</p>
-
-              <!-- Effects -->
-              @if (item.traitDetails[traitId].levelData.effects) {
-                <div class="effects-section">
-                  <div class="effect-label">Effects:</div>
-                  <div class="effects-grid">
-                    <!-- Legacy effect format (vendorPrice, etc.) -->
-                    @for (effect of getLegacyEffectKeys(item.traitDetails[traitId].levelData.effects); track effect) {
-                      <div class="effect-item">
-                        <span class="effect-type">{{ formatEffectType(effect) }}:</span>
-                        <span class="effect-value">{{ formatEffectValue(item.traitDetails[traitId].levelData.effects[effect]) }}</span>
-                      </div>
-                    }
-                    <!-- New applicators format -->
-                    @if (getApplicators(item.traitDetails[traitId].levelData.effects).length > 0) {
-                      <div class="effect-item">
-                        <span class="effect-type">{{ getApplicatorsLabel(item.traitDetails[traitId].levelData.effects) }}:</span>
-                        <span class="effect-value">
-                          @for (applicator of getApplicators(item.traitDetails[traitId].levelData.effects); track applicator; let i = $index) {
-                            <span>
-                              {{ applicator.description }}@if (i < getApplicators(item.traitDetails[traitId].levelData.effects).length - 1) {<span>, </span>}
-                            </span>
-                          }
-                        </span>
-                      </div>
-                    }
-                  </div>
-                </div>
-              }
-            </div>
-          }
-        </div>
-      </div>
-    }
-  </div>
-
-    <!-- Actions Footer (only show if enabled) -->
-    @if (showActions) {
-      <div class="details-footer">
-        <!-- Quantity Controls (only show if enabled and quantity > 1) -->
-        @if (showDropControls && item.quantity > 1) {
-          <div class="drop-quantity-controls">
-            <div class="quantity-header">
-              <label class="quantity-label">Drop Quantity:</label>
-              <div class="quantity-input-group">
-                <input
-                  type="number"
-                  class="quantity-input"
-                  [(ngModel)]="dropQuantity"
-                  (ngModelChange)="updateDropQuantity($event)"
-                  [min]="1"
-                  [max]="getMaxDropQuantity()"
-                  [disabled]="!!item.equipped"
-                />
-                <span class="quantity-max">/ {{ item.quantity }}</span>
-              </div>
-            </div>
-            <input
-              type="range"
-              class="quantity-slider"
-              [(ngModel)]="dropQuantity"
-              (ngModelChange)="updateDropQuantity($event)"
-              [min]="1"
-              [max]="getMaxDropQuantity()"
-              [disabled]="!!item.equipped"
-            />
-          </div>
-        }
-
-        <div class="detail-actions">
-          @if (item.definition.category === 'consumable') {
-            <button
-              class="btn-primary"
-              (click)="onUse()"
-              [disabled]="isUsingItem">
-              {{ isUsingItem ? 'Using...' : 'Use' }}
-            </button>
-          }
-          @if (item.definition.category === 'equipment' && !item.equipped) {
-            <button
-              class="btn-primary"
-              (click)="onEquip()">
-              Equip
-            </button>
-          }
-          @if (item.definition.category === 'equipment' && item.equipped) {
-            <button
-              class="btn-secondary"
-              (click)="onUnequip()">
-              Unequip
-            </button>
-          }
-          @if (showDropControls && item.quantity > 1) {
-            <button
-              class="btn-danger"
-              (click)="onRemove()"
-              [disabled]="!!item.equipped">
-              Drop ({{ dropQuantity }})
-            </button>
-          }
-          @if (showDropControls) {
-            <button
-              class="btn-danger"
-              (click)="onRemoveAll()"
-              [disabled]="!!item.equipped">
-              {{ item.quantity === 1 ? 'Drop' : 'Drop All' }}
-            </button>
-          }
-        </div>
-      </div>
-    }
+    <!-- Actions (Decomposed Component) -->
+    <app-item-actions
+      [category]="item.definition.category"
+      [quantity]="item.quantity"
+      [isEquipped]="!!item.equipped"
+      [showActions]="showActions"
+      [showDropControls]="showDropControls"
+      [isUsingItem]="isUsingItem"
+      [dropQuantity]="dropQuantity"
+      [maxDropQuantity]="getMaxDropQuantity()"
+      (use)="onUse()"
+      (equip)="onEquip()"
+      (unequip)="onUnequip()"
+      (remove)="onRemove()"
+      (removeAll)="onRemoveAll()"
+      (dropQuantityChange)="updateDropQuantity($event)">
+    </app-item-actions>
   </div>
 }
