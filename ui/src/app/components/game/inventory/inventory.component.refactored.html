@@ -1,0 +1,65 @@
+<div class="inventory-container">
+  <!-- Header and Filters (Decomposed Component) -->
+  <app-inventory-header
+    [viewMode]="viewMode"
+    [isAltKeyHeld]="isAltKeyHeld"
+    [isVendorOpen]="vendorService.isVendorOpen()"
+    [selectedCategory]="selectedCategory"
+    [searchQuery]="searchQuery"
+    [categories]="categories"
+    (viewModeChange)="viewMode = $event"
+    (categoryChange)="selectedCategory = $event"
+    (searchQueryChange)="searchQuery = $event">
+  </app-inventory-header>
+
+  <!-- List View (Decomposed Component) -->
+  @if (viewMode === 'list') {
+    <app-inventory-list-view
+      [items]="getFilteredInventory()"
+      [isAltKeyHeld]="isAltKeyHeld"
+      [isVendorOpen]="vendorService.isVendorOpen()"
+      (itemClick)="onItemClick($event.event, $event.item)"
+      (itemRightClick)="onItemRightClick($event.event, $event.item)"
+      (itemDragStart)="onItemDragStart($event.event, $event.item)"
+      (itemDragEnd)="onItemDragEnd($event)">
+    </app-inventory-list-view>
+  }
+
+  <!-- Grouped View (Decomposed Component) -->
+  @if (viewMode === 'grouped') {
+    <app-inventory-grouped-view
+      [groups]="getGroupedInventory()"
+      [isAltKeyHeld]="isAltKeyHeld"
+      [isVendorOpen]="vendorService.isVendorOpen()"
+      (groupToggle)="toggleGroup($event)"
+      (itemClick)="onItemClick($event.event, $event.item)"
+      (itemRightClick)="onItemRightClick($event.event, $event.item)"
+      (itemDragStart)="onItemDragStart($event.event, $event.item)"
+      (itemDragEnd)="onItemDragEnd($event)">
+    </app-inventory-grouped-view>
+  }
+
+  <!-- Item Details Panel (Shared Component) -->
+  @if (selectedItem) {
+    <app-item-details-panel
+      [item]="selectedItem"
+      [showActions]="true"
+      [showDropControls]="true"
+      (close)="closeItemDetails()"
+      (equipItem)="equipItem($event)"
+      (unequipItem)="unequipItem($event)"
+      (useItem)="useItem($event)"
+      (removeItem)="removeItem($event.instanceId, $event.quantity)"
+      (removeAllItems)="removeAllItems($event)">
+    </app-item-details-panel>
+  }
+
+  <!-- Inventory Stats (Decomposed Component) -->
+  <app-inventory-stats
+    [currentWeight]="inventoryService.currentWeight()"
+    [carryingCapacity]="inventoryService.carryingCapacity()"
+    [inventorySize]="inventoryService.inventorySize()"
+    [gold]="inventoryService.gold()"
+    [floatingGold]="floatingGold">
+  </app-inventory-stats>
+</div>
