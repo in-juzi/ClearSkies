@@ -12,6 +12,7 @@ import { CombatGoblinBasic } from './drop-tables/CombatGoblinBasic';
 import { CombatGoblinScout } from './drop-tables/CombatGoblinScout';
 import { CombatGoblinShaman } from './drop-tables/CombatGoblinShaman';
 import { CombatWolfBasic } from './drop-tables/CombatWolfBasic';
+import { FishingCod } from './drop-tables/FishingCod';
 import { FishingSalmon } from './drop-tables/FishingSalmon';
 import { FishingShrimp } from './drop-tables/FishingShrimp';
 import { GatheringChamomile } from './drop-tables/GatheringChamomile';
@@ -21,11 +22,18 @@ import { GatheringMoonpetal } from './drop-tables/GatheringMoonpetal';
 import { GatheringNettle } from './drop-tables/GatheringNettle';
 import { GatheringSage } from './drop-tables/GatheringSage';
 import { MiningCopper } from './drop-tables/MiningCopper';
+import { MiningIron } from './drop-tables/MiningIron';
 import { MiningTin } from './drop-tables/MiningTin';
 import { RareFishing } from './drop-tables/RareFishing';
 import { RareLowMining } from './drop-tables/RareLowMining';
 import { RareWoodcutting } from './drop-tables/RareWoodcutting';
+import { RareWoodcuttingBirch } from './drop-tables/RareWoodcuttingBirch';
+import { RareWoodcuttingFinds } from './drop-tables/RareWoodcuttingFinds';
+import { RareWoodcuttingOak } from './drop-tables/RareWoodcuttingOak';
+import { RareWoodcuttingPine } from './drop-tables/RareWoodcuttingPine';
+import { WoodcuttingBirch } from './drop-tables/WoodcuttingBirch';
 import { WoodcuttingOak } from './drop-tables/WoodcuttingOak';
+import { WoodcuttingPine } from './drop-tables/WoodcuttingPine';
 
 /**
  * Central registry for all droptables
@@ -37,6 +45,7 @@ export class DropTableRegistry {
     [CombatGoblinScout.dropTableId, CombatGoblinScout],
     [CombatGoblinShaman.dropTableId, CombatGoblinShaman],
     [CombatWolfBasic.dropTableId, CombatWolfBasic],
+    [FishingCod.dropTableId, FishingCod],
     [FishingSalmon.dropTableId, FishingSalmon],
     [FishingShrimp.dropTableId, FishingShrimp],
     [GatheringChamomile.dropTableId, GatheringChamomile],
@@ -46,11 +55,18 @@ export class DropTableRegistry {
     [GatheringNettle.dropTableId, GatheringNettle],
     [GatheringSage.dropTableId, GatheringSage],
     [MiningCopper.dropTableId, MiningCopper],
+    [MiningIron.dropTableId, MiningIron],
     [MiningTin.dropTableId, MiningTin],
     [RareFishing.dropTableId, RareFishing],
     [RareLowMining.dropTableId, RareLowMining],
     [RareWoodcutting.dropTableId, RareWoodcutting],
+    [RareWoodcuttingBirch.dropTableId, RareWoodcuttingBirch],
+    [RareWoodcuttingFinds.dropTableId, RareWoodcuttingFinds],
+    [RareWoodcuttingOak.dropTableId, RareWoodcuttingOak],
+    [RareWoodcuttingPine.dropTableId, RareWoodcuttingPine],
+    [WoodcuttingBirch.dropTableId, WoodcuttingBirch],
     [WoodcuttingOak.dropTableId, WoodcuttingOak],
+    [WoodcuttingPine.dropTableId, WoodcuttingPine],
   ]);
 
   /**

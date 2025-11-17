@@ -204,6 +204,7 @@ export const SUBCATEGORY = {
   // Weapon characteristics
   MELEE: 'melee',
   ONE_HANDED: 'one-handed',
+  TWO_HANDED: 'two-handed',
   DEFENSIVE: 'defensive',
 
   // Gathering tool types
@@ -343,7 +344,7 @@ export const SKILL_SOURCE = {
   TWO_HANDED: 'twoHanded',
   RANGED: 'ranged',
   CASTING: 'casting',
-  GUN: 'gun',
+  PROTECTION: 'protection',
 } as const;
 
 // ===== MATERIAL TYPES =====

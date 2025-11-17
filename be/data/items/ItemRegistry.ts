@@ -38,6 +38,8 @@ import { IronHelm } from './definitions/equipment/IronHelm';
 import { IronMiningPickaxe } from './definitions/equipment/IronMiningPickaxe';
 import { IronPlate } from './definitions/equipment/IronPlate';
 import { IronSword } from './definitions/equipment/IronSword';
+import { IronGreatsword } from './definitions/equipment/IronGreatsword';
+import { IronBattleaxe } from './definitions/equipment/IronBattleaxe';
 import { IronWoodcuttingAxe } from './definitions/equipment/IronWoodcuttingAxe';
 import { LeatherTunic } from './definitions/equipment/LeatherTunic';
 import { RareIronMiningPickaxeOffhand } from './definitions/equipment/RareIronMiningPickaxeOffhand';
@@ -45,9 +47,14 @@ import { WillowFishingRod } from './definitions/equipment/WillowFishingRod';
 import { WoodenShield } from './definitions/equipment/WoodenShield';
 
 // RESOURCES
+import { Amber } from './definitions/resources/Amber';
 import { Amethyst } from './definitions/resources/Amethyst';
 import { Aquamarine } from './definitions/resources/Aquamarine';
+import { BirchBark } from './definitions/resources/BirchBark';
+import { BirchLog } from './definitions/resources/BirchLog';
 import { BronzeIngot } from './definitions/resources/BronzeIngot';
+import { CabbageSeeds } from './definitions/resources/CabbageSeeds';
+import { CarrotSeeds } from './definitions/resources/CarrotSeeds';
 import { Chamomile } from './definitions/resources/Chamomile';
 import { Citrine } from './definitions/resources/Citrine';
 import { Cod } from './definitions/resources/Cod';
@@ -62,6 +69,7 @@ import { IronOre } from './definitions/resources/IronOre';
 import { Jade } from './definitions/resources/Jade';
 import { Jasmine } from './definitions/resources/Jasmine';
 import { LeatherScraps } from './definitions/resources/LeatherScraps';
+import { LettuceSeeds } from './definitions/resources/LettuceSeeds';
 import { MandrakeRoot } from './definitions/resources/MandrakeRoot';
 import { MapleLog } from './definitions/resources/MapleLog';
 import { Moonpetal } from './definitions/resources/Moonpetal';
@@ -69,9 +77,14 @@ import { Moonvine } from './definitions/resources/Moonvine';
 import { MorningGlory } from './definitions/resources/MorningGlory';
 import { Nettle } from './definitions/resources/Nettle';
 import { OakLog } from './definitions/resources/OakLog';
+import { OnionSeeds } from './definitions/resources/OnionSeeds';
 import { Passionflower } from './definitions/resources/Passionflower';
 import { PhoenixVine } from './definitions/resources/PhoenixVine';
 import { Pike } from './definitions/resources/Pike';
+import { PineLog } from './definitions/resources/PineLog';
+import { PineResin } from './definitions/resources/PineResin';
+import { PotatoSeeds } from './definitions/resources/PotatoSeeds';
+import { PumpkinSeeds } from './definitions/resources/PumpkinSeeds';
 import { Quartz } from './definitions/resources/Quartz';
 import { RawMeat } from './definitions/resources/RawMeat';
 import { Ruby } from './definitions/resources/Ruby';
@@ -81,11 +94,14 @@ import { Sapphire } from './definitions/resources/Sapphire';
 import { ScrapMetal } from './definitions/resources/ScrapMetal';
 import { Shrimp } from './definitions/resources/Shrimp';
 import { SilverOre } from './definitions/resources/SilverOre';
+import { StrawberrySeeds } from './definitions/resources/StrawberrySeeds';
 import { TatteredCloth } from './definitions/resources/TatteredCloth';
 import { TinOre } from './definitions/resources/TinOre';
+import { TomatoSeeds } from './definitions/resources/TomatoSeeds';
 import { Topaz } from './definitions/resources/Topaz';
 import { Trout } from './definitions/resources/Trout';
 import { TrumpetVine } from './definitions/resources/TrumpetVine';
+import { TurnipSeeds } from './definitions/resources/TurnipSeeds';
 import { Turquoise } from './definitions/resources/Turquoise';
 import { WillowLog } from './definitions/resources/WillowLog';
 import { Wisteria } from './definitions/resources/Wisteria';
@@ -125,14 +141,21 @@ export class ItemRegistry {
     [IronMiningPickaxe.itemId, IronMiningPickaxe],
     [IronPlate.itemId, IronPlate],
     [IronSword.itemId, IronSword],
+    [IronGreatsword.itemId, IronGreatsword],
+    [IronBattleaxe.itemId, IronBattleaxe],
     [IronWoodcuttingAxe.itemId, IronWoodcuttingAxe],
     [LeatherTunic.itemId, LeatherTunic],
     [RareIronMiningPickaxeOffhand.itemId, RareIronMiningPickaxeOffhand],
     [WillowFishingRod.itemId, WillowFishingRod],
     [WoodenShield.itemId, WoodenShield],
+    [Amber.itemId, Amber],
     [Amethyst.itemId, Amethyst],
     [Aquamarine.itemId, Aquamarine],
+    [BirchBark.itemId, BirchBark],
+    [BirchLog.itemId, BirchLog],
     [BronzeIngot.itemId, BronzeIngot],
+    [CabbageSeeds.itemId, CabbageSeeds],
+    [CarrotSeeds.itemId, CarrotSeeds],
     [Chamomile.itemId, Chamomile],
     [Citrine.itemId, Citrine],
     [Cod.itemId, Cod],
@@ -147,6 +170,7 @@ export class ItemRegistry {
     [Jade.itemId, Jade],
     [Jasmine.itemId, Jasmine],
     [LeatherScraps.itemId, LeatherScraps],
+    [LettuceSeeds.itemId, LettuceSeeds],
     [MandrakeRoot.itemId, MandrakeRoot],
     [MapleLog.itemId, MapleLog],
     [Moonpetal.itemId, Moonpetal],
@@ -154,9 +178,14 @@ export class ItemRegistry {
     [MorningGlory.itemId, MorningGlory],
     [Nettle.itemId, Nettle],
     [OakLog.itemId, OakLog],
+    [OnionSeeds.itemId, OnionSeeds],
     [Passionflower.itemId, Passionflower],
     [PhoenixVine.itemId, PhoenixVine],
     [Pike.itemId, Pike],
+    [PineLog.itemId, PineLog],
+    [PineResin.itemId, PineResin],
+    [PotatoSeeds.itemId, PotatoSeeds],
+    [PumpkinSeeds.itemId, PumpkinSeeds],
     [Quartz.itemId, Quartz],
     [RawMeat.itemId, RawMeat],
     [Ruby.itemId, Ruby],
@@ -166,11 +195,14 @@ export class ItemRegistry {
     [ScrapMetal.itemId, ScrapMetal],
     [Shrimp.itemId, Shrimp],
     [SilverOre.itemId, SilverOre],
+    [StrawberrySeeds.itemId, StrawberrySeeds],
     [TatteredCloth.itemId, TatteredCloth],
     [TinOre.itemId, TinOre],
+    [TomatoSeeds.itemId, TomatoSeeds],
     [Topaz.itemId, Topaz],
     [Trout.itemId, Trout],
     [TrumpetVine.itemId, TrumpetVine],
+    [TurnipSeeds.itemId, TurnipSeeds],
     [Turquoise.itemId, Turquoise],
     [WillowLog.itemId, WillowLog],
     [Wisteria.itemId, Wisteria],

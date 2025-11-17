@@ -10,10 +10,10 @@ export const ActivityChopOak: ActivityUnion = {
   "name": "Chop Oak Trees",
   "description": "Fell sturdy oak trees for quality timber",
   "type": "resource-gathering",
-  "duration": 6,
+  "duration": 8,
   "requirements": {
     "skills": {
-      "woodcutting": 1
+      "woodcutting": 3
     },
     "equipped": [
       {
@@ -27,7 +27,8 @@ export const ActivityChopOak: ActivityUnion = {
     },
     "dropTables": [
       "woodcutting-oak",
-      "rare-woodcutting"
+      "rare-woodcutting-oak",
+      "rare-woodcutting-finds"
     ]
   }
 } as const;

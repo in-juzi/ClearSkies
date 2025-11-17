@@ -15,6 +15,8 @@ export const ForestLoggingCamp: Facility = {
     "forest-clearing-merchant"
   ],
   "activities": [
-    "activity-chop-oak"
+    "activity-chop-pine",
+    "activity-chop-oak",
+    "activity-chop-birch"
   ]
 } as const;

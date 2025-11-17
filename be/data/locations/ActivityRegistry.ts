@@ -7,7 +7,9 @@
 
 import { ActivityUnion } from '../../types/locations';
 
+import { ActivityChopBirch } from './activities/ActivityChopBirch';
 import { ActivityChopOak } from './activities/ActivityChopOak';
+import { ActivityChopPine } from './activities/ActivityChopPine';
 import { ActivityCombatBandit } from './activities/ActivityCombatBandit';
 import { ActivityCombatBandits } from './activities/ActivityCombatBandits';
 import { ActivityCombatForestWolf } from './activities/ActivityCombatForestWolf';
@@ -33,7 +35,9 @@ import { ActivityMineTin } from './activities/ActivityMineTin';
  */
 export class ActivityRegistry {
   private static readonly items = new Map<string, ActivityUnion>([
+    [ActivityChopBirch.activityId, ActivityChopBirch],
     [ActivityChopOak.activityId, ActivityChopOak],
+    [ActivityChopPine.activityId, ActivityChopPine],
     [ActivityCombatBandit.activityId, ActivityCombatBandit],
     [ActivityCombatBandits.activityId, ActivityCombatBandits],
     [ActivityCombatForestWolf.activityId, ActivityCombatForestWolf],

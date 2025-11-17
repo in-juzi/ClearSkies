@@ -1,0 +1,33 @@
+/**
+ * Pine Woodcutting Drops
+ * Common drops from chopping pine trees
+ */
+
+import { DropTable } from '../../../types/locations';
+
+export const WoodcuttingPine: DropTable = {
+  "dropTableId": "woodcutting-pine",
+  "name": "Pine Woodcutting Drops",
+  "description": "Common drops from chopping pine trees",
+  "drops": [
+    {
+      "itemId": "pine_log",
+      "weight": 80,
+      "quantity": {
+        "min": 1,
+        "max": 2
+      }
+    },
+    {
+      "itemId": "pine_log",
+      "weight": 20,
+      "quantity": {
+        "min": 2,
+        "max": 3
+      },
+      "qualityBonus": {
+        "woodGrain": 0.2
+      }
+    }
+  ]
+} as const;
