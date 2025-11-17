@@ -7,11 +7,11 @@ import { AuthService } from '../../../services/auth.service';
 import { SkillsService } from '../../../services/skills.service';
 import { ChatService } from '../../../services/chat.service';
 import { Recipe } from '../../../models/recipe.model';
-import { ItemModifiersComponent } from '../../shared/item-modifiers/item-modifiers.component';
-import { ItemMiniComponent } from '../../shared/item-mini/item-mini.component';
-import { IconComponent } from '../../shared/icon/icon.component';
-import { ActivityLogComponent, ActivityLogEntry } from '../../shared/activity-log/activity-log.component';
+import { ActivityLogEntry } from '../../shared/activity-log/activity-log.component';
 import { ItemInstance, RecipeIngredient } from '@shared/types';
+import { RecipeListComponent } from './recipe-list/recipe-list.component';
+import { CraftingProgressComponent } from './crafting-progress/crafting-progress.component';
+import { IngredientSelectorComponent } from './ingredient-selector/ingredient-selector.component';
 
 // Extended item instance with crafting-specific properties (uses any for flexibility with ItemDetails)
 type CraftingItemInstance = ItemInstance | any;
@@ -19,7 +19,7 @@ type CraftingItemInstance = ItemInstance | any;
 @Component({
   selector: 'app-crafting',
   standalone: true,
-  imports: [CommonModule, ItemModifiersComponent, ItemMiniComponent, IconComponent, ActivityLogComponent],
+  imports: [CommonModule, RecipeListComponent, CraftingProgressComponent, IngredientSelectorComponent],
   templateUrl: './crafting.component.html',
   styleUrls: ['./crafting.component.scss']
 })
@@ -79,11 +79,16 @@ export class CraftingComponent implements OnInit {
   playerSkills = computed(() => this.authService.currentPlayer()?.skills);
   playerInventory = computed(() => this.inventoryService.inventory());
 
+  // Recipes filtered by current skill
+  recipesBySkill = computed(() => {
+    return this.recipeService.recipes().filter(r => r.skill === this.skill);
+  });
+
   // Get the current active recipe for progress calculation
-  activeRecipe = computed(() => {
+  activeRecipe = computed<Recipe | null>(() => {
     const activeCrafting = this.craftingService.activeCrafting();
     if (!activeCrafting) return null;
-    return this.recipeService.getRecipe(activeCrafting.recipeId);
+    return this.recipeService.getRecipe(activeCrafting.recipeId) || null;
   });
 
   // Calculate progress percentage (0-100)

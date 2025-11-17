@@ -1,309 +1,49 @@
 <div class="crafting-container">
-  <!-- Active Crafting Progress -->
+  <!-- Active Crafting Progress (Decomposed Component) -->
   @if (craftingService.isCrafting() || isRestarting()) {
-    <div class="active-crafting">
-      @if (activeRecipe() && activeOutputIcon()) {
-        <div class="recipe-output-display">
-          <app-icon
-            [icon]="activeOutputIcon()!"
-            [size]="48"
-            class="output-icon">
-          </app-icon>
-          <div class="recipe-name-active">{{ activeRecipe()!.name }}</div>
-        </div>
-      } @else if (activeRecipe()) {
-        <div class="recipe-name-active">{{ activeRecipe()!.name }}</div>
-      }
-      <div class="progress-bar-container">
-        <div class="progress-bar"
-             [style.width.%]="craftingProgress()">
-        </div>
-      </div>
-      <div class="time-remaining">
-        {{ formatTime(craftingService.remainingTime()) }} remaining
-      </div>
-
-      <!-- Crafting With Ingredients -->
-      @if (activeIngredientItems().length > 0) {
-        <div class="crafting-with">
-          <h4>Using:</h4>
-          <div class="ingredient-items">
-            @for (group of activeIngredientItems(); track group.itemId) {
-              <div class="ingredient-group-display">
-                <div class="ingredient-header">
-                  <span class="ingredient-label">{{ group.itemId }}</span>
-                </div>
-                <div class="ingredient-instances-display">
-                  @for (instance of group.instances; track instance.instanceId) {
-                    <div class="instance-with-remaining">
-                      <div class="instance-with-name">
-                        <span class="instance-item-name">{{ instance.definition?.name || instance.itemId }}</span>
-                        <app-item-mini
-                          [item]="createItemForDisplay(instance, instance.usedQuantity)"
-                          [showIcon]="false"
-                          [showItemId]="false"
-                          [showModifiers]="true">
-                        </app-item-mini>
-                      </div>
-                      <span class="remaining-text">({{ instance.remainingQuantity }} left)</span>
-                    </div>
-                  }
-                </div>
-              </div>
-            }
-          </div>
-        </div>
-      }
-
-      <div class="auto-restart-toggle">
-        <label>
-          <input type="checkbox"
-                 [checked]="autoRestartEnabled()"
-                 (change)="toggleAutoRestart()">
-          Auto-restart when ingredients available
-        </label>
-      </div>
-      <button class="btn-cancel" (click)="cancelCrafting()">
-        Cancel
-      </button>
-    </div>
+    <app-crafting-progress
+      [activeRecipe]="activeRecipe()"
+      [activeOutputIcon]="activeOutputIcon()"
+      [craftingProgress]="craftingProgress()"
+      [remainingTime]="craftingService.remainingTime()"
+      [activeIngredientItems]="activeIngredientItems()"
+      [autoRestartEnabled]="autoRestartEnabled()"
+      [isRestarting]="isRestarting()"
+      [craftingLog]="craftingLog"
+      [lastResult]="craftingService.lastResult()"
+      (autoRestartToggled)="toggleAutoRestart()"
+      (craftingCancelled)="cancelCrafting()"
+      (resultCleared)="clearResult()">
+    </app-crafting-progress>
   }
 
-  <!-- Crafting Log -->
-  @if (craftingLog.length > 0 && autoRestartEnabled()) {
-    <app-activity-log
-      [entries]="craftingLog"
-      [maxEntries]="10"
-      [showTimestamp]="true"
-      [title]="'Recent Completions'">
-    </app-activity-log>
-  }
-
-  <!-- Last Crafting Result -->
-  @if (craftingService.lastResult() && !autoRestartEnabled()) {
-    <div class="crafting-result">
-      <h3>Crafting Complete!</h3>
-      <div class="result-item">
-        <div class="item-name">{{ craftingService.lastResult()!.recipe.name }}</div>
-        <div class="xp-gain">+{{ craftingService.lastResult()!.experience.xp }} {{ craftingService.lastResult()!.experience.skill }} XP</div>
-      </div>
-      <button class="btn-close" (click)="clearResult()">
-        Close
-      </button>
-    </div>
-  }
-
-  <!-- Recipe List -->
+  <!-- Recipe List (Decomposed Component) -->
   @if (!craftingService.isCrafting() && !selectedRecipe() && !isRestarting()) {
-    <div class="recipe-list-container">
-      <div class="header-row">
-        <h2>{{ skill | titlecase }} Recipes</h2>
-        @if (!recipeService.loading()) {
-          <span class="recipe-count">{{ filteredRecipes().length }} recipe{{ filteredRecipes().length !== 1 ? 's' : '' }}</span>
-        }
-      </div>
-
-      <!-- Filters -->
-      <div class="recipe-filters">
-        <div class="filter-row">
-          <input
-            type="text"
-            class="search-input"
-            placeholder="Search recipes..."
-            [value]="searchQuery()"
-            (input)="searchQuery.set($any($event.target).value)"
-          />
-        </div>
-
-        <div class="filter-row">
-          <label class="filter-checkbox">
-            <input
-              type="checkbox"
-              [checked]="showCraftableOnly()"
-              (change)="showCraftableOnly.set(!showCraftableOnly())"
-            />
-            <span>Show craftable only</span>
-          </label>
-
-          <div class="filter-sort">
-            <label>Sort by:</label>
-            <select
-              class="sort-select"
-              [value]="sortBy()"
-              (change)="sortBy.set($any($event.target).value)"
-            >
-              <option value="level">Level</option>
-              <option value="name">Name</option>
-              <option value="xp">XP Reward</option>
-            </select>
-          </div>
-
-          @if (hasActiveFilters()) {
-            <button class="btn-clear-filters" (click)="clearFilters()">
-              Clear Filters
-            </button>
-          }
-        </div>
-      </div>
-
-      @if (recipeService.loading()) {
-        <div class="loading">Loading recipes...</div>
-      } @else if (filteredRecipes().length === 0) {
-        <div class="empty-message">
-          @if (searchQuery() || showCraftableOnly()) {
-            No recipes match your filters
-          } @else {
-            No recipes available for {{ skill }}
-          }
-        </div>
-      } @else {
-        <div class="recipe-list">
-          @for (recipe of filteredRecipes(); track recipe.recipeId) {
-            <div class="recipe-card"
-                 (click)="!isRecipeLocked(recipe) && selectRecipe(recipe)"
-                 [class.can-craft]="!isRecipeLocked(recipe) && canCraft(recipe).canCraft"
-                 [class.cannot-craft]="!isRecipeLocked(recipe) && !canCraft(recipe).canCraft"
-                 [class.locked]="isRecipeLocked(recipe)"
-                 [title]="isRecipeLocked(recipe) ? getUnlockHint(recipe) : ''">
-              <div class="recipe-header">
-                <div class="recipe-name">
-                  @if (isRecipeLocked(recipe)) {
-                    <span class="lock-icon">🔒</span>
-                  }
-                  {{ recipe.name }}
-                </div>
-                <div class="recipe-level">Lvl {{ recipe.requiredLevel }}</div>
-              </div>
-              <div class="recipe-description">{{ recipe.description }}</div>
-              @if (isRecipeLocked(recipe)) {
-                <div class="unlock-hint">{{ getUnlockHint(recipe) }}</div>
-              }
-              <div class="recipe-ingredients">
-                @for (ingredient of recipe.ingredients; track getIngredientLookupKey(ingredient)) {
-                  <span class="ingredient"
-                        [class.has-enough]="hasEnoughIngredientByLookupKey(getIngredientLookupKey(ingredient), ingredient, ingredient.quantity)"
-                        [class.not-enough]="!hasEnoughIngredientByLookupKey(getIngredientLookupKey(ingredient), ingredient, ingredient.quantity)">
-                    {{ getIngredientLabel(ingredient) }} ({{ getIngredientDisplayByLookupKey(getIngredientLookupKey(ingredient), ingredient, ingredient.quantity) }})
-                  </span>
-                }
-              </div>
-            </div>
-          }
-        </div>
-      }
-    </div>
+    <app-recipe-list
+      [skill]="skill"
+      [recipes]="recipesBySkill()"
+      [loading]="recipeService.loading()"
+      [playerSkills]="playerSkills()"
+      [playerInventory]="playerInventory()"
+      (recipeSelected)="selectRecipe($event)">
+    </app-recipe-list>
   }
 
-  <!-- Recipe Details -->
+  <!-- Recipe Details / Ingredient Selector (Decomposed Component) -->
   @if (selectedRecipe() && !craftingService.isCrafting()) {
-    <div class="recipe-details">
-      <button class="btn-back" (click)="selectedRecipe.set(null)">
-        ← Back to Recipes
-      </button>
-
-      <div class="recipe-header-detail">
-        <h2>{{ selectedRecipe()!.name }}</h2>
-        <div class="recipe-meta">
-          <span class="level-req">Requires {{ skill | titlecase }} Level {{ selectedRecipe()!.requiredLevel }}</span>
-          <span class="duration">Duration: {{ selectedRecipe()!.duration }}s</span>
-          <span class="xp-reward">+{{ selectedRecipe()!.experience }} XP</span>
-        </div>
-      </div>
-
-      <!-- Output Section -->
-      <div class="output-section">
-        <h3>Creates</h3>
-        @for (outputItem of selectedRecipeOutputItems(); track outputItem.itemId) {
-          <div class="output-item-display">
-            @if (outputItem.definition?.icon) {
-              <app-icon
-                [icon]="outputItem.definition.icon"
-                [size]="32"
-                class="output-icon-inline">
-              </app-icon>
-            }
-            <div class="output-details">
-              <div class="output-name-display">
-                <span class="output-name">{{ outputItem.name }}</span>
-                <span class="output-quantity">x{{ outputItem.quantity }}</span>
-              </div>
-              <div class="recipe-description-detail">
-                {{ selectedRecipe()!.description }}
-              </div>
-              @if (outputItem.qualityModifier === 'inherit') {
-                <div class="quality-note">
-                  Quality inherited from ingredients + {{ skill }} level bonus
-                </div>
-              }
-            </div>
-          </div>
-        }
-      </div>
-
-      <div class="craft-actions">
-        @if (canCraft(selectedRecipe()!).canCraft) {
-          <button class="btn-craft" (click)="startCrafting(selectedRecipe()!)">
-            Start Crafting
-          </button>
-        } @else {
-          <div class="cannot-craft-message">
-            {{ canCraft(selectedRecipe()!).message }}
-          </div>
-        }
-      </div>
-
-      <div class="ingredients-section">
-        <h3>Required Ingredients</h3>
-
-        @for (ingredient of selectedRecipe()!.ingredients; track getIngredientLookupKey(ingredient)) {
-          <div class="ingredient-group">
-            <div class="ingredient-header">
-              <span class="ingredient-name">{{ getIngredientLabel(ingredient) }}</span>
-              <span class="ingredient-selection-count">
-                Selected: {{ getTotalSelectedByLookupKey(getIngredientLookupKey(ingredient)) }} / {{ ingredient.quantity }}
-              </span>
-            </div>
-
-            <div class="ingredient-actions">
-              <button class="btn-auto-select"
-                      (click)="autoSelectBestQuality(selectedRecipe()!)">
-                Auto-select Best
-              </button>
-              <button class="btn-clear-selection"
-                      (click)="clearSelection()">
-                Clear Selection
-              </button>
-            </div>
-
-            <div class="instance-list">
-              @for (instance of getAvailableInstancesByIngredient(ingredient); track instance.instanceId) {
-                <div class="instance-card"
-                     (click)="toggleInstanceSelection(getIngredientLookupKey(ingredient), instance.instanceId, instance.quantity, ingredient.quantity)"
-                     [class.selected]="getSelectedQuantity(instance.instanceId) > 0"
-                     [class.fully-selected]="getSelectedQuantity(instance.instanceId) === instance.quantity">
-                  <div class="instance-info">
-                    <span class="instance-item-name">{{ instance.definition?.name || instance.itemId }}</span>
-                    <span class="instance-quantity">x{{ instance.quantity }}</span>
-                    <app-item-modifiers [item]="instance" displayMode="badge-name" size="normal"></app-item-modifiers>
-                  </div>
-
-                  @if (getSelectedQuantity(instance.instanceId) > 0) {
-                    <div class="selection-indicator">
-                      ✓ {{ getSelectedQuantity(instance.instanceId) }} selected
-                    </div>
-                  }
-                </div>
-              }
-
-              @if (getAvailableInstancesByIngredient(ingredient).length === 0) {
-                <div class="no-instances">
-                  No {{ getIngredientLabel(ingredient) }} available
-                </div>
-              }
-            </div>
-          </div>
-        }
-      </div>
-    </div>
+    <app-ingredient-selector
+      [recipe]="selectedRecipe()"
+      [skill]="skill"
+      [playerInventory]="playerInventory()"
+      [selectedIngredients]="selectedIngredients"
+      [outputItems]="selectedRecipeOutputItems()"
+      [canCraft]="canCraft(selectedRecipe()!).canCraft"
+      [canCraftMessage]="canCraft(selectedRecipe()!).message"
+      (recipeBack)="selectedRecipe.set(null)"
+      (craftingStarted)="startCrafting($event)"
+      (ingredientSelectionChanged)="toggleInstanceSelection($event.lookupKey, $event.instanceId, $event.maxQuantity, $event.required)"
+      (autoSelectRequested)="autoSelectBestQuality($event)"
+      (selectionCleared)="clearSelection()">
+    </app-ingredient-selector>
   }
 </div>
