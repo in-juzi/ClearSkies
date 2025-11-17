@@ -88,8 +88,12 @@
 - ✅ Centralized item utilities (completed - item-filter service and item-sort utils)
 - ✅ Component utility migration (completed - all components use shared rarity/filter/sort utilities)
 - ✅ Frontend logging cleanup (completed - removed debug console.log statements, kept console.error for production)
+- ✅ Angular inject() migration (completed - migrated components from constructor DI to inject() function)
 
 **Recent Changes** (Last 10 commits):
+- refactor: standardize component class names with Component suffix
+- refactor: migrate components to use inject() instead of constructor DI
+- docs: update CLAUDE.md with frontend logging cleanup
 - refactor: remove debug console.log statements from frontend
 - docs: update CLAUDE.md with centralized utility documentation
 - refactor: migrate item-details-panel sub-components to use rarity pipes
