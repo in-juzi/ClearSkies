@@ -28,6 +28,9 @@ router.get('/activities/status', locationController.getActivityStatus);
 router.post('/activities/complete', locationController.completeActivity);
 router.post('/activities/cancel', locationController.cancelActivity);
 
+// Drop table endpoints
+router.get('/drop-tables/:dropTableId', locationController.getDropTable);
+
 // Admin/Debug endpoints
 router.get('/definitions/all', locationController.getAllDefinitions);
 router.post('/definitions/reload', locationController.reloadDefinitions);

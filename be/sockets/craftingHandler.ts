@@ -2,6 +2,7 @@ import { Server, Socket } from 'socket.io';
 import Player from '../models/Player';
 import recipeService from '../services/recipeService';
 import itemService from '../services/itemService';
+import questService from '../services/questService';
 
 // Track active crafting timers per user
 const craftingTimers = new Map<string, NodeJS.Timeout>();
@@ -119,6 +120,9 @@ function scheduleCraftingCompletion(
           }
         });
       }
+
+      // Update quest progress for recipe crafted
+      await questService.onRecipeCrafted(freshPlayer, recipeId);
 
       // Clear crafting state
       freshPlayer.activeCrafting = undefined;

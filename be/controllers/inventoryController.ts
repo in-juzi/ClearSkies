@@ -677,6 +677,14 @@ export const equipItem = async (req: Request<{}, {}, EquipItemRequest>, res: Res
     // Equip the item
     const result = await player.equipItem(instanceId, slotName);
 
+    // Trigger quest system for equipment check (for FullyEquipped quest)
+    try {
+      const questService = require('../services/questService').default;
+      await questService.onItemEquipped(player);
+    } catch (error) {
+      console.error('Error updating quest progress on item equipped:', error);
+    }
+
     // Get enhanced item details
     const plainItem = convertMapsToObjects(result.item);
     const itemDetails = itemService.getItemDetails(plainItem);
@@ -714,6 +722,14 @@ export const unequipItem = async (req: Request<{}, {}, UnequipItemRequest>, res:
 
     // Unequip the item
     const result = await player.unequipItem(slotName);
+
+    // Trigger quest system for equipment check (for FullyEquipped quest)
+    try {
+      const questService = require('../services/questService').default;
+      await questService.onItemEquipped(player);
+    } catch (error) {
+      console.error('Error updating quest progress on item unequipped:', error);
+    }
 
     // Get enhanced item details
     const itemDetails = result.item ? itemService.getItemDetails(convertMapsToObjects(result.item)) : null;

@@ -69,6 +69,7 @@ export interface EquipmentProperties extends ItemProperties {
   attackSpeed?: number;
   critChance?: number;
   skillScalar?: string;
+  twoHanded?: boolean; // If true, weapon occupies both mainHand and offHand slots
   toolEfficiency?: number;
   // Armor properties
   armor?: number;
@@ -92,6 +93,7 @@ export interface WeaponProperties extends EquipmentProperties {
   attackSpeed: number;
   critChance: number;
   skillScalar: string;
+  twoHanded?: boolean; // If true, weapon occupies both mainHand and offHand slots
   toolEfficiency?: number; // For gathering tools that are also weapons
 }
 

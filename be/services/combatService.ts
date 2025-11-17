@@ -435,7 +435,9 @@ class CombatService {
     }
 
     // Get skill level for scaling
-    const skillScalar = weapon.skillScalar;
+    // For players, use active combat skill (context-dependent on equipment)
+    // For monsters, use weapon's skillScalar
+    const skillScalar = attacker.getActiveCombatSkill ? attacker.getActiveCombatSkill() : weapon.skillScalar;
     const skill = attacker.skills[skillScalar];
     const skillLevel = skill ? skill.level : 1;
 
@@ -594,12 +596,12 @@ class CombatService {
   /**
    * Apply damage over time effect from a buff
    */
-  private applyDamageOverTime(
+  private async applyDamageOverTime(
     buff: ActiveBuff,
     player: any,
     monsterInstance: any,
     result: { playerDamage: number; monsterDamage: number }
-  ): void {
+  ): Promise<void> {
     if (!buff.damageOverTime) return;
 
     if (buff.target === 'monster') {
@@ -607,7 +609,7 @@ class CombatService {
       result.monsterDamage += buff.damageOverTime;
       player.addCombatLog(`${buff.name} deals ${buff.damageOverTime} damage to ${monsterInstance.name}.`, 'debuff', buff.damageOverTime, 'monster');
     } else {
-      player.takeDamage(buff.damageOverTime);
+      await player.takeDamage(buff.damageOverTime);
       result.playerDamage += buff.damageOverTime;
       player.addCombatLog(`${buff.name} deals ${buff.damageOverTime} damage to you.`, 'debuff', buff.damageOverTime, 'player');
     }
@@ -663,7 +665,7 @@ class CombatService {
    * Process buff/debuff tick effects (DoT, HoT, durations)
    * Refactored to use separate handler methods for each effect type
    */
-  processBuffTick(player: any, monsterInstance: any, tickingEntity?: 'player' | 'monster'): any {
+  async processBuffTick(player: any, monsterInstance: any, tickingEntity?: 'player' | 'monster'): Promise<any> {
     if (!player.activeCombat || !player.activeCombat.activeBuffs) {
       return { playerDamage: 0, monsterDamage: 0, expiredBuffs: [] };
     }
@@ -682,7 +684,7 @@ class CombatService {
 
       if (shouldApplyEffects) {
         // Apply all buff effects using dedicated handlers
-        this.applyDamageOverTime(buff, player, monsterInstance, result);
+        await this.applyDamageOverTime(buff, player, monsterInstance, result);
         this.applyHealOverTime(buff, player, monsterInstance);
         this.applyManaRegen(buff, player);
         this.applyManaDrain(buff, player, monsterInstance);
@@ -804,9 +806,9 @@ class CombatService {
       // Store the activity ID that started this combat
       player.lastCombatActivityId = activityId;
 
-      // Get player's available abilities based on equipped weapon
-      const weapon = this.getEquippedWeapon(player, itemService);
-      const availableAbilities = weapon ? this.getAbilitiesForWeapon(weapon.skillScalar) : [];
+      // Get player's available abilities based on active combat skill
+      const activeCombatSkill = player.getActiveCombatSkill();
+      const availableAbilities = this.getAbilitiesForWeapon(activeCombatSkill);
 
       return {
         success: true,
@@ -853,7 +855,7 @@ class CombatService {
   /**
    * Use ability in combat
    */
-  useAbility(player: any, abilityId: string, itemService: any): any {
+  async useAbility(player: any, abilityId: string, itemService: any): Promise<any> {
     if (!player.isInCombat()) {
       throw new Error('Player is not in combat');
     }
@@ -861,6 +863,23 @@ class CombatService {
     const ability = this.getAbility(abilityId);
     if (!ability) {
       throw new Error(`Ability not found: ${abilityId}`);
+    }
+
+    // Validate skill level requirement
+    if (ability.requirements && ability.requirements.minSkillLevel) {
+      const activeCombatSkill = player.getActiveCombatSkill();
+      const skillLevel = player.skills[activeCombatSkill]?.level || 1;
+      if (skillLevel < ability.requirements.minSkillLevel) {
+        throw new Error(`Insufficient ${activeCombatSkill} skill level. Need level ${ability.requirements.minSkillLevel}, have level ${skillLevel}`);
+      }
+    }
+
+    // Validate weapon type requirement
+    if (ability.requirements && ability.requirements.weaponTypes) {
+      const activeCombatSkill = player.getActiveCombatSkill();
+      if (!ability.requirements.weaponTypes.includes(activeCombatSkill)) {
+        throw new Error(`Cannot use ${ability.name} with ${activeCombatSkill} combat style. Requires: ${ability.requirements.weaponTypes.join(', ')}`);
+      }
     }
 
     // Check cooldown
@@ -875,6 +894,11 @@ class CombatService {
 
     // Use mana
     player.useMana(ability.manaCost);
+
+    // Award XP if ability has xpOnUse (for protection/support skills)
+    if (ability.xpOnUse && ability.xpOnUse > 0) {
+      await player.addSkillExperience('protection', ability.xpOnUse);
+    }
 
     // Get monster instance
     const combat = player.activeCombat;
@@ -918,11 +942,11 @@ class CombatService {
 
     // Process buff/debuff tick effects (DoT, HoT, durations) BEFORE applying new buffs
     // Only decrement player buffs since the player is using the ability
-    const buffTickResults = this.processBuffTick(player, monsterInstance, 'player');
+    const buffTickResults = await this.processBuffTick(player, monsterInstance, 'player');
 
     // Apply DoT/HoT damage from buffs
     if (buffTickResults.playerDamage > 0) {
-      player.takeDamage(buffTickResults.playerDamage);
+      await player.takeDamage(buffTickResults.playerDamage);
     }
     if (buffTickResults.monsterDamage > 0) {
       monsterInstance.stats.health.current = Math.max(0, monsterInstance.stats.health.current - buffTickResults.monsterDamage);
@@ -981,10 +1005,9 @@ class CombatService {
       player.addGold(goldAmount);
       rewards.gold = goldAmount;
 
-      // Award XP (use weapon's skill scalar)
-      const weapon = this.getEquippedWeapon(player, itemService);
-      const skillScalar = weapon ? weapon.skillScalar : 'oneHanded';
-      const xpResult = await player.addSkillExperience(skillScalar, monsterDef.experience);
+      // Award XP (use active combat skill based on equipment)
+      const activeCombatSkill = player.getActiveCombatSkill();
+      const xpResult = await player.addSkillExperience(activeCombatSkill, monsterDef.experience);
       rewards.experience = monsterDef.experience;
       rewards.skillResult = xpResult;
 

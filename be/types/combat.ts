@@ -3,6 +3,7 @@
  */
 
 import { IconConfig, Stats, Skill, Attribute, SkillName, AttributeName } from './common';
+import { ModifierType } from '@shared/types/combat-enums';
 
 // ===== ENUMS & LITERAL TYPES =====
 
@@ -13,6 +14,8 @@ export type TargetType = 'single' | 'aoe' | 'self';
 export type DamageType = 'physical' | 'magical';
 
 export type CombatLogType = 'damage' | 'heal' | 'dodge' | 'miss' | 'crit' | 'ability' | 'system';
+
+export type StatModifierType = 'flat' | 'percentage';
 
 // ===== MONSTER DEFINITIONS =====
 
@@ -100,6 +103,7 @@ export interface Ability {
   requirements: AbilityRequirements;
   effects: AbilityEffects;
   icon: IconConfig;
+  xpOnUse?: number; // XP awarded when ability is used
 }
 
 /**
@@ -108,6 +112,31 @@ export interface Ability {
 export interface AbilityRequirements {
   weaponTypes: string[];
   minSkillLevel: number;
+}
+
+/**
+ * Buff application configuration for abilities
+ */
+export interface BuffApplication {
+  target: 'self' | 'enemy'; // Who receives the buff/debuff
+  name: string; // Display name
+  description: string; // Description of the buff
+  duration: number; // Turns
+  icon?: IconConfig; // Visual icon
+  statModifiers?: StatModifier[]; // Stat modifications
+  damageOverTime?: number; // Damage per turn
+  healOverTime?: number; // Healing per turn
+  manaRegen?: number; // Mana per turn
+  manaDrain?: number; // Mana drain per turn
+}
+
+/**
+ * Stat modifier for buffs/debuffs
+ */
+export interface StatModifier {
+  stat: string; // Stat to modify (armor, damage, etc.)
+  type: ModifierType | StatModifierType; // Type of modification (supports enum or string)
+  value: number; // e.g., 10 for +10 armor, or 0.15 for +15% damage
 }
 
 /**
@@ -121,6 +150,7 @@ export interface AbilityEffects {
   heal?: {
     multiplier: number;
   };
+  applyBuff?: BuffApplication; // Apply buff/debuff
   buff?: {
     stat: string;
     amount: number;

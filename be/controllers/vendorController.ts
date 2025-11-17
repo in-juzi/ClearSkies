@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import Player from '../models/Player';
 import vendorService from '../services/vendorService';
 import itemService from '../services/itemService';
+import questService from '../services/questService';
 
 // ============================================================================
 // Type Definitions for Request Bodies
@@ -134,6 +135,9 @@ export const buyItem = async (
       const itemInstance = itemService.createItemInstance(itemId, 1);
       player.addItem(itemInstance);
     }
+
+    // Update quest progress for item acquisition
+    await questService.onItemAcquired(player, itemId, quantity);
 
     await player.save();
 

@@ -107,6 +107,7 @@ export interface Ability {
   requirements: AbilityRequirements;
   effects: AbilityEffects;
   icon: IconConfig;
+  xpOnUse?: number; // Optional: XP awarded to a skill when this ability is used (for protection/support skills)
 }
 
 /**

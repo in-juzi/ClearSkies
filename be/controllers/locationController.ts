@@ -779,3 +779,45 @@ export const reloadDefinitions = async (req: Request, res: Response): Promise<vo
     res.status(500).json({ message: 'Server error', error: (error as Error).message });
   }
 };
+
+/**
+ * GET /api/locations/drop-tables/:dropTableId
+ * Get drop table with enriched item information
+ */
+export const getDropTable = async (
+  req: Request<{ dropTableId: string }>,
+  res: Response
+): Promise<void> => {
+  try {
+    const { dropTableId } = req.params;
+
+    const dropTable = locationService.getDropTable(dropTableId);
+
+    if (!dropTable) {
+      res.status(404).json({ message: 'Drop table not found' });
+      return;
+    }
+
+    // Enrich drop table entries with item definitions
+    const enrichedDrops = dropTable.drops.map(drop => {
+      if (drop.itemId) {
+        const itemDef = itemService.getItemDefinition(drop.itemId);
+        return {
+          ...drop,
+          itemDef: itemDef || null
+        };
+      }
+      return drop;
+    });
+
+    res.json({
+      dropTable: {
+        ...dropTable,
+        enrichedDrops
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching drop table:', error);
+    res.status(500).json({ message: 'Server error', error: (error as Error).message });
+  }
+};

@@ -114,7 +114,7 @@ export default function (io: Server): void {
         }
 
         // Use combat service to handle ability (includes buff application)
-        const result = combatService.useAbility(player, abilityId, itemService);
+        const result = await combatService.useAbility(player, abilityId, itemService);
 
         // Get ability for emit data
         const ability = combatService.getAbility(abilityId);
@@ -634,11 +634,11 @@ async function performPlayerTurn(userId: string, io: Server): Promise<void> {
 
     // Process buff/debuff tick effects (DoT, HoT, durations)
     // Only decrement player buffs on player turn
-    const buffTickResults = combatService.processBuffTick(player, monsterInstance, 'player');
+    const buffTickResults = await combatService.processBuffTick(player, monsterInstance, 'player');
 
     // Apply DoT/HoT damage from buffs
     if (buffTickResults.playerDamage > 0) {
-      player.takeDamage(buffTickResults.playerDamage);
+      await player.takeDamage(buffTickResults.playerDamage);
     }
     if (buffTickResults.monsterDamage > 0) {
       monsterInstance.stats.health.current = Math.max(0, monsterInstance.stats.health.current - buffTickResults.monsterDamage);
@@ -698,7 +698,7 @@ async function performMonsterTurn(userId: string, io: Server): Promise<void> {
     const attackResult = combatService.calculateDamage(monsterInstance, player, itemService, player);
 
     // Apply damage to player
-    const playerDefeated = player.takeDamage(attackResult.damage);
+    const playerDefeated = await player.takeDamage(attackResult.damage);
 
     // Update combat state
     const monsterWeapon = combatService.getEquippedWeapon(monsterInstance, itemService);
@@ -722,11 +722,11 @@ async function performMonsterTurn(userId: string, io: Server): Promise<void> {
 
     // Process buff/debuff tick effects (DoT, HoT, durations)
     // Only decrement monster buffs on monster turn
-    const buffTickResults = combatService.processBuffTick(player, monsterInstance, 'monster');
+    const buffTickResults = await combatService.processBuffTick(player, monsterInstance, 'monster');
 
     // Apply DoT/HoT damage from buffs
     if (buffTickResults.playerDamage > 0) {
-      player.takeDamage(buffTickResults.playerDamage);
+      await player.takeDamage(buffTickResults.playerDamage);
     }
     if (buffTickResults.monsterDamage > 0) {
       monsterInstance.stats.health.current = Math.max(0, monsterInstance.stats.health.current - buffTickResults.monsterDamage);

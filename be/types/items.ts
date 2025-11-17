@@ -66,6 +66,7 @@ export interface EquipmentProperties extends ItemProperties {
   attackSpeed?: number;
   critChance?: number;
   skillScalar?: string;
+  twoHanded?: boolean; // If true, occupies both hands
   toolEfficiency?: number;
   // Armor properties
   armor?: number;

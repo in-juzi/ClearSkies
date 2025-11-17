@@ -4,6 +4,7 @@ import locationService from '../services/locationService';
 import itemService from '../services/itemService';
 import dropTableService from '../services/dropTableService';
 import effectEvaluator from '../services/effectEvaluator';
+import questService from '../services/questService';
 import { GatheringActivity, EffectContext } from '@shared/types';
 import { schedulePlayerTurn, scheduleMonsterTurn } from './combatHandler';
 
@@ -92,6 +93,9 @@ function scheduleActivityCompletion(
           });
         }
       }
+
+      // Update quest progress for activity completion
+      await questService.onActivityComplete(freshPlayer, activityId, itemsReceived);
 
       // Clear activity
       freshPlayer.activeActivity = undefined;
@@ -509,6 +513,9 @@ export default function (io: Server): void {
                 }
               }
 
+              // Update quest progress for activity completion
+              await questService.onActivityComplete(freshPlayer, activity.activityId, itemsReceived);
+
               freshPlayer.activeActivity = undefined;
               await freshPlayer.save();
 
@@ -657,6 +664,9 @@ export default function (io: Server): void {
             if (!freshPlayer.discoveredLocations.includes(locationId)) {
               freshPlayer.discoveredLocations.push(locationId);
             }
+
+            // Update quest progress for location discovery
+            await questService.onLocationDiscovered(freshPlayer, locationId);
 
             // Clear travel state
             freshPlayer.travelState = {

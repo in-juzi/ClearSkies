@@ -141,7 +141,7 @@ export const getSkill = async (
     const { skillName } = req.params;
     const validSkills: SkillName[] = [
       'woodcutting', 'mining', 'fishing', 'gathering', 'smithing', 'cooking', 'alchemy',
-      'oneHanded', 'dualWield', 'twoHanded', 'ranged', 'casting', 'gun'
+      'oneHanded', 'dualWield', 'twoHanded', 'ranged', 'casting', 'protection'
     ];
 
     if (!validSkills.includes(skillName)) {

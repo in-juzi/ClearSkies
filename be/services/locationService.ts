@@ -319,6 +319,13 @@ class LocationService {
 
     return rewards;
   }
+
+  /**
+   * Get drop table by ID (delegates to dropTableService)
+   */
+  getDropTable(dropTableId: string): any {
+    return this.dropTableService.getDropTable(dropTableId);
+  }
 }
 
 // Create singleton instance
