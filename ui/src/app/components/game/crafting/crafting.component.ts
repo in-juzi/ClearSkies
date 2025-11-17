@@ -11,6 +11,10 @@ import { ItemModifiersComponent } from '../../shared/item-modifiers/item-modifie
 import { ItemMiniComponent } from '../../shared/item-mini/item-mini.component';
 import { IconComponent } from '../../shared/icon/icon.component';
 import { ActivityLogComponent, ActivityLogEntry } from '../../shared/activity-log/activity-log.component';
+import { ItemInstance, RecipeIngredient } from '@shared/types';
+
+// Extended item instance with crafting-specific properties (uses any for flexibility with ItemDetails)
+type CraftingItemInstance = ItemInstance | any;
 
 @Component({
   selector: 'app-crafting',
@@ -101,13 +105,13 @@ export class CraftingComponent implements OnInit {
     const activeCrafting = this.craftingService.activeCrafting();
     if (!activeCrafting || !activeCrafting.selectedIngredients) return [];
 
-    const items: any[] = [];
+    const items: CraftingItemInstance[] = [];
     // Explicitly read from inventoryService to ensure reactivity
     const inventory = this.inventoryService.inventory();
     if (!inventory) return [];
 
     // Group ingredients by itemId
-    const ingredientGroups: { [itemId: string]: { itemId: string; instances: any[] } } = {};
+    const ingredientGroups: { [itemId: string]: { itemId: string; instances: CraftingItemInstance[] } } = {};
 
     for (const [itemId, instanceIds] of Object.entries(activeCrafting.selectedIngredients)) {
       if (!ingredientGroups[itemId]) {
@@ -299,12 +303,12 @@ export class CraftingComponent implements OnInit {
       selectedIngredients[itemId] = instanceIds;
     });
 
-    this.craftingService.startCrafting(recipe.recipeId, selectedIngredients).then((response: any) => {
+    this.craftingService.startCrafting(recipe.recipeId, selectedIngredients).then(() => {
       // Clear result AFTER craft starts to prevent effect from retriggering during transition
       this.craftingService.clearResult();
       // Reset restarting flag now that craft has started
       this.isRestarting.set(false);
-    }).catch((error: any) => {
+    }).catch((error: Error) => {
       console.error('Error restarting crafting:', error);
       this.craftingService.clearResult();
       this.autoRestartEnabled.set(false);
@@ -350,7 +354,7 @@ export class CraftingComponent implements OnInit {
    */
   private loadOutputItemDefinitions(recipe: Recipe): void {
     const outputs = this.getRecipeOutputs(recipe);
-    const loadedItems: any[] = [];
+    const loadedItems: Array<{ itemId: string; quantity: number; definition?: any; name: string }> = [];
 
     outputs.forEach(output => {
       this.inventoryService.getItemDefinition(output.itemId).subscribe({
@@ -431,14 +435,14 @@ export class CraftingComponent implements OnInit {
       });
     }
 
-    this.craftingService.startCrafting(recipe.recipeId, selectedIngredients).then((response: any) => {
+    this.craftingService.startCrafting(recipe.recipeId, selectedIngredients).then(() => {
       this.showMessage(`Started crafting ${recipe.name}`, 'success');
       this.lastCraftedRecipeId.set(recipe.recipeId);
       // Enable auto-restart by default
       this.autoRestartEnabled.set(true);
       this.selectedRecipe.set(null);
       // Don't clear selection - keep it for auto-restart
-    }).catch((error: any) => {
+    }).catch((error: Error) => {
       console.error('Error starting crafting:', error);
       this.showMessage(error.message || 'Failed to start crafting', 'error');
     });
@@ -459,7 +463,7 @@ export class CraftingComponent implements OnInit {
       this.autoRestartEnabled.set(false);
       this.clearSelection();
       this.showMessage('Crafting cancelled', 'info');
-    }).catch((error: any) => {
+    }).catch((error: Error) => {
       console.error('Error cancelling crafting:', error);
       this.showMessage('Failed to cancel crafting', 'error');
     });
@@ -468,14 +472,14 @@ export class CraftingComponent implements OnInit {
   /**
    * Get lookupKey for an ingredient (itemId or subcategory)
    */
-  getIngredientLookupKey(ingredient: any): string {
+  getIngredientLookupKey(ingredient: RecipeIngredient): string {
     return ingredient.itemId || ingredient.subcategory || '';
   }
 
   /**
    * Get display label for an ingredient
    */
-  getIngredientLabel(ingredient: any): string {
+  getIngredientLabel(ingredient: RecipeIngredient): string {
     if (ingredient.subcategory) {
       // Capitalize first letter for display
       return ingredient.subcategory.charAt(0).toUpperCase() + ingredient.subcategory.slice(1);
@@ -505,7 +509,7 @@ export class CraftingComponent implements OnInit {
   /**
    * Get ingredient availability display (supports subcategory)
    */
-  getIngredientDisplayByLookupKey(lookupKey: string, ingredient: any, required: number): string {
+  getIngredientDisplayByLookupKey(lookupKey: string, ingredient: RecipeIngredient, required: number): string {
     const inventory = this.playerInventory();
     if (!inventory) return `0/${required}`;
 
@@ -513,7 +517,7 @@ export class CraftingComponent implements OnInit {
     if (ingredient.subcategory) {
       // Count items matching subcategory
       available = inventory
-        .filter(item => !item.equipped && item.definition?.subcategories?.includes(ingredient.subcategory))
+        .filter(item => !item.equipped && item.definition?.subcategories?.includes(ingredient.subcategory!))
         .reduce((sum, item) => sum + item.quantity, 0);
     } else {
       // Count specific itemId
@@ -542,7 +546,7 @@ export class CraftingComponent implements OnInit {
   /**
    * Check if player has enough of an ingredient (supports subcategory)
    */
-  hasEnoughIngredientByLookupKey(lookupKey: string, ingredient: any, required: number): boolean {
+  hasEnoughIngredientByLookupKey(lookupKey: string, ingredient: RecipeIngredient, required: number): boolean {
     const inventory = this.playerInventory();
     if (!inventory) return false;
 
@@ -550,7 +554,7 @@ export class CraftingComponent implements OnInit {
     if (ingredient.subcategory) {
       // Count items matching subcategory
       available = inventory
-        .filter(item => !item.equipped && item.definition?.subcategories?.includes(ingredient.subcategory))
+        .filter(item => !item.equipped && item.definition?.subcategories?.includes(ingredient.subcategory!))
         .reduce((sum, item) => sum + item.quantity, 0);
     } else {
       // Count specific itemId
@@ -565,7 +569,7 @@ export class CraftingComponent implements OnInit {
   /**
    * Get available instances of an ingredient
    */
-  getAvailableInstances(itemId: string): any[] {
+  getAvailableInstances(itemId: string): CraftingItemInstance[] {
     const inventory = this.playerInventory();
     if (!inventory) return [];
 
@@ -582,15 +586,15 @@ export class CraftingComponent implements OnInit {
   /**
    * Get available instances for an ingredient (supports subcategory)
    */
-  getAvailableInstancesByIngredient(ingredient: any): any[] {
+  getAvailableInstancesByIngredient(ingredient: RecipeIngredient): CraftingItemInstance[] {
     const inventory = this.playerInventory();
     if (!inventory) return [];
 
-    let items: any[];
+    let items: CraftingItemInstance[];
     if (ingredient.subcategory) {
       // Filter by subcategory
       items = inventory.filter(item =>
-        !item.equipped && item.definition?.subcategories?.includes(ingredient.subcategory)
+        !item.equipped && item.definition?.subcategories?.includes(ingredient.subcategory!)
       );
     } else {
       // Filter by specific itemId
@@ -610,7 +614,7 @@ export class CraftingComponent implements OnInit {
   /**
    * Calculate quality score for sorting
    */
-  getQualityScore(item: any): number {
+  getQualityScore(item: CraftingItemInstance): number {
     if (!item.qualities) return 0;
     const qualities = Object.values(item.qualities) as number[];
     return qualities.reduce((sum, level) => sum + level, 0);
@@ -809,7 +813,7 @@ export class CraftingComponent implements OnInit {
   /**
    * Create item object for display with custom quantity
    */
-  createItemForDisplay(instance: any, usedQuantity: number): any {
+  createItemForDisplay(instance: CraftingItemInstance, usedQuantity: number): CraftingItemInstance {
     return {
       ...instance,
       quantity: usedQuantity

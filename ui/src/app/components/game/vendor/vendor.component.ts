@@ -7,6 +7,7 @@ import { ChatService } from '../../../services/chat.service';
 import { VendorStockItem } from '../../../models/vendor.model';
 import { ItemModifiersComponent } from '../../shared/item-modifiers/item-modifiers.component';
 import { IconComponent } from '../../shared/icon/icon.component';
+import { ItemInstance } from '@shared/types';
 
 @Component({
   selector: 'app-vendor',
@@ -104,10 +105,11 @@ export class VendorComponent {
   /**
    * Calculate sell price for an item (50% of vendor price)
    */
-  calculateSellPrice(item: any): number {
+  calculateSellPrice(item: ItemInstance | { vendorPrice?: number }): number {
     // Use vendorPrice from ItemDetails (already calculated with quality/trait bonuses)
     // Vendors buy items at 50% of their vendor price
-    return Math.floor((item.vendorPrice || 0) * 0.5);
+    const vendorPrice = 'vendorPrice' in item ? item.vendorPrice : 0;
+    return Math.floor((vendorPrice || 0) * 0.5);
   }
 
   /**

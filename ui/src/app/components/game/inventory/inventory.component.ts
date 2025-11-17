@@ -17,7 +17,7 @@ import { isEquipmentItem, isConsumableItem } from '@shared/types';
 // Interface for grouped items
 interface ItemGroup {
   itemId: string;
-  definition: any;
+  definition: ItemDetails['definition'];
   instances: ItemDetails[];
   totalQuantity: number;
   isExpanded: boolean;
@@ -454,7 +454,7 @@ export class InventoryComponent implements OnInit {
           }
         }, 100);
       },
-      error: (error: any) => {
+      error: (error: Error) => {
         console.error('Error equipping item:', error);
       }
     });
@@ -490,7 +490,7 @@ export class InventoryComponent implements OnInit {
           }
         }, 100);
       },
-      error: (error: any) => {
+      error: (error: Error) => {
         console.error('Error unequipping item:', error);
       }
     });
@@ -501,7 +501,7 @@ export class InventoryComponent implements OnInit {
    */
   useItem(instanceId: string): void {
     this.inventoryService.useItem(instanceId).subscribe({
-      next: (response: any) => {
+      next: (response: { message: string }) => {
         console.log('Item used successfully:', response);
 
         // Close the details panel if item quantity is now 0 and it was the selected item
@@ -520,7 +520,7 @@ export class InventoryComponent implements OnInit {
           }
         }, 100);
       },
-      error: (error: any) => {
+      error: (error: { error?: { message: string } }) => {
         console.error('Error using item:', error);
         // Optionally show error message to user
         alert(error.error?.message || 'Failed to use item');

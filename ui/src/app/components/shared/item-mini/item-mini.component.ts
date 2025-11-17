@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ItemModifiersComponent } from '../item-modifiers/item-modifiers.component';
 import { IconComponent } from '../icon/icon.component';
+import { ItemInstance } from '@shared/types';
 
 @Component({
   selector: 'app-item-mini',
@@ -11,7 +12,7 @@ import { IconComponent } from '../icon/icon.component';
   styleUrls: ['./item-mini.component.scss']
 })
 export class ItemMiniComponent {
-  @Input() item: any; // Item with itemId, quantity, qualities, traits, name, definition (with icon)
+  @Input() item?: ItemInstance | any; // Item with itemId, quantity, qualities, traits, name, definition (with icon) - accepts ItemInstance or ItemDetails
   @Input() showIcon: boolean = true; // Show SVG icon
   @Input() showQuantity: boolean = true; // Show quantity (x3)
   @Input() showItemId: boolean = true; // Show item text (name or itemId)

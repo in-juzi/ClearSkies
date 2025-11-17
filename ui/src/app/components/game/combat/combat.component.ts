@@ -8,7 +8,7 @@ import { LocationService } from '../../../services/location.service';
 import { AbilityButtonComponent } from '../../shared/ability-button/ability-button.component';
 import { ItemButtonComponent } from '../../shared/item-button/item-button.component';
 import { ItemMiniComponent } from '../../shared/item-mini/item-mini.component';
-import { BuffIconComponent } from '../../shared/buff-icon/buff-icon';
+import { BuffIconComponent } from '../../shared/buff-icon/buff-icon.component';
 
 @Component({
   selector: 'app-combat',
@@ -108,7 +108,7 @@ export class CombatComponent implements OnInit, OnDestroy, AfterViewChecked {
     if (maxTime <= 0) return 0;
     return Math.min(100, ((maxTime - currentTime) / maxTime) * 100);
   });
-  private timerInterval: any;
+  private timerInterval: ReturnType<typeof setInterval> | null = null;
 
   // Watch combat log for new entries and trigger floating numbers
   private combatLogEffect = effect(() => {
@@ -317,7 +317,7 @@ export class CombatComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.combatService.useAbility(fullAbility.abilityId).then(() => {
       this.isExecutingAction.set(false);
       this.selectedAbility.set(null);
-    }).catch((err: any) => {
+    }).catch((err: Error) => {
       console.error('Ability failed:', err);
       this.isExecutingAction.set(false);
       this.selectedAbility.set(null);
@@ -403,7 +403,7 @@ export class CombatComponent implements OnInit, OnDestroy, AfterViewChecked {
     // Start the activity again to initiate new combat
     this.locationService.startActivity(activityId, facilityId).then(() => {
       this.isExecutingAction.set(false);
-    }).catch((err: any) => {
+    }).catch((err: Error) => {
       console.error('Failed to restart combat:', err);
       this.isExecutingAction.set(false);
     });
@@ -412,7 +412,7 @@ export class CombatComponent implements OnInit, OnDestroy, AfterViewChecked {
   /**
    * Use a consumable item during combat
    */
-  useConsumable(item: any): void {
+  useConsumable(item: { instanceId: string }): void {
     if (this.isUsingItem() || this.isExecutingAction()) return;
 
     this.isUsingItem.set(true);
@@ -420,7 +420,7 @@ export class CombatComponent implements OnInit, OnDestroy, AfterViewChecked {
     // Use combat service socket method instead of inventory HTTP endpoint
     this.combatService.useItem(item.instanceId).then(() => {
       this.isUsingItem.set(false);
-    }).catch((error: any) => {
+    }).catch((error: Error) => {
       console.error('Error using item in combat:', error);
       this.isUsingItem.set(false);
     });
@@ -429,7 +429,7 @@ export class CombatComponent implements OnInit, OnDestroy, AfterViewChecked {
   /**
    * Get HP bar width style
    */
-  getHpBarStyle(percent: number, color: string): any {
+  getHpBarStyle(percent: number, color: string): { width: string; backgroundColor: string; transition: string } {
     return {
       width: `${percent}%`,
       backgroundColor: color,
@@ -440,7 +440,7 @@ export class CombatComponent implements OnInit, OnDestroy, AfterViewChecked {
   /**
    * Get mana bar width style
    */
-  getManaBarStyle(percent: number): any {
+  getManaBarStyle(percent: number): { width: string; backgroundColor: string; transition: string } {
     return {
       width: `${percent}%`,
       backgroundColor: '#3b82f6',
@@ -451,7 +451,7 @@ export class CombatComponent implements OnInit, OnDestroy, AfterViewChecked {
   /**
    * Get attack timer bar width style
    */
-  getTimerBarStyle(percent: number): any {
+  getTimerBarStyle(percent: number): { width: string; backgroundColor: string; transition: string } {
     return {
       width: `${percent}%`,
       backgroundColor: percent >= 100 ? '#4ade80' : '#667eea',

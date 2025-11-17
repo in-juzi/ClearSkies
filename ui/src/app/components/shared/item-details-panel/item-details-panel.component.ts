@@ -5,6 +5,57 @@ import { ItemDetails } from '../../../models/inventory.model';
 import { IconComponent } from '../icon/icon.component';
 import { InventoryService } from '../../../services/inventory.service';
 
+// Combat stats interface
+interface CombatStats {
+  damage?: number;
+  armor?: number;
+  evasion?: number;
+  scaledDamageRoll?: string;
+  scaledDamageRange?: string;
+  avgScaledDamage?: number;
+  attackSpeed: number; // Non-optional to avoid template errors
+  critChance: number; // Non-optional to avoid template errors
+  totalLevelBonus?: number;
+  skillLevel?: number;
+  attributeLevel?: number;
+  attrLevel?: number;
+  traitDamageBonus?: number;
+  traitCritBonus?: number;
+  traitAttackSpeedBonus?: number;
+  traitArmorBonus?: number;
+  armorTraitBonus?: number;
+  evasionTraitBonus?: number;
+  blockChance?: number;
+  requiredLevel?: number;
+  [key: string]: any; // Allow other properties with any type for flexibility
+}
+
+// Effect data interface for formatEffectValue
+interface EffectData {
+  modifier?: number;
+  potencyMultiplier?: number;
+  qualityBonus?: number;
+  efficiencyMultiplier?: number;
+  healingMultiplier?: number;
+  timeReduction?: number;
+  healthDrain?: number;
+  difficultyIncrease?: number;
+  bonusProperties?: string[];
+  reductionPercent?: number;
+  hotEffect?: {
+    healPerTick: number;
+    ticks: number;
+    tickInterval: number;
+  };
+  buffEffect?: {
+    stat: string;
+    value: number;
+    duration: number;
+    isPercentage: boolean;
+  };
+  [key: string]: any; // Allow other properties with any type for flexibility
+}
+
 @Component({
   selector: 'app-item-details-panel',
   standalone: true,
@@ -25,7 +76,7 @@ export class ItemDetailsPanelComponent implements OnChanges {
 
   dropQuantity: number = 1;
   isUsingItem: boolean = false;
-  combatStats: any = null;
+  combatStats: CombatStats | null = null;
   loadingCombatStats: boolean = false;
 
   // Drag functionality
@@ -87,9 +138,9 @@ export class ItemDetailsPanelComponent implements OnChanges {
   loadCombatStats(instanceId: string): void {
     this.loadingCombatStats = true;
     this.inventoryService.getItemCombatStats(instanceId).subscribe({
-      next: (response: any) => {
+      next: (response: { success: boolean; stats?: CombatStats }) => {
         if (response.success) {
-          this.combatStats = response.stats;
+          this.combatStats = response.stats || null;
         }
         this.loadingCombatStats = false;
       },
@@ -149,7 +200,7 @@ export class ItemDetailsPanelComponent implements OnChanges {
     return this.item?.quantity || 1;
   }
 
-  getQualityKeys(qualities: any): string[] {
+  getQualityKeys(qualities: Record<string, any> | null | undefined): string[] {
     if (!qualities) return [];
     return Object.keys(qualities);
   }
@@ -157,7 +208,7 @@ export class ItemDetailsPanelComponent implements OnChanges {
   /**
    * Get legacy effect keys (excludes 'applicators')
    */
-  getLegacyEffectKeys(effects: any): string[] {
+  getLegacyEffectKeys(effects: Record<string, unknown> | null | undefined): string[] {
     if (!effects) return [];
     return Object.keys(effects).filter(key => key !== 'applicators');
   }
@@ -165,7 +216,7 @@ export class ItemDetailsPanelComponent implements OnChanges {
   /**
    * Get applicators as an array
    */
-  getApplicators(effects: any): any[] {
+  getApplicators(effects: { applicators?: unknown } | null | undefined): Array<{ context?: string; description?: string; [key: string]: any }> {
     if (!effects || !effects.applicators) return [];
     // If it's already an array, return it
     if (Array.isArray(effects.applicators)) {
@@ -178,7 +229,7 @@ export class ItemDetailsPanelComponent implements OnChanges {
   /**
    * Get label for applicators based on their contexts
    */
-  getApplicatorsLabel(effects: any): string {
+  getApplicatorsLabel(effects: { applicators?: unknown } | null | undefined): string {
     const applicators = this.getApplicators(effects);
     if (applicators.length === 0) return 'Effects';
 
@@ -214,7 +265,7 @@ export class ItemDetailsPanelComponent implements OnChanges {
     return typeMap[effectKey] || effectKey;
   }
 
-  formatEffectValue(effectData: any): string {
+  formatEffectValue(effectData: EffectData | null | undefined): string {
     if (!effectData) return '';
 
     const effects: string[] = [];
@@ -248,32 +299,32 @@ export class ItemDetailsPanelComponent implements OnChanges {
       effects.push(`Healing ${percentNum >= 0 ? '+' : ''}${percent}%`);
     }
 
-    if (effectData.yieldMultiplier !== undefined) {
-      const percentNum = (effectData.yieldMultiplier - 1) * 100;
+    if (effectData['yieldMultiplier'] !== undefined) {
+      const percentNum = ((effectData['yieldMultiplier'] as number) - 1) * 100;
       const percent = percentNum.toFixed(0);
       effects.push(`Yield ${percentNum >= 0 ? '+' : ''}${percent}%`);
     }
 
-    if (effectData.damageBonus !== undefined) {
+    if (effectData['damageBonus'] !== undefined) {
       // damageBonus is a flat value, not a percentage
-      effects.push(`+${effectData.damageBonus} Damage`);
+      effects.push(`+${effectData['damageBonus']} Damage`);
     }
 
-    if (effectData.healthDrain !== undefined) {
-      effects.push(`Health Drain -${effectData.healthDrain}/sec`);
+    if (effectData['healthDrain'] !== undefined) {
+      effects.push(`Health Drain -${effectData['healthDrain']}/sec`);
     }
 
-    if (effectData.difficultyIncrease !== undefined) {
-      effects.push(`Difficulty +${effectData.difficultyIncrease}%`);
+    if (effectData['difficultyIncrease'] !== undefined) {
+      effects.push(`Difficulty +${effectData['difficultyIncrease']}%`);
     }
 
-    if (effectData.bonusProperties !== undefined && Array.isArray(effectData.bonusProperties)) {
-      effects.push(`Grants: ${effectData.bonusProperties.join(', ')}`);
+    if (effectData['bonusProperties'] !== undefined && Array.isArray(effectData['bonusProperties'])) {
+      effects.push(`Grants: ${(effectData['bonusProperties'] as string[]).join(', ')}`);
     }
 
     // Activity Time Reduction (percentage) - e.g., Grain quality
-    if (effectData.reductionPercent !== undefined) {
-      const percent = (effectData.reductionPercent * 100).toFixed(0);
+    if (effectData['reductionPercent'] !== undefined) {
+      const percent = ((effectData['reductionPercent'] as number) * 100).toFixed(0);
       effects.push(`-${percent}% Activity Time`);
     }
 
@@ -413,7 +464,7 @@ export class ItemDetailsPanelComponent implements OnChanges {
   /**
    * Get the transform style for the panel position
    */
-  getPanelStyle(): any {
+  getPanelStyle(): { transform?: string; left?: string; top?: string } {
     if (this.hasDragged) {
       return {
         transform: 'none',

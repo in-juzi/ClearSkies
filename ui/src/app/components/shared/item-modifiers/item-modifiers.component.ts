@@ -1,6 +1,7 @@
 import { Component, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { InventoryService } from '../../../services/inventory.service';
+import { ItemInstance } from '@shared/types';
 
 @Component({
   selector: 'app-item-modifiers',
@@ -10,7 +11,7 @@ import { InventoryService } from '../../../services/inventory.service';
   styleUrls: ['./item-modifiers.component.scss']
 })
 export class ItemModifiersComponent {
-  @Input() item: any; // Item with qualities/traits
+  @Input() item?: ItemInstance | any; // Item with qualities/traits - accepts ItemInstance or ItemDetails
   @Input() displayMode: 'badge-level' | 'badge-tier' | 'badge-name' | 'inline-text' = 'badge-level';
   @Input() showQualities: boolean = true;
   @Input() showTraits: boolean = true;
@@ -133,7 +134,7 @@ export class ItemModifiersComponent {
   /**
    * Calculate average quality level
    */
-  getAverageQuality(item: any): number {
+  getAverageQuality(item: ItemInstance | any): number {
     if (!item.qualities || Object.keys(item.qualities).length === 0) return 0;
     const qualities = Object.values(item.qualities) as number[];
     if (qualities.length === 0) return 0;
@@ -161,7 +162,7 @@ export class ItemModifiersComponent {
   /**
    * Format qualities and traits as inline text
    */
-  formatInlineText(item: any): string {
+  formatInlineText(item: ItemInstance | any): string {
     const parts: string[] = [];
 
     // Add qualities

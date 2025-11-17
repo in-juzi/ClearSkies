@@ -56,17 +56,4 @@ export class AttributesComponent implements OnInit {
   getTotalXP(attribute: AttributeWithProgress): number {
     return this.attributesService.getTotalXP(attribute);
   }
-
-  // Testing method - adds 100 XP to an attribute
-  testAddXP(attributeName: AttributeName): void {
-    this.attributesService.addAttributeExperience(attributeName, 100).subscribe({
-      next: (response) => {
-        console.log('XP added:', response);
-        this.loadAttributes();
-      },
-      error: (err) => {
-        console.error('Error adding XP:', err);
-      }
-    });
-  }
 }
