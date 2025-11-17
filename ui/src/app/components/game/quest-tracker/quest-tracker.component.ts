@@ -6,9 +6,10 @@ import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-quest-tracker',
+  standalone: true,
   imports: [CommonModule],
-  templateUrl: './quest-tracker.html',
-  styleUrl: './quest-tracker.scss',
+  templateUrl: './quest-tracker.component.html',
+  styleUrl: './quest-tracker.component.scss',
 })
 export class QuestTracker implements OnInit, OnDestroy {
   activeQuests: ActiveQuest[] = [];

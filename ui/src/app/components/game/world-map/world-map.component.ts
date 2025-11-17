@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { DynamicNode, Edge, EdgeChange, NodeChange, Vflow, VflowComponent } from 'ngx-vflow';
 import { LocationService } from '../../../services/location.service';
 import { QuestService } from '../../../services/quest.service';
-import type { NavigationLink } from '@shared/types';
+import type { NavigationLink, NavigationRequirements } from '@shared/types';
 import type { Location } from '../../../models/location.model';
 import type { ActiveQuest } from '@shared/types';
 
@@ -11,7 +11,7 @@ import type { ActiveQuest } from '@shared/types';
 interface TravelEdgeData {
   link: NavigationLink;
   travelTime: number;
-  requirements: any;
+  requirements: NavigationRequirements;
   available: boolean;
   label: string;
 }
@@ -20,8 +20,8 @@ interface TravelEdgeData {
   selector: 'app-world-map',
   standalone: true,
   imports: [CommonModule, Vflow],
-  templateUrl: './world-map.html',
-  styleUrl: './world-map.scss',
+  templateUrl: './world-map.component.html',
+  styleUrl: './world-map.component.scss',
 })
 export class WorldMap implements OnInit {
   private locationService = inject(LocationService);
@@ -178,7 +178,7 @@ export class WorldMap implements OnInit {
   /**
    * Check if navigation requirements are met
    */
-  private checkRequirements(link: any): boolean {
+  private checkRequirements(link: NavigationLink): boolean {
     // TODO: Implement actual requirement checking
     // For now, just return true if no requirements
     if (!link.requirements) return true;

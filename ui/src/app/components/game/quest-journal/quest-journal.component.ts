@@ -10,8 +10,8 @@ type QuestTab = 'active' | 'available' | 'completed';
   selector: 'app-quest-journal',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './quest-journal.html',
-  styleUrl: './quest-journal.scss',
+  templateUrl: './quest-journal.component.html',
+  styleUrl: './quest-journal.component.scss',
 })
 export class QuestJournal implements OnInit, OnDestroy {
   private questService = inject(QuestService);

@@ -6,8 +6,8 @@ import { NotificationService, Notification } from '../../../services/notificatio
   selector: 'app-notification-display',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './notification-display.html',
-  styleUrl: './notification-display.scss',
+  templateUrl: './notification-display.component.html',
+  styleUrl: './notification-display.component.scss',
 })
 export class NotificationDisplay {
   private notificationService = inject(NotificationService);

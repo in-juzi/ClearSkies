@@ -7,8 +7,8 @@ import { IconComponent } from '../icon/icon.component';
   selector: 'app-buff-icon',
   standalone: true,
   imports: [CommonModule, IconComponent],
-  templateUrl: './buff-icon.html',
-  styleUrl: './buff-icon.scss'
+  templateUrl: './buff-icon.component.html',
+  styleUrl: './buff-icon.component.scss'
 })
 export class BuffIconComponent {
   @Input() buff!: ActiveBuff;
