@@ -1,0 +1,45 @@
+<!-- Error Message -->
+@if (errorMessage) {
+  <div class="error-message">
+    {{ errorMessage }}
+  </div>
+}
+
+<!-- Input Area -->
+<div class="chat-input-area">
+  <!-- Command Autocomplete Dropdown -->
+  @if (showSuggestions) {
+    <div class="autocomplete-dropdown">
+      @for (suggestion of commandSuggestions; track suggestion.name; let i = $index) {
+        <div
+          class="suggestion-item"
+          [class.selected]="i === selectedSuggestionIndex"
+          (click)="onSelectSuggestion(i)"
+        >
+          <span class="suggestion-name">{{ suggestion.name }}</span>
+          <span class="suggestion-description">{{ suggestion.description }}</span>
+        </div>
+      }
+    </div>
+  }
+
+  <input
+    type="text"
+    class="chat-input"
+    placeholder="Type a message or /help for commands"
+    [(ngModel)]="messageInput"
+    (ngModelChange)="onInputChange()"
+    (keypress)="onKeyPress($event)"
+    (keydown)="onKeyDown($event)"
+    [disabled]="sendingMessage || connectionStatus !== 'connected'"
+    maxlength="500"
+  />
+  <button
+    class="send-btn"
+    type="button"
+    (click)="onSend()"
+    [disabled]="!messageInput().trim() || sendingMessage || connectionStatus !== 'connected'"
+  >
+    {{ sendingMessage ? '...' : 'Send' }}
+  </button>
+</div>

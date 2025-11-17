@@ -1,0 +1,12 @@
+<div class="chat-header" (click)="toggleCollapse.emit()">
+  <div class="chat-title">
+    <span class="chat-icon">💬</span>
+    <span>Global Chat</span>
+    <span class="connection-status" [class]="getStatusClass()">
+      {{ getStatusText() }}
+    </span>
+  </div>
+  <button class="collapse-btn" type="button">
+    {{ isCollapsed ? '▲' : '▼' }}
+  </button>
+</div>

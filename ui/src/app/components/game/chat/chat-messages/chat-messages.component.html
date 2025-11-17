@@ -1,0 +1,18 @@
+<div class="message-list" #messageList>
+  @if (messages.length === 0) {
+    <div class="no-messages">
+      No messages yet. Start the conversation!
+    </div>
+  }
+
+  @for (msg of messages; track msg._id) {
+    <div
+      class="message"
+      [class.own-message]="isOwnMessage(msg)"
+    >
+      <span class="message-time">{{ formatTime(msg.createdAt) }}</span>
+      <span class="message-username">{{ msg.username }}:</span>
+      <span class="message-text" [innerHTML]="msg.message | messageFormat"></span>
+    </div>
+  }
+</div>

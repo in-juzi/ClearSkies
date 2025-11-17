@@ -1,0 +1,73 @@
+// Styles extracted from chat.component.scss - messages section
+
+@use '../../../../../design-tokens.scss' as *;
+
+.message-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--spacing-m);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+
+  /* Custom scrollbar */
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--color-bg-primary);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-border-primary);
+    border-radius: var(--radius-s);
+
+    &:hover {
+      background: var(--color-border-secondary);
+    }
+  }
+}
+
+.no-messages {
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-style: italic;
+  padding: var(--spacing-xl);
+}
+
+.message {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-xs);
+  word-wrap: break-word;
+  line-height: 1.5;
+
+  &.own-message {
+    .message-username {
+      color: var(--color-accent-purple);
+    }
+  }
+}
+
+.message-time {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.message-username {
+  font-weight: var(--font-weight-bold);
+  color: var(--color-accent-gold);
+  font-size: var(--font-size-s);
+  flex-shrink: 0;
+}
+
+.message-text {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-s);
+  word-wrap: break-word;
+  word-break: break-word;
+  white-space: pre-wrap;
+  flex: 1;
+}
