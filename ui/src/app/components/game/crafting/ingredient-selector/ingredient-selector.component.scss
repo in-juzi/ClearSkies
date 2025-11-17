@@ -1,0 +1,342 @@
+// Styles extracted from crafting.component.scss - recipe details section
+
+.recipe-details {
+  flex: 1;
+  overflow-y: auto;
+
+  .btn-back {
+    background-color: transparent;
+    border: var(--border-light);
+    color: var(--color-text-muted);
+    padding: var(--spacing-s) var(--spacing-l);
+    border-radius: var(--radius-s);
+    cursor: pointer;
+    margin-bottom: var(--spacing-l);
+    transition: all var(--transition-fast);
+
+    &:hover {
+      background-color: var(--color-bg-elevated);
+      border-color: var(--color-text-label);
+      color: var(--color-text-tertiary);
+    }
+  }
+
+  .recipe-header-detail {
+    margin-bottom: var(--spacing-l);
+
+    h2 {
+      margin: 0 0 var(--spacing-s) 0;
+      color: var(--color-secondary);
+    }
+
+    .recipe-meta {
+      display: flex;
+      gap: var(--spacing-l);
+      color: var(--color-text-secondary);
+      font-size: var(--font-size-s);
+    }
+  }
+
+  .recipe-description-detail {
+    color: var(--color-text-secondary);
+    font-style: italic;
+    line-height: 1.5;
+    margin-top: var(--spacing-xs);
+    font-size: var(--font-size-s);
+
+    // When standalone (not inside output-item-display)
+    &:not(.output-details .recipe-description-detail) {
+      padding: var(--spacing-m);
+      background: var(--color-bg-overlay);
+      border-radius: var(--radius-s);
+      margin-bottom: var(--spacing-l);
+    }
+  }
+
+  .ingredients-section,
+  .output-section {
+    margin-bottom: var(--spacing-l);
+
+    h3 {
+      margin: 0 0 var(--spacing-m) 0;
+      color: var(--color-accent-purple);
+    }
+  }
+
+  .ingredient-group {
+    padding: var(--spacing-l);
+    background: var(--color-bg-elevated);
+    border-radius: var(--radius-card);
+    border: var(--border-default);
+    margin-bottom: var(--spacing-m);
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .ingredient-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--spacing-m);
+      padding-bottom: var(--spacing-m);
+      border-bottom: var(--border-light);
+
+      .ingredient-name {
+        font-size: var(--font-size-l);
+        font-weight: var(--font-weight-medium);
+        color: var(--color-text-primary);
+        text-transform: capitalize;
+      }
+
+      .ingredient-selection-count {
+        color: var(--color-text-secondary);
+        font-size: var(--font-size-m);
+      }
+    }
+
+    .ingredient-actions {
+      display: flex;
+      gap: var(--spacing-s);
+      margin-bottom: var(--spacing-m);
+
+      button {
+        flex: 1;
+        padding: var(--spacing-s) var(--spacing-m);
+        border-radius: var(--radius-button);
+        font-size: var(--font-size-s);
+        font-weight: var(--font-weight-medium);
+        cursor: pointer;
+        transition: all var(--transition-fast);
+      }
+
+      .btn-auto-select {
+        background: rgba(138, 43, 226, 0.2);
+        border: var(--border-width-medium) solid var(--color-accent-purple);
+        color: var(--color-accent-purple);
+
+        &:hover {
+          background: rgba(138, 43, 226, 0.3);
+        }
+      }
+
+      .btn-clear-selection {
+        background: rgba(244, 67, 54, 0.2);
+        border: var(--border-width-medium) solid var(--color-error);
+        color: var(--color-error);
+
+        &:hover {
+          background: rgba(244, 67, 54, 0.3);
+        }
+      }
+    }
+
+    .instance-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-s);
+
+      .instance-card {
+        padding: var(--spacing-m);
+        background: var(--color-bg-base);
+        border: var(--border-width-medium) solid var(--color-surface-border);
+        border-radius: var(--radius-s);
+        cursor: pointer;
+        transition: all var(--transition-fast);
+
+        &:hover {
+          border-color: var(--color-accent-purple);
+          transform: translateX(4px);
+        }
+
+        &.selected {
+          border-color: var(--color-accent-purple);
+          background: rgba(138, 43, 226, 0.1);
+        }
+
+        &.fully-selected {
+          border-color: var(--color-secondary);
+          background: rgba(255, 215, 0, 0.1);
+        }
+
+        .instance-info {
+          display: flex;
+          align-items: center;
+          gap: var(--spacing-m);
+          margin-bottom: var(--spacing-s);
+
+          .instance-item-name {
+            font-weight: var(--font-weight-medium);
+            color: var(--color-secondary);
+            font-size: var(--font-size-m);
+            flex-shrink: 0;
+          }
+
+          .instance-quantity {
+            font-weight: var(--font-weight-bold);
+            color: var(--color-text-primary);
+            font-size: var(--font-size-l);
+          }
+
+          .quality-badge {
+            padding: var(--spacing-xs) var(--spacing-s);
+            border-radius: var(--radius-s);
+            font-size: var(--font-size-s);
+            font-weight: var(--font-weight-medium);
+
+            &.common {
+              background: rgba(128, 128, 128, 0.3);
+              color: #aaa;
+            }
+
+            &.uncommon {
+              background: rgba(76, 175, 80, 0.3);
+              color: #4caf50;
+            }
+
+            &.rare {
+              background: rgba(33, 150, 243, 0.3);
+              color: #2196f3;
+            }
+
+            &.epic {
+              background: rgba(156, 39, 176, 0.3);
+              color: #9c27b0;
+            }
+
+            &.legendary {
+              background: rgba(255, 152, 0, 0.3);
+              color: #ff9800;
+            }
+          }
+        }
+
+        .selection-indicator {
+          color: var(--color-accent-purple);
+          font-weight: var(--font-weight-medium);
+          font-size: var(--font-size-s);
+        }
+      }
+
+      .no-instances {
+        padding: var(--spacing-l);
+        text-align: center;
+        color: var(--color-text-muted);
+        font-style: italic;
+      }
+    }
+  }
+
+  .output-item {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--spacing-m);
+    background: var(--gradient-card);
+    border-radius: var(--radius-s);
+    margin-bottom: var(--spacing-s);
+
+    .output-name {
+      font-weight: var(--font-weight-medium);
+      color: var(--color-secondary);
+    }
+
+    .output-quantity {
+      color: var(--color-text-secondary);
+    }
+  }
+
+  .output-item-display {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-m);
+    padding: var(--spacing-m);
+    background: var(--gradient-card);
+    border-radius: var(--radius-s);
+    margin-bottom: var(--spacing-m);
+
+    .output-icon-inline {
+      flex-shrink: 0;
+    }
+
+    .output-details {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-xs);
+    }
+
+    .output-name-display {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-m);
+
+      .output-name {
+        font-weight: var(--font-weight-medium);
+        color: var(--color-secondary);
+        font-size: var(--font-size-l);
+      }
+
+      .output-quantity {
+        color: var(--color-accent-gold);
+        font-weight: var(--font-weight-medium);
+      }
+    }
+  }
+
+  .quality-note {
+    font-size: var(--font-size-s);
+    color: var(--color-text-muted);
+    font-style: italic;
+  }
+
+  .craft-actions {
+    margin-top: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
+
+    .btn-craft {
+      width: 100%;
+      padding: var(--spacing-l);
+      background: var(--gradient-purple);
+      border: none;
+      color: var(--color-text-primary);
+      border-radius: var(--radius-button);
+      font-size: var(--font-size-l);
+      font-weight: var(--font-weight-bold);
+      cursor: pointer;
+      transition: all var(--transition-normal);
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-glow-purple);
+      }
+    }
+
+    .cannot-craft-message {
+      text-align: center;
+      padding: var(--spacing-l);
+      background: rgba(244, 67, 54, 0.2);
+      border: var(--border-width-medium) solid var(--color-error);
+      color: var(--color-error);
+      border-radius: var(--radius-s);
+      font-weight: var(--font-weight-medium);
+    }
+  }
+}
+
+// Scrollbar styling
+.recipe-details::-webkit-scrollbar {
+  width: 8px;
+}
+
+.recipe-details::-webkit-scrollbar-track {
+  background: var(--color-bg-elevated);
+}
+
+.recipe-details::-webkit-scrollbar-thumb {
+  background: var(--color-surface-border);
+  border-radius: var(--radius-s);
+
+  &:hover {
+    background: var(--color-surface-border-light);
+  }
+}

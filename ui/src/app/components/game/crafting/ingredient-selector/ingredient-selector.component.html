@@ -1,0 +1,111 @@
+<div class="recipe-details">
+  <button class="btn-back" (click)="back()">
+    ← Back to Recipes
+  </button>
+
+  @if (recipe) {
+    <div class="recipe-header-detail">
+      <h2>{{ recipe.name }}</h2>
+      <div class="recipe-meta">
+        <span class="level-req">Requires {{ skill | titlecase }} Level {{ recipe.requiredLevel }}</span>
+        <span class="duration">Duration: {{ recipe.duration }}s</span>
+        <span class="xp-reward">+{{ recipe.experience }} XP</span>
+      </div>
+    </div>
+
+    <!-- Output Section -->
+    <div class="output-section">
+      <h3>Creates</h3>
+      @for (outputItem of outputItems; track outputItem.itemId) {
+        <div class="output-item-display">
+          @if (outputItem.definition?.icon) {
+            <app-icon
+              [icon]="outputItem.definition.icon"
+              [size]="32"
+              class="output-icon-inline">
+            </app-icon>
+          }
+          <div class="output-details">
+            <div class="output-name-display">
+              <span class="output-name">{{ outputItem.name }}</span>
+              <span class="output-quantity">x{{ outputItem.quantity }}</span>
+            </div>
+            <div class="recipe-description-detail">
+              {{ recipe.description }}
+            </div>
+            @if (outputItem.qualityModifier === 'inherit') {
+              <div class="quality-note">
+                Quality inherited from ingredients + {{ skill }} level bonus
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="craft-actions">
+      @if (canCraft) {
+        <button class="btn-craft" (click)="startCrafting()">
+          Start Crafting
+        </button>
+      } @else {
+        <div class="cannot-craft-message">
+          {{ canCraftMessage }}
+        </div>
+      }
+    </div>
+
+    <div class="ingredients-section">
+      <h3>Required Ingredients</h3>
+
+      @for (ingredient of recipe.ingredients; track getIngredientLookupKey(ingredient)) {
+        <div class="ingredient-group">
+          <div class="ingredient-header">
+            <span class="ingredient-name">{{ getIngredientLabel(ingredient) }}</span>
+            <span class="ingredient-selection-count">
+              Selected: {{ getTotalSelectedByLookupKey(getIngredientLookupKey(ingredient)) }} / {{ ingredient.quantity }}
+            </span>
+          </div>
+
+          <div class="ingredient-actions">
+            <button class="btn-auto-select"
+                    (click)="autoSelectBestQuality()">
+              Auto-select Best
+            </button>
+            <button class="btn-clear-selection"
+                    (click)="clearSelection()">
+              Clear Selection
+            </button>
+          </div>
+
+          <div class="instance-list">
+            @for (instance of getAvailableInstancesByIngredient(ingredient); track instance.instanceId) {
+              <div class="instance-card"
+                   (click)="toggleInstanceSelection(getIngredientLookupKey(ingredient), instance.instanceId, instance.quantity, ingredient.quantity)"
+                   [class.selected]="getSelectedQuantity(instance.instanceId) > 0"
+                   [class.fully-selected]="getSelectedQuantity(instance.instanceId) === instance.quantity">
+                <div class="instance-info">
+                  <span class="instance-item-name">{{ instance.definition?.name || instance.itemId }}</span>
+                  <span class="instance-quantity">x{{ instance.quantity }}</span>
+                  <app-item-modifiers [item]="instance" displayMode="badge-name" size="normal"></app-item-modifiers>
+                </div>
+
+                @if (getSelectedQuantity(instance.instanceId) > 0) {
+                  <div class="selection-indicator">
+                    ✓ {{ getSelectedQuantity(instance.instanceId) }} selected
+                  </div>
+                }
+              </div>
+            }
+
+            @if (getAvailableInstancesByIngredient(ingredient).length === 0) {
+              <div class="no-instances">
+                No {{ getIngredientLabel(ingredient) }} available
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

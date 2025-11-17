@@ -1,0 +1,93 @@
+<!-- Active Crafting Progress -->
+@if (activeRecipe || isRestarting) {
+  <div class="active-crafting">
+    @if (activeRecipe && activeOutputIcon) {
+      <div class="recipe-output-display">
+        <app-icon
+          [icon]="activeOutputIcon"
+          [size]="48"
+          class="output-icon">
+        </app-icon>
+        <div class="recipe-name-active">{{ activeRecipe.name }}</div>
+      </div>
+    } @else if (activeRecipe) {
+      <div class="recipe-name-active">{{ activeRecipe.name }}</div>
+    }
+    <div class="progress-bar-container">
+      <div class="progress-bar"
+           [style.width.%]="craftingProgress">
+      </div>
+    </div>
+    <div class="time-remaining">
+      {{ formatTime(remainingTime) }} remaining
+    </div>
+
+    <!-- Crafting With Ingredients -->
+    @if (activeIngredientItems.length > 0) {
+      <div class="crafting-with">
+        <h4>Using:</h4>
+        <div class="ingredient-items">
+          @for (group of activeIngredientItems; track group.itemId) {
+            <div class="ingredient-group-display">
+              <div class="ingredient-header">
+                <span class="ingredient-label">{{ group.itemId }}</span>
+              </div>
+              <div class="ingredient-instances-display">
+                @for (instance of group.instances; track instance.instanceId) {
+                  <div class="instance-with-remaining">
+                    <div class="instance-with-name">
+                      <span class="instance-item-name">{{ instance.definition?.name || instance.itemId }}</span>
+                      <app-item-mini
+                        [item]="createItemForDisplay(instance, instance.usedQuantity)"
+                        [showIcon]="false"
+                        [showItemId]="false"
+                        [showModifiers]="true">
+                      </app-item-mini>
+                    </div>
+                    <span class="remaining-text">({{ instance.remainingQuantity }} left)</span>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <div class="auto-restart-toggle">
+      <label>
+        <input type="checkbox"
+               [checked]="autoRestartEnabled"
+               (change)="toggleAutoRestart()">
+        Auto-restart when ingredients available
+      </label>
+    </div>
+    <button class="btn-cancel" (click)="cancelCrafting()">
+      Cancel
+    </button>
+  </div>
+}
+
+<!-- Crafting Log -->
+@if (craftingLog.length > 0 && autoRestartEnabled) {
+  <app-activity-log
+    [entries]="craftingLog"
+    [maxEntries]="10"
+    [showTimestamp]="true"
+    [title]="'Recent Completions'">
+  </app-activity-log>
+}
+
+<!-- Last Crafting Result -->
+@if (lastResult && !autoRestartEnabled) {
+  <div class="crafting-result">
+    <h3>Crafting Complete!</h3>
+    <div class="result-item">
+      <div class="item-name">{{ lastResult.recipe.name }}</div>
+      <div class="xp-gain">+{{ lastResult.experience.xp }} {{ lastResult.experience.skill }} XP</div>
+    </div>
+    <button class="btn-close" (click)="clearResult()">
+      Close
+    </button>
+  </div>
+}
