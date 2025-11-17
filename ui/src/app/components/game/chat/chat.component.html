@@ -1,86 +1,34 @@
 <div class="chat-container" [class.collapsed]="isCollapsed()">
-  <!-- Chat Header -->
-  <div class="chat-header" (click)="toggleCollapse()">
-    <div class="chat-title">
-      <span class="chat-icon">💬</span>
-      <span>Global Chat</span>
-      <span class="connection-status" [class]="getStatusClass()">
-        {{ getStatusText() }}
-      </span>
-    </div>
-    <button class="collapse-btn" type="button">
-      {{ isCollapsed() ? '▲' : '▼' }}
-    </button>
-  </div>
+  <!-- Chat Header (Decomposed Component) -->
+  <app-chat-header
+    [isCollapsed]="isCollapsed()"
+    [connectionStatus]="chatService.connectionStatus()"
+    (toggleCollapse)="toggleCollapse()">
+  </app-chat-header>
 
   <!-- Chat Body -->
   @if (!isCollapsed()) {
     <div class="chat-body">
-      <!-- Message List -->
-      <div class="message-list" #messageList>
-        @if (chatService.messages().length === 0) {
-          <div class="no-messages">
-            No messages yet. Start the conversation!
-          </div>
-        }
+      <!-- Message List (Decomposed Component) -->
+      <app-chat-messages
+        [messages]="chatService.messages()"
+        [shouldScrollToBottom]="shouldScrollToBottom()">
+      </app-chat-messages>
 
-        @for (msg of chatService.messages(); track msg._id) {
-          <div
-            class="message"
-            [class.own-message]="isOwnMessage(msg)"
-          >
-            <span class="message-time">{{ formatTime(msg.createdAt) }}</span>
-            <span class="message-username">{{ msg.username }}:</span>
-            <span class="message-text" [innerHTML]="msg.message | messageFormat"></span>
-          </div>
-        }
-      </div>
-
-      <!-- Error Message -->
-      @if (errorMessage()) {
-        <div class="error-message">
-          {{ errorMessage() }}
-        </div>
-      }
-
-      <!-- Input Area -->
-      <div class="chat-input-area">
-        <!-- Command Autocomplete Dropdown -->
-        @if (showSuggestions()) {
-          <div class="autocomplete-dropdown">
-            @for (suggestion of commandSuggestions(); track suggestion.name; let i = $index) {
-              <div
-                class="suggestion-item"
-                [class.selected]="i === selectedSuggestionIndex()"
-                (click)="selectSuggestion(i)"
-              >
-                <span class="suggestion-name">{{ suggestion.name }}</span>
-                <span class="suggestion-description">{{ suggestion.description }}</span>
-              </div>
-            }
-          </div>
-        }
-
-      <input
-        type="text"
-        class="chat-input"
-        placeholder="Type a message or /help for commands"
-        [(ngModel)]="messageInput"
-        (ngModelChange)="onInputChange()"
-        (keypress)="onKeyPress($event)"
-        (keydown)="onKeyDown($event)"
-        [disabled]="sendingMessage() || chatService.connectionStatus() !== 'connected'"
-        maxlength="500"
-      />
-        <button
-          class="send-btn"
-          type="button"
-          (click)="sendMessage()"
-          [disabled]="!messageInput().trim() || sendingMessage() || chatService.connectionStatus() !== 'connected'"
-        >
-          {{ sendingMessage() ? '...' : 'Send' }}
-        </button>
-      </div>
+      <!-- Chat Input (Decomposed Component) -->
+      <app-chat-input
+        [connectionStatus]="chatService.connectionStatus()"
+        [errorMessage]="errorMessage()"
+        [showSuggestions]="showSuggestions()"
+        [commandSuggestions]="commandSuggestions()"
+        [selectedSuggestionIndex]="selectedSuggestionIndex()"
+        [sendingMessage]="sendingMessage()"
+        (inputChange)="onInputChange($event)"
+        (sendMessage)="sendMessage()"
+        (selectSuggestion)="selectSuggestion($event)"
+        (keyPress)="onKeyPress($event)"
+        (keyDown)="onKeyDown($event)">
+      </app-chat-input>
     </div>
   }
 </div>

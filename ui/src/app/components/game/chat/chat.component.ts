@@ -1,34 +1,29 @@
-import { Component, OnInit, OnDestroy, inject, signal, ElementRef, ViewChild, AfterViewChecked } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { ChatService } from '../../../services/chat.service';
 import { InventoryService } from '../../../services/inventory.service';
-import { ChatMessage } from '../../../models/chat.model';
 import { AddItemRequest } from '../../../models/inventory.model';
-import { MessageFormatPipe } from '../../../pipes/message-format.pipe';
+import { ChatHeaderComponent } from './chat-header/chat-header.component';
+import { ChatMessagesComponent } from './chat-messages/chat-messages.component';
+import { ChatInputComponent, ChatCommand } from './chat-input/chat-input.component';
 
 /**
- * Chat command interface
+ * Internal command interface with execute function
  */
-interface ChatCommand {
-  name: string;
-  description: string;
-  syntax?: string;
+interface ChatCommandInternal extends ChatCommand {
   execute: (args: string[]) => void;
 }
 
 @Component({
   selector: 'app-chat',
   standalone: true,
-  imports: [CommonModule, FormsModule, MessageFormatPipe],
+  imports: [CommonModule, ChatHeaderComponent, ChatMessagesComponent, ChatInputComponent],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss'
 })
-export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
+export class ChatComponent implements OnInit, OnDestroy {
   chatService = inject(ChatService);
   inventoryService = inject(InventoryService);
-
-  @ViewChild('messageList') private messageList!: ElementRef;
 
   // Component state
   isCollapsed = signal(true);
@@ -41,10 +36,10 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   commandSuggestions = signal<ChatCommand[]>([]);
   selectedSuggestionIndex = signal(0);
 
-  private shouldScrollToBottom = false;
+  shouldScrollToBottom = signal(false);
 
   // Command registry
-  private commands: ChatCommand[] = [
+  private commands: ChatCommandInternal[] = [
     {
       name: '/help',
       description: 'Show available commands',
@@ -55,7 +50,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
       description: 'Show number of users currently online',
       execute: () => {
         this.chatService.getOnlineCount();
-        this.shouldScrollToBottom = true;
+        this.shouldScrollToBottom.set(true);
       }
     },
     {
@@ -90,13 +85,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   ngOnInit(): void {
     // Chat service auto-connects via effect
-  }
-
-  ngAfterViewChecked(): void {
-    if (this.shouldScrollToBottom) {
-      this.scrollToBottom();
-      this.shouldScrollToBottom = false;
-    }
   }
 
   ngOnDestroy(): void {
@@ -143,7 +131,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     try {
       await this.chatService.sendMessage(message);
       this.messageInput.set('');
-      this.shouldScrollToBottom = true;
+      this.shouldScrollToBottom.set(true);
     } catch (error: any) {
       this.errorMessage.set(error.message || 'Failed to send message');
       console.error('Error sending message:', error);
@@ -155,14 +143,15 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   /**
    * Update message input and filter command suggestions
    */
-  onInputChange(): void {
-    const input = this.messageInput();
+  onInputChange(input: string): void {
+    this.messageInput.set(input);
 
     // Show suggestions if input starts with /
     if (input.startsWith('/')) {
-      const filtered = this.commands.filter(cmd =>
-        cmd.name.startsWith(input.toLowerCase())
-      );
+      // Convert ChatCommandInternal to ChatCommand (without execute)
+      const filtered = this.commands
+        .filter(cmd => cmd.name.startsWith(input.toLowerCase()))
+        .map(cmd => ({ name: cmd.name, description: cmd.description, syntax: cmd.syntax }));
       this.commandSuggestions.set(filtered);
       this.showSuggestions.set(filtered.length > 0);
       this.selectedSuggestionIndex.set(0);
@@ -229,7 +218,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
       message: text,
       createdAt: new Date()
     });
-    this.shouldScrollToBottom = true;
+    this.shouldScrollToBottom.set(true);
   }
 
   /**
@@ -425,74 +414,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         event.preventDefault();
         this.showSuggestions.set(false);
         break;
-    }
-  }
-
-  /**
-   * Format timestamp for display
-   */
-  formatTime(date: Date | string): string {
-    const d = typeof date === 'string' ? new Date(date) : date;
-    return d.toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: true
-    });
-  }
-
-  /**
-   * Check if message is from current user
-   */
-  isOwnMessage(message: ChatMessage): boolean {
-    // You can compare with current user's ID if available
-    // For now, just return false (all messages appear as others')
-    return false;
-  }
-
-  /**
-   * Scroll message list to bottom
-   */
-  private scrollToBottom(): void {
-    try {
-      if (this.messageList) {
-        const element = this.messageList.nativeElement;
-        element.scrollTop = element.scrollHeight;
-      }
-    } catch (err) {
-      console.error('Error scrolling to bottom:', err);
-    }
-  }
-
-  /**
-   * Get connection status color class
-   */
-  getStatusClass(): string {
-    switch (this.chatService.connectionStatus()) {
-      case 'connected':
-        return 'status-connected';
-      case 'connecting':
-        return 'status-connecting';
-      case 'error':
-        return 'status-error';
-      default:
-        return 'status-disconnected';
-    }
-  }
-
-  /**
-   * Get connection status text
-   */
-  getStatusText(): string {
-    switch (this.chatService.connectionStatus()) {
-      case 'connected':
-        return 'Connected';
-      case 'connecting':
-        return 'Connecting...';
-      case 'error':
-        return 'Error';
-      default:
-        return 'Disconnected';
     }
   }
 }
