@@ -1,0 +1,49 @@
+<div class="crafting-container">
+  <!-- Active Crafting Progress (Decomposed Component) -->
+  @if (craftingService.isCrafting() || isRestarting()) {
+    <app-crafting-progress
+      [activeRecipe]="activeRecipe()"
+      [activeOutputIcon]="activeOutputIcon()"
+      [craftingProgress]="craftingProgress()"
+      [remainingTime]="craftingService.remainingTime()"
+      [activeIngredientItems]="activeIngredientItems()"
+      [autoRestartEnabled]="autoRestartEnabled()"
+      [isRestarting]="isRestarting()"
+      [craftingLog]="craftingLog"
+      [lastResult]="craftingService.lastResult()"
+      (autoRestartToggled)="toggleAutoRestart()"
+      (craftingCancelled)="cancelCrafting()"
+      (resultCleared)="clearResult()">
+    </app-crafting-progress>
+  }
+
+  <!-- Recipe List (Decomposed Component) -->
+  @if (!craftingService.isCrafting() && !selectedRecipe() && !isRestarting()) {
+    <app-recipe-list
+      [skill]="skill"
+      [recipes]="recipeService.recipes().filter(r => r.skill === skill)"
+      [loading]="recipeService.loading()"
+      [playerSkills]="playerSkills()"
+      [playerInventory]="playerInventory()"
+      (recipeSelected)="selectRecipe($event)">
+    </app-recipe-list>
+  }
+
+  <!-- Recipe Details / Ingredient Selector (Decomposed Component) -->
+  @if (selectedRecipe() && !craftingService.isCrafting()) {
+    <app-ingredient-selector
+      [recipe]="selectedRecipe()"
+      [skill]="skill"
+      [playerInventory]="playerInventory()"
+      [selectedIngredients]="selectedIngredients"
+      [outputItems]="selectedRecipeOutputItems()"
+      [canCraft]="canCraft(selectedRecipe()!).canCraft"
+      [canCraftMessage]="canCraft(selectedRecipe()!).message"
+      (recipeBack)="selectedRecipe.set(null)"
+      (craftingStarted)="startCrafting($event)"
+      (ingredientSelectionChanged)="toggleInstanceSelection($event.lookupKey, $event.instanceId, $event.maxQuantity, $event.required)"
+      (autoSelectRequested)="autoSelectBestQuality($event)"
+      (selectionCleared)="clearSelection()">
+    </app-ingredient-selector>
+  }
+</div>
