@@ -33,7 +33,7 @@ export const IronMiningPickaxe: EquipmentItem = {
     "weight": 6,
     "material": MATERIAL.IRON,
     "tier": TIER.T2,
-    "damageRoll": "1d4",
+    "damageRoll": "1d2",
     "attackSpeed": 3.2,
     "critChance": 0.05,
     "skillScalar": SKILL_SOURCE.ONE_HANDED,

@@ -21,7 +21,7 @@ export const ALL_SKILLS: readonly SkillName[] = [
   'twoHanded',
   'ranged',
   'casting',
-  'gun'
+  'protection'
 ] as const;
 
 /**
@@ -53,7 +53,7 @@ export const SKILL_DISPLAY_NAMES: Record<SkillName, string> = {
   twoHanded: 'Two-Handed',
   ranged: 'Ranged',
   casting: 'Casting',
-  gun: 'Gun'
+  protection: 'Protection'
 };
 
 /**
@@ -72,7 +72,7 @@ export const SKILL_ICONS: Record<SkillName, string> = {
   twoHanded: 'assets/icons/abilities/ability_hammer_smash.svg',
   ranged: 'assets/icons/abilities/ability_piercing_arrow.svg',
   casting: 'assets/icons/abilities/ability_lightning_strike.svg',
-  gun: 'assets/icons/abilities/ability_plasma_shot.svg'
+  protection: 'assets/icons/status/status_armor_up.svg'
 };
 
 /**

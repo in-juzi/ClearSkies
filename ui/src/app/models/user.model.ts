@@ -96,7 +96,7 @@ export interface PlayerSkills {
   twoHanded: Skill;
   ranged: Skill;
   casting: Skill;
-  gun: Skill;
+  protection: Skill; // NEW: Tank/defensive skill (replaced gun)
 }
 
 export interface AttributeWithProgress extends Attribute {
@@ -128,7 +128,7 @@ export interface SkillsResponse {
       twoHanded: SkillWithProgress;
       ranged: SkillWithProgress;
       casting: SkillWithProgress;
-      gun: SkillWithProgress;
+      protection: SkillWithProgress; // NEW: Tank/defensive skill (replaced gun)
     };
   };
 }
@@ -157,7 +157,7 @@ export interface SkillExperienceResponse {
   };
 }
 
-export type SkillName = 'woodcutting' | 'mining' | 'fishing' | 'gathering' | 'smithing' | 'cooking' | 'alchemy' | 'oneHanded' | 'dualWield' | 'twoHanded' | 'ranged' | 'casting' | 'gun';
+export type SkillName = 'woodcutting' | 'mining' | 'fishing' | 'gathering' | 'smithing' | 'cooking' | 'alchemy' | 'oneHanded' | 'dualWield' | 'twoHanded' | 'ranged' | 'casting' | 'protection';
 export type AttributeName = 'strength' | 'endurance' | 'wisdom' | 'perception' | 'dexterity' | 'will' | 'charisma'; // 'magic' renamed to 'wisdom'
 
 export interface Location {

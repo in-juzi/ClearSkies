@@ -33,7 +33,7 @@ export const WillowFishingRod: EquipmentItem = {
     "weight": 2,
     "material": MATERIAL.WILLOW,
     "tier": TIER.T2,
-    "damageRoll": "1d3",
+    "damageRoll": "1d2",
     "attackSpeed": 2.4,
     "critChance": 0.04,
     "skillScalar": SKILL_SOURCE.ONE_HANDED,

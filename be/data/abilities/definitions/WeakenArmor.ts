@@ -45,7 +45,7 @@ export const WeakenArmor: Ability = {
     }
   },
   icon: {
-    path: 'abilities/weaken-armor.svg',
-    material: 'generic'
+    path: 'abilities/ability_hammer_smash.svg',
+    material: 'iron'
   }
 };

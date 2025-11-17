@@ -33,7 +33,7 @@ export const BronzeWoodcuttingAxe: EquipmentItem = {
     "weight": 4,
     "material": MATERIAL.BRONZE,
     "tier": TIER.T1,
-    "damageRoll": "1d3",
+    "damageRoll": "1d2",
     "attackSpeed": 2.8,
     "critChance": 0.04,
     "skillScalar": SKILL_SOURCE.ONE_HANDED,

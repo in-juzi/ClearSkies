@@ -16,8 +16,7 @@ export const RapidFire: Ability = {
   "cooldown": 2,
   "requirements": {
     "weaponTypes": [
-      "ranged",
-      "gun"
+      "ranged"
     ],
     "minSkillLevel": 3
   },

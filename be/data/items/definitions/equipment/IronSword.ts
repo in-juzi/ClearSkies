@@ -30,7 +30,7 @@ export const IronSword: EquipmentItem = {
     "weight": 5,
     "material": MATERIAL.IRON,
     "tier": TIER.T2,
-    "damageRoll": "1d5",
+    "damageRoll": "1d6",
     "attackSpeed": 2.6,
     "critChance": 0.06,
     "skillScalar": SKILL_SOURCE.ONE_HANDED,

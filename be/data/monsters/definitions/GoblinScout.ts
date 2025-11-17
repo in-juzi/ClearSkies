@@ -76,10 +76,10 @@ export const GoblinScout: Monster = {
       "experience": 0,
       "mainAttribute": "wisdom"
     },
-    "gun": {
+    "protection": {
       "level": 1,
       "experience": 0,
-      "mainAttribute": "perception"
+      "mainAttribute": "endurance"
     }
   },
   "equipment": {

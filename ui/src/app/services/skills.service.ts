@@ -26,7 +26,7 @@ export class SkillsService {
     twoHanded: SkillWithProgress;
     ranged: SkillWithProgress;
     casting: SkillWithProgress;
-    gun: SkillWithProgress;
+    protection: SkillWithProgress;
   } | null>(null);
 
   /**

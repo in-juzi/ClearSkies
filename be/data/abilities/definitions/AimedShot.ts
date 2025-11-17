@@ -16,8 +16,7 @@ export const AimedShot: Ability = {
   "cooldown": 2,
   "requirements": {
     "weaponTypes": [
-      "ranged",
-      "gun"
+      "ranged"
     ],
     "minSkillLevel": 1
   },
