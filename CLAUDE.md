@@ -51,6 +51,7 @@
 - ✅ Angular component naming standardization (completed - all components use .component.* convention)
 - ✅ Location component decomposition (completed - split into 5 specialized sub-components)
 - ✅ Crafting component decomposition (completed - split into 3 specialized sub-components)
+- ✅ Inventory component decomposition (completed - split into 4 specialized sub-components)
 - ✅ Equipment subtype display system (completed - human-readable labels for all equipment types)
 - ✅ Legacy potion cleanup (completed - removed old item definitions, added migration script)
 - ✅ Context-aware trait system (completed - dual validation/display for crafting vs random generation)
@@ -83,16 +84,16 @@
 - ✅ Skill system refactor (completed - removed gun skill, added protection skill for tanks)
 
 **Recent Changes** (Last 10 commits):
+- docs: add backup of refactored inventory template
+- refactor: remove unused crafting component styles
+- refactor: decompose inventory component into sub-components
+- feat: add inventory sub-components for better modularity
+- docs: update CLAUDE.md with crafting component decomposition
 - docs: add backup of refactored crafting template
 - refactor: decompose crafting component into sub-components
 - feat: add crafting sub-components for better modularity
 - docs: update CLAUDE.md with latest component refactoring
 - docs: add UI refactoring plan documentation
-- chore: remove deprecated bank.service.ts
-- refactor: update component imports to use standardized file paths
-- refactor: standardize component file naming to .component.* convention
-- docs: update CLAUDE.md with quest system and recent features
-- chore: remove duplicate XP system documentation
 
 **Known Issues**:
 - None currently identified
@@ -152,6 +153,7 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 **Frontend Core:**
 - Game Component: [ui/src/app/components/game/game.component.ts](ui/src/app/components/game/game.component.ts), [ui/src/app/components/game/game.component.html](ui/src/app/components/game/game.component.html)
 - Inventory: [ui/src/app/components/game/inventory/inventory.component.ts](ui/src/app/components/game/inventory/inventory.component.ts), [ui/src/app/components/game/inventory/inventory.component.html](ui/src/app/components/game/inventory/inventory.component.html)
+  - Inventory Sub-components: [inventory-header/](ui/src/app/components/game/inventory/inventory-header/), [inventory-stats/](ui/src/app/components/game/inventory/inventory-stats/), [inventory-list-view/](ui/src/app/components/game/inventory/inventory-list-view/), [inventory-grouped-view/](ui/src/app/components/game/inventory/inventory-grouped-view/)
 - Location: [ui/src/app/components/game/location/location.component.ts](ui/src/app/components/game/location/location.component.ts), [ui/src/app/components/game/location/location.component.html](ui/src/app/components/game/location/location.component.html)
   - Location Sub-components: [location-activity-detail/](ui/src/app/components/game/location/location-activity-detail/), [location-activity-progress/](ui/src/app/components/game/location/location-activity-progress/), [location-facility-detail/](ui/src/app/components/game/location/location-facility-detail/), [location-facility-list/](ui/src/app/components/game/location/location-facility-list/), [location-travel/](ui/src/app/components/game/location/location-travel/), [activity-drop-table/](ui/src/app/components/game/location/activity-drop-table/)
 - Skills: [ui/src/app/components/game/skills/skills.component.ts](ui/src/app/components/game/skills/skills.component.ts)
