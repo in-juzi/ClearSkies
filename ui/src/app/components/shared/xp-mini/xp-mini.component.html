@@ -1,28 +1,28 @@
-<div class="xp-mini" [class.compact]="compact">
+<div class="xp-mini" [class.compact]="compact()">
   <!-- Icon (optional) -->
-  @if (showIcon) {
-    <span class="xp-icon">{{ icon }}</span>
+  @if (showIcon()) {
+    <span class="xp-icon">{{ icon() }}</span>
   }
 
   <!-- Skill/Attribute name (optional) -->
-  @if (showSkillName && skillName) {
+  @if (showSkillName() && skillName()) {
     <span class="xp-skill-name">
-      {{ formattedSkillName }}:
+      {{ formattedSkillName() }}:
     </span>
   }
 
   <!-- XP amount with scaling info -->
   <span class="xp-amount">
     <!-- Show raw → scaled if different -->
-    @if (wasScaled) {
-      <span class="xp-raw">{{ rawXp }} XP</span>
+    @if (wasScaled()) {
+      <span class="xp-raw">{{ rawXp() }} XP</span>
       <span class="xp-arrow">→</span>
-      <span class="xp-scaled">{{ xp }} XP</span>
+      <span class="xp-scaled">{{ xp() }} XP</span>
     }
 
     <!-- Show simple XP if not scaled or scaling disabled -->
-    @if (!wasScaled) {
-      +{{ xp }} XP
+    @if (!wasScaled()) {
+      +{{ xp() }} XP
     }
   </span>
 </div>

@@ -1,9 +1,9 @@
 <div class="activity-log">
-  <h3>{{ title }}</h3>
+  <h3>{{ title() }}</h3>
   <div class="log-entries">
-    @for (entry of visibleEntries; track entry.timestamp) {
+    @for (entry of visibleEntries(); track entry.timestamp) {
       <div class="log-entry">
-        @if (showTimestamp) {
+        @if (showTimestamp()) {
           <div class="log-timestamp">{{ entry.timestamp | date:'HH:mm:ss' }}</div>
         }
         <div class="log-content">

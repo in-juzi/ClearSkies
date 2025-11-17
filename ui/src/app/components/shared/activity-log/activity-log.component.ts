@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, input, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ItemMiniComponent } from '../item-mini/item-mini.component';
 import { XpMiniComponent } from '../xp-mini/xp-mini.component';
@@ -42,17 +42,16 @@ export interface ActivityLogEntry {
   styleUrls: ['./activity-log.component.scss']
 })
 export class ActivityLogComponent {
-  @Input() entries: ActivityLogEntry[] = [];
-  @Input() maxEntries: number = 10;
-  @Input() showTimestamp: boolean = true;
-  @Input() title: string = 'Recent Completions';
+  // Inputs as signals
+  entries = input<ActivityLogEntry[]>([]);
+  maxEntries = input<number>(10);
+  showTimestamp = input<boolean>(true);
+  title = input<string>('Recent Completions');
 
-  /**
-   * Get visible entries limited by maxEntries
-   */
-  get visibleEntries(): ActivityLogEntry[] {
-    return this.entries.slice(0, this.maxEntries);
-  }
+  // Computed signal (replacing getter)
+  visibleEntries = computed(() => {
+    return this.entries().slice(0, this.maxEntries());
+  });
 
   /**
    * Format skill name for display
