@@ -53,6 +53,7 @@
 - ✅ Crafting component decomposition (completed - split into 3 specialized sub-components)
 - ✅ Inventory component decomposition (completed - split into 4 specialized sub-components)
 - ✅ Chat component decomposition (completed - split into 3 specialized sub-components)
+- ✅ Item-details-panel decomposition (completed - split into 5 specialized sub-components)
 - ✅ Equipment subtype display system (completed - human-readable labels for all equipment types)
 - ✅ Legacy potion cleanup (completed - removed old item definitions, added migration script)
 - ✅ Context-aware trait system (completed - dual validation/display for crafting vs random generation)
@@ -85,6 +86,9 @@
 - ✅ Skill system refactor (completed - removed gun skill, added protection skill for tanks)
 
 **Recent Changes** (Last 10 commits):
+- refactor: decompose item-details-panel into sub-components
+- feat: add item-details-panel sub-components for better modularity
+- docs: update CLAUDE.md with chat component decomposition
 - refactor: decompose chat component into sub-components
 - feat: add chat sub-components for better modularity
 - docs: update CLAUDE.md with inventory component decomposition
@@ -92,9 +96,6 @@
 - refactor: remove unused crafting component styles
 - refactor: decompose inventory component into sub-components
 - feat: add inventory sub-components for better modularity
-- docs: update CLAUDE.md with crafting component decomposition
-- docs: add backup of refactored crafting template
-- refactor: decompose crafting component into sub-components
 
 **Known Issues**:
 - None currently identified
@@ -172,6 +173,7 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 - Quest Components: [quest-tracker/](ui/src/app/components/game/quest-tracker/), [quest-journal/](ui/src/app/components/game/quest-journal/)
 - Manual: [ui/src/app/components/manual/manual.component.ts](ui/src/app/components/manual/manual.component.ts), [ui/src/app/components/manual/sections/](ui/src/app/components/manual/sections/)
 - Shared Components: [ui/src/app/components/shared/item-mini/item-mini.component.ts](ui/src/app/components/shared/item-mini/item-mini.component.ts), [ui/src/app/components/shared/item-modifiers/item-modifiers.component.ts](ui/src/app/components/shared/item-modifiers/item-modifiers.component.ts), [ui/src/app/components/shared/item-details-panel/item-details-panel.component.ts](ui/src/app/components/shared/item-details-panel/item-details-panel.component.ts), [ui/src/app/components/shared/icon/icon.component.ts](ui/src/app/components/shared/icon/icon.component.ts), [ui/src/app/components/shared/xp-mini/xp-mini.component.ts](ui/src/app/components/shared/xp-mini/xp-mini.component.ts), [ui/src/app/components/shared/ability-button/ability-button.component.ts](ui/src/app/components/shared/ability-button/ability-button.component.ts), [ui/src/app/components/shared/item-button/item-button.component.ts](ui/src/app/components/shared/item-button/item-button.component.ts), [ui/src/app/components/shared/buff-icon/buff-icon.component.ts](ui/src/app/components/shared/buff-icon/buff-icon.component.ts), [ui/src/app/components/shared/activity-log/activity-log.component.ts](ui/src/app/components/shared/activity-log/activity-log.component.ts), [notification-display/](ui/src/app/components/shared/notification-display/)
+  - Item-details-panel Sub-components: [item-detail-header/](ui/src/app/components/shared/item-details-panel/item-detail-header/), [item-basic-info/](ui/src/app/components/shared/item-details-panel/item-basic-info/), [item-stats-display/](ui/src/app/components/shared/item-details-panel/item-stats-display/), [item-modifiers-display/](ui/src/app/components/shared/item-details-panel/item-modifiers-display/), [item-actions/](ui/src/app/components/shared/item-details-panel/item-actions/)
 - Services: [ui/src/app/services/inventory.service.ts](ui/src/app/services/inventory.service.ts), [ui/src/app/services/location.service.ts](ui/src/app/services/location.service.ts), [ui/src/app/services/skills.service.ts](ui/src/app/services/skills.service.ts), [ui/src/app/services/auth.service.ts](ui/src/app/services/auth.service.ts), [ui/src/app/services/manual.service.ts](ui/src/app/services/manual.service.ts), [ui/src/app/services/chat.service.ts](ui/src/app/services/chat.service.ts), [ui/src/app/services/vendor.service.ts](ui/src/app/services/vendor.service.ts), [ui/src/app/services/recipe.service.ts](ui/src/app/services/recipe.service.ts), [ui/src/app/services/crafting.service.ts](ui/src/app/services/crafting.service.ts), [ui/src/app/services/combat.service.ts](ui/src/app/services/combat.service.ts), [ui/src/app/services/icon.service.ts](ui/src/app/services/icon.service.ts), [ui/src/app/services/storage.service.ts](ui/src/app/services/storage.service.ts), [ui/src/app/services/quest.service.ts](ui/src/app/services/quest.service.ts), [ui/src/app/services/notification.service.ts](ui/src/app/services/notification.service.ts)
 - Constants: [ui/src/app/constants/material-colors.constants.ts](ui/src/app/constants/material-colors.constants.ts), [ui/src/app/constants/game-data.constants.ts](ui/src/app/constants/game-data.constants.ts)
 
