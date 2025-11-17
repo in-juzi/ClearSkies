@@ -25,15 +25,9 @@ export const ActivityFishCod: ActivityUnion = {
     "experience": {
       "fishing": 20
     },
-    "items": [
-      {
-        "itemId": "trout",
-        "quantity": {
-          "min": 1,
-          "max": 3
-        },
-        "chance": 0.8
-      }
+    "dropTables": [
+      "fishing-cod",
+      "rare-fishing"
     ]
   }
 } as const;

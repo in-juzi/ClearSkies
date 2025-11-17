@@ -25,15 +25,9 @@ export const ActivityMineIron: ActivityUnion = {
     "experience": {
       "mining": 20
     },
-    "items": [
-      {
-        "itemId": "iron_ore",
-        "quantity": {
-          "min": 1,
-          "max": 3
-        },
-        "chance": 0.75
-      }
+    "dropTables": [
+      "mining-iron",
+      "rare-low-mining"
     ]
   }
 } as const;

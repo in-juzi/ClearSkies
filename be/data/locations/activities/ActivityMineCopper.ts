@@ -26,7 +26,8 @@ export const ActivityMineCopper: ActivityUnion = {
       "mining": 20
     },
     "dropTables": [
-      "mining-copper"
+      "mining-copper",
+      "rare-low-mining"
     ]
   }
 } as const;
