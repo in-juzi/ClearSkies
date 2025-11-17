@@ -34,7 +34,7 @@ export type SkillName =
   | 'twoHanded'
   | 'ranged'
   | 'casting'
-  | 'gun';
+  | 'protection'; // NEW: Tank/defensive skill
 
 export type AttributeName =
   | 'strength'

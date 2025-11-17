@@ -11,7 +11,10 @@ import {
   CombatLogType,
   ActiveCombat,
   CombatLogEntry,
-  CombatStats
+  CombatStats,
+  ActiveQuest,
+  ObjectiveProgress,
+  PlayerAchievementData
 } from '@shared/types';
 import { ATTRIBUTE_SCALING } from '../../shared/constants/attribute-constants';
 
@@ -59,18 +62,7 @@ export interface StorageContainer {
   items: InventoryItem[];
 }
 
-// CombatLogEntry, ActiveCombat, and CombatStats imported from @shared/types
-
-export interface QuestProgress {
-  questId: mongoose.Types.ObjectId;
-  status: 'not_started' | 'in_progress' | 'completed';
-  progress: Map<string, any>;
-}
-
-export interface Achievement {
-  achievementId: mongoose.Types.ObjectId;
-  unlockedAt: Date;
-}
+// CombatLogEntry, ActiveCombat, CombatStats, ActiveQuest, ObjectiveProgress, and PlayerAchievementData imported from @shared/types
 
 export interface PlayerStats {
   health: Stats;
@@ -104,8 +96,15 @@ export interface IPlayer extends Document {
   activeCombat?: ActiveCombat;
   lastCombatActivityId?: string;
   combatStats: CombatStats;
-  questProgress: QuestProgress[];
-  achievements: Achievement[];
+  quests: {
+    active: ActiveQuest[];
+    completed: string[];
+    available: string[];
+  };
+  achievements: PlayerAchievementData[];
+  titles: string[];
+  activeTitle: string | null;
+  decorations: string[];
   attributes: Record<AttributeName, Attribute>;
   skills: Record<SkillName, Skill>;
   createdAt: Date;
@@ -171,6 +170,7 @@ export interface IPlayer extends Document {
   getInventoryValue(): number;
   equipItem(instanceId: string, slotName: string): Promise<{ slot: string; item: InventoryItem }>;
   unequipItem(slotName: string): Promise<{ slot: string; item: InventoryItem | undefined }>;
+  getActiveCombatSkill(): string;
   getEquippedItems(): Record<string, InventoryItem>;
   isSlotAvailable(slotName: string): boolean;
   addEquipmentSlot(slotName: string): Promise<string>;
@@ -181,7 +181,7 @@ export interface IPlayer extends Document {
   getContainerItems(containerId: string): any[];
   depositToContainer(containerId: string, instanceId: string, quantity?: number | null): any;
   withdrawFromContainer(containerId: string, instanceId: string, quantity?: number | null): any;
-  takeDamage(amount: number): boolean;
+  takeDamage(amount: number): Promise<boolean>;
   heal(amount: number): void;
   useMana(amount: number): void;
   restoreMana(amount: number): void;
@@ -199,6 +199,12 @@ export interface IPlayer extends Document {
   removeActiveBuff(buffId: string): boolean;
   getActiveBuffs(): any[];
   getActiveBuffsForTarget(target: 'player' | 'monster'): any[];
+  acceptQuest(questId: string, objectives: ObjectiveProgress[]): void;
+  updateQuestObjective(questId: string, objectiveId: string, amount: number): ObjectiveProgress | null;
+  completeQuest(questId: string): void;
+  isQuestActive(questId: string): boolean;
+  isQuestCompleted(questId: string): boolean;
+  getActiveQuest(questId: string): ActiveQuest | undefined;
 }
 
 // ============================================================================
@@ -367,19 +373,30 @@ const playerSchema = new Schema<IPlayer>({
     criticalHits: { type: Number, default: 0 },
     dodges: { type: Number, default: 0 }
   },
-  questProgress: [{
-    questId: { type: Schema.Types.ObjectId, ref: 'Quest' },
-    status: {
-      type: String,
-      enum: ['not_started', 'in_progress', 'completed'],
-      default: 'not_started'
-    },
-    progress: { type: Map, of: Schema.Types.Mixed }
-  }],
+  quests: {
+    active: [{
+      questId: { type: String, required: true },
+      startedAt: { type: Date, required: true },
+      objectives: [{
+        objectiveId: { type: String, required: true },
+        type: { type: String, required: true },
+        current: { type: Number, default: 0 },
+        required: { type: Number, required: true },
+        completed: { type: Boolean, default: false }
+      }],
+      turnedIn: { type: Boolean, default: false }
+    }],
+    completed: [{ type: String }],
+    available: [{ type: String }]
+  },
   achievements: [{
-    achievementId: { type: Schema.Types.ObjectId, ref: 'Achievement' },
-    unlockedAt: { type: Date, default: Date.now }
+    achievementId: { type: String, required: true },
+    unlockedAt: { type: Date, required: true },
+    progress: { type: Number, default: 0 }
   }],
+  titles: [{ type: String }],
+  activeTitle: { type: String, default: null },
+  decorations: [{ type: String }],
   attributes: {
     strength: {
       level: { type: Number, default: 1, min: 1 },
@@ -471,10 +488,10 @@ const playerSchema = new Schema<IPlayer>({
       experience: { type: Number, default: 0, min: 0 },
       mainAttribute: { type: String, default: 'wisdom' }
     },
-    gun: {
+    protection: {
       level: { type: Number, default: 1, min: 1 },
       experience: { type: Number, default: 0, min: 0 },
-      mainAttribute: { type: String, default: 'perception' }
+      mainAttribute: { type: String, default: 'endurance' }
     }
   },
   createdAt: {
@@ -694,7 +711,7 @@ playerSchema.methods.addSkillExperience = async function(
   const { getXPForLevel } = require('@shared/constants/attribute-constants');
   const validSkills: SkillName[] = [
     'woodcutting', 'mining', 'fishing', 'gathering', 'smithing', 'cooking', 'alchemy',
-    'oneHanded', 'dualWield', 'twoHanded', 'ranged', 'casting', 'gun'
+    'oneHanded', 'dualWield', 'twoHanded', 'ranged', 'casting', 'protection'
   ];
 
   if (!validSkills.includes(skillName)) {
@@ -717,6 +734,14 @@ playerSchema.methods.addSkillExperience = async function(
 
   if (leveledUp) {
     skill.level = newLevel;
+
+    // Trigger quest system for skill level-up (for SharpeningYourSkills quest)
+    try {
+      const questService = require('../services/questService').default;
+      await questService.onSkillLevelUp(this, skillName, newLevel);
+    } catch (error) {
+      console.error('Error updating quest progress on skill level-up:', error);
+    }
   }
 
   const skillResult = {
@@ -746,7 +771,7 @@ playerSchema.methods.getSkillProgress = function(this: IPlayer, skillName: Skill
   const { getPercentToNextLevel } = require('@shared/constants/attribute-constants');
   const validSkills: SkillName[] = [
     'woodcutting', 'mining', 'fishing', 'gathering', 'smithing', 'cooking', 'alchemy',
-    'oneHanded', 'dualWield', 'twoHanded', 'ranged', 'casting', 'gun'
+    'oneHanded', 'dualWield', 'twoHanded', 'ranged', 'casting', 'protection'
   ];
 
   if (!validSkills.includes(skillName)) {
@@ -925,6 +950,32 @@ playerSchema.methods.equipItem = async function(
     throw new Error(`Item cannot be equipped to ${slotName} slot. It can only be equipped to ${itemDef.slot}`);
   }
 
+  // Two-handed weapon logic
+  const isTwoHandedWeapon = (itemDef as any).properties?.twoHanded === true;
+
+  if (isTwoHandedWeapon) {
+    // Two-handed weapon being equipped to mainHand
+    // Must unequip offHand if anything is there
+    const offHandEquipped = this.equipmentSlots.get('offHand');
+    if (offHandEquipped) {
+      await this.unequipItem('offHand');
+    }
+  } else if (slotName === 'mainHand' || slotName === 'offHand') {
+    // Equipping something to mainHand or offHand
+    // Check if a two-handed weapon is currently equipped
+    const mainHandInstanceId = this.equipmentSlots.get('mainHand');
+    if (mainHandInstanceId) {
+      const mainHandItem = this.getItem(mainHandInstanceId);
+      if (mainHandItem) {
+        const mainHandDef = itemService.getItemDefinition(mainHandItem.itemId);
+        if ((mainHandDef as any).properties?.twoHanded === true) {
+          // Unequip the two-handed weapon
+          await this.unequipItem('mainHand');
+        }
+      }
+    }
+  }
+
   // Check if slot already has an item equipped
   const currentlyEquipped = this.equipmentSlots.get(slotName);
   if (currentlyEquipped) {
@@ -966,6 +1017,50 @@ playerSchema.methods.unequipItem = async function(
 
   await this.save();
   return { slot: slotName, item };
+};
+
+// Get active combat skill based on currently equipped weapons
+playerSchema.methods.getActiveCombatSkill = function(this: IPlayer): string {
+  const itemService = require('../services/itemService').default;
+
+  const mainHandInstanceId = this.equipmentSlots.get('mainHand');
+  const offHandInstanceId = this.equipmentSlots.get('offHand');
+
+  // No weapon equipped - return oneHanded (unarmed combat)
+  if (!mainHandInstanceId) {
+    return 'oneHanded';
+  }
+
+  // Check mainHand weapon
+  const mainHandItem = this.getItem(mainHandInstanceId);
+  if (!mainHandItem) {
+    return 'oneHanded';
+  }
+
+  const mainHandDef = itemService.getItemDefinition(mainHandItem.itemId);
+  if (!mainHandDef) {
+    return 'oneHanded';
+  }
+
+  // Check if mainHand weapon is two-handed
+  if ((mainHandDef as any).properties?.twoHanded === true) {
+    return 'twoHanded';
+  }
+
+  // Check offHand for dual-wield
+  if (offHandInstanceId) {
+    const offHandItem = this.getItem(offHandInstanceId);
+    if (offHandItem) {
+      const offHandDef = itemService.getItemDefinition(offHandItem.itemId);
+      // If offHand has a weapon (not shield/armor), it's dual-wield
+      if (offHandDef && (offHandDef as any).subcategories?.includes('weapon')) {
+        return 'dualWield';
+      }
+    }
+  }
+
+  // Default: one-handed (weapon + shield/empty offHand)
+  return 'oneHanded';
 };
 
 // Get all currently equipped items
@@ -1227,13 +1322,18 @@ playerSchema.methods.withdrawFromContainer = function(
 // ============================================================================
 
 // Take damage and return true if defeated
-playerSchema.methods.takeDamage = function(this: IPlayer, amount: number): boolean {
+playerSchema.methods.takeDamage = async function(this: IPlayer, amount: number): Promise<boolean> {
   if (amount < 0) {
     throw new Error('Damage amount must be positive');
   }
 
   this.stats.health.current = Math.max(0, this.stats.health.current - amount);
   this.combatStats.totalDamageTaken += amount;
+
+  // Award protection XP when taking damage in combat (1 dmg = 1 XP)
+  if (this.isInCombat() && amount > 0) {
+    await this.addSkillExperience('protection', amount);
+  }
 
   return this.stats.health.current === 0; // Returns true if defeated
 };
@@ -1466,6 +1566,90 @@ playerSchema.methods.getActiveBuffsForTarget = function(this: IPlayer, target: '
   return Array.from(this.activeCombat.activeBuffs.values()).filter(
     (buff: any) => buff.target === target
   );
+};
+
+// ============================================================================
+// Quest Methods
+// ============================================================================
+
+// Accept a quest
+playerSchema.methods.acceptQuest = function(this: IPlayer, questId: string, objectives: ObjectiveProgress[]): void {
+  if (!this.quests) {
+    this.quests = { active: [], completed: [], available: [] };
+  }
+
+  this.quests.active.push({
+    questId,
+    startedAt: new Date(),
+    objectives,
+    turnedIn: false
+  });
+};
+
+// Update quest objective progress
+playerSchema.methods.updateQuestObjective = function(
+  this: IPlayer,
+  questId: string,
+  objectiveId: string,
+  amount: number
+): ObjectiveProgress | null {
+  if (!this.quests || !this.quests.active) {
+    return null;
+  }
+
+  const quest = this.quests.active.find((q: ActiveQuest) => q.questId === questId);
+  if (!quest) {
+    return null;
+  }
+
+  const objective = quest.objectives.find((obj: ObjectiveProgress) => obj.objectiveId === objectiveId);
+  if (!objective) {
+    return null;
+  }
+
+  objective.current = Math.min(objective.current + amount, objective.required);
+  objective.completed = objective.current >= objective.required;
+
+  return objective;
+};
+
+// Complete a quest (mark ready for turn-in)
+playerSchema.methods.completeQuest = function(this: IPlayer, questId: string): void {
+  if (!this.quests || !this.quests.active) {
+    return;
+  }
+
+  const quest = this.quests.active.find((q: ActiveQuest) => q.questId === questId);
+  if (quest) {
+    quest.turnedIn = false; // Ready to turn in but not yet turned in
+  }
+};
+
+// Check if quest is active
+playerSchema.methods.isQuestActive = function(this: IPlayer, questId: string): boolean {
+  if (!this.quests || !this.quests.active) {
+    return false;
+  }
+
+  return this.quests.active.some((q: ActiveQuest) => q.questId === questId);
+};
+
+// Check if quest is completed
+playerSchema.methods.isQuestCompleted = function(this: IPlayer, questId: string): boolean {
+  if (!this.quests || !this.quests.completed) {
+    return false;
+  }
+
+  return this.quests.completed.includes(questId);
+};
+
+// Get active quest by ID
+playerSchema.methods.getActiveQuest = function(this: IPlayer, questId: string): ActiveQuest | undefined {
+  if (!this.quests || !this.quests.active) {
+    return undefined;
+  }
+
+  return this.quests.active.find((q: ActiveQuest) => q.questId === questId);
 };
 
 // ============================================================================
