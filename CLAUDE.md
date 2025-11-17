@@ -84,18 +84,21 @@
 - ✅ Drop table preview UI (completed - expandable reward viewer in activity details)
 - ✅ Notification system (completed - toast-style notifications for quest events)
 - ✅ Skill system refactor (completed - removed gun skill, added protection skill for tanks)
+- ✅ Centralized rarity utilities (completed - 3 standalone pipes for rarity styling)
+- ✅ Centralized item utilities (completed - item-filter service and item-sort utils)
+- ✅ Component utility migration (completed - all components use shared rarity/filter/sort utilities)
 
 **Recent Changes** (Last 10 commits):
+- refactor: migrate item-details-panel sub-components to use rarity pipes
+- refactor: migrate crafting components to use rarity pipes
+- refactor: migrate bank, vendor, and equipment to use rarity pipes
+- refactor: migrate inventory components to use rarity pipes
+- refactor: migrate services to use centralized utilities
+- feat: add centralized item filtering service
+- feat: add centralized item sorting utilities
+- feat: add rarity transformation pipes for consistent styling
 - refactor: migrate shared components to Angular signals API
 - docs: update CLAUDE.md with item-details-panel decomposition
-- refactor: decompose item-details-panel into sub-components
-- feat: add item-details-panel sub-components for better modularity
-- docs: update CLAUDE.md with chat component decomposition
-- refactor: decompose chat component into sub-components
-- feat: add chat sub-components for better modularity
-- docs: update CLAUDE.md with inventory component decomposition
-- docs: add backup of refactored inventory template
-- refactor: remove unused crafting component styles
 
 **Known Issues**:
 - None currently identified
@@ -174,7 +177,9 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 - Manual: [ui/src/app/components/manual/manual.component.ts](ui/src/app/components/manual/manual.component.ts), [ui/src/app/components/manual/sections/](ui/src/app/components/manual/sections/)
 - Shared Components: [ui/src/app/components/shared/item-mini/item-mini.component.ts](ui/src/app/components/shared/item-mini/item-mini.component.ts), [ui/src/app/components/shared/item-modifiers/item-modifiers.component.ts](ui/src/app/components/shared/item-modifiers/item-modifiers.component.ts), [ui/src/app/components/shared/item-details-panel/item-details-panel.component.ts](ui/src/app/components/shared/item-details-panel/item-details-panel.component.ts), [ui/src/app/components/shared/icon/icon.component.ts](ui/src/app/components/shared/icon/icon.component.ts), [ui/src/app/components/shared/xp-mini/xp-mini.component.ts](ui/src/app/components/shared/xp-mini/xp-mini.component.ts), [ui/src/app/components/shared/ability-button/ability-button.component.ts](ui/src/app/components/shared/ability-button/ability-button.component.ts), [ui/src/app/components/shared/item-button/item-button.component.ts](ui/src/app/components/shared/item-button/item-button.component.ts), [ui/src/app/components/shared/buff-icon/buff-icon.component.ts](ui/src/app/components/shared/buff-icon/buff-icon.component.ts), [ui/src/app/components/shared/activity-log/activity-log.component.ts](ui/src/app/components/shared/activity-log/activity-log.component.ts), [notification-display/](ui/src/app/components/shared/notification-display/)
   - Item-details-panel Sub-components: [item-detail-header/](ui/src/app/components/shared/item-details-panel/item-detail-header/), [item-basic-info/](ui/src/app/components/shared/item-details-panel/item-basic-info/), [item-stats-display/](ui/src/app/components/shared/item-details-panel/item-stats-display/), [item-modifiers-display/](ui/src/app/components/shared/item-details-panel/item-modifiers-display/), [item-actions/](ui/src/app/components/shared/item-details-panel/item-actions/)
-- Services: [ui/src/app/services/inventory.service.ts](ui/src/app/services/inventory.service.ts), [ui/src/app/services/location.service.ts](ui/src/app/services/location.service.ts), [ui/src/app/services/skills.service.ts](ui/src/app/services/skills.service.ts), [ui/src/app/services/auth.service.ts](ui/src/app/services/auth.service.ts), [ui/src/app/services/manual.service.ts](ui/src/app/services/manual.service.ts), [ui/src/app/services/chat.service.ts](ui/src/app/services/chat.service.ts), [ui/src/app/services/vendor.service.ts](ui/src/app/services/vendor.service.ts), [ui/src/app/services/recipe.service.ts](ui/src/app/services/recipe.service.ts), [ui/src/app/services/crafting.service.ts](ui/src/app/services/crafting.service.ts), [ui/src/app/services/combat.service.ts](ui/src/app/services/combat.service.ts), [ui/src/app/services/icon.service.ts](ui/src/app/services/icon.service.ts), [ui/src/app/services/storage.service.ts](ui/src/app/services/storage.service.ts), [ui/src/app/services/quest.service.ts](ui/src/app/services/quest.service.ts), [ui/src/app/services/notification.service.ts](ui/src/app/services/notification.service.ts)
+- Services: [ui/src/app/services/inventory.service.ts](ui/src/app/services/inventory.service.ts), [ui/src/app/services/location.service.ts](ui/src/app/services/location.service.ts), [ui/src/app/services/skills.service.ts](ui/src/app/services/skills.service.ts), [ui/src/app/services/auth.service.ts](ui/src/app/services/auth.service.ts), [ui/src/app/services/manual.service.ts](ui/src/app/services/manual.service.ts), [ui/src/app/services/chat.service.ts](ui/src/app/services/chat.service.ts), [ui/src/app/services/vendor.service.ts](ui/src/app/services/vendor.service.ts), [ui/src/app/services/recipe.service.ts](ui/src/app/services/recipe.service.ts), [ui/src/app/services/crafting.service.ts](ui/src/app/services/crafting.service.ts), [ui/src/app/services/combat.service.ts](ui/src/app/services/combat.service.ts), [ui/src/app/services/icon.service.ts](ui/src/app/services/icon.service.ts), [ui/src/app/services/storage.service.ts](ui/src/app/services/storage.service.ts), [ui/src/app/services/quest.service.ts](ui/src/app/services/quest.service.ts), [ui/src/app/services/notification.service.ts](ui/src/app/services/notification.service.ts), [ui/src/app/services/item-filter.service.ts](ui/src/app/services/item-filter.service.ts)
+- Utilities: [ui/src/app/utils/item-sort.utils.ts](ui/src/app/utils/item-sort.utils.ts)
+- Pipes: [ui/src/app/pipes/rarity-class.pipe.ts](ui/src/app/pipes/rarity-class.pipe.ts), [ui/src/app/pipes/rarity-color.pipe.ts](ui/src/app/pipes/rarity-color.pipe.ts), [ui/src/app/pipes/rarity-name.pipe.ts](ui/src/app/pipes/rarity-name.pipe.ts)
 - Constants: [ui/src/app/constants/material-colors.constants.ts](ui/src/app/constants/material-colors.constants.ts), [ui/src/app/constants/game-data.constants.ts](ui/src/app/constants/game-data.constants.ts)
 
 **Game Data (TypeScript):**
@@ -561,9 +566,9 @@ See [project/docs/005-content-generator-agent.md](project/docs/005-content-gener
 **Combat**: Turn-based combat (Socket.io), Monsters (5), Abilities (11), Combat stats tracking, Restart encounters, Real-time events, Buff/debuff system
 **Crafting**: Cooking (4 recipes) + Smithing (16 recipes) + Alchemy (10 recipes, Socket.io), Quality inheritance, Instance selection, Recipe filtering, Subcategory ingredients, Recipe unlocks, Auto-restart
 **Quests**: Tutorial chain (5 quests), Optional side quests (7 quests), Auto-accept mechanics, Objective tracking, Real-time progress updates, Toast notifications
-**UI**: IconComponent (multi-channel colorization), ItemMiniComponent, AbilityButtonComponent, ItemButtonComponent, Manual/help system, Quest tracker, Quest journal, Notification system, Drop table preview
+**UI**: IconComponent (multi-channel colorization), ItemMiniComponent, AbilityButtonComponent, ItemButtonComponent, Manual/help system, Quest tracker, Quest journal, Notification system, Drop table preview, Centralized utilities (rarity pipes, item-filter service, item-sort utils)
 **Social**: Real-time chat (Socket.io), Vendor trading, Gold system
-**Architecture**: Full Socket.io migration (activities, crafting, combat, quests) - eliminated HTTP polling, server-authoritative timing, client-driven auto-restart, Shared TypeScript types, Effect system
+**Architecture**: Full Socket.io migration (activities, crafting, combat, quests) - eliminated HTTP polling, server-authoritative timing, client-driven auto-restart, Shared TypeScript types, Effect system, Centralized UI utilities
 
 See [project/docs/012-completed-features.md](project/docs/012-completed-features.md) for full list.
 
@@ -882,6 +887,61 @@ AI-powered autonomous agent for creating game content (locations, facilities, ac
 ❌ "Show me all the items in the game"
 ❌ "How does equipment work?"
 ```
+
+## Centralized UI Utilities
+
+The frontend now uses centralized utilities for common operations, eliminating duplicate code across components.
+
+**Rarity Pipes** ([ui/src/app/pipes/](ui/src/app/pipes/)):
+- **RarityClassPipe**: Maps rarity → CSS border class (`border-gray-500`, `border-orange-500`, etc.)
+- **RarityColorPipe**: Maps rarity → CSS text color class (`text-gray-400`, `text-purple-400`, etc.)
+- **RarityNamePipe**: Capitalizes rarity names for display (`common` → `Common`)
+
+**Usage**: Import pipes in component and use in templates:
+```typescript
+import { RarityClassPipe } from '../pipes/rarity-class.pipe';
+
+// Template:
+<div [class]="item.rarity | rarityClass">...</div>
+```
+
+**Item Filter Service** ([item-filter.service.ts](ui/src/app/services/item-filter.service.ts)):
+Provides 10 filtering methods for item collections:
+- `filterByCategory()`, `filterBySubcategory()`, `filterByRarity()` - Basic filters
+- `filterBySearch()` - Searches name/itemId
+- `filterByQuality()`, `filterByTrait()` - Quality/trait level filtering
+- `filterEquipped()`, `filterUnequipped()` - Equipment state
+- `applyFilters()` - Combined multi-criteria filtering
+
+**Usage**: Inject service and call methods:
+```typescript
+constructor(private itemFilter: ItemFilterService) {}
+
+const filtered = this.itemFilter.filterByCategory(items, 'equipment');
+```
+
+**Item Sort Utilities** ([item-sort.utils.ts](ui/src/app/utils/item-sort.utils.ts)):
+Provides 8 sorting algorithms for item collections:
+- `sortByScore()` - Quality + trait score (customizable trait weight)
+- `sortByName()`, `sortByRarity()`, `sortByCategory()` - Basic sorts
+- `sortByQuantity()`, `sortByWeight()`, `sortByValue()` - Numeric sorts
+- `sortByCategoryRarityScore()` - Multi-criteria sort
+
+**Usage**: Import functions and call directly:
+```typescript
+import { sortByRarity, calculateItemScore } from '../utils/item-sort.utils';
+
+const sorted = sortByRarity(items);
+const score = calculateItemScore(item, traitWeight);
+```
+
+**Benefits**:
+- ✅ Eliminates 100+ lines of duplicate code across components
+- ✅ Consistent behavior across inventory, bank, vendor, crafting, equipment
+- ✅ Easier to test and maintain
+- ✅ Single source of truth for rarity styling and item operations
+
+**Migration Status**: All game components (inventory, bank, vendor, equipment, crafting) and shared components (item-details-panel) now use these utilities.
 
 ## Chat System
 
