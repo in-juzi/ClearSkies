@@ -94,8 +94,11 @@
 - ✅ Construction materials (completed - 5 new materials: sand, stone, planks, glass, nails)
 - ✅ Construction activities (completed - sand gathering, stone quarrying, sawmill processing)
 - ✅ Player housing system (completed - property ownership, building slots, construction projects)
+- ✅ Backend type system consolidation (completed - removed redundant be/types/, all imports use @shared/types)
 
 **Recent Changes** (Last 10 commits):
+- refactor: remove redundant backend type files
+- refactor: migrate all backend imports to @shared/types
 - chore: update Claude Code local settings
 - chore: code formatting and minor registry updates
 - docs: add player housing and construction system documentation
@@ -1331,10 +1334,11 @@ The project uses a **comprehensive TypeScript type system** with shared types be
 import { Item, Monster, Activity, isWeaponItem } from '@shared/types';
 ```
 
-**Backend Compatibility Layer**:
-- [be/types/index.ts](be/types/index.ts) re-exports from @shared/types for backward compatibility
-- Existing code using `import { Item } from '../types'` continues to work
-- New code should use `import { Item } from '@shared/types'` directly
+**Backend Type Migration**:
+- ✅ All backend imports now use `@shared/types` directly
+- ✅ Legacy `be/types/` directory removed (1,040 lines of duplicate definitions)
+- ✅ Complete migration across 260+ game data files
+- ✅ Centralized type system enforces consistency
 
 ### TypeScript Data Layer Migration
 
