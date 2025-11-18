@@ -105,6 +105,9 @@ export interface IPlayer extends Document {
   titles: string[];
   activeTitle: string | null;
   decorations: string[];
+  properties: string[]; // Array of propertyIds owned by player
+  maxProperties: number; // Scales with Construction level
+  activeConstructionProjects: string[]; // Array of projectIds player is participating in
   attributes: Record<AttributeName, Attribute>;
   skills: Record<SkillName, Skill>;
   createdAt: Date;
@@ -397,6 +400,9 @@ const playerSchema = new Schema<IPlayer>({
   titles: [{ type: String }],
   activeTitle: { type: String, default: null },
   decorations: [{ type: String }],
+  properties: [{ type: String }], // Array of propertyIds
+  maxProperties: { type: Number, default: 1 }, // Scales with Construction level: Math.floor(level / 10) + 1
+  activeConstructionProjects: [{ type: String }], // Array of projectIds
   attributes: {
     strength: {
       level: { type: Number, default: 1, min: 1 },
@@ -462,6 +468,11 @@ const playerSchema = new Schema<IPlayer>({
       level: { type: Number, default: 1, min: 1 },
       experience: { type: Number, default: 0, min: 0 },
       mainAttribute: { type: String, default: 'will' }
+    },
+    construction: {
+      level: { type: Number, default: 1, min: 1 },
+      experience: { type: Number, default: 0, min: 0 },
+      mainAttribute: { type: String, default: 'strength' }
     },
     oneHanded: {
       level: { type: Number, default: 1, min: 1 },

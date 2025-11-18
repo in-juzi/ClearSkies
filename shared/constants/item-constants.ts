@@ -46,6 +46,7 @@ export const QUALITY_SETS = {
   // Ore and metal items
   ORE: ['purity'],
   METAL: ['purity', 'sheen'],
+  INGOT: ['purity', 'sheen'],
 
   // Gemstones and crystals
   GEMSTONE: ['sheen'],
@@ -265,6 +266,8 @@ export const SUBCATEGORY = {
   FUEL: 'fuel',
   TIMBER: 'timber',
   BUILDING_MATERIAL: 'building-material',
+  BUILDING: 'building',
+  MINERAL: 'mineral',
   CRYSTAL: 'crystal',
   JEWELRY: 'jewelry',
   ENCHANTING: 'enchanting',
@@ -338,6 +341,7 @@ export const SKILL_SOURCE = {
   ALCHEMY: 'alchemy',      // NEW: Potion/reagent crafting
   SMITHING: 'smithing',
   COOKING: 'cooking',
+  CONSTRUCTION: 'construction',  // NEW: Housing/building skill
   COMBAT: 'combat',
   ONE_HANDED: 'oneHanded',
   DUAL_WIELD: 'dualWield',
@@ -365,6 +369,7 @@ export const MATERIAL = {
   MAPLE: 'maple',
   YEW: 'yew',
   BAMBOO: 'bamboo',
+  WOOD: 'wood',
 
   // Gemstones
   AMETHYST: 'amethyst',
@@ -377,6 +382,8 @@ export const MATERIAL = {
   LEATHER: 'leather',
   HEMP: 'hemp',
   GEMSTONE: 'gemstone',
+  GLASS: 'glass',
+  STONE: 'stone',
   GENERIC: 'generic',
 } as const;
 

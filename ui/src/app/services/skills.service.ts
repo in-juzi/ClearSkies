@@ -21,6 +21,7 @@ export class SkillsService {
     cooking: SkillWithProgress;
     gathering: SkillWithProgress;
     alchemy: SkillWithProgress;
+    construction: SkillWithProgress;
     oneHanded: SkillWithProgress;
     dualWield: SkillWithProgress;
     twoHanded: SkillWithProgress;
