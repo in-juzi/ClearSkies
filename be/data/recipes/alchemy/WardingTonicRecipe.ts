@@ -7,7 +7,7 @@
 
 import { Recipe } from '../../../types';
 
-export const SageWardingTonic: Recipe = {
+export const WardingTonicRecipe: Recipe = {
   recipeId: 'sage_warding_tonic',
   name: 'Sage Warding Tonic',
   description: 'A protective brew made from sage that hardens the skin and fortifies defenses. Grants temporary armor bonus.',

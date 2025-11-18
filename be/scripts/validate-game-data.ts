@@ -154,7 +154,8 @@ function validateActivities() {
     if (activity.requirements?.inventory) {
       for (const invReq of activity.requirements.inventory) {
         result.totalChecks++;
-        if (!ItemRegistry.has(invReq.itemId)) {
+        // Skip validation if using subcategory instead of itemId
+        if (invReq.itemId && !ItemRegistry.has(invReq.itemId)) {
           addError(
             'activity',
             `Required item not found: ${invReq.itemId}`,

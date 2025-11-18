@@ -20,22 +20,9 @@ export const ActivityCombatBandits: ActivityUnion = {
     }
   },
   "rewards": {
-    "items": [
-      {
-        "itemId": "bronze_sword",
-        "quantity": {
-          "min": 1,
-          "max": 1
-        },
-        "chance": 0.1
-      }
-    ],
-    "gold": {
-      "min": 10,
-      "max": 30
-    }
+    "dropTables": ["combat-bandit-basic"]
   },
   "stub": true,
   "stubMessage": "Combat system not yet implemented. You fought bravely against the bandits!"
   // Note: XP awarded dynamically based on Monster.experience and equipped weapon's skillScalar
-} as const;
+};

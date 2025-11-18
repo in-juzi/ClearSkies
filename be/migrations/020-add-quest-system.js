@@ -85,6 +85,11 @@ module.exports = {
 
     console.log(`Auto-accepted tutorial_welcome for ${level1Players.length} level 1 players`);
     console.log('Quest system migration complete!');
+
+    return {
+      modified: updateResult.modifiedCount + level1Players.length,
+      message: `Updated ${updateResult.modifiedCount} players with quest fields, auto-accepted tutorial for ${level1Players.length} level 1 players`
+    };
   },
 
   async down() {
@@ -111,5 +116,13 @@ module.exports = {
 
     console.log(`Rolled back ${updateResult.modifiedCount} players`);
     console.log('Quest system migration rollback complete!');
-  }
+
+    return {
+      modified: updateResult.modifiedCount,
+      message: `Rolled back quest system for ${updateResult.modifiedCount} players`
+    };
+  },
+
+  name: '020-add-quest-system',
+  description: 'Adds quest system with active/completed/available quests, achievements tracking, titles, and auto-accepts tutorial quest for new players'
 };

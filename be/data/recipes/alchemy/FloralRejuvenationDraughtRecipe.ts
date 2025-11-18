@@ -9,7 +9,7 @@
 import { Recipe } from '../../../types';
 import { SUBCATEGORY } from '../../constants/item-constants';
 
-export const FloralRejuvenationDraught: Recipe = {
+export const FloralRejuvenationDraughtRecipe: Recipe = {
   recipeId: 'floral_rejuvenation_draught',
   name: 'Floral Rejuvenation Draught',
   description: 'A delicate potion harnessing the restorative power of flowers. Combines herbal and floral essences.',

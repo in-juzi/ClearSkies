@@ -8,7 +8,7 @@
 
 import { Recipe } from '../../../types';
 
-export const MandrakePowerElixir: Recipe = {
+export const PowerElixirRecipe: Recipe = {
   recipeId: 'mandrake_power_elixir',
   name: 'Mandrake Power Elixir',
   description: 'A potent brew infused with the mystical essence of mandrake. Amplifies offensive power temporarily.',

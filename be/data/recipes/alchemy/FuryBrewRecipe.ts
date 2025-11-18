@@ -8,7 +8,7 @@
 
 import { Recipe } from '../../../types';
 
-export const DragonsFuryBrew: Recipe = {
+export const FuryBrewRecipe: Recipe = {
   recipeId: 'dragons_fury_brew',
   name: "Dragon's Fury Brew",
   description: "A fiery elixir made from dragon's breath that ignites the warrior spirit. Increases critical strike chance.",

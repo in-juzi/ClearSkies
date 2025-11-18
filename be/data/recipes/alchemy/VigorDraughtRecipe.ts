@@ -9,7 +9,7 @@
 import { Recipe } from '../../../types';
 import { SUBCATEGORY } from '../../constants/item-constants';
 
-export const NettleVigorDraught: Recipe = {
+export const VigorDraughtRecipe: Recipe = {
   recipeId: 'nettle_vigor_draught',
   name: 'Nettle Vigor Draught',
   description: 'An energizing concoction made from nettle that quickens reflexes. Increases attack speed temporarily.',

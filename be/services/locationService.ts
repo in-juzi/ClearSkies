@@ -216,7 +216,7 @@ class LocationService {
         const { itemId, quantity = 1 } = invReq;
         const hasItem = player.hasInventoryItem(itemId, quantity);
         if (!hasItem) {
-          const itemService = require('./itemService');
+          const itemService = require('./itemService').default;
           const itemDef = itemService.getItemDefinition(itemId);
           const itemName = itemDef?.name || itemId;
           failures.push(`Requires ${quantity}x ${itemName} in inventory`);
