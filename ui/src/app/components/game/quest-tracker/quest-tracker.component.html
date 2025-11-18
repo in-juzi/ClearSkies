@@ -1,40 +1,116 @@
-<div class="quest-tracker" *ngIf="activeQuests.length > 0">
-  <h3 class="tracker-title">Active Quests</h3>
+<div class="quest-tracker">
+  <!-- Active Quests Section -->
+  <div class="quest-section">
+    <div class="section-header" (click)="toggleSection('active')">
+      <span class="section-icon">{{ collapsedSections.active ? '▶' : '▼' }}</span>
+      <h3 class="section-title">Active Quests</h3>
+      <span class="section-count">{{ activeQuests.length }}</span>
+    </div>
 
-  <div class="quest-list">
-    <div *ngFor="let quest of activeQuests"
-         class="quest-item"
-         [class.complete]="isQuestComplete(quest)">
+    <div class="section-content" [class.collapsed]="collapsedSections.active">
+      <div *ngIf="activeQuests.length > 0" class="quest-list">
+        <div *ngFor="let quest of activeQuests"
+             class="quest-item"
+             [class.complete]="isQuestComplete(quest)">
 
-      <!-- Quest Header -->
-      <div class="quest-header">
-        <h4 class="quest-name">{{ getQuestName(quest) }}</h4>
-        <span class="quest-progress">{{ getCompletionPercentage(quest) }}%</span>
-      </div>
+          <!-- Quest Header -->
+          <div class="quest-header">
+            <h4 class="quest-name">{{ getQuestName(quest) }}</h4>
+            <span class="quest-progress">{{ getCompletionPercentage(quest) }}%</span>
+          </div>
 
-      <!-- Quest Objectives -->
-      <div class="quest-objectives">
-        <div *ngFor="let objective of quest.objectives"
-             class="objective"
-             [class.completed]="objective.completed">
-          <span class="objective-icon">{{ objective.completed ? '✓' : '○' }}</span>
-          <span class="objective-description">
-            {{ objective.current }}/{{ objective.required }}
-          </span>
+          <!-- Quest Objectives -->
+          <div class="quest-objectives">
+            <div *ngFor="let objective of quest.objectives"
+                 class="objective"
+                 [class.completed]="objective.completed">
+              <span class="objective-icon">{{ objective.completed ? '✓' : '○' }}</span>
+              <span class="objective-description">
+                {{ getObjectiveDescription(quest, objective) }}
+                ({{ objective.current }}/{{ objective.required }})
+              </span>
+            </div>
+          </div>
+
+          <!-- Turn In Button -->
+          <button *ngIf="isQuestComplete(quest)"
+                  class="turn-in-btn"
+                  (click)="turnInQuest(quest.questId)">
+            Turn In Quest
+          </button>
         </div>
       </div>
 
-      <!-- Turn In Button -->
-      <button *ngIf="isQuestComplete(quest)"
-              class="turn-in-btn"
-              (click)="turnInQuest(quest.questId)">
-        Turn In Quest
-      </button>
+      <!-- Empty State -->
+      <div *ngIf="activeQuests.length === 0" class="empty-state">
+        <p class="empty-message">No active quests</p>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- Empty State -->
-<div class="quest-tracker-empty" *ngIf="activeQuests.length === 0">
-  <p class="empty-message">No active quests</p>
+  <!-- Available Quests Section -->
+  <div class="quest-section">
+    <div class="section-header" (click)="toggleSection('available')">
+      <span class="section-icon">{{ collapsedSections.available ? '▶' : '▼' }}</span>
+      <h3 class="section-title">Available Quests</h3>
+      <span class="section-count">{{ availableQuests.length }}</span>
+    </div>
+
+    <div class="section-content" [class.collapsed]="collapsedSections.available">
+      <div *ngIf="availableQuests.length > 0" class="quest-list">
+        <div *ngFor="let quest of availableQuests" class="quest-item available">
+          <!-- Quest Header -->
+          <div class="quest-header">
+            <h4 class="quest-name">{{ getAvailableQuestName(quest) }}</h4>
+          </div>
+
+          <!-- Quest Description -->
+          <div class="quest-description">
+            <p>{{ quest.description }}</p>
+          </div>
+
+          <!-- Accept Button -->
+          <button class="accept-btn" (click)="acceptQuest(quest.questId)">
+            Accept Quest
+          </button>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="availableQuests.length === 0" class="empty-state">
+        <p class="empty-message">No available quests at this time</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Completed Quests Section -->
+  <div class="quest-section">
+    <div class="section-header" (click)="toggleSection('completed')">
+      <span class="section-icon">{{ collapsedSections.completed ? '▶' : '▼' }}</span>
+      <h3 class="section-title">Completed Quests</h3>
+      <span class="section-count">{{ completedQuests.length }}</span>
+    </div>
+
+    <div class="section-content" [class.collapsed]="collapsedSections.completed">
+      <div *ngIf="completedQuests.length > 0" class="quest-list">
+        <div *ngFor="let quest of completedQuests" class="quest-item completed-quest">
+          <!-- Quest Header -->
+          <div class="quest-header">
+            <h4 class="quest-name">{{ getCompletedQuestName(quest) }}</h4>
+            <span class="completion-badge">✓ Completed</span>
+          </div>
+
+          <!-- Quest Description -->
+          <div class="quest-description">
+            <p>{{ quest.description }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="completedQuests.length === 0" class="empty-state">
+        <p class="empty-message">No completed quests yet</p>
+      </div>
+    </div>
+  </div>
 </div>

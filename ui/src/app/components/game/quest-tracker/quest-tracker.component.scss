@@ -1,136 +1,241 @@
 @use '../../../../design-tokens.scss';
 
 .quest-tracker {
-  background: rgba(30, 30, 50, 0.95);
-  border: 2px solid var(--color-primary);
-  border-radius: 8px;
-  padding: 1rem;
-  margin: 1rem 0;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  padding: var(--spacing-l); // 16px padding
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-l);
 
-  .tracker-title {
-    color: var(--color-accent-blue);
-    font-size: 1.2rem;
-    margin: 0 0 1rem 0;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid rgba(255, 215, 0, 0.3);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
+  .quest-section {
+    background: rgba(30, 30, 50, 0.95);
+    border: 2px solid var(--color-primary);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 
-  .quest-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-
-    .quest-item {
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-m);
+      padding: var(--spacing-l);
       background: rgba(20, 20, 40, 0.8);
-      border: 1px solid rgba(100, 150, 255, 0.3);
-      border-radius: 6px;
-      padding: 0.75rem;
-      transition: all 0.3s ease;
+      border-bottom: var(--border-width-medium) solid var(--color-surface-border);
+      cursor: pointer;
+      transition: background var(--transition-fast);
+      user-select: none;
 
       &:hover {
-        border-color: var(--color-primary);
-        box-shadow: 0 2px 8px rgba(100, 150, 255, 0.2);
+        background: rgba(30, 30, 50, 0.9);
       }
 
-      &.complete {
-        border-color: var(--color-success);
-        background: rgba(40, 80, 40, 0.3);
+      .section-icon {
+        color: var(--color-secondary);
+        font-size: var(--font-size-m);
+        width: 16px;
+        display: inline-block;
+        transition: transform var(--transition-fast);
       }
 
-      .quest-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 0.75rem;
-
-        .quest-name {
-          color: var(--color-text-primary);
-          font-size: 1rem;
-          margin: 0;
-          font-weight: 600;
-        }
-
-        .quest-progress {
-          color: var(--color-accent-blue);
-          font-size: 0.9rem;
-          font-weight: bold;
-        }
+      .section-title {
+        color: var(--color-secondary);
+        font-size: var(--font-size-2xl);
+        font-weight: var(--font-weight-semibold);
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: var(--letter-spacing-wide);
+        flex: 1;
       }
 
-      .quest-objectives {
+      .section-count {
+        background: var(--color-primary);
+        color: var(--color-text-primary);
+        padding: var(--spacing-xs) var(--spacing-m);
+        border-radius: var(--radius-full);
+        font-size: var(--font-size-s);
+        font-weight: var(--font-weight-bold);
+        min-width: 28px;
+        text-align: center;
+      }
+    }
+
+    .section-content {
+      max-height: 1000px;
+      overflow: hidden;
+      transition: max-height 0.3s ease, opacity 0.3s ease;
+      opacity: 1;
+
+      &.collapsed {
+        max-height: 0;
+        opacity: 0;
+      }
+
+      .quest-list {
         display: flex;
         flex-direction: column;
-        gap: 0.5rem;
-        margin-bottom: 0.75rem;
+        gap: var(--spacing-m);
+        padding: var(--spacing-l);
 
-        .objective {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          color: var(--color-text-secondary);
-          font-size: 0.9rem;
-          padding-left: 0.5rem;
+        .quest-item {
+          background: rgba(20, 20, 40, 0.8);
+          border: var(--border-width-thin) solid rgba(100, 150, 255, 0.3);
+          border-radius: var(--radius-card);
+          padding: var(--spacing-m);
+          transition: all var(--transition-normal);
 
-          &.completed {
-            color: var(--color-success);
-            text-decoration: line-through;
+          &:hover {
+            border-color: var(--color-primary);
+            box-shadow: 0 2px 8px rgba(100, 150, 255, 0.2);
           }
 
-          .objective-icon {
-            font-size: 1rem;
-            font-weight: bold;
-            min-width: 20px;
-            text-align: center;
+          &.complete {
+            border-color: var(--color-success);
+            background: rgba(40, 80, 40, 0.3);
           }
 
-          .objective-description {
-            flex: 1;
+          &.available {
+            border-color: rgba(255, 215, 0, 0.4);
+          }
+
+          &.completed-quest {
+            border-color: rgba(78, 205, 196, 0.4);
+            background: rgba(20, 40, 40, 0.3);
+          }
+
+          .quest-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-m);
+
+            .quest-name {
+              color: var(--color-text-primary);
+              font-size: var(--font-size-l);
+              font-weight: var(--font-weight-semibold);
+              margin: 0;
+            }
+
+            .quest-progress {
+              color: var(--color-accent-blue);
+              font-size: var(--font-size-m);
+              font-weight: var(--font-weight-bold);
+            }
+
+            .completion-badge {
+              color: var(--color-success);
+              font-size: var(--font-size-m);
+              font-weight: var(--font-weight-bold);
+              display: flex;
+              align-items: center;
+              gap: var(--spacing-xs);
+            }
+          }
+
+          .quest-description {
+            margin-bottom: var(--spacing-m);
+            color: var(--color-text-tertiary);
+            font-size: var(--font-size-m);
+            line-height: var(--line-height-normal);
+
+            p {
+              margin: 0;
+            }
+          }
+
+          .quest-objectives {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-s);
+            margin-bottom: var(--spacing-m);
+
+            .objective {
+              display: flex;
+              align-items: center;
+              gap: var(--spacing-s);
+              color: var(--color-text-secondary);
+              font-size: var(--font-size-m);
+              padding-left: var(--spacing-s);
+
+              &.completed {
+                color: var(--color-success);
+                text-decoration: line-through;
+              }
+
+              .objective-icon {
+                font-size: var(--font-size-l);
+                font-weight: var(--font-weight-bold);
+                min-width: 20px;
+                text-align: center;
+              }
+
+              .objective-description {
+                flex: 1;
+              }
+            }
+          }
+
+          .turn-in-btn {
+            width: 100%;
+            padding: var(--spacing-m) var(--spacing-l);
+            background: linear-gradient(135deg, var(--color-success) 0%, #3ab395 100%);
+            color: var(--color-text-primary);
+            border: none;
+            border-radius: var(--radius-button);
+            font-weight: var(--font-weight-bold);
+            font-size: var(--font-size-m);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            text-transform: uppercase;
+            letter-spacing: var(--letter-spacing-wide);
+
+            &:hover {
+              background: linear-gradient(135deg, #5ed9c7 0%, var(--color-success) 100%);
+              transform: translateY(-1px);
+              box-shadow: 0 4px 8px rgba(46, 204, 113, 0.3);
+            }
+
+            &:active {
+              transform: translateY(0);
+            }
+          }
+
+          .accept-btn {
+            width: 100%;
+            padding: var(--spacing-m) var(--spacing-l);
+            background: var(--gradient-secondary);
+            color: var(--color-bg-primary);
+            border: none;
+            border-radius: var(--radius-button);
+            font-weight: var(--font-weight-bold);
+            font-size: var(--font-size-m);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            text-transform: uppercase;
+            letter-spacing: var(--letter-spacing-wide);
+
+            &:hover {
+              background: linear-gradient(135deg, var(--color-secondary-light) 0%, var(--color-secondary) 100%);
+              transform: translateY(-1px);
+              box-shadow: 0 4px 8px rgba(255, 215, 0, 0.3);
+            }
+
+            &:active {
+              transform: translateY(0);
+            }
           }
         }
       }
 
-      .turn-in-btn {
-        width: 100%;
-        padding: 0.5rem 1rem;
-        background: linear-gradient(135deg, var(--color-success) 0%, #3ab395 100%);
-        color: white;
-        border: none;
-        border-radius: 4px;
-        font-weight: bold;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        font-size: 0.9rem;
+      .empty-state {
+        padding: var(--spacing-2xl);
+        text-align: center;
 
-        &:hover {
-          background: linear-gradient(135deg, #5ed9c7 0%, var(--color-success) 100%);
-          transform: translateY(-1px);
-          box-shadow: 0 4px 8px rgba(46, 204, 113, 0.3);
-        }
-
-        &:active {
-          transform: translateY(0);
+        .empty-message {
+          color: var(--color-text-muted);
+          font-size: var(--font-size-m);
+          font-style: italic;
+          margin: 0;
         }
       }
     }
-  }
-}
-
-.quest-tracker-empty {
-  background: rgba(30, 30, 50, 0.95);
-  border: 2px solid rgba(100, 150, 255, 0.3);
-  border-radius: 8px;
-  padding: 2rem;
-  margin: 1rem 0;
-  text-align: center;
-
-  .empty-message {
-    color: var(--color-text-secondary);
-    font-style: italic;
-    margin: 0;
   }
 }
