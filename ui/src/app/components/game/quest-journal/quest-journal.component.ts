@@ -57,9 +57,11 @@ export class QuestJournalComponent implements OnInit, OnDestroy {
    * Get quest name from questId
    */
   getQuestName(quest: ActiveQuest | Quest): string {
-    if ('definition' in quest && (quest as any).definition) {
-      return (quest as any).definition.name;
+    // ActiveQuest with enriched definition
+    if ('definition' in quest && quest.definition) {
+      return quest.definition.name;
     }
+    // Direct Quest object
     if ('name' in quest) {
       return (quest as Quest).name;
     }
@@ -74,9 +76,11 @@ export class QuestJournalComponent implements OnInit, OnDestroy {
    * Get quest description
    */
   getQuestDescription(quest: ActiveQuest | Quest): string {
-    if ('definition' in quest && (quest as any).definition) {
-      return (quest as any).definition.description || '';
+    // ActiveQuest with enriched definition
+    if ('definition' in quest && quest.definition) {
+      return quest.definition.description || '';
     }
+    // Direct Quest object
     if ('description' in quest) {
       return (quest as Quest).description || '';
     }
