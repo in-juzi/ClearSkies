@@ -3,7 +3,7 @@
  * A nimble goblin archer that prefers to strike from afar with crude arrows. Scouts are the eyes and...
  */
 
-import { Monster } from '../../../types/combat';
+import { Monster } from '@shared/types';
 
 export const GoblinScout: Monster = {
   "monsterId": "goblin_scout",

@@ -5,7 +5,7 @@
  * DO NOT EDIT MANUALLY
  */
 
-import { Location } from '../../types/locations';
+import { Location } from '@shared/types';
 
 import { ForestClearing } from './definitions/ForestClearing';
 import { GoblinVillage } from './definitions/GoblinVillage';

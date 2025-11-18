@@ -3,7 +3,7 @@
  * Luminescent moonpetals collected under starlight
  */
 
-import { DropTable } from '../../../types/locations';
+import { DropTable } from '@shared/types';
 
 export const GatheringMoonpetal: DropTable = {
   "dropTableId": "gathering-moonpetal",

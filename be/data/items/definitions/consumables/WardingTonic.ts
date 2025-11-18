@@ -3,7 +3,7 @@
  * Tier: 1
  */
 
-import { ConsumableItem } from '../../../../types/items';
+import { ConsumableItem } from '@shared/types';
 import { CATEGORY, SUBCATEGORY, RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL } from '../../../constants/item-constants';
 
 export const WardingTonic: ConsumableItem = {

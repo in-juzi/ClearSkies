@@ -3,7 +3,7 @@
  * Wade in the shallow waters to catch shrimp
  */
 
-import { ActivityUnion } from '../../../types/locations';
+import { ActivityUnion } from '@shared/types';
 
 export const ActivityFishShrimp: ActivityUnion = {
   "activityId": "activity-fish-shrimp",

@@ -5,7 +5,7 @@
  * Combines chamomile's soothing properties with any additional herb
  */
 
-import { Recipe } from '../../../types';
+import { Recipe } from '@shared/types';
 import { SUBCATEGORY } from '../../constants/item-constants';
 
 export const HealthPotionRecipe: Recipe = {

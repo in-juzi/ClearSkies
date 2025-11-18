@@ -3,7 +3,7 @@
  * Engage in combat with a lone forest wolf that prowls the clearing. Test your combat skills against a...
  */
 
-import { ActivityUnion } from '../../../types/locations';
+import { ActivityUnion } from '@shared/types';
 
 export const ActivityCombatForestWolf: ActivityUnion = {
   "activityId": "activity-combat-forest-wolf",

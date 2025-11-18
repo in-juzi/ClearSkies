@@ -3,7 +3,7 @@
  * A high mountain meadow bathed in ethereal moonlight. Luminescent flowers bloom here under the stars,...
  */
 
-import { Facility } from '../../../types/locations';
+import { Facility } from '@shared/types';
 
 export const MountainMoonlitMeadow: Facility = {
   "facilityId": "mountain-moonlit-meadow",

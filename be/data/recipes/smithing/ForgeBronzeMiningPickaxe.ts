@@ -3,7 +3,7 @@
  * Hammer bronze into a sturdy pickaxe head, designed to break through stone and extract precious ores.
  */
 
-import { Recipe } from '../../../types/crafting';
+import { Recipe } from '@shared/types';
 
 export const ForgeBronzeMiningPickaxe: Recipe = {
   "recipeId": "forge-bronze-mining-pickaxe",

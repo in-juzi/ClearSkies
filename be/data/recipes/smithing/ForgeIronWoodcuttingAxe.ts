@@ -3,7 +3,7 @@
  * Craft an iron axe head with superior edge retention, able to fell even the mightiest trees.
  */
 
-import { Recipe } from '../../../types/crafting';
+import { Recipe } from '@shared/types';
 
 export const ForgeIronWoodcuttingAxe: Recipe = {
   "recipeId": "forge-iron-woodcutting-axe",

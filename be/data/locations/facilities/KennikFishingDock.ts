@@ -3,7 +3,7 @@
  * Weathered wooden docks extend into the harbor. Fishermen mend their nets and prepare their lines.
  */
 
-import { Facility } from '../../../types/locations';
+import { Facility } from '@shared/types';
 
 export const KennikFishingDock: Facility = {
   "facilityId": "kennik-fishing-dock",

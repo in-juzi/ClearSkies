@@ -3,7 +3,7 @@
  * Calming and healing properties that restore health over time
  */
 
-import { TraitDefinition as Trait } from '../../../../types/items';
+import { TraitDefinition as Trait } from '@shared/types';
 
 export const RestorativeTrait: Trait = {
   "traitId": "restorative",

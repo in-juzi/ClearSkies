@@ -5,7 +5,7 @@
  * DO NOT EDIT MANUALLY
  */
 
-import { Recipe } from '../../types/crafting';
+import { Recipe } from '@shared/types';
 
 // ALCHEMY
 import { FloralRejuvenationDraughtRecipe } from './alchemy/FloralRejuvenationDraughtRecipe';

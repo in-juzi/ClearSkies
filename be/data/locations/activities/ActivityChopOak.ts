@@ -3,7 +3,7 @@
  * Fell sturdy oak trees for quality timber
  */
 
-import { ActivityUnion } from '../../../types/locations';
+import { ActivityUnion } from '@shared/types';
 
 export const ActivityChopOak: ActivityUnion = {
   "activityId": "activity-chop-oak",

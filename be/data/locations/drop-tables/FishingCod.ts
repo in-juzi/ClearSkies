@@ -3,7 +3,7 @@
  * Common drops from cod fishing
  */
 
-import { DropTable } from '../../../types/locations';
+import { DropTable } from '@shared/types';
 
 export const FishingCod: DropTable = {
   "dropTableId": "fishing-cod",

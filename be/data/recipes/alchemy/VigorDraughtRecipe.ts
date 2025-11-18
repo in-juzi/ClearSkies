@@ -6,7 +6,7 @@
  * Unlocked after crafting Basic Health Tincture
  */
 
-import { Recipe } from '../../../types';
+import { Recipe } from '@shared/types';
 import { SUBCATEGORY } from '../../constants/item-constants';
 
 export const VigorDraughtRecipe: Recipe = {

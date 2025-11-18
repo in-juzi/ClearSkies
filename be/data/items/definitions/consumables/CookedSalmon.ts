@@ -3,7 +3,7 @@
  * Tier: 2
  */
 
-import { ConsumableItem } from '../../../../types/items';
+import { ConsumableItem } from '@shared/types';
 import { CATEGORY, RARITY, TIER, QUALITY_SETS, TRAIT_SETS, SUBCATEGORIES, MATERIAL } from '../../../constants/item-constants';
 
 export const CookedSalmon: ConsumableItem = {

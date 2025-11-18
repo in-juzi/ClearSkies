@@ -3,7 +3,7 @@
  * Common drops from quarrying stone blocks
  */
 
-import { DropTable } from '../../../types/locations';
+import { DropTable } from '@shared/types';
 
 export const MiningStone: DropTable = {
   "dropTableId": "mining-stone",

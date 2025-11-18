@@ -3,7 +3,7 @@
  * Protective properties that fortify defenses
  */
 
-import { TraitDefinition as Trait } from '../../../../types/items';
+import { TraitDefinition as Trait } from '@shared/types';
 
 export const WardingTrait: Trait = {
   "traitId": "warding",

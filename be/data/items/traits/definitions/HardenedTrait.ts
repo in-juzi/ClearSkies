@@ -3,7 +3,7 @@
  * Weapon has been tempered to perfection, granting increased damage
  */
 
-import { TraitDefinition as Trait } from '../../../../types/items';
+import { TraitDefinition as Trait } from '@shared/types';
 import { EffectContext, ModifierType, ConditionType } from '@shared/types/effect-system';
 
 export const HardenedTrait: Trait = {

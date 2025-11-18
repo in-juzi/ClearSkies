@@ -3,7 +3,7 @@
  * A bustling marketplace where locals trade goods and supplies. The aroma of fresh cooking and the gli...
  */
 
-import { Facility } from '../../../types/locations';
+import { Facility } from '@shared/types';
 
 export const KennikMarket: Facility = {
   "facilityId": "kennik-market",

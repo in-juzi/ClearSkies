@@ -3,7 +3,7 @@
  * Standard loot from goblin scouts
  */
 
-import { DropTable } from '../../../types/locations';
+import { DropTable } from '@shared/types';
 
 export const CombatGoblinScout: DropTable = {
   "dropTableId": "combat-goblin-scout",

@@ -3,7 +3,7 @@
  * Common drops from chopping oak trees
  */
 
-import { DropTable } from '../../../types/locations';
+import { DropTable } from '@shared/types';
 
 export const WoodcuttingOak: DropTable = {
   "dropTableId": "woodcutting-oak",

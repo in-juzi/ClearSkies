@@ -3,7 +3,7 @@
  * Magical potency that amplifies offensive power
  */
 
-import { TraitDefinition as Trait } from '../../../../types/items';
+import { TraitDefinition as Trait } from '@shared/types';
 
 export const EmpoweringTrait: Trait = {
   "traitId": "empowering",

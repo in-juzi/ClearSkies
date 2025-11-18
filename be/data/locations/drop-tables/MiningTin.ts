@@ -3,7 +3,7 @@
  * Common tin ore deposits found in mountain mines
  */
 
-import { DropTable } from '../../../types/locations';
+import { DropTable } from '@shared/types';
 
 export const MiningTin: DropTable = {
   "dropTableId": "mining-tin",

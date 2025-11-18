@@ -5,7 +5,7 @@
  * Sage's protective properties grant temporary armor
  */
 
-import { Recipe } from '../../../types';
+import { Recipe } from '@shared/types';
 
 export const WardingTonicRecipe: Recipe = {
   recipeId: 'sage_warding_tonic',

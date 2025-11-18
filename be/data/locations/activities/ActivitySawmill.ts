@@ -3,7 +3,7 @@
  * Convert raw logs into usable planks for construction
  */
 
-import { ActivityUnion } from '../../../types/locations';
+import { ActivityUnion } from '@shared/types';
 
 export const ActivitySawmill: ActivityUnion = {
   "activityId": "activity-sawmill",

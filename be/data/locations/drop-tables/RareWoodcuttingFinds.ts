@@ -3,7 +3,7 @@
  * Universal rare items that can be found while woodcutting any tree type
  */
 
-import { DropTable } from '../../../types/locations';
+import { DropTable } from '@shared/types';
 
 export const RareWoodcuttingFinds: DropTable = {
   "dropTableId": "rare-woodcutting-finds",

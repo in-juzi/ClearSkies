@@ -3,7 +3,7 @@
  * Craft heavy iron greaves and sabatons, offering superior protection for legs and feet.
  */
 
-import { Recipe } from '../../../types/crafting';
+import { Recipe } from '@shared/types';
 
 export const ForgeIronBoots: Recipe = {
   "recipeId": "forge-iron-boots",

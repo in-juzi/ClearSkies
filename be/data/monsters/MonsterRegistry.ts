@@ -5,7 +5,7 @@
  * DO NOT EDIT MANUALLY
  */
 
-import { Monster } from '../../types/combat';
+import { Monster } from '@shared/types';
 
 import { BanditThug } from './definitions/BanditThug';
 import { ForestWolf } from './definitions/ForestWolf';

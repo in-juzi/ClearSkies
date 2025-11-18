@@ -3,7 +3,7 @@
  * Heat and shape iron ingots into sturdy nails for construction projects.
  */
 
-import { Recipe } from '../../../types/crafting';
+import { Recipe } from '@shared/types';
 
 export const ForgeNails: Recipe = {
   "recipeId": "forge-nails",

@@ -3,7 +3,7 @@
  * Engage in combat with a mystical goblin shaman
  */
 
-import { ActivityUnion } from '../../../types/locations';
+import { ActivityUnion } from '@shared/types';
 
 export const ActivityCombatGoblinShaman: ActivityUnion = {
   "activityId": "combat-goblin-shaman",

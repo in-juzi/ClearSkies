@@ -3,7 +3,7 @@
  * Challenge a dangerous bandit thug who preys on travelers along the road. These brigands show no merc...
  */
 
-import { ActivityUnion } from '../../../types/locations';
+import { ActivityUnion } from '@shared/types';
 
 export const ActivityCombatBandit: ActivityUnion = {
   "activityId": "activity-combat-bandit",

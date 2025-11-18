@@ -3,7 +3,7 @@
  * Carefully unearth mystical mandrake roots, mindful of their legendary screams
  */
 
-import { ActivityUnion } from '../../../types/locations';
+import { ActivityUnion } from '@shared/types';
 
 export const ActivityGatherMandrake: ActivityUnion = {
   "activityId": "activity-gather-mandrake",

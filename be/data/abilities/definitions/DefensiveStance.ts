@@ -3,7 +3,7 @@
  * Assume a defensive posture, significantly increasing armor for a short duration. Practice makes perfect.
  */
 
-import { Ability } from '../../../types/combat';
+import { Ability } from '@shared/types';
 
 export const DefensiveStance: Ability = {
   "abilityId": "defensive_stance",

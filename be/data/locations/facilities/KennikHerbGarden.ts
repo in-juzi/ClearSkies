@@ -3,7 +3,7 @@
  * A peaceful garden filled with medicinal plants and fragrant herbs. Local healers tend to the plots, ...
  */
 
-import { Facility } from '../../../types/locations';
+import { Facility } from '@shared/types';
 
 export const KennikHerbGarden: Facility = {
   "facilityId": "kennik-herb-garden",

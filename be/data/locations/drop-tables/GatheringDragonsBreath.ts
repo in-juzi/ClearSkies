@@ -3,7 +3,7 @@
  * Fiery crimson flowers plucked from volcanic soil
  */
 
-import { DropTable } from '../../../types/locations';
+import { DropTable } from '@shared/types';
 
 export const GatheringDragonsBreath: DropTable = {
   "dropTableId": "gathering-dragons-breath",

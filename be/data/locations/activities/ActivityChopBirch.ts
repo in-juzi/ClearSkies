@@ -3,7 +3,7 @@
  * Fell distinctive birch trees for their prized light-colored wood
  */
 
-import { ActivityUnion } from '../../../types/locations';
+import { ActivityUnion } from '@shared/types';
 
 export const ActivityChopBirch: ActivityUnion = {
   "activityId": "activity-chop-birch",

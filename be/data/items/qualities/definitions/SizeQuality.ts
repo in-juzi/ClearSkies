@@ -3,7 +3,7 @@
  * The physical size of the fish - larger specimens yield more meat
  */
 
-import { QualityDefinition as Quality } from '../../../../types/items';
+import { QualityDefinition as Quality } from '@shared/types';
 
 export const SizeQuality: Quality = {
   "qualityId": "size",

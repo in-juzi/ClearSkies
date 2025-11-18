@@ -3,7 +3,7 @@
  * Shared rare drop table for tier 1 mining activities (copper and tin). Contains low-tier gemstones.
  */
 
-import { DropTable } from '../../../types/locations';
+import { DropTable } from '@shared/types';
 
 export const RareLowMining: DropTable = {
   "dropTableId": "rare-low-mining",

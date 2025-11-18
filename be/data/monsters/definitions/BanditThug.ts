@@ -3,7 +3,7 @@
  * A rough-looking brigand wielding a rusty blade. These outlaws prey on travelers along the roads, see...
  */
 
-import { Monster } from '../../../types/combat';
+import { Monster } from '@shared/types';
 
 export const BanditThug: Monster = {
   "monsterId": "bandit_thug",

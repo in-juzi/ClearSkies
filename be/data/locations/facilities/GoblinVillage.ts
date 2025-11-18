@@ -3,7 +3,7 @@
  * A ramshackle settlement of goblins, with crude huts and defensive barriers
  */
 
-import { Facility } from '../../../types/locations';
+import { Facility } from '@shared/types';
 
 export const GoblinVillage: Facility = {
   "facilityId": "goblin-village-main",

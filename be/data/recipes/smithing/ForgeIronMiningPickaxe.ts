@@ -3,7 +3,7 @@
  * Create a powerful iron pickaxe capable of extracting the hardest ores from deep within the earth.
  */
 
-import { Recipe } from '../../../types/crafting';
+import { Recipe } from '@shared/types';
 
 export const ForgeIronMiningPickaxe: Recipe = {
   "recipeId": "forge-iron-mining-pickaxe",

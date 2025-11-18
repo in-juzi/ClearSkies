@@ -3,7 +3,7 @@
  * Extract solid stone blocks from rock faces for construction
  */
 
-import { ActivityUnion } from '../../../types/locations';
+import { ActivityUnion } from '@shared/types';
 
 export const ActivityQuarryStone: ActivityUnion = {
   "activityId": "activity-quarry-stone",

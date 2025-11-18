@@ -3,7 +3,7 @@
  * Heat raw iron ore in the scorching flames until impurities burn away, leaving a heavy iron ingot.
  */
 
-import { Recipe } from '../../../types/crafting';
+import { Recipe } from '@shared/types';
 
 export const SmeltIronIngot: Recipe = {
   "recipeId": "smelt-iron-ingot",

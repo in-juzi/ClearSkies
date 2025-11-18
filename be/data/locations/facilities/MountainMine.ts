@@ -3,7 +3,7 @@
  * Dark tunnels lead deep into the mountain where rich veins of ore can be found. Copper and tin glimme...
  */
 
-import { Facility } from '../../../types/locations';
+import { Facility } from '@shared/types';
 
 export const MountainMine: Facility = {
   "facilityId": "mountain-mine",

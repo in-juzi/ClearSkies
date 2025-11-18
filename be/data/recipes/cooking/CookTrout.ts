@@ -3,7 +3,7 @@
  * Pan-fry tender trout fillets with a touch of herbs and butter until golden brown.
  */
 
-import { Recipe } from '../../../types/crafting';
+import { Recipe } from '@shared/types';
 
 export const CookTrout: Recipe = {
   "recipeId": "cook-trout",

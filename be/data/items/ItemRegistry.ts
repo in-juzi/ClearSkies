@@ -5,7 +5,7 @@
  * DO NOT EDIT MANUALLY
  */
 
-import { Item } from '../../types/items';
+import { Item } from '@shared/types';
 
 // CONSUMABLES
 import { CookedCod } from './definitions/consumables/CookedCod';

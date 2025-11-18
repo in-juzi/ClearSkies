@@ -3,7 +3,7 @@
  * Fresh shrimp from the shallow waters
  */
 
-import { DropTable } from '../../../types/locations';
+import { DropTable } from '@shared/types';
 
 export const FishingShrimp: DropTable = {
   "dropTableId": "fishing-shrimp",

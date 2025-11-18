@@ -3,7 +3,7 @@
  * Energizing properties that quicken reflexes and actions
  */
 
-import { TraitDefinition as Trait } from '../../../../types/items';
+import { TraitDefinition as Trait } from '@shared/types';
 
 export const InvigoratingTrait: Trait = {
   "traitId": "invigorating",

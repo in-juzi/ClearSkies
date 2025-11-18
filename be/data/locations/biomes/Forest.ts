@@ -3,7 +3,7 @@
  * Dense trees and dappled sunlight create a peaceful woodland environment
  */
 
-import { BiomeDefinition } from '../../../types/locations';
+import { BiomeDefinition } from '@shared/types';
 
 export const Forest: BiomeDefinition = {
   "biomeId": "forest",

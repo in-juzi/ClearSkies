@@ -1,8 +1,7 @@
 import { Request, Response } from 'express';
 import Player from '../models/Player';
 import itemService from '../services/itemService';
-import { QualityMap, TraitMap, ItemCategory, ConsumableItem } from '@shared/types';
-import { isWeaponItem, isArmorItem } from '../types/guards';
+import { QualityMap, TraitMap, ItemCategory, ConsumableItem, isWeaponItem, isArmorItem } from '@shared/types';
 import effectEvaluator from '../services/effectEvaluator';
 import { EffectContext } from '@shared/types/effect-system';
 

@@ -3,7 +3,7 @@
  * Common drops from salmon fishing
  */
 
-import { DropTable } from '../../../types/locations';
+import { DropTable } from '@shared/types';
 
 export const FishingSalmon: DropTable = {
   "dropTableId": "fishing-salmon",

@@ -3,7 +3,7 @@
  * A cheerful woman with flour-dusted apron and warm smile. The delicious aroma of her cooking draws tr...
  */
 
-import { Vendor } from '../../types/crafting';
+import { Vendor } from '@shared/types';
 
 export const KennikCook: Vendor = {
   "vendorId": "kennik-cook",

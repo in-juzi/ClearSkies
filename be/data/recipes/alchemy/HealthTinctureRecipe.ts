@@ -5,7 +5,7 @@
  * Uses any 2 herbs - great for beginners learning alchemy
  */
 
-import { Recipe } from '../../../types';
+import { Recipe } from '@shared/types';
 import { SUBCATEGORY } from '../../constants/item-constants';
 
 export const HealthTinctureRecipe: Recipe = {

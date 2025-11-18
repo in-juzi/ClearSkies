@@ -3,7 +3,7 @@
  * Tier: 1
  */
 
-import { EquipmentItem } from '../../../../types/items';
+import { EquipmentItem } from '@shared/types';
 import { SUBCATEGORY, CATEGORY, RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL, SLOT, ARMOR_SUBTYPE } from '../../../constants/item-constants';
 
 export const HempCoif: EquipmentItem = {

@@ -3,7 +3,7 @@
  * Engage forest bandits in combat
  */
 
-import { ActivityUnion } from '../../../types/locations';
+import { ActivityUnion } from '@shared/types';
 
 export const ActivityCombatBandits: ActivityUnion = {
   "activityId": "activity-combat-bandits",

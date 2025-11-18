@@ -3,7 +3,7 @@
  * Rare items that can be found while chopping oak trees
  */
 
-import { DropTable } from '../../../types/locations';
+import { DropTable } from '@shared/types';
 
 export const RareWoodcuttingOak: DropTable = {
   "dropTableId": "rare-woodcutting-oak",

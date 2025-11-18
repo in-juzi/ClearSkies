@@ -3,7 +3,7 @@
  * Common drops from iron ore mining
  */
 
-import { DropTable } from '../../../types/locations';
+import { DropTable } from '@shared/types';
 
 export const MiningIron: DropTable = {
   "dropTableId": "mining-iron",

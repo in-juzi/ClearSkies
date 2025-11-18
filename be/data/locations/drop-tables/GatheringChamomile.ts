@@ -3,7 +3,7 @@
  * Delicate chamomile flowers gathered from meadows
  */
 
-import { DropTable } from '../../../types/locations';
+import { DropTable } from '@shared/types';
 
 export const GatheringChamomile: DropTable = {
   "dropTableId": "gathering-chamomile",

@@ -3,7 +3,7 @@
  * Craft a bronze axe head with a keen edge, perfect for felling trees with efficiency.
  */
 
-import { Recipe } from '../../../types/crafting';
+import { Recipe } from '@shared/types';
 
 export const ForgeBronzeWoodcuttingAxe: Recipe = {
   "recipeId": "forge-bronze-woodcutting-axe",

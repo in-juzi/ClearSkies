@@ -3,7 +3,7 @@
  * Brave the stinging leaves to harvest medicinal nettles from the forest undergrowth
  */
 
-import { ActivityUnion } from '../../../types/locations';
+import { ActivityUnion } from '@shared/types';
 
 export const ActivityGatherNettle: ActivityUnion = {
   "activityId": "activity-gather-nettle",

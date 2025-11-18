@@ -3,7 +3,7 @@
  * Cast your line into the harbor waters for common cod
  */
 
-import { ActivityUnion } from '../../../types/locations';
+import { ActivityUnion } from '@shared/types';
 
 export const ActivityFishCod: ActivityUnion = {
   "activityId": "activity-fish-cod",

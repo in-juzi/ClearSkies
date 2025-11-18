@@ -3,7 +3,7 @@
  * Engage in combat with a fierce goblin warrior at the village
  */
 
-import { ActivityUnion } from '../../../types/locations';
+import { ActivityUnion } from '@shared/types';
 
 export const ActivityCombatGoblinWarriorVillage: ActivityUnion = {
   "activityId": "combat-goblin-warrior-village",

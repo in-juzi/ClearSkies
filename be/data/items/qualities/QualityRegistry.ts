@@ -3,7 +3,7 @@
  * Generated: Auto-generated
  */
 
-import { QualityDefinition } from '../../../types/items';
+import { QualityDefinition } from '@shared/types';
 
 import { AgeQuality } from './definitions/AgeQuality';
 import { GrainQuality } from './definitions/GrainQuality';

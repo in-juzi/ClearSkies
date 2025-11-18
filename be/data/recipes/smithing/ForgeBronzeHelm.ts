@@ -3,7 +3,7 @@
  * Mold bronze into a protective helmet, offering decent defense for those venturing into danger.
  */
 
-import { Recipe } from '../../../types/crafting';
+import { Recipe } from '@shared/types';
 
 export const ForgeBronzeHelm: Recipe = {
   "recipeId": "forge-bronze-helm",

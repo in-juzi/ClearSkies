@@ -3,7 +3,7 @@
  * The moisture content and tenderness of the fish meat
  */
 
-import { QualityDefinition as Quality } from '../../../../types/items';
+import { QualityDefinition as Quality } from '@shared/types';
 
 export const JuicyQuality: Quality = {
   "qualityId": "juicy",

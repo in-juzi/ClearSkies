@@ -3,7 +3,7 @@
  * The salty air and sound of waves create a maritime atmosphere
  */
 
-import { BiomeDefinition } from '../../../types/locations';
+import { BiomeDefinition } from '@shared/types';
 
 export const Sea: BiomeDefinition = {
   "biomeId": "sea",

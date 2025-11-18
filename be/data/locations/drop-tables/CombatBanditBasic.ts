@@ -3,7 +3,7 @@
  * Standard loot from bandit thugs
  */
 
-import { DropTable } from '../../../types/locations';
+import { DropTable } from '@shared/types';
 
 export const CombatBanditBasic: DropTable = {
   "dropTableId": "combat-bandit-basic",

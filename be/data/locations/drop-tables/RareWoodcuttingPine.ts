@@ -3,7 +3,7 @@
  * Rare items that can be found while chopping pine trees
  */
 
-import { DropTable } from '../../../types/locations';
+import { DropTable } from '@shared/types';
 
 export const RareWoodcuttingPine: DropTable = {
   "dropTableId": "rare-woodcutting-pine",

@@ -3,7 +3,7 @@
  * Venture into volcanic regions to collect the rare crimson dragon's breath flowers
  */
 
-import { ActivityUnion } from '../../../types/locations';
+import { ActivityUnion } from '@shared/types';
 
 export const ActivityGatherDragonsBreath: ActivityUnion = {
   "activityId": "activity-gather-dragons-breath",

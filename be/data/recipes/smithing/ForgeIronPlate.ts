@@ -3,7 +3,7 @@
  * Create a full suit of iron plate armor, the pinnacle of defensive metalwork for seasoned warriors.
  */
 
-import { Recipe } from '../../../types/crafting';
+import { Recipe } from '@shared/types';
 
 export const ForgeIronPlate: Recipe = {
   "recipeId": "forge-iron-plate",

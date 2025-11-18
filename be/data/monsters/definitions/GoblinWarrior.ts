@@ -3,7 +3,7 @@
  * A small but fierce goblin clad in crude metal armor. What these creatures lack in size, they make up...
  */
 
-import { Monster } from '../../../types/combat';
+import { Monster } from '@shared/types';
 
 export const GoblinWarrior: Monster = {
   "monsterId": "goblin_warrior",

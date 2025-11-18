@@ -3,7 +3,7 @@
  * Take careful aim and fire a precise shot with increased critical hit chance. Patience yields deadly ...
  */
 
-import { Ability } from '../../../types/combat';
+import { Ability } from '@shared/types';
 
 export const AimedShot: Ability = {
   "abilityId": "aimed_shot",

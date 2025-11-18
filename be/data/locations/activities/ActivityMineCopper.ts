@@ -3,7 +3,7 @@
  * Extract copper ore from shallow veins in the mountain rock
  */
 
-import { ActivityUnion } from '../../../types/locations';
+import { ActivityUnion } from '@shared/types';
 
 export const ActivityMineCopper: ActivityUnion = {
   "activityId": "activity-mine-copper",

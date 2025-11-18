@@ -3,7 +3,7 @@
  * A clearing filled with tree stumps and the sound of axes striking wood.
  */
 
-import { Facility } from '../../../types/locations';
+import { Facility } from '@shared/types';
 
 export const ForestLoggingCamp: Facility = {
   "facilityId": "forest-logging-camp",

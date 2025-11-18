@@ -1,4 +1,4 @@
-import { Facility } from '../../../types';
+import { Facility } from '@shared/types';
 
 export const BankFacility: Facility = {
   facilityId: 'kennik-bank',

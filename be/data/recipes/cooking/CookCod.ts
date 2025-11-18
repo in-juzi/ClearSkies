@@ -3,7 +3,7 @@
  * Bake thick cod steaks until the meat is white and tender, perfect for a hearty meal.
  */
 
-import { Recipe } from '../../../types/crafting';
+import { Recipe } from '@shared/types';
 
 export const CookCod: Recipe = {
   "recipeId": "cook-cod",

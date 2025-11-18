@@ -3,7 +3,7 @@
  * A rocky excavation site where solid stone blocks are extracted from the mountainside for construction.
  */
 
-import { Facility } from '../../../types/locations';
+import { Facility } from '@shared/types';
 
 export const MountainQuarry: Facility = {
   "facilityId": "mountain-quarry",

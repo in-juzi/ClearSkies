@@ -5,7 +5,7 @@
  * DO NOT EDIT MANUALLY
  */
 
-import { ActivityUnion } from '../../types/locations';
+import { ActivityUnion } from '@shared/types';
 
 import { ActivityChopBirch } from './activities/ActivityChopBirch';
 import { ActivityChopOak } from './activities/ActivityChopOak';

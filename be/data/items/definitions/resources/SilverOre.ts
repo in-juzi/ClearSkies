@@ -3,7 +3,7 @@
  * Tier: 3
  */
 
-import { ResourceItem } from '../../../../types/items';
+import { ResourceItem } from '@shared/types';
 import { SUBCATEGORY, CATEGORY, RARITY, TIER, QUALITY_SETS, TRAIT_SETS, SUBCATEGORIES, MATERIAL, SKILL_SOURCE } from '../../../constants/item-constants';
 
 export const SilverOre: ResourceItem = {

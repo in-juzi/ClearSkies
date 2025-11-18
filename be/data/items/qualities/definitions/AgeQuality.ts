@@ -3,7 +3,7 @@
  * How aged the wood is - older wood has enhanced properties
  */
 
-import { QualityDefinition as Quality } from '../../../../types/items';
+import { QualityDefinition as Quality } from '@shared/types';
 
 export const AgeQuality: Quality = {
   "qualityId": "age",

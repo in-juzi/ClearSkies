@@ -3,7 +3,7 @@
  * A mystical goblin adorned with bone fetishes and painted symbols. These cunning spellcasters wield...
  */
 
-import { Monster } from '../../../types/combat';
+import { Monster } from '@shared/types';
 
 export const GoblinShaman: Monster = {
   "monsterId": "goblin_shaman",

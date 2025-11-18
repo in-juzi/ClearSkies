@@ -3,7 +3,7 @@
  * Has a pleasant, aromatic scent
  */
 
-import { TraitDefinition as Trait } from '../../../../types/items';
+import { TraitDefinition as Trait } from '@shared/types';
 
 export const FragrantTrait: Trait = {
   "traitId": "fragrant",

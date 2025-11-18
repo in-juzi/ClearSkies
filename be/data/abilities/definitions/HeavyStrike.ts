@@ -3,7 +3,7 @@
  * A powerful overhead blow that deals increased damage. The weight of your weapon comes crashing down ...
  */
 
-import { Ability } from '../../../types/combat';
+import { Ability } from '@shared/types';
 
 export const HeavyStrike: Ability = {
   "abilityId": "heavy_strike",

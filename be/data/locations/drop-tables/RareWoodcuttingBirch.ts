@@ -3,7 +3,7 @@
  * Rare items that can be found while chopping birch trees
  */
 
-import { DropTable } from '../../../types/locations';
+import { DropTable } from '@shared/types';
 
 export const RareWoodcuttingBirch: DropTable = {
   "dropTableId": "rare-woodcutting-birch",

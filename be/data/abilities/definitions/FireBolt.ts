@@ -3,7 +3,7 @@
  * Hurl a bolt of searing flame at your enemy. The arcane fires burn hot and true.
  */
 
-import { Ability } from '../../../types/combat';
+import { Ability } from '@shared/types';
 
 export const FireBolt: Ability = {
   "abilityId": "fire_bolt",

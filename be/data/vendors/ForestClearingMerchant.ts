@@ -3,7 +3,7 @@
  * A burly woodcutter with arms like tree trunks and a thick beard. His hands are calloused from years ...
  */
 
-import { Vendor } from '../../types/crafting';
+import { Vendor } from '@shared/types';
 
 export const ForestClearingMerchant: Vendor = {
   "vendorId": "forest-clearing-merchant",

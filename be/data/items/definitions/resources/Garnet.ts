@@ -3,7 +3,7 @@
  * Tier: 2
  */
 
-import { ResourceItem } from '../../../../types/items';
+import { ResourceItem } from '@shared/types';
 import {
   CATEGORY,
   RARITY,

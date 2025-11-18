@@ -3,7 +3,7 @@
  * Carefully pick delicate chamomile flowers from sunny meadows
  */
 
-import { ActivityUnion } from '../../../types/locations';
+import { ActivityUnion } from '@shared/types';
 
 export const ActivityGatherChamomile: ActivityUnion = {
   "activityId": "activity-gather-chamomile",

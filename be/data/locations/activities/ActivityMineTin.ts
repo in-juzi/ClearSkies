@@ -3,7 +3,7 @@
  * Extract tin ore from shallow veins in the mountain rock
  */
 
-import { ActivityUnion } from '../../../types/locations';
+import { ActivityUnion } from '@shared/types';
 
 export const ActivityMineTin: ActivityUnion = {
   "activityId": "activity-mine-tin",

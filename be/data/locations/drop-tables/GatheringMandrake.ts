@@ -3,7 +3,7 @@
  * Mystical mandrake roots unearthed with care
  */
 
-import { DropTable } from '../../../types/locations';
+import { DropTable } from '@shared/types';
 
 export const GatheringMandrake: DropTable = {
   "dropTableId": "gathering-mandrake",

@@ -51,7 +51,7 @@ function generateRegistry(items: ItemImport[]): string {
   lines.push(' * DO NOT EDIT MANUALLY');
   lines.push(' */');
   lines.push('');
-  lines.push("import { Item } from '../../types/items';");
+  lines.push("import { Item } from '@shared/types';");
   lines.push('');
 
   // Sort items by category then name

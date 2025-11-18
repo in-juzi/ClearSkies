@@ -3,7 +3,7 @@
  * Engage in combat with a nimble goblin scout
  */
 
-import { ActivityUnion } from '../../../types/locations';
+import { ActivityUnion } from '@shared/types';
 
 export const ActivityCombatGoblinScout: ActivityUnion = {
   "activityId": "combat-goblin-scout",

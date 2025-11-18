@@ -5,7 +5,7 @@
  * DO NOT EDIT MANUALLY
  */
 
-import { Ability } from '../../types/combat';
+import { Ability } from '@shared/types';
 
 import { AimedShot } from './definitions/AimedShot';
 import { BattleFury } from './definitions/BattleFury';

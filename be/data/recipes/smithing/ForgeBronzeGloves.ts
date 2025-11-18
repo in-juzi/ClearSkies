@@ -3,7 +3,7 @@
  * Shape bronze plates into protective gauntlets, safeguarding the hands without sacrificing dexterity.
  */
 
-import { Recipe } from '../../../types/crafting';
+import { Recipe } from '@shared/types';
 
 export const ForgeBronzeGloves: Recipe = {
   "recipeId": "forge-bronze-gloves",

@@ -3,7 +3,7 @@
  * Collect fine sand from beaches and riverbanks for glassmaking
  */
 
-import { ActivityUnion } from '../../../types/locations';
+import { ActivityUnion } from '@shared/types';
 
 export const ActivityGatherSand: ActivityUnion = {
   "activityId": "activity-gather-sand",

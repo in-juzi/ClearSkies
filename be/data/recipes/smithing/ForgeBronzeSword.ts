@@ -3,7 +3,7 @@
  * Shape heated bronze into a sturdy sword blade, suitable for combat and reliable in the hands of any warrior.
  */
 
-import { Recipe } from '../../../types/crafting';
+import { Recipe } from '@shared/types';
 
 export const ForgeBronzeSword: Recipe = {
   "recipeId": "forge-bronze-sword",

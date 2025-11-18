@@ -3,7 +3,7 @@
  * Planks produced from processing logs at the sawmill
  */
 
-import { DropTable } from '../../../types/locations';
+import { DropTable } from '@shared/types';
 
 export const SawmillPlanks: DropTable = {
   "dropTableId": "sawmill-planks",

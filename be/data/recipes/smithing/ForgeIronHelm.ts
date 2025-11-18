@@ -3,7 +3,7 @@
  * Shape iron into a sturdy helmet with reinforced plates, providing excellent head protection.
  */
 
-import { Recipe } from '../../../types/crafting';
+import { Recipe } from '@shared/types';
 
 export const ForgeIronHelm: Recipe = {
   "recipeId": "forge-iron-helm",

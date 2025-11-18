@@ -3,7 +3,7 @@
  * The structural integrity and tightness of wood grain, affecting crafted tool performance
  */
 
-import { QualityDefinition as Quality } from '../../../../types/items';
+import { QualityDefinition as Quality } from '@shared/types';
 
 export const GrainQuality: Quality = {
   "qualityId": "grain",

@@ -3,7 +3,7 @@
  * Common drops from chopping birch trees
  */
 
-import { DropTable } from '../../../types/locations';
+import { DropTable } from '@shared/types';
 
 export const WoodcuttingBirch: DropTable = {
   "dropTableId": "woodcutting-birch",

@@ -3,7 +3,7 @@
  * Carefully harvested stinging nettles
  */
 
-import { DropTable } from '../../../types/locations';
+import { DropTable } from '@shared/types';
 
 export const GatheringNettle: DropTable = {
   "dropTableId": "gathering-nettle",

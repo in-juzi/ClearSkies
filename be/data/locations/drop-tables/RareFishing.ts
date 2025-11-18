@@ -3,7 +3,7 @@
  * Rare treasures pulled from the water
  */
 
-import { DropTable } from '../../../types/locations';
+import { DropTable } from '@shared/types';
 
 export const RareFishing: DropTable = {
   "dropTableId": "rare-fishing",

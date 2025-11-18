@@ -3,7 +3,7 @@
  * A gentle riverbank with deposits of fine sand perfect for glassmaking and construction.
  */
 
-import { Facility } from '../../../types/locations';
+import { Facility } from '@shared/types';
 
 export const ForestRiverbank: Facility = {
   "facilityId": "forest-riverbank",

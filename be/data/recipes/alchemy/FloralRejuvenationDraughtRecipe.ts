@@ -6,7 +6,7 @@
  * Combines herb knowledge with flower essences
  */
 
-import { Recipe } from '../../../types';
+import { Recipe } from '@shared/types';
 import { SUBCATEGORY } from '../../constants/item-constants';
 
 export const FloralRejuvenationDraughtRecipe: Recipe = {

@@ -3,7 +3,7 @@
  * In excellent condition
  */
 
-import { TraitDefinition as Trait } from '../../../../types/items';
+import { TraitDefinition as Trait } from '@shared/types';
 
 export const PristineTrait: Trait = {
   "traitId": "pristine",

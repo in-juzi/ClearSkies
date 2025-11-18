@@ -3,7 +3,7 @@
  * Unleash a flurry of quick shots that deal moderate damage. Quantity has a quality all its own.
  */
 
-import { Ability } from '../../../types/combat';
+import { Ability } from '@shared/types';
 
 export const RapidFire: Ability = {
   "abilityId": "rapid_fire",

@@ -3,7 +3,7 @@
  * A secluded grove deep in the forest where rare herbs flourish in the dappled sunlight. The air is th...
  */
 
-import { Facility } from '../../../types/locations';
+import { Facility } from '@shared/types';
 
 export const ForestHerbGrove: Facility = {
   "facilityId": "forest-herb-grove",

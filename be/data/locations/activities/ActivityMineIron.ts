@@ -3,7 +3,7 @@
  * Extract iron ore from the mountain veins
  */
 
-import { ActivityUnion } from '../../../types/locations';
+import { ActivityUnion } from '@shared/types';
 
 export const ActivityMineIron: ActivityUnion = {
   "activityId": "activity-mine-iron",

@@ -5,7 +5,7 @@
  * Uses any 2 herbs - teaches the basics of mana restoration
  */
 
-import { Recipe } from '../../../types';
+import { Recipe } from '@shared/types';
 import { SUBCATEGORY } from '../../constants/item-constants';
 
 export const ManaTinctureRecipe: Recipe = {

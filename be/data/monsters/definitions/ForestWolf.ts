@@ -3,7 +3,7 @@
  * A lean gray wolf that prowls the forest paths. Its keen eyes and sharp fangs make it a dangerous opp...
  */
 
-import { Monster } from '../../../types/combat';
+import { Monster } from '@shared/types';
 
 export const ForestWolf: Monster = {
   "monsterId": "forest_wolf",

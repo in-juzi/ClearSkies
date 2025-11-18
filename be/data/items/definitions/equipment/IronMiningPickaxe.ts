@@ -3,7 +3,7 @@
  * Tier: 2
  */
 
-import { EquipmentItem } from '../../../../types/items';
+import { EquipmentItem } from '@shared/types';
 import { SUBCATEGORY, CATEGORY, RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL, SLOT, WEAPON_SUBTYPE, SKILL_SOURCE } from '../../../constants/item-constants';
 
 export const IronMiningPickaxe: EquipmentItem = {

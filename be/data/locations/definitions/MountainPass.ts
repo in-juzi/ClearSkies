@@ -3,7 +3,7 @@
  * A high mountain pass where the air is thin and cold. Rocky outcroppings reveal precious ore veins.
  */
 
-import { Location } from '../../../types/locations';
+import { Location } from '@shared/types';
 
 export const MountainPass: Location = {
   "locationId": "mountain-pass",

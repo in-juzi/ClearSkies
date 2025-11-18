@@ -3,7 +3,7 @@
  * A peaceful clearing in the heart of the woods. Ancient oak trees tower overhead, and the sounds of w...
  */
 
-import { Location } from '../../../types/locations';
+import { Location } from '@shared/types';
 
 export const ForestClearing: Location = {
   "locationId": "forest-clearing",

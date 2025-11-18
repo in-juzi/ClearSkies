@@ -3,7 +3,7 @@
  * Standard loot from goblin shamans
  */
 
-import { DropTable } from '../../../types/locations';
+import { DropTable } from '@shared/types';
 
 export const CombatGoblinShaman: DropTable = {
   "dropTableId": "combat-goblin-shaman",

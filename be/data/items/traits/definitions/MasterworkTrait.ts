@@ -3,7 +3,7 @@
  * Crafted by a skilled artisan
  */
 
-import { TraitDefinition as Trait } from '../../../../types/items';
+import { TraitDefinition as Trait } from '@shared/types';
 
 export const MasterworkTrait: Trait = {
   "traitId": "masterwork",

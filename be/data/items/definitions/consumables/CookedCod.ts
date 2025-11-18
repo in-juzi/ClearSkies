@@ -3,7 +3,7 @@
  * Tier: 3
  */
 
-import { ConsumableItem } from '../../../../types/items';
+import { ConsumableItem } from '@shared/types';
 import { CATEGORY, RARITY, TIER, QUALITY_SETS, TRAIT_SETS, SUBCATEGORIES, MATERIAL, CONSUMABLE_SUBTYPE } from '../../../constants/item-constants';
 
 export const CookedCod: ConsumableItem = {

@@ -3,7 +3,7 @@
  * Forge interlocking bronze plates into a full suit of body armor, offering substantial protection.
  */
 
-import { Recipe } from '../../../types/crafting';
+import { Recipe } from '@shared/types';
 
 export const ForgeBronzePlate: Recipe = {
   "recipeId": "forge-bronze-plate",

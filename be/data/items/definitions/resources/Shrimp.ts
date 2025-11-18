@@ -3,7 +3,7 @@
  * Tier: 1
  */
 
-import { ConsumableItem } from '../../../../types/items';
+import { ConsumableItem } from '@shared/types';
 import { CATEGORY, RARITY, TIER, MATERIAL, SKILL_SOURCE, SUBCATEGORIES } from '../../../constants/item-constants';
 
 export const Shrimp: ConsumableItem = {

@@ -3,7 +3,7 @@
  * The surface luster and reflectivity of metals and gemstones
  */
 
-import { QualityDefinition as Quality } from '../../../../types/items';
+import { QualityDefinition as Quality } from '@shared/types';
 
 export const SheenQuality: Quality = {
   "qualityId": "sheen",

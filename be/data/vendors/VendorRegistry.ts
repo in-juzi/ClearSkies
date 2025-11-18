@@ -5,7 +5,7 @@
  * DO NOT EDIT MANUALLY
  */
 
-import { Vendor } from '../../types/crafting';
+import { Vendor } from '@shared/types';
 
 import { ForestClearingMerchant } from './ForestClearingMerchant';
 import { KennikCook } from './KennikCook';

@@ -5,7 +5,7 @@
  * DO NOT EDIT MANUALLY
  */
 
-import { Facility } from '../../types/locations';
+import { Facility } from '@shared/types';
 
 import { BankFacility } from './facilities/BankFacility';
 import { ForestBanditCamp } from './facilities/ForestBanditCamp';

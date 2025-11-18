@@ -3,7 +3,7 @@
  * Hammer refined iron into a razor-sharp blade, stronger and more durable than its bronze predecessor.
  */
 
-import { Recipe } from '../../../types/crafting';
+import { Recipe } from '@shared/types';
 
 export const ForgeIronSword: Recipe = {
   "recipeId": "forge-iron-sword",

@@ -3,7 +3,7 @@
  * Standard loot from goblin warriors
  */
 
-import { DropTable } from '../../../types/locations';
+import { DropTable } from '@shared/types';
 
 export const CombatGoblinBasic: DropTable = {
   "dropTableId": "combat-goblin-basic",

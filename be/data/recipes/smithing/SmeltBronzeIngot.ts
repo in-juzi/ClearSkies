@@ -3,7 +3,7 @@
  * Combine copper and tin ore in the forge, heating them until they meld into a gleaming bronze ingot.
  */
 
-import { Recipe } from '../../../types/crafting';
+import { Recipe } from '@shared/types';
 
 export const SmeltBronzeIngot: Recipe = {
   "recipeId": "smelt-bronze-ingot",

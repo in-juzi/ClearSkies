@@ -3,7 +3,7 @@
  * Harvest silvery sage leaves from wild bushes, taking care not to damage the plants
  */
 
-import { ActivityUnion } from '../../../types/locations';
+import { ActivityUnion } from '@shared/types';
 
 export const ActivityGatherSage: ActivityUnion = {
   "activityId": "activity-gather-sage",

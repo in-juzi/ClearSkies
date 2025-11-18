@@ -3,7 +3,7 @@
  * Common drops from collecting sand
  */
 
-import { DropTable } from '../../../types/locations';
+import { DropTable } from '@shared/types';
 
 export const GatheringSand: DropTable = {
   "dropTableId": "gathering-sand",

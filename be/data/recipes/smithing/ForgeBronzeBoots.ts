@@ -3,7 +3,7 @@
  * Craft bronze greaves and boots, protecting the legs and feet in battle.
  */
 
-import { Recipe } from '../../../types/crafting';
+import { Recipe } from '@shared/types';
 
 export const ForgeBronzeBoots: Recipe = {
   "recipeId": "forge-bronze-boots",

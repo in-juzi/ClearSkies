@@ -3,7 +3,7 @@
  * Generated: Auto-generated
  */
 
-import { TraitDefinition } from '../../../types/items';
+import { TraitDefinition } from '@shared/types';
 
 import { BalancedTrait } from './definitions/BalancedTrait';
 import { BlessedTrait } from './definitions/BlessedTrait';

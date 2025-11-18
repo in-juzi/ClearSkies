@@ -3,7 +3,7 @@
  * A dark cave carved into the mountainside, home to aggressive goblin warriors. The sound of crude wea...
  */
 
-import { Facility } from '../../../types/locations';
+import { Facility } from '@shared/types';
 
 export const GoblinCave: Facility = {
   "facilityId": "goblin-cave",

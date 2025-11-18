@@ -3,7 +3,7 @@
  * Launch a jagged spike of ice that pierces your foe. The cold slows and damages.
  */
 
-import { Ability } from '../../../types/combat';
+import { Ability } from '@shared/types';
 
 export const IceShard: Ability = {
   "abilityId": "ice_shard",

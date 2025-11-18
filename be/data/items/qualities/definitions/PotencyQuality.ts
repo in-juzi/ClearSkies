@@ -3,7 +3,7 @@
  * The alchemical effectiveness of herbs and flowers, affecting potion strength
  */
 
-import { QualityDefinition as Quality } from '../../../../types/items';
+import { QualityDefinition as Quality } from '@shared/types';
 
 export const PotencyQuality: Quality = {
   "qualityId": "potency",

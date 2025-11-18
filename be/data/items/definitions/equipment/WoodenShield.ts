@@ -3,7 +3,7 @@
  * Tier: 1
  */
 
-import { EquipmentItem } from '../../../../types/items';
+import { EquipmentItem } from '@shared/types';
 import { SUBCATEGORY, CATEGORY, RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL, SLOT, WEAPON_SUBTYPE } from '../../../constants/item-constants';
 
 export const WoodenShield: EquipmentItem = {

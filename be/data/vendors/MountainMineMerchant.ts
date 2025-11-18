@@ -3,7 +3,7 @@
  * A grizzled miner with hands stained black from coal dust. Her sharp eyes can spot a valuable vein fr...
  */
 
-import { Vendor } from '../../types/crafting';
+import { Vendor } from '@shared/types';
 
 export const MountainMineMerchant: Vendor = {
   "vendorId": "mountain-mine-merchant",

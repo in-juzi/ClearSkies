@@ -3,7 +3,7 @@
  * Common copper ore deposits found in mountain mines
  */
 
-import { DropTable } from '../../../types/locations';
+import { DropTable } from '@shared/types';
 
 export const MiningCopper: DropTable = {
   "dropTableId": "mining-copper",

@@ -3,7 +3,7 @@
  * Standard loot from forest wolves
  */
 
-import { DropTable } from '../../../types/locations';
+import { DropTable } from '@shared/types';
 
 export const CombatWolfBasic: DropTable = {
   "dropTableId": "combat-wolf-basic",

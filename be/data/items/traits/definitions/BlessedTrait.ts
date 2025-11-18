@@ -3,7 +3,7 @@
  * Blessed by divine forces
  */
 
-import { TraitDefinition as Trait } from '../../../../types/items';
+import { TraitDefinition as Trait } from '@shared/types';
 
 export const BlessedTrait: Trait = {
   "traitId": "blessed",

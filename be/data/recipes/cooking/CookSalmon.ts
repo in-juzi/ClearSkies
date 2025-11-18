@@ -3,7 +3,7 @@
  * Grill fresh salmon over an open flame until the flesh turns a delicate pink and flakes easily.
  */
 
-import { Recipe } from '../../../types/crafting';
+import { Recipe } from '@shared/types';
 
 export const CookSalmon: Recipe = {
   "recipeId": "cook-salmon",

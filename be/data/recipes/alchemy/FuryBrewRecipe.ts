@@ -6,7 +6,7 @@
  * Unlocked after crafting Mandrake Power Elixir
  */
 
-import { Recipe } from '../../../types';
+import { Recipe } from '@shared/types';
 
 export const FuryBrewRecipe: Recipe = {
   recipeId: 'dragons_fury_brew',

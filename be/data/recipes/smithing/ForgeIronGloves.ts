@@ -3,7 +3,7 @@
  * Forge articulated iron gauntlets that protect the hands while allowing full mobility.
  */
 
-import { Recipe } from '../../../types/crafting';
+import { Recipe } from '@shared/types';
 
 export const ForgeIronGloves: Recipe = {
   "recipeId": "forge-iron-gloves",

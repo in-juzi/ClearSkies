@@ -3,7 +3,7 @@
  * A gentle soul with dirt-stained fingers and a peaceful smile. She knows every plant in the realm and...
  */
 
-import { Vendor } from '../../types/crafting';
+import { Vendor } from '@shared/types';
 
 export const KennikHerbGardenMerchant: Vendor = {
   "vendorId": "kennik-herb-garden-merchant",

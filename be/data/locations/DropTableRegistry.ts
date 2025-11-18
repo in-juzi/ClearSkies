@@ -5,7 +5,7 @@
  * DO NOT EDIT MANUALLY
  */
 
-import { DropTable } from '../../types/locations';
+import { DropTable } from '@shared/types';
 
 import { CombatBanditBasic } from './drop-tables/CombatBanditBasic';
 import { CombatGoblinBasic } from './drop-tables/CombatGoblinBasic';

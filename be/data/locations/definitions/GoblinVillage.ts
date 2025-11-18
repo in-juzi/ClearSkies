@@ -3,7 +3,7 @@
  * A hostile goblin settlement hidden deep in the wilderness, built from scavenged materials
  */
 
-import { Location } from '../../../types/locations';
+import { Location } from '@shared/types';
 
 export const GoblinVillage: Location = {
   "locationId": "goblin-village",

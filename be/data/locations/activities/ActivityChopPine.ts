@@ -3,7 +3,7 @@
  * Fell softwood pine trees for basic timber and construction materials
  */
 
-import { ActivityUnion } from '../../../types/locations';
+import { ActivityUnion } from '@shared/types';
 
 export const ActivityChopPine: ActivityUnion = {
   "activityId": "activity-chop-pine",

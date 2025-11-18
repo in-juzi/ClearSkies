@@ -3,7 +3,7 @@
  * Search moonlit glades for the rare luminescent moonpetals that shimmer in darkness
  */
 
-import { ActivityUnion } from '../../../types/locations';
+import { ActivityUnion } from '@shared/types';
 
 export const ActivityGatherMoonpetal: ActivityUnion = {
   "activityId": "activity-gather-moonpetal",

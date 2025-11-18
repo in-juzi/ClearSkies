@@ -3,7 +3,7 @@
  * Try your luck catching prized salmon in deeper waters
  */
 
-import { ActivityUnion } from '../../../types/locations';
+import { ActivityUnion } from '@shared/types';
 
 export const ActivityFishSalmon: ActivityUnion = {
   "activityId": "activity-fish-salmon",

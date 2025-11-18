@@ -3,7 +3,7 @@
  * Heat sand to extreme temperatures to create clear glass panes for construction.
  */
 
-import { Recipe } from '../../../types/crafting';
+import { Recipe } from '@shared/types';
 
 export const GlassblowingRecipe: Recipe = {
   "recipeId": "glassblowing",

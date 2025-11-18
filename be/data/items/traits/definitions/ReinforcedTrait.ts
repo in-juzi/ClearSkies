@@ -3,7 +3,7 @@
  * Armor has been reinforced with additional protection layers
  */
 
-import { TraitDefinition as Trait } from '../../../../types/items';
+import { TraitDefinition as Trait } from '@shared/types';
 import { EffectContext, ModifierType, ConditionType } from '@shared/types/effect-system';
 
 export const ReinforcedTrait: Trait = {

@@ -6,7 +6,7 @@
  * Unlocked after crafting Nettle Vigor Draught
  */
 
-import { Recipe } from '../../../types';
+import { Recipe } from '@shared/types';
 
 export const PowerElixirRecipe: Recipe = {
   recipeId: 'mandrake_power_elixir',

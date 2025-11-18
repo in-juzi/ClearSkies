@@ -6,7 +6,7 @@
  * Unlocked after crafting Basic Mana Tincture
  */
 
-import { Recipe } from '../../../types';
+import { Recipe } from '@shared/types';
 import { SUBCATEGORY } from '../../constants/item-constants';
 
 export const ManaPotionRecipe: Recipe = {

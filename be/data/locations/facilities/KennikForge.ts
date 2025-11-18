@@ -3,7 +3,7 @@
  * A sturdy stone forge where the rhythmic clang of hammer on anvil echoes through the air. Glowing emb...
  */
 
-import { Facility } from '../../../types/locations';
+import { Facility } from '@shared/types';
 
 export const KennikForge: Facility = {
   "facilityId": "kennik-forge",

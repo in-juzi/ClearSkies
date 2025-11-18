@@ -3,7 +3,7 @@
  * Sauté plump shrimp in garlic and oil until they curl and turn a vibrant pink.
  */
 
-import { Recipe } from '../../../types/crafting';
+import { Recipe } from '@shared/types';
 
 export const CookShrimp: Recipe = {
   "recipeId": "cook-shrimp",

@@ -3,7 +3,7 @@
  * A cozy shop filled with drying herbs and bubbling alembics. The village alchemist practices the ancient art of potion-making here.
  */
 
-import { Facility } from '../../../types/locations';
+import { Facility } from '@shared/types';
 
 export const VillageApothecary: Facility = {
   "facilityId": "village-apothecary",

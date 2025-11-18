@@ -3,7 +3,7 @@
  * A swift strike that deals moderate damage with a short cooldown. Speed over power.
  */
 
-import { Ability } from '../../../types/combat';
+import { Ability } from '@shared/types';
 
 export const QuickSlash: Ability = {
   "abilityId": "quick_slash",

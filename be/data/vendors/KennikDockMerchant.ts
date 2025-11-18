@@ -3,7 +3,7 @@
  * A weathered fisherman with sun-darkened skin and keen eyes. He's spent decades on the waters and kno...
  */
 
-import { Vendor } from '../../types/crafting';
+import { Vendor } from '@shared/types';
 
 export const KennikDockMerchant: Vendor = {
   "vendorId": "kennik-dock-merchant",

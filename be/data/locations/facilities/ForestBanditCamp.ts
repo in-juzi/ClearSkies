@@ -3,7 +3,7 @@
  * A dangerous encampment where bandits have taken residence. Approach with caution.
  */
 
-import { Facility } from '../../../types/locations';
+import { Facility } from '@shared/types';
 
 export const ForestBanditCamp: Facility = {
   "facilityId": "forest-bandit-camp",

@@ -3,7 +3,7 @@
  * A mysterious woman with silver-streaked hair and stained fingers from years of brewing potions. Her ...
  */
 
-import { Vendor } from '../../types/crafting';
+import { Vendor } from '@shared/types';
 
 export const KennikPotionSeller: Vendor = {
   "vendorId": "kennik-potion-seller",

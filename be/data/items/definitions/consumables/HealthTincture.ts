@@ -3,7 +3,7 @@
  * Tier: 1 | Alchemy
  */
 
-import { ConsumableItem } from '../../../../types/items';
+import { ConsumableItem } from '@shared/types';
 import { CATEGORY, RARITY, TIER, QUALITY_SETS, TRAIT_SETS, MATERIAL, SUBCATEGORIES } from '../../../constants/item-constants';
 
 export const HealthTincture: ConsumableItem = {

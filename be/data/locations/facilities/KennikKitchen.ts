@@ -3,7 +3,7 @@
  * A warm communal kitchen where locals gather to prepare meals. The scent of herbs and freshly cooked ...
  */
 
-import { Facility } from '../../../types/locations';
+import { Facility } from '@shared/types';
 
 export const KennikKitchen: Facility = {
   "facilityId": "kennik-kitchen",

@@ -3,7 +3,7 @@
  * Face off against a fierce goblin warrior clad in crude armor. These creatures are small but deadly w...
  */
 
-import { ActivityUnion } from '../../../types/locations';
+import { ActivityUnion } from '@shared/types';
 
 export const ActivityCombatGoblin: ActivityUnion = {
   "activityId": "activity-combat-goblin",

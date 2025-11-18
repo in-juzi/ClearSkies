@@ -3,7 +3,7 @@
  * Common drops from chopping pine trees
  */
 
-import { DropTable } from '../../../types/locations';
+import { DropTable } from '@shared/types';
 
 export const WoodcuttingPine: DropTable = {
   "dropTableId": "woodcutting-pine",
