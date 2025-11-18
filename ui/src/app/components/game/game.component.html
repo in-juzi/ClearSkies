@@ -45,6 +45,12 @@
                 (click)="leftSidebarTab.set('inventory')">
                 Inventory
               </button>
+              <button
+                class="nav-tab"
+                [class.active]="leftSidebarTab() === 'quests'"
+                (click)="leftSidebarTab.set('quests')">
+                Quests
+              </button>
 
               <!-- Collapse Button (inside nav when expanded) -->
               <button
@@ -60,6 +66,9 @@
               @if (leftSidebarTab() === 'inventory') {
                 <app-inventory></app-inventory>
               }
+              @if (leftSidebarTab() === 'quests') {
+                <app-quest-tracker></app-quest-tracker>
+              }
             </div>
           }
         </aside>
@@ -67,11 +76,6 @@
         <!-- Center: Main Game Area -->
         <section class="center-content">
           <app-location></app-location>
-
-          <!-- Quest Tracker -->
-          @if (currentPlayer()) {
-            <app-quest-tracker></app-quest-tracker>
-          }
 
           <!-- Chat Component (Bottom of Center Content) -->
           @if (currentPlayer()) {

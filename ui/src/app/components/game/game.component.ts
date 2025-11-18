@@ -47,7 +47,7 @@ export class GameComponent implements OnInit {
   rightSidebarTab = signal<'character' | 'equipment' | 'skills' | 'attributes' | 'status'>('character');
 
   // Track which tab is active in the left sidebar
-  leftSidebarTab = signal<'inventory'>('inventory');
+  leftSidebarTab = signal<'inventory' | 'quests'>('inventory');
 
   // Track collapse state of sidebars
   leftSidebarCollapsed = signal(false);
