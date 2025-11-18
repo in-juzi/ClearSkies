@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { IconComponent } from '../../../shared/icon/icon.component';
 import { ItemMiniComponent } from '../../../shared/item-mini/item-mini.component';
 import { ActivityLogComponent, ActivityLogEntry } from '../../../shared/activity-log/activity-log.component';
-import { Recipe } from '../../../../models/recipe.model';
+import { Recipe } from '@shared/types';
 
 // Interface for ingredient group display
 interface IngredientGroup {

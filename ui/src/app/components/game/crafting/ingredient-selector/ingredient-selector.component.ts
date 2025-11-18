@@ -2,8 +2,7 @@ import { Component, Input, Output, EventEmitter, computed, signal } from '@angul
 import { CommonModule } from '@angular/common';
 import { IconComponent } from '../../../shared/icon/icon.component';
 import { ItemModifiersComponent } from '../../../shared/item-modifiers/item-modifiers.component';
-import { Recipe } from '../../../../models/recipe.model';
-import { RecipeIngredient } from '@shared/types';
+import { Recipe, RecipeIngredient } from '@shared/types';
 import { calculateItemScore } from '../../../../utils/item-sort.utils';
 
 type CraftingItemInstance = any; // Simplified type for brevity
