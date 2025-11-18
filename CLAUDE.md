@@ -95,8 +95,12 @@
 - ✅ Construction activities (completed - sand gathering, stone quarrying, sawmill processing)
 - ✅ Player housing system (completed - property ownership, building slots, construction projects)
 - ✅ Backend type system consolidation (completed - removed redundant be/types/, all imports use @shared/types)
+- ✅ Frontend type system consolidation (completed - cleaned up model re-exports, components import directly from @shared/types)
 
 **Recent Changes** (Last 10 commits):
+- refactor: update crafting components to import from @shared/types
+- refactor: clean up frontend model re-exports
+- docs: update CLAUDE.md with backend type consolidation
 - refactor: remove redundant backend type files
 - refactor: migrate all backend imports to @shared/types
 - chore: update Claude Code local settings
@@ -1334,11 +1338,12 @@ The project uses a **comprehensive TypeScript type system** with shared types be
 import { Item, Monster, Activity, isWeaponItem } from '@shared/types';
 ```
 
-**Backend Type Migration**:
-- ✅ All backend imports now use `@shared/types` directly
-- ✅ Legacy `be/types/` directory removed (1,040 lines of duplicate definitions)
-- ✅ Complete migration across 260+ game data files
-- ✅ Centralized type system enforces consistency
+**Type System Migration Status**:
+- ✅ **Backend**: All imports use `@shared/types` directly (260+ files migrated)
+- ✅ **Backend**: Legacy `be/types/` directory removed (1,040 lines eliminated)
+- ✅ **Frontend**: Model re-exports cleaned up (components import directly from @shared/types)
+- ✅ **Frontend**: Crafting components migrated to direct imports (4 components updated)
+- ✅ Complete stack-wide type consistency with zero duplicate definitions
 
 ### TypeScript Data Layer Migration
 
@@ -1495,11 +1500,12 @@ return armor / (armor + COMBAT_FORMULAS.ARMOR_SCALING_FACTOR);
 - [recipeService.ts](be/services/recipeService.ts) - Recipe management with typed ingredients/outputs
 - [vendorService.ts](be/services/vendorService.ts) - Vendor transactions with typed stock
 
-**Frontend Models** (all use @shared/types):
-- [inventory.model.ts](ui/src/app/models/inventory.model.ts) - Imports Item types from shared
-- [location.model.ts](ui/src/app/models/location.model.ts) - Imports Activity/Location types from shared
-- [recipe.model.ts](ui/src/app/models/recipe.model.ts) - Imports Recipe types from shared
-- [vendor.model.ts](ui/src/app/models/vendor.model.ts) - Imports Vendor types from shared
+**Frontend Models** (cleaned up, minimal re-exports):
+- [inventory.model.ts](ui/src/app/models/inventory.model.ts) - ItemIcon alias for semantic clarity
+- [location.model.ts](ui/src/app/models/location.model.ts) - Frontend-specific Activity interface only
+- [recipe.model.ts](ui/src/app/models/recipe.model.ts) - ActiveCrafting interface only (no re-exports)
+- [vendor.model.ts](ui/src/app/models/vendor.model.ts) - Vendor-related frontend types
+- **Note**: Components import shared types directly from @shared/types, not through model files
 
 ### Features
 
