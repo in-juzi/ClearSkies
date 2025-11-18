@@ -18,6 +18,7 @@ import { WorldMapComponent } from './world-map/world-map.component';
 import { QuestTrackerComponent } from './quest-tracker/quest-tracker.component';
 import { QuestJournalComponent } from './quest-journal/quest-journal.component';
 import { NotificationDisplayComponent } from '../shared/notification-display/notification-display.component';
+import { HousingComponent } from './housing/housing.component';
 import { ALL_SKILLS, ALL_ATTRIBUTES } from '../../constants/game-data.constants';
 import { LocationService } from '../../services/location.service';
 import { QuestService } from '../../services/quest.service';
@@ -25,7 +26,7 @@ import { QuestService } from '../../services/quest.service';
 @Component({
   selector: 'app-game',
   standalone: true,
-  imports: [CommonModule, RouterModule, ManualComponent, SkillsComponent, AttributesComponent, InventoryComponent, LocationComponent, EquipmentComponent, CharacterStatusComponent, ChatComponent, BankComponent, WorldMapComponent, QuestTrackerComponent, QuestJournalComponent, NotificationDisplayComponent],
+  imports: [CommonModule, RouterModule, ManualComponent, SkillsComponent, AttributesComponent, InventoryComponent, LocationComponent, EquipmentComponent, CharacterStatusComponent, ChatComponent, BankComponent, WorldMapComponent, QuestTrackerComponent, QuestJournalComponent, NotificationDisplayComponent, HousingComponent],
   templateUrl: './game.component.html',
   styleUrl: './game.component.scss'
 })
@@ -47,7 +48,7 @@ export class GameComponent implements OnInit {
   rightSidebarTab = signal<'character' | 'equipment' | 'skills' | 'attributes' | 'status'>('character');
 
   // Track which tab is active in the left sidebar
-  leftSidebarTab = signal<'inventory' | 'quests'>('inventory');
+  leftSidebarTab = signal<'inventory' | 'quests' | 'housing'>('inventory');
 
   // Track collapse state of sidebars
   leftSidebarCollapsed = signal(false);

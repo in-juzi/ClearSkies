@@ -1,0 +1,147 @@
+<div class="housing-container">
+  <!-- Header -->
+  <div class="housing-header">
+    <h2>Housing & Construction</h2>
+    <div class="property-count">
+      Properties: {{ properties().length }} / {{ maxProperties() }}
+    </div>
+  </div>
+
+  <!-- Navigation Tabs -->
+  <div class="housing-tabs">
+    <button
+      class="tab-button"
+      [class.active]="selectedView() === 'properties'"
+      (click)="selectView('properties')">
+      My Properties
+    </button>
+    <button
+      class="tab-button"
+      [class.active]="selectedView() === 'purchase'"
+      (click)="selectView('purchase')">
+      Purchase Plot
+    </button>
+    <button
+      class="tab-button"
+      [class.active]="selectedView() === 'projects'"
+      (click)="selectView('projects')">
+      Active Projects
+    </button>
+  </div>
+
+  <!-- Error Message -->
+  @if (errorMessage()) {
+    <div class="error-message">
+      {{ errorMessage() }}
+    </div>
+  }
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="loading">Loading...</div>
+  }
+
+  <!-- Properties View -->
+  @if (selectedView() === 'properties' && !isLoading()) {
+    <div class="properties-view">
+      @if (properties().length === 0) {
+        <div class="empty-state">
+          <p>You don't own any properties yet.</p>
+          <button class="btn-primary" (click)="selectView('purchase')">
+            Purchase Your First Plot
+          </button>
+        </div>
+      } @else {
+        <div class="properties-list">
+          @for (property of properties(); track property.propertyId) {
+            <div class="property-card" (click)="viewProperty(property)">
+              <div class="property-header">
+                <h3>{{ getTierDisplayName(property.tier) }}</h3>
+                <span class="property-location">{{ property.location }}</span>
+              </div>
+              <div class="property-info">
+                <div class="capacity-info">
+                  {{ getPropertyCapacityText(property) }}
+                </div>
+                <div class="property-stats">
+                  <span>🏠 {{ property.rooms.length }} Rooms</span>
+                  <span>📦 {{ property.storageContainers.length }} Storage</span>
+                  <span>🌱 {{ property.gardens.length }} Gardens</span>
+                </div>
+              </div>
+              <div class="property-footer">
+                Last visited: {{ property.lastVisited | date:'short' }}
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Purchase Plot View -->
+  @if (selectedView() === 'purchase' && !isLoading()) {
+    <div class="purchase-view">
+      <div class="purchase-header">
+        <h3>Purchase a Plot of Land</h3>
+        @if (currentLocation()) {
+          <p>Location: <strong>{{ currentLocation() }}</strong></p>
+        } @else {
+          <p class="warning">You must be at a location to purchase a plot</p>
+        }
+      </div>
+
+      @if (properties().length >= maxProperties()) {
+        <div class="warning-box">
+          <p>You have reached your maximum property limit ({{ maxProperties() }}).</p>
+          <p>Level up your Construction skill to increase this limit.</p>
+        </div>
+      } @else {
+        <div class="tier-selection">
+          @for (tier of availableTiers; track tier) {
+            @if (propertyTiers()[tier]; as config) {
+              <div
+                class="tier-card"
+                [class.selected]="selectedTier() === tier"
+                [class.affordable]="canAffordTier(tier)"
+                (click)="selectedTier.set(tier)">
+                <h4>{{ getTierDisplayName(tier) }}</h4>
+                <div class="tier-stats">
+                  <div>🏠 {{ config.maxRooms }} Rooms</div>
+                  <div>📦 {{ config.maxStorage }} Storage</div>
+                  <div>🌱 {{ config.maxGardens }} Gardens</div>
+                </div>
+                <div class="tier-requirements">
+                  {{ getTierRequirementText(tier) }}
+                </div>
+                <div class="tier-cost">
+                  <strong>{{ config.plotCost }}g</strong>
+                </div>
+              </div>
+            }
+          }
+        </div>
+
+        <div class="purchase-actions">
+          <button
+            class="btn-primary"
+            [disabled]="!canAffordTier(selectedTier()) || !currentLocation()"
+            (click)="purchasePlot()">
+            Purchase {{ getTierDisplayName(selectedTier()) }} Plot
+          </button>
+          <div class="gold-display">
+            Your Gold: {{ playerGold() }}g
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Active Projects View -->
+  @if (selectedView() === 'projects' && !isLoading()) {
+    <div class="projects-view">
+      <p>Construction projects will be displayed here.</p>
+      <p class="hint">This view will show active construction projects you're participating in.</p>
+    </div>
+  }
+</div>

@@ -51,6 +51,12 @@
                 (click)="leftSidebarTab.set('quests')">
                 Quests
               </button>
+              <button
+                class="nav-tab"
+                [class.active]="leftSidebarTab() === 'housing'"
+                (click)="leftSidebarTab.set('housing')">
+                Housing
+              </button>
 
               <!-- Collapse Button (inside nav when expanded) -->
               <button
@@ -68,6 +74,9 @@
               }
               @if (leftSidebarTab() === 'quests') {
                 <app-quest-tracker></app-quest-tracker>
+              }
+              @if (leftSidebarTab() === 'housing') {
+                <app-housing></app-housing>
               }
             </div>
           }

@@ -1,0 +1,131 @@
+<div class="construction-browser">
+  <!-- Header -->
+  <div class="browser-header">
+    <h3>Active Construction Projects</h3>
+    <p class="location-info">{{ currentLocation()?.name }}</p>
+  </div>
+
+  <!-- Error Message -->
+  @if (error()) {
+    <div class="error-message">{{ error() }}</div>
+  }
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="loading">Loading construction projects...</div>
+  }
+
+  <!-- Empty State -->
+  @if (!loading() && projects().length === 0) {
+    <div class="empty-state">
+      <p>No active construction projects at this location.</p>
+      <p class="hint">Visit the Housing menu to start a new construction project.</p>
+    </div>
+  }
+
+  <!-- Projects List -->
+  @if (!loading() && projects().length > 0) {
+    <div class="projects-list">
+      @for (project of projects(); track project.projectId) {
+        <div class="project-card">
+          <!-- Project Header -->
+          <div class="project-header">
+            <div class="project-title">
+              <h4>{{ getProjectTypeDisplayName(project.projectType) }}</h4>
+            </div>
+            <div class="project-owner">
+              <span class="owner-label">Owner:</span>
+              <span class="owner-name">{{ project.ownerName }}</span>
+            </div>
+          </div>
+
+          <!-- Overall Progress -->
+          <div class="progress-section">
+            <div class="progress-header">
+              <span>Construction Progress</span>
+              <span class="progress-text">{{ project.completedActions }} / {{ project.totalActions }} actions</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width.%]="getProgressPercent(project)"></div>
+            </div>
+          </div>
+
+          <!-- Material Requirements -->
+          <div class="materials-section">
+            <h5>Material Requirements</h5>
+            <div class="materials-list">
+              @for (material of getMaterialProgress(project); track material.itemId) {
+                <div class="material-item">
+                  <div class="material-info">
+                    <span class="material-name">{{ material.name }}</span>
+                    <span class="material-amount">{{ material.contributed }} / {{ material.required }}</span>
+                  </div>
+                  <div class="material-progress">
+                    <div class="material-bar">
+                      <div class="material-fill" [style.width.%]="material.percent"></div>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+
+            @if (!project.goldPaid) {
+              <div class="gold-requirement">
+                <span class="gold-label">Gold Required:</span>
+                <span class="gold-amount">{{ project.requiredGold }} gold</span>
+              </div>
+            }
+          </div>
+
+          <!-- Contributors -->
+          <div class="contributors-section">
+            <h5>Contributors ({{ getContributorCount(project) }})</h5>
+            <div class="contributors-list">
+              @for (contributor of Object.values(project.contributors); track contributor.userId) {
+                <div class="contributor-item">
+                  <span class="contributor-name">{{ contributor.username }}</span>
+                  <span class="contributor-actions">{{ contributor.actionsCompleted }} actions</span>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="project-actions">
+            @if (canContribute(project)) {
+              <button
+                class="btn-contribute"
+                (click)="contribute(project.projectId)"
+                [disabled]="isContributing() === project.projectId"
+              >
+                {{ isContributing() === project.projectId ? 'Contributing...' : 'Contribute (1 Action)' }}
+              </button>
+
+              <button
+                class="btn-contribute-5"
+                (click)="contribute(project.projectId, 5)"
+                [disabled]="isContributing() === project.projectId"
+              >
+                Contribute (5 Actions)
+              </button>
+            }
+
+            @if (isPlayerOwner(project) && project.status === 'in-progress') {
+              <button
+                class="btn-abandon"
+                (click)="abandonProject(project.projectId)"
+              >
+                Abandon Project
+              </button>
+            }
+          </div>
+
+          <!-- Status Badge -->
+          <div class="status-badge" [class.completed]="project.status === 'completed'" [class.abandoned]="project.status === 'abandoned'">
+            {{ project.status }}
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
