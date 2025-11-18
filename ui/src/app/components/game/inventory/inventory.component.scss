@@ -16,6 +16,10 @@
   min-height: 0;
 }
 
+app-inventory-list-view {
+  flex: 1;
+}
+
 /* Item Details Panel - Shared component styles */
 .item-details-panel {
   position: fixed;
