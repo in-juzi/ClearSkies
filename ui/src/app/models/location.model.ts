@@ -1,15 +1,9 @@
 // Import types from shared (replaces duplicate definitions)
+// Note: Components should import shared types directly from @shared/types
 import {
   Activity as BaseActivity,
-  GatheringActivity,
-  CombatActivity,
-  ActivityUnion,
-  Biome,
-  BiomeDefinition as SharedBiomeDefinition
+  BiomeDefinition
 } from '@shared/types';
-
-// Re-export BiomeDefinition from shared
-export type BiomeDefinition = SharedBiomeDefinition;
 
 // Frontend-specific Activity type with populated fields from backend
 // The backend populates duration and monsterLevel fields that exist in GatheringActivity/CombatActivity
@@ -53,8 +47,7 @@ export interface Location {
   };
 }
 
-// Export shared activity types for type guards
-export type { GatheringActivity, CombatActivity, ActivityUnion };
+// Note: Import GatheringActivity, CombatActivity, ActivityUnion from @shared/types if needed
 
 export interface ActiveActivity {
   activityId: string | null;

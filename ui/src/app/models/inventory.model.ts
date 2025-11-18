@@ -1,7 +1,7 @@
 // Import Item and IconConfig from shared types (replaces ItemDefinition and ItemIcon)
 import { Item, IconConfig } from '@shared/types';
 
-// Re-export IconConfig as ItemIcon for backward compatibility
+// ItemIcon alias for semantic clarity in inventory/icon contexts
 export type ItemIcon = IconConfig;
 
 export interface QualityLevelData {

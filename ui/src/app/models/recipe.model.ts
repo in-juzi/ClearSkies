@@ -1,9 +1,3 @@
-// Import types from shared (replaces duplicate definitions)
-import { Recipe } from '@shared/types';
-
-// Re-export Recipe so components can import it from this file
-export type { Recipe };
-
 export interface ActiveCrafting {
   recipeId: string;
   startTime: Date;
