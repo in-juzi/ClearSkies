@@ -30,6 +30,7 @@ import craftingHandler from './sockets/craftingHandler';
 import combatHandler from './sockets/combatHandler';
 import storageHandler from './sockets/storageHandler';
 import questHandler from './sockets/questHandler';
+import constructionHandler from './sockets/constructionHandler';
 
 // Import routes
 import authRoutes from './routes/auth';
@@ -42,6 +43,7 @@ import vendorRoutes from './routes/vendors';
 import craftingRoutes from './routes/crafting';
 import storageRoutes from './routes/storage';
 import questRoutes from './routes/quests';
+import housingRoutes from './routes/housing';
 
 const app = express();
 const server = http.createServer(app);
@@ -112,6 +114,7 @@ app.use('/api/vendors', vendorRoutes);
 app.use('/api/crafting', craftingRoutes);
 app.use('/api/storage', storageRoutes);
 app.use('/api/quests', questRoutes);
+app.use('/api/housing', housingRoutes);
 
 // Error handling middleware
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -143,6 +146,7 @@ craftingHandler(io);
 combatHandler(io);
 storageHandler(io);
 questHandler(io);
+constructionHandler(io);
 
 // Start server - bind to 0.0.0.0 for IPv4 accessibility
 const HOST = '0.0.0.0';
