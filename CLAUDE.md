@@ -89,19 +89,19 @@
 - ✅ Component utility migration (completed - all components use shared rarity/filter/sort utilities)
 - ✅ Frontend logging cleanup (completed - removed debug console.log statements, kept console.error for production)
 - ✅ Angular inject() migration (completed - migrated components from constructor DI to inject() function)
+- ✅ Enhanced quest tracker (completed - collapsible sections for active/available/completed quests in left sidebar)
 
 **Recent Changes** (Last 10 commits):
+- feat: add skill icons for construction, farming, and protection
+- style: improve flexbox layout consistency across components
+- feat: move quest tracker to left sidebar as dedicated tab
+- feat: expand quest tracker with available and completed quests
+- refactor: improve type safety for quest definition access
+- feat: add optional definition field to ActiveQuest type
 - refactor: standardize component class names with Component suffix
 - refactor: migrate components to use inject() instead of constructor DI
 - docs: update CLAUDE.md with frontend logging cleanup
 - refactor: remove debug console.log statements from frontend
-- docs: update CLAUDE.md with centralized utility documentation
-- refactor: migrate item-details-panel sub-components to use rarity pipes
-- refactor: migrate crafting components to use rarity pipes
-- refactor: migrate bank, vendor, and equipment to use rarity pipes
-- refactor: migrate inventory components to use rarity pipes
-- refactor: migrate services to use centralized utilities
-- feat: add centralized item filtering service
 - feat: add centralized item sorting utilities
 - feat: add rarity transformation pipes for consistent styling
 
