@@ -18,7 +18,8 @@
       "Bash(rm:*)",
       "Bash(timeout 90 npx ng build:*)",
       "Bash(npm run update:activity-xp:*)",
-      "Bash(npm run survey:activity-xp:*)"
+      "Bash(npm run survey:activity-xp:*)",
+      "Bash(sed:*)"
     ],
     "deny": [],
     "ask": []
