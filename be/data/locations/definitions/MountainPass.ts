@@ -12,6 +12,7 @@ export const MountainPass: Location = {
   "biome": "mountain",
   "facilities": [
     "mountain-mine",
+    "mountain-quarry",
     "mountain-moonlit-meadow",
     "volcanic-garden",
     "goblin-cave"

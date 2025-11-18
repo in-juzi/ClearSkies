@@ -13,7 +13,8 @@ export const ForestClearing: Location = {
   "facilities": [
     "forest-logging-camp",
     "forest-bandit-camp",
-    "forest-herb-grove"
+    "forest-herb-grove",
+    "forest-riverbank"
   ],
   "navigationLinks": [
     {
