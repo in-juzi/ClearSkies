@@ -31,6 +31,9 @@ export * from './effect-system';
 export * from './quests';
 export * from './achievements';
 
+// ===== HOUSING TYPES =====
+export * from './housing';
+
 // ===== CONSTANTS =====
 export * from '../constants/item-constants';
 

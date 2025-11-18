@@ -10,7 +10,7 @@ export type Biome = 'sea' | 'forest' | 'mountain' | 'plains' | 'desert' | 'swamp
 
 export type FacilityType = 'gathering' | 'resource-gathering' | 'trading' | 'crafting' | 'combat' | 'bank';
 
-export type ActivityType = 'resource-gathering' | 'combat' | 'social';
+export type ActivityType = 'resource-gathering' | 'combat' | 'social' | 'crafting';
 
 // ===== LOCATION DEFINITIONS =====
 
@@ -104,7 +104,8 @@ export interface ActivityRequirements {
     subtype: string;
   }>;
   inventory?: Array<{
-    itemId: string;
+    itemId?: string;
+    subcategory?: string;
     quantity: number;
   }>;
   attributes?: Record<string, number>;
@@ -148,9 +149,27 @@ export interface CombatActivity extends Activity {
 }
 
 /**
+ * Crafting activity
+ * Process materials into finished goods
+ */
+export interface CraftingActivity extends Activity {
+  type: 'crafting';
+  duration: number; // seconds
+  rewards: {
+    experience: ExperienceRewards;
+    dropTables?: string[];
+  };
+  consumes?: Array<{
+    itemId?: string;
+    subcategory?: string;
+    quantity: number;
+  }>;
+}
+
+/**
  * Union type for all activity types
  */
-export type ActivityUnion = GatheringActivity | CombatActivity;
+export type ActivityUnion = GatheringActivity | CombatActivity | CraftingActivity;
 
 // ===== DROP TABLE DEFINITIONS =====
 

@@ -29,6 +29,7 @@ export type SkillName =
   | 'smithing'
   | 'cooking'
   | 'alchemy'    // NEW: Potion/reagent crafting
+  | 'construction' // NEW: Building and crafting structures
   | 'oneHanded'
   | 'dualWield'
   | 'twoHanded'
