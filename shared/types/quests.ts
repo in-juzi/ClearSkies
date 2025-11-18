@@ -128,6 +128,7 @@ export interface ActiveQuest {
   startedAt: Date;
   objectives: ObjectiveProgress[];
   turnedIn: boolean;                // true if complete but not yet turned in
+  definition?: Quest;               // Quest definition (enriched by backend)
 }
 
 export interface QuestProgress {
