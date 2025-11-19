@@ -50,6 +50,12 @@ export const FishingShrimp: DropTable = {
       "dropNothing": true,
       "weight": 5,
       "comment": "The shrimp got away"
+    },
+    {
+      "type": "dropTable",
+      "dropTableId": "rare-fishing",
+      "weight": 3,
+      "comment": "Rare fishing finds (3% chance)"
     }
   ]
 } as const;

@@ -59,6 +59,12 @@ export const FishingCod: DropTable = {
       "dropNothing": true,
       "weight": 2,
       "comment": "The one that got away"
+    },
+    {
+      "type": "dropTable",
+      "dropTableId": "rare-fishing",
+      "weight": 3,
+      "comment": "Rare fishing finds (3% chance)"
     }
   ]
 } as const;

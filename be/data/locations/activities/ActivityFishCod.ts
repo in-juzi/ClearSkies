@@ -26,8 +26,7 @@ export const ActivityFishCod: ActivityUnion = {
       "fishing": 20
     },
     "dropTables": [
-      "fishing-cod",
-      "rare-fishing"
+      "fishing-cod"
     ]
   }
 } as const;
