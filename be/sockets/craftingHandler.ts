@@ -1,8 +1,6 @@
 import { Server, Socket } from 'socket.io';
 import Player from '../models/Player';
 import recipeService from '../services/recipeService';
-import itemService from '../services/itemService';
-import questService from '../services/questService';
 
 // Track active crafting timers per user
 const craftingTimers = new Map<string, NodeJS.Timeout>();
@@ -38,77 +36,12 @@ function scheduleCraftingCompletion(
         return;
       }
 
-      // Gather ingredient instances for quality calculation
-      const ingredientInstances: any[] = [];
+      // Process crafting (centralized logic in recipeService)
       const selectedIngredients = freshPlayer.activeCrafting.selectedIngredients;
-
-      // Process ingredients
-      for (const ingredient of recipe.ingredients) {
-        const lookupKey = ingredient.itemId || ingredient.subcategory;
-        const instanceIds = selectedIngredients.get
-          ? selectedIngredients.get(lookupKey)
-          : (selectedIngredients as any)[lookupKey];
-
-        if (instanceIds && instanceIds.length > 0) {
-          // Use selected instances
-          for (const instanceId of instanceIds) {
-            const item = freshPlayer.getItem(instanceId);
-            if (item) {
-              ingredientInstances.push(item);
-              freshPlayer.removeItem(instanceId, 1);
-            }
-          }
-        } else {
-          // Auto-select instances
-          let items: any[] = [];
-
-          if (ingredient.itemId) {
-            items = freshPlayer.getItemsByItemId(ingredient.itemId);
-          } else if (ingredient.subcategory) {
-            items = freshPlayer.inventory.filter((item: any) => {
-              const itemDef = itemService.getItemDefinition(item.itemId);
-              return itemDef?.subcategories?.includes(ingredient.subcategory!);
-            });
-          }
-
-          let remaining = ingredient.quantity;
-          for (const item of items) {
-            if (remaining <= 0) break;
-            const toRemove = Math.min(remaining, item.quantity);
-            if (ingredientInstances.length < recipe.ingredients.length) {
-              ingredientInstances.push(item);
-            }
-            freshPlayer.removeItem(item.instanceId, toRemove);
-            remaining -= toRemove;
-          }
-        }
-      }
-
-      // Calculate crafting outcome
-      const playerSkillLevel = freshPlayer.skills[recipe.skill].level;
-      const outputItems = recipeService.calculateCraftingOutcome(
+      const { outputItems, xpRewards } = await recipeService.processCrafting(
+        freshPlayer,
         recipe,
-        ingredientInstances,
-        playerSkillLevel,
-        itemService,
-        freshPlayer  // Pass player for effect system integration
-      );
-
-      // Add crafted items to inventory
-      for (const output of outputItems) {
-        const craftedItem = itemService.createItemInstance(
-          output.itemId,
-          output.quantity,
-          output.qualities || {},
-          output.traits || {}
-        );
-        freshPlayer.addItem(craftedItem);
-      }
-
-      // Award XP
-      const xpResult = await freshPlayer.addSkillExperience(
-        recipe.skill,
-        recipe.experience
+        selectedIngredients
       );
 
       // Check for recipe unlocks
@@ -121,10 +54,7 @@ function scheduleCraftingCompletion(
         });
       }
 
-      // Update quest progress for recipe crafted
-      await questService.onRecipeCrafted(freshPlayer, recipeId);
-
-      // Clear crafting state
+      // Clear crafting state (quest update already handled by processCrafting)
       freshPlayer.activeCrafting = undefined;
       await freshPlayer.save();
 
@@ -159,8 +89,8 @@ function scheduleCraftingCompletion(
         result: plainOutputs[0], // First output item (legacy)
         outputs: plainOutputs, // All output items (new schema)
         xpGained: recipe.experience,
-        skillUpdate: xpResult.skill,
-        attributeUpdate: xpResult.attribute,
+        skillUpdate: xpRewards.skill,
+        attributeUpdate: xpRewards.attribute,
         inventory,
         newRecipes: newRecipes.map((rid: string) => recipeService.getRecipe(rid))
       });
@@ -458,10 +388,18 @@ export default function (io: Server): void {
 
     /**
      * Event: disconnect
+     * Clean up timers on disconnect to prevent memory leaks
      */
     socket.on('disconnect', (reason: string) => {
       console.log(`✗ User disconnected from crafting handler: ${userId} (${reason})`);
-      // Timers continue running for reconnection
+
+      // Clear crafting timer if exists
+      const craftingTimer = craftingTimers.get(userId);
+      if (craftingTimer) {
+        clearTimeout(craftingTimer);
+        craftingTimers.delete(userId);
+        console.log(`[Crafting] Cleared crafting timer for disconnected user ${userId}`);
+      }
     });
   });
 }

@@ -3,6 +3,8 @@ import Player from '../models/Player';
 import combatService from '../services/combatService';
 import locationService from '../services/locationService';
 import itemService from '../services/itemService';
+import playerInventoryService from '../services/playerInventoryService';
+import playerCombatService from '../services/playerCombatService';
 
 // Track combat turn timers per user (separate for player and monster)
 const playerTurnTimers = new Map<string, NodeJS.Timeout>();
@@ -91,7 +93,7 @@ export default function (io: Server): void {
           return;
         }
 
-        if (!player.isInCombat()) {
+        if (!playerCombatService.isInCombat(player)) {
           if (typeof callback === 'function') {
             callback({ success: false, message: 'Not in combat' });
           }
@@ -214,7 +216,7 @@ export default function (io: Server): void {
           return;
         }
 
-        if (!player.isInCombat()) {
+        if (!playerCombatService.isInCombat(player)) {
           if (typeof callback === 'function') {
             callback({ success: false, message: 'Not in combat' });
           }
@@ -253,7 +255,7 @@ export default function (io: Server): void {
 
         // Apply immediate healing
         if (healAmount > 0) {
-          player.heal(healAmount);
+          playerCombatService.heal(player,healAmount);
         }
 
         // Apply immediate mana restoration
@@ -294,10 +296,10 @@ export default function (io: Server): void {
           message += ` (${effectMessages.join(', ')})`;
         }
 
-        player.addCombatLog(message, 'heal', healAmount, 'player');
+        playerCombatService.addCombatLog(player,message, 'heal', healAmount, 'player');
 
         // Remove item from inventory
-        player.removeItem(instanceId, 1);
+        playerInventoryService.removeItem(player, instanceId, 1);
 
         await player.save();
 
@@ -365,7 +367,7 @@ export default function (io: Server): void {
           return;
         }
 
-        if (!player.isInCombat()) {
+        if (!playerCombatService.isInCombat(player)) {
           if (typeof callback === 'function') {
             callback({ success: false, message: 'Not in combat' });
           }
@@ -419,7 +421,7 @@ export default function (io: Server): void {
           return;
         }
 
-        if (!player.isInCombat()) {
+        if (!playerCombatService.isInCombat(player)) {
           if (typeof callback === 'function') {
             callback({
               success: true,
@@ -596,7 +598,7 @@ function clearCombatTimers(userId: string): void {
 async function performPlayerTurn(userId: string, io: Server): Promise<void> {
   try {
     const player = await Player.findOne({ userId });
-    if (!player || !player.isInCombat()) {
+    if (!player || !playerCombatService.isInCombat(player)) {
       playerTurnTimers.delete(userId);
       return;
     }
@@ -625,11 +627,11 @@ async function performPlayerTurn(userId: string, io: Server): Promise<void> {
 
     // Log attack
     if (attackResult.isDodge) {
-      player.addCombatLog(`Your attack missed - ${monsterInstance.name} dodged!`, 'miss');
+      playerCombatService.addCombatLog(player,`Your attack missed - ${monsterInstance.name} dodged!`, 'miss');
     } else if (attackResult.isCrit) {
-      player.addCombatLog(`CRITICAL HIT! You deal ${attackResult.damage} damage with ${attackResult.weaponName}!`, 'crit', attackResult.damage, 'monster');
+      playerCombatService.addCombatLog(player,`CRITICAL HIT! You deal ${attackResult.damage} damage with ${attackResult.weaponName}!`, 'crit', attackResult.damage, 'monster');
     } else {
-      player.addCombatLog(`You deal ${attackResult.damage} damage with ${attackResult.weaponName}.`, 'damage', attackResult.damage, 'monster');
+      playerCombatService.addCombatLog(player,`You deal ${attackResult.damage} damage with ${attackResult.weaponName}.`, 'damage', attackResult.damage, 'monster');
     }
 
     // Process buff/debuff tick effects (DoT, HoT, durations)
@@ -638,7 +640,7 @@ async function performPlayerTurn(userId: string, io: Server): Promise<void> {
 
     // Apply DoT/HoT damage from buffs
     if (buffTickResults.playerDamage > 0) {
-      await player.takeDamage(buffTickResults.playerDamage);
+      await playerCombatService.takeDamage(player,buffTickResults.playerDamage);
     }
     if (buffTickResults.monsterDamage > 0) {
       monsterInstance.stats.health.current = Math.max(0, monsterInstance.stats.health.current - buffTickResults.monsterDamage);
@@ -664,7 +666,7 @@ async function performPlayerTurn(userId: string, io: Server): Promise<void> {
 
     // Check if monster defeated
     if (monsterInstance.stats.health.current <= 0) {
-      player.addCombatLog(`You defeated ${monsterInstance.name}!`, 'system');
+      playerCombatService.addCombatLog(player,`You defeated ${monsterInstance.name}!`, 'system');
       await savePlayerSafely(player);
 
       await handleCombatVictory(player, io, userId);
@@ -686,7 +688,7 @@ async function performPlayerTurn(userId: string, io: Server): Promise<void> {
 async function performMonsterTurn(userId: string, io: Server): Promise<void> {
   try {
     const player = await Player.findOne({ userId });
-    if (!player || !player.isInCombat()) {
+    if (!player || !playerCombatService.isInCombat(player)) {
       monsterTurnTimers.delete(userId);
       return;
     }
@@ -698,7 +700,7 @@ async function performMonsterTurn(userId: string, io: Server): Promise<void> {
     const attackResult = combatService.calculateDamage(monsterInstance, player, itemService, player);
 
     // Apply damage to player
-    const playerDefeated = await player.takeDamage(attackResult.damage);
+    const playerDefeated = await playerCombatService.takeDamage(player,attackResult.damage);
 
     // Update combat state
     const monsterWeapon = combatService.getEquippedWeapon(monsterInstance, itemService);
@@ -713,11 +715,11 @@ async function performMonsterTurn(userId: string, io: Server): Promise<void> {
 
     // Log attack
     if (attackResult.isDodge) {
-      player.addCombatLog(`${monsterInstance.name}'s attack missed - You dodged!`, 'dodge');
+      playerCombatService.addCombatLog(player,`${monsterInstance.name}'s attack missed - You dodged!`, 'dodge');
     } else if (attackResult.isCrit) {
-      player.addCombatLog(`${monsterInstance.name} CRITICALLY HITS you for ${attackResult.damage} damage!`, 'crit', attackResult.damage, 'player');
+      playerCombatService.addCombatLog(player,`${monsterInstance.name} CRITICALLY HITS you for ${attackResult.damage} damage!`, 'crit', attackResult.damage, 'player');
     } else {
-      player.addCombatLog(`${monsterInstance.name} deals ${attackResult.damage} damage.`, 'damage', attackResult.damage, 'player');
+      playerCombatService.addCombatLog(player,`${monsterInstance.name} deals ${attackResult.damage} damage.`, 'damage', attackResult.damage, 'player');
     }
 
     // Process buff/debuff tick effects (DoT, HoT, durations)
@@ -726,7 +728,7 @@ async function performMonsterTurn(userId: string, io: Server): Promise<void> {
 
     // Apply DoT/HoT damage from buffs
     if (buffTickResults.playerDamage > 0) {
-      await player.takeDamage(buffTickResults.playerDamage);
+      await playerCombatService.takeDamage(player,buffTickResults.playerDamage);
     }
     if (buffTickResults.monsterDamage > 0) {
       monsterInstance.stats.health.current = Math.max(0, monsterInstance.stats.health.current - buffTickResults.monsterDamage);

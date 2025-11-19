@@ -3,8 +3,9 @@ import Player from '../models/Player';
 import locationService from '../services/locationService';
 import itemService from '../services/itemService';
 import dropTableService from '../services/dropTableService';
-import effectEvaluator from '../services/effectEvaluator';
 import questService from '../services/questService';
+import effectEvaluator from '../services/effectEvaluator';
+import rewardProcessor from '../services/rewardProcessor';
 import { GatheringActivity, EffectContext } from '@shared/types';
 import { schedulePlayerTurn, scheduleMonsterTurn } from './combatHandler';
 
@@ -38,81 +39,45 @@ function scheduleActivityCompletion(
         return; // Activity was cancelled
       }
 
-      // Calculate rewards
-      const rewards = locationService.calculateActivityRewards(activity, {
-        player: freshPlayer,
-        dropTableService,
-        itemService
-      });
+      // Get location for context
+      const location = locationService.getLocation(freshPlayer.currentLocation);
 
-      // Award XP
+      // Process activity completion (centralized reward logic)
+      const { xpRewards, lootItems, questProgress } =
+        await locationService.processActivityCompletion(freshPlayer, activity, location);
+
+      // Clear activity state
+      freshPlayer.activeActivity = undefined;
+      await freshPlayer.save();
+
+      // Build skill/attribute updates for client
       const skillUpdates: any = {};
       const attributeUpdates: any = {};
 
-      if (rewards.experience) {
-        for (const [skillName, xp] of Object.entries(rewards.experience)) {
-          const result = await freshPlayer.addSkillExperience(skillName as any, xp as number);
-          skillUpdates[skillName] = {
-            ...result.skill,
-            experience: xp // Include the scaled XP amount awarded
-          };
-          if (result.attribute) {
-            attributeUpdates[result.attribute.attribute] = result.attribute;
-          }
-        }
+      // Format skill update
+      const skillId = Object.keys(activity.rewards.experience)[0];
+      skillUpdates[skillId] = {
+        ...xpRewards.skill,
+        experience: xpRewards.skill.experienceGained
+      };
+
+      // Format attribute update
+      if (xpRewards.attribute) {
+        attributeUpdates[xpRewards.attribute.attribute] = xpRewards.attribute;
       }
-
-      // Award items from drop tables (already rolled by calculateActivityRewards)
-      const itemsReceived: any[] = [];
-      if (rewards.items && rewards.items.length > 0) {
-        for (const itemReward of rewards.items) {
-          // Generate random qualities and traits for the item
-          const qualities = itemService.generateRandomQualities(itemReward.itemId);
-          const traits = itemService.generateRandomTraits(itemReward.itemId);
-
-          const itemInstance = itemService.createItemInstance(
-            itemReward.itemId,
-            itemReward.quantity,
-            qualities,
-            traits
-          );
-          freshPlayer.addItem(itemInstance);
-
-          // Get item definition for name and icon
-          const itemDef = itemService.getItemDefinition(itemReward.itemId);
-
-          itemsReceived.push({
-            itemId: itemReward.itemId,
-            name: itemDef?.name,
-            quantity: itemReward.quantity,
-            qualities: itemInstance.qualities instanceof Map ? Object.fromEntries(itemInstance.qualities) : itemInstance.qualities,
-            traits: itemInstance.traits instanceof Map ? Object.fromEntries(itemInstance.traits) : itemInstance.traits,
-            definition: itemDef ? {
-              icon: itemDef.icon
-            } : undefined
-          });
-        }
-      }
-
-      // Update quest progress for activity completion
-      await questService.onActivityComplete(freshPlayer, activityId, itemsReceived);
-
-      // Clear activity
-      freshPlayer.activeActivity = undefined;
-      await freshPlayer.save();
 
       // Emit completion event
       io.to(`user:${userId}`).emit('activity:completed', {
         success: true,
         activity: activity.name,
         rewards: {
-          experience: skillUpdates, // Send skill updates with full structure
-          rawExperience: rewards.rawExperience, // Raw XP before scaling
-          items: itemsReceived,
-          gold: rewards.gold || 0
+          experience: skillUpdates,
+          items: lootItems,
+          gold: 0 // TODO: Add gold rewards if needed
         },
         skillUpdates,
-        attributeUpdates
+        attributeUpdates,
+        questProgress
       });
 
       // Cleanup timer
@@ -472,64 +437,57 @@ export default function (io: Server): void {
                 return;
               }
 
+              // Get rewards from drop tables
               const rewards = locationService.calculateActivityRewards(activity, {
                 player: freshPlayer,
                 dropTableService,
                 itemService
               });
 
+              // Process rewards using centralized reward processor
+              const result = await rewardProcessor.processRewardsWithQuests(
+                freshPlayer,
+                {
+                  experience: rewards.experience,
+                  items: rewards.items,
+                  gold: rewards.gold
+                },
+                {
+                  activityId: activity.activityId,
+                  itemsAdded: [] // Will be populated by processRewards
+                }
+              );
+
+              // Clear activity state
+              freshPlayer.activeActivity = undefined;
+
+              // Build skill/attribute updates for client response
               const skillUpdates: any = {};
               const attributeUpdates: any = {};
 
-              if (rewards.experience) {
-                for (const [skillName, xp] of Object.entries(rewards.experience)) {
-                  const result = await freshPlayer.addSkillExperience(skillName as any, xp as number);
-                  skillUpdates[skillName] = {
-                    ...result.skill,
-                    experience: xp // Include the scaled XP amount awarded
-                  };
-                  if (result.attribute) {
-                    attributeUpdates[result.attribute.attribute] = result.attribute;
-                  }
+              for (const [skillName, xpResult] of Object.entries(result.xpRewards)) {
+                skillUpdates[skillName] = {
+                  ...xpResult.skill,
+                  experience: xpResult.skill.experienceGained
+                };
+                if (xpResult.attribute) {
+                  attributeUpdates[xpResult.attribute.attribute] = xpResult.attribute;
                 }
               }
 
-              const itemsReceived: any[] = [];
-              if (rewards.items && rewards.items.length > 0) {
-                for (const itemReward of rewards.items) {
-                  const itemInstance = itemService.createItemInstance(
-                    itemReward.itemId,
-                    itemReward.quantity,
-                    {},
-                    {}
-                  );
-                  freshPlayer.addItem(itemInstance);
-                  itemsReceived.push({
-                    itemId: itemReward.itemId,
-                    quantity: itemReward.quantity,
-                    qualities: itemInstance.qualities instanceof Map ? Object.fromEntries(itemInstance.qualities) : {},
-                    traits: itemInstance.traits instanceof Map ? Object.fromEntries(itemInstance.traits) : {}
-                  });
-                }
-              }
-
-              // Update quest progress for activity completion
-              await questService.onActivityComplete(freshPlayer, activity.activityId, itemsReceived);
-
-              freshPlayer.activeActivity = undefined;
-              await freshPlayer.save();
-
+              // Emit completion event
               io.to(`user:${userId}`).emit('activity:completed', {
                 success: true,
                 activity: activity.name,
                 rewards: {
                   experience: skillUpdates,
                   rawExperience: rewards.rawExperience,
-                  items: itemsReceived,
-                  gold: rewards.gold || 0
+                  items: result.itemsAdded,
+                  gold: result.goldAdded
                 },
                 skillUpdates,
-                attributeUpdates
+                attributeUpdates,
+                questProgress: result.questProgress
               });
 
               activityTimers.delete(userId);
@@ -790,12 +748,26 @@ export default function (io: Server): void {
 
     /**
      * Event: disconnect
-     * User disconnects - preserve timers for reconnection
+     * Clean up timers on disconnect to prevent memory leaks
      */
     socket.on('disconnect', (reason: string) => {
       console.log(`✗ User disconnected from activity handler: ${userId} (${reason})`);
-      // Note: We DON'T clear timers on disconnect - they continue running
-      // This allows activities to complete even if user disconnects
+
+      // Clear activity timer if exists
+      const activityTimer = activityTimers.get(userId);
+      if (activityTimer) {
+        clearTimeout(activityTimer);
+        activityTimers.delete(userId);
+        console.log(`[Activity] Cleared activity timer for disconnected user ${userId}`);
+      }
+
+      // Clear travel timer if exists
+      const travelTimer = travelTimers.get(userId);
+      if (travelTimer) {
+        clearTimeout(travelTimer);
+        travelTimers.delete(userId);
+        console.log(`[Activity] Cleared travel timer for disconnected user ${userId}`);
+      }
     });
   });
 }
