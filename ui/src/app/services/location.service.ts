@@ -262,6 +262,9 @@ export class LocationService {
       // Update current location
       this.getCurrentLocation().subscribe();
 
+      // Clear facility selection when arriving at new location
+      this.selectedFacility.set(null);
+
       // Clear travel state
       this.travelState.set({
         isTravel: false,
