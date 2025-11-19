@@ -8,6 +8,7 @@ import { QuantityDialogService } from '../../../services/quantity-dialog.service
 import { ItemDetails } from '../../../models/inventory.model';
 import { ItemMiniComponent } from '../../shared/item-mini/item-mini.component';
 import { IconComponent } from '../../shared/icon/icon.component';
+import { sortByName, sortByWeight, sortByQuantity } from '../../../utils/item-sort.utils';
 
 @Component({
   selector: 'app-bank',
@@ -28,12 +29,15 @@ export class BankComponent implements OnInit, OnDestroy {
   // Bank filters (signals for reactivity)
   selectedBankCategory = signal<string>('all');
   bankSearchQuery = signal<string>('');
+  bankSortType = signal<'name' | 'weight' | 'count'>('name');
 
   // Inventory filters (signals for reactivity)
   selectedInventoryCategory = signal<string>('all');
   inventorySearchQuery = signal<string>('');
+  inventorySortType = signal<'name' | 'weight' | 'count'>('name');
 
   storingStacks = signal<boolean>(false);
+  storingAll = signal<boolean>(false);
 
   // Drag functionality
   isDragging: boolean = false;
@@ -51,24 +55,46 @@ export class BankComponent implements OnInit, OnDestroy {
 
   // Computed filtered bank items
   filteredBankItems = computed(() => {
-    return this.itemFilterService.applyFilters(
+    const filtered = this.itemFilterService.applyFilters(
       this.storageService.containerItems(),
       {
         category: this.selectedBankCategory(),
         searchQuery: this.bankSearchQuery()
       }
     );
+
+    // Apply sorting based on selected sort type
+    const sortType = this.bankSortType();
+    if (sortType === 'name') {
+      return sortByName(filtered);
+    } else if (sortType === 'weight') {
+      return sortByWeight(filtered);
+    } else if (sortType === 'count') {
+      return sortByQuantity(filtered);
+    }
+    return filtered;
   });
 
   // Computed filtered inventory items
   filteredInventoryItems = computed(() => {
-    return this.itemFilterService.applyFilters(
+    const filtered = this.itemFilterService.applyFilters(
       this.inventoryService.inventory(),
       {
         category: this.selectedInventoryCategory(),
         searchQuery: this.inventorySearchQuery()
       }
     );
+
+    // Apply sorting based on selected sort type
+    const sortType = this.inventorySortType();
+    if (sortType === 'name') {
+      return sortByName(filtered);
+    } else if (sortType === 'weight') {
+      return sortByWeight(filtered);
+    } else if (sortType === 'count') {
+      return sortByQuantity(filtered);
+    }
+    return filtered;
   });
 
   // Capacity percentage for progress bar
@@ -292,6 +318,51 @@ export class BankComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.inventoryService.getInventory().subscribe(() => {
         this.storingStacks.set(false);
+      });
+    }, 500);
+  }
+
+  /**
+   * Store all items from inventory that are not equipped
+   * Attempts to deposit everything possible, respecting bank capacity
+   */
+  storeAll(): void {
+    if (this.storingAll()) return;
+
+    this.storingAll.set(true);
+
+    // Get all inventory items (not equipped)
+    const inventoryItems = this.inventoryService.inventory().filter(item => !item.equipped);
+
+    // If no items to deposit, show message
+    if (inventoryItems.length === 0) {
+      this.storingAll.set(false);
+      alert('No items to deposit. Unequip items first if you want to store them.');
+      return;
+    }
+
+    // Check if bank has enough capacity
+    const availableSlots = this.storageService.containerAvailableSlots();
+    if (availableSlots === 0) {
+      this.storingAll.set(false);
+      alert('Bank is full! Cannot deposit any items.');
+      return;
+    }
+
+    // Prepare all items for bulk deposit
+    const itemsToDeposit: Array<{ instanceId: string; quantity: null }> = inventoryItems.map(item => ({
+      instanceId: item.instanceId,
+      quantity: null
+    }));
+
+    // Use bulk deposit via WebSocket
+    this.storageService.bulkDeposit(this.BANK_CONTAINER_ID, itemsToDeposit);
+
+    // Refresh inventory after bulk deposit
+    // Note: We wait a bit for the WebSocket events to process
+    setTimeout(() => {
+      this.inventoryService.getInventory().subscribe(() => {
+        this.storingAll.set(false);
       });
     }, 500);
   }

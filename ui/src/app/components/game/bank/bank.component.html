@@ -44,11 +44,20 @@
         <button
           class="btn-action"
           (click)="storeStacks()"
-          [disabled]="storingStacks()"
+          [disabled]="storingStacks() || storingAll()"
           title="Deposit all stackable items that already exist in the bank"
         >
           <span class="action-icon">📦</span>
           <span class="action-text">{{ storingStacks() ? 'Storing...' : 'Store Stacks' }}</span>
+        </button>
+        <button
+          class="btn-action btn-action-primary"
+          (click)="storeAll()"
+          [disabled]="storingAll() || storingStacks()"
+          title="Deposit all non-equipped items from your inventory"
+        >
+          <span class="action-icon">💰</span>
+          <span class="action-text">{{ storingAll() ? 'Storing...' : 'Store All' }}</span>
         </button>
       </div>
 
@@ -77,6 +86,34 @@
               placeholder="Search items..."
               class="search-input"
             />
+          </div>
+
+          <!-- Sort Buttons -->
+          <div class="sort-buttons">
+            <button
+              class="sort-btn"
+              [class.active]="bankSortType() === 'name'"
+              (click)="bankSortType.set('name')"
+              title="Sort by name (A-Z)"
+            >
+              Name
+            </button>
+            <button
+              class="sort-btn"
+              [class.active]="bankSortType() === 'weight'"
+              (click)="bankSortType.set('weight')"
+              title="Sort by total stack weight"
+            >
+              Weight
+            </button>
+            <button
+              class="sort-btn"
+              [class.active]="bankSortType() === 'count'"
+              (click)="bankSortType.set('count')"
+              title="Sort by stack count"
+            >
+              Count
+            </button>
           </div>
 
           <!-- Bank Items Grid -->
@@ -140,6 +177,34 @@
               placeholder="Search items..."
               class="search-input"
             />
+          </div>
+
+          <!-- Sort Buttons -->
+          <div class="sort-buttons">
+            <button
+              class="sort-btn"
+              [class.active]="inventorySortType() === 'name'"
+              (click)="inventorySortType.set('name')"
+              title="Sort by name (A-Z)"
+            >
+              Name
+            </button>
+            <button
+              class="sort-btn"
+              [class.active]="inventorySortType() === 'weight'"
+              (click)="inventorySortType.set('weight')"
+              title="Sort by total stack weight"
+            >
+              Weight
+            </button>
+            <button
+              class="sort-btn"
+              [class.active]="inventorySortType() === 'count'"
+              (click)="inventorySortType.set('count')"
+              title="Sort by stack count"
+            >
+              Count
+            </button>
           </div>
 
           <!-- Inventory Items Grid -->
