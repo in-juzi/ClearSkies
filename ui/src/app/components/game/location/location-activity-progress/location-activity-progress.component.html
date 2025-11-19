@@ -37,9 +37,9 @@
     }
 
     <!-- Activity Log -->
-    @if (activityLog.length > 0) {
+    @if (activityLog().length > 0) {
       <app-activity-log
-        [entries]="activityLog"
+        [entries]="activityLog()"
         [maxEntries]="10"
         [showTimestamp]="true"
         [title]="'Recent Completions'">

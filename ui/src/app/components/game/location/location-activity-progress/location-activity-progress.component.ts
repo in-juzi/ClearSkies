@@ -1,4 +1,4 @@
-import { Component, inject, computed } from '@angular/core';
+import { Component, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LocationService } from '../../../../services/location.service';
 import { SkillsService } from '../../../../services/skills.service';
@@ -34,7 +34,7 @@ export class LocationActivityProgressComponent {
 
   // Local state
   lastRewards: ActivityRewards | null = null;
-  activityLog: ActivityLogEntry[] = [];
+  activityLog = signal<ActivityLogEntry[]>([]);
 
   // Computed signal to get the skill being trained by current activity
   activeSkill = computed<{ name: string; skill: SkillWithProgress } | null>(() => {
@@ -119,12 +119,10 @@ export class LocationActivityProgressComponent {
         }
       };
 
-      this.activityLog.unshift(logEntry);
-
-      // Keep only the last 10 entries
-      if (this.activityLog.length > 10) {
-        this.activityLog = this.activityLog.slice(0, 10);
-      }
+      // Add new entry to the beginning and keep only last 10 entries
+      const currentLog = this.activityLog();
+      const newLog = [logEntry, ...currentLog].slice(0, 10);
+      this.activityLog.set(newLog);
 
       // Refresh skills after activity completion to update XP display
       this.skillsService.getSkills().subscribe();
