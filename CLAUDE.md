@@ -100,18 +100,21 @@
 - ✅ Quantity dialog component (completed - reusable modal for bulk item operations)
 - ✅ Bank bulk operations (completed - integrated quantity dialog for improved UX)
 - ✅ Error handling standardization (completed - custom error classes and middleware)
+- ✅ Player model cleanup (completed - removed deprecated methods, migrated to services)
+- ✅ Two-handed weapon equip logic (completed - auto-unequip conflicting items, slot validation)
+- ✅ Bank UI enhancements (completed - Store All button, sorting controls for bank/inventory)
 
 **Recent Changes** (Last 10 commits):
+- style: minor UI polish and cleanup
+- feat: add 5 new item icons for future content
+- feat: enhance bank UI with Store All and sorting controls
+- fix: correct planks item definition and remove sawmill activity
+- fix: correct bank storage capacity validation logic
+- feat: add two-handed weapon equip logic and validation
+- refactor: remove deprecated Player model methods
+- docs: update CLAUDE.md with backend refactoring changes
 - docs: add comprehensive backend refactoring documentation
 - feat: add construction materials and processing activities
-- feat: improve bank component with bulk operations and better UX
-- feat: add quantity dialog component for bulk item operations
-- feat: add standardized error handling middleware and utilities
-- refactor: update controllers and models to use new service architecture
-- refactor: simplify socket handlers using centralized services
-- refactor: consolidate service methods and improve code organization
-- refactor: add centralized reward processor for consistent reward handling
-- refactor: extract player service modules for better separation of concerns
 
 **Known Issues**:
 - None currently identified
@@ -503,6 +506,7 @@ See [project/docs/005-content-generator-agent.md](project/docs/005-content-gener
 ## Critical Code Locations
 
 ### Player Model (be/models/Player.ts)
+**Schema:**
 - Skills schema: ~L15-40
 - Attributes schema: ~L42-55
 - Inventory schema: ~L57-75
@@ -511,17 +515,24 @@ See [project/docs/005-content-generator-agent.md](project/docs/005-content-gener
 - Stats schema: ~L196-203 (health.current, mana.current - max values are virtual properties)
 - Virtual properties: `maxHP` ~L460, `maxMP` ~L469, `carryingCapacity` ~L481, `currentWeight` ~L490
 - Pre-save hook: ~L498-510 (initializes HP/MP for new players)
-- `addSkillExperience()`: ~L145-165
-- `addAttributeExperience()`: ~L167-185
-- `addItem()`: ~L200-240 (includes stacking logic)
-- `removeItem()`: ~L242-265
-- `equipItem()`: ~L280-310
-- `unequipItem()`: ~L312-330
-- `hasEquippedSubtype()`: ~L350-365
-- `hasInventoryItem()`: ~L367-380
-- `getContainer()`: ~L965-975 (get storage container by ID)
-- `depositToContainer()`: ~L1005-1075 (deposit items with stacking)
-- `withdrawFromContainer()`: ~L1077-1133 (withdraw items to inventory)
+
+**Core Methods (retained):**
+- `addSkillExperience()`: ~L145-165 - Award skill XP with attribute passthrough
+- `addAttributeExperience()`: ~L167-185 - Award attribute XP
+- `getItem()`: Get item by instanceId
+- `hasEquippedSubtype()`: Check if subtype is equipped
+- `getContainer()`: Get storage container by ID
+- `getContainerItems()`: Get all items in container
+- `takeDamage()`, `heal()`, `useMana()`, `restoreMana()`: Combat stat management
+- `isInCombat()`, `clearCombat()`: Combat state
+- `addActiveBuff()`, `removeActiveBuff()`: Buff management
+- Quest methods: `acceptQuest()`, `updateQuestObjective()`, `isQuestActive()`, etc.
+
+**Deprecated Methods (migrated to services):**
+- Inventory: `addItem()`, `removeItem()`, `equipItem()`, `unequipItem()` → playerInventoryService
+- Storage: `depositToContainer()`, `withdrawFromContainer()` → playerStorageService
+- Combat: `addCombatLog()`, ability cooldowns → combatService
+- Quests: `completeQuest()` → questService
 
 ### Item Service (be/services/itemService.ts)
 - Item registry loading: Loads from ItemRegistry.ts
