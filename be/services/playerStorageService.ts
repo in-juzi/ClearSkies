@@ -54,9 +54,15 @@ class PlayerStorageService {
     // Get item definition
     const itemDef = itemService.getItemDefinition(invItem.itemId);
 
-    // Check if container is at capacity
-    const containerSize = container.items.reduce((total, item) => total + item.quantity, 0);
-    if (containerSize + depositQuantity > container.capacity) {
+    // Check if container is at capacity (slot-based, not quantity-based)
+    // Only check if we need a new slot (item doesn't stack with existing)
+    const needsNewSlot = !itemDef?.stackable || !container.items.find((item: InventoryItem) =>
+      item.itemId === invItem.itemId &&
+      itemService._sortedMapString(item.qualities) === itemService._sortedMapString(invItem.qualities) &&
+      itemService._sortedMapString(item.traits) === itemService._sortedMapString(invItem.traits)
+    );
+
+    if (needsNewSlot && container.items.length >= container.capacity) {
       throw new Error('Storage container is at capacity');
     }
 
