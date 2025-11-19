@@ -28,6 +28,18 @@ export const WoodcuttingBirch: DropTable = {
       "qualityBonus": {
         "woodGrain": 0.2
       }
+    },
+    {
+      "type": "dropTable",
+      "dropTableId": "rare-woodcutting-birch",
+      "weight": 15,
+      "comment": "Birch-specific rare finds (15% chance - bark, seeds)"
+    },
+    {
+      "type": "dropTable",
+      "dropTableId": "rare-woodcutting-finds",
+      "weight": 5,
+      "comment": "Universal woodcutting finds (5% chance - amber)"
     }
   ]
 } as const;

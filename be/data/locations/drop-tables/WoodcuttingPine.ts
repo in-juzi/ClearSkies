@@ -28,6 +28,18 @@ export const WoodcuttingPine: DropTable = {
       "qualityBonus": {
         "woodGrain": 0.2
       }
+    },
+    {
+      "type": "dropTable",
+      "dropTableId": "rare-woodcutting-pine",
+      "weight": 15,
+      "comment": "Pine-specific rare finds (15% chance - resin, seeds)"
+    },
+    {
+      "type": "dropTable",
+      "dropTableId": "rare-woodcutting-finds",
+      "weight": 5,
+      "comment": "Universal woodcutting finds (5% chance - amber)"
     }
   ]
 } as const;

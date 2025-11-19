@@ -26,9 +26,7 @@ export const ActivityChopPine: ActivityUnion = {
       "woodcutting": 20
     },
     "dropTables": [
-      "woodcutting-pine",
-      "rare-woodcutting-pine",
-      "rare-woodcutting-finds"
+      "woodcutting-pine"
     ]
   }
 } as const;
