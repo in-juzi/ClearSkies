@@ -25,7 +25,7 @@ export const Planks: ResourceItem = {
   "allowedQualities": QUALITY_SETS.WOOD,
   "allowedTraits": TRAIT_SETS.EQUIPMENT_PRISTINE,
   "icon": {
-    "path": "item-categories/item_cat_wood.svg",
-    "material": "wood"
+    "path": "items/planks",
+    "material": "planks"
   }
 } as const;

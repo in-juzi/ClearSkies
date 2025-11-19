@@ -42,6 +42,9 @@ export interface ColorChannels {
   // Specific parts for logs (wood)
   end?: string;         // Cut cross-section end
   ring?: string;        // Tree rings on cross-section
+  // Specific parts for planks (processed wood)
+  wood?: string;        // Main wood plank color
+  grain?: string;       // Wood grain detail
   // Specific parts for gemstones (cut gems with facets)
   facet?: string;       // Gemstone facet planes
   highlight?: string;   // Bright reflections
@@ -761,6 +764,13 @@ export const MATERIAL_COLORS: Record<string, ColorChannels> = {
     blade: '#FFFFFF',     // White body
     edge: '#FFFFFF',      // White edge
     detail: '#CCCCCC'     // Light gray detail
+  },
+
+  // Processed wood materials
+  planks: {
+    primary: '#A0826D',   // Light brown (fallback)
+    wood: '#8B7355',      // Medium brown main plank bodies
+    grain: '#654321'      // Dark brown wood grain detail
   }
 };
 

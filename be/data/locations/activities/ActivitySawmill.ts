@@ -4,6 +4,7 @@
  */
 
 import { ActivityUnion } from '@shared/types';
+import { SUBCATEGORY } from '@shared/constants/item-constants';
 
 export const ActivitySawmill: ActivityUnion = {
   "activityId": "activity-sawmill",
@@ -17,7 +18,7 @@ export const ActivitySawmill: ActivityUnion = {
     },
     "inventory": [
       {
-        "subcategory": "log",
+        "subcategory": SUBCATEGORY.LOG,
         "quantity": 1
       }
     ]
@@ -32,7 +33,7 @@ export const ActivitySawmill: ActivityUnion = {
   },
   "consumes": [
     {
-      "subcategory": "log",
+      "subcategory": SUBCATEGORY.LOG,
       "quantity": 1
     }
   ]
