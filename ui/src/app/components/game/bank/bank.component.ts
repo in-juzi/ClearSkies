@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { StorageService } from '../../../services/storage.service';
 import { InventoryService } from '../../../services/inventory.service';
 import { ItemFilterService } from '../../../services/item-filter.service';
+import { QuantityDialogService } from '../../../services/quantity-dialog.service';
 import { ItemDetails } from '../../../models/inventory.model';
 import { ItemMiniComponent } from '../../shared/item-mini/item-mini.component';
 import { IconComponent } from '../../shared/icon/icon.component';
@@ -19,6 +20,7 @@ export class BankComponent implements OnInit, OnDestroy {
   public storageService = inject(StorageService);
   public inventoryService = inject(InventoryService);
   private itemFilterService = inject(ItemFilterService);
+  private quantityDialogService = inject(QuantityDialogService);
 
   // Bank container ID (could be made dynamic for multi-container support)
   private readonly BANK_CONTAINER_ID = 'bank';
@@ -159,8 +161,25 @@ export class BankComponent implements OnInit, OnDestroy {
   /**
    * Deposit item to bank
    */
-  depositItem(item: ItemDetails): void {
-    this.storageService.depositItem(this.BANK_CONTAINER_ID, item.instanceId, null);
+  async depositItem(item: ItemDetails, showDialog: boolean = false): Promise<void> {
+    let quantity: number | null = null;
+
+    // Show quantity dialog for stacks > 1 if requested
+    if (showDialog && item.quantity > 1) {
+      quantity = await this.quantityDialogService.open({
+        itemName: item.definition.name,
+        itemIcon: item.definition.icon,
+        maxQuantity: item.quantity,
+        actionLabel: 'Deposit'
+      });
+
+      // User cancelled
+      if (quantity === null) {
+        return;
+      }
+    }
+
+    this.storageService.depositItem(this.BANK_CONTAINER_ID, item.instanceId, quantity);
     // Refresh inventory to reflect changes (WebSocket will update storage automatically)
     this.inventoryService.getInventory().subscribe();
   }
@@ -168,8 +187,25 @@ export class BankComponent implements OnInit, OnDestroy {
   /**
    * Withdraw item from bank
    */
-  withdrawItem(item: ItemDetails): void {
-    this.storageService.withdrawItem(this.BANK_CONTAINER_ID, item.instanceId, null);
+  async withdrawItem(item: ItemDetails, showDialog: boolean = false): Promise<void> {
+    let quantity: number | null = null;
+
+    // Show quantity dialog for stacks > 1 if requested
+    if (showDialog && item.quantity > 1) {
+      quantity = await this.quantityDialogService.open({
+        itemName: item.definition.name,
+        itemIcon: item.definition.icon,
+        maxQuantity: item.quantity,
+        actionLabel: 'Withdraw'
+      });
+
+      // User cancelled
+      if (quantity === null) {
+        return;
+      }
+    }
+
+    this.storageService.withdrawItem(this.BANK_CONTAINER_ID, item.instanceId, quantity);
     // Refresh inventory to reflect changes (WebSocket will update storage automatically)
     this.inventoryService.getInventory().subscribe();
   }
@@ -177,15 +213,15 @@ export class BankComponent implements OnInit, OnDestroy {
   /**
    * Double-click item in bank to withdraw
    */
-  onBankItemDoubleClick(item: ItemDetails): void {
-    this.withdrawItem(item);
+  onBankItemDoubleClick(event: MouseEvent, item: ItemDetails): void {
+    this.withdrawItem(item, event.shiftKey);
   }
 
   /**
    * Double-click item in inventory to deposit
    */
-  onInventoryItemDoubleClick(item: ItemDetails): void {
-    this.depositItem(item);
+  onInventoryItemDoubleClick(event: MouseEvent, item: ItemDetails): void {
+    this.depositItem(item, event.shiftKey);
   }
 
   /**
@@ -193,7 +229,7 @@ export class BankComponent implements OnInit, OnDestroy {
    */
   onBankItemRightClick(event: MouseEvent, item: ItemDetails): void {
     event.preventDefault();
-    this.withdrawItem(item);
+    this.withdrawItem(item, event.shiftKey);
   }
 
   /**
@@ -206,7 +242,7 @@ export class BankComponent implements OnInit, OnDestroy {
       alert('Cannot deposit equipped items. Unequip the item first.');
       return;
     }
-    this.depositItem(item);
+    this.depositItem(item, event.shiftKey);
   }
 
   /**

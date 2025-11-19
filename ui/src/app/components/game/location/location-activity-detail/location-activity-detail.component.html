@@ -43,9 +43,9 @@
               Any {{ formatEquipmentSubtype(equipped.subtype) }} equipped
             </li>
           }
-          @for (inv of selectedActivity()!.requirements.inventory; track inv.itemId) {
+          @for (inv of selectedActivity()!.requirements.inventory; track inv.itemId || inv.subcategory) {
             <li>
-              {{ inv.quantity || 1 }}x {{ inv.itemId }} in inventory
+              {{ inv.quantity || 1 }}x {{ inv.itemId || ('any ' + inv.subcategory) }} in inventory
             </li>
           }
         </ul>

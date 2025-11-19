@@ -25,10 +25,9 @@ export class InventoryService {
 
   // Signals for reactive state
   inventory = signal<ItemDetails[]>([]);
-  inventoryCapacity = signal<number>(100); // DEPRECATED: use carryingCapacity
   carryingCapacity = signal<number>(53); // in kg (base 50 + 1 STR + 1 END)
   currentWeight = signal<number>(0); // in kg
-  inventorySize = signal<number>(0); // DEPRECATED: item count
+  inventorySize = signal<number>(0); // Calculated from inventory array length
   inventoryValue = signal<number>(0);
   gold = signal<number>(0);
   itemDefinitions = signal<Item[]>([]);
@@ -53,10 +52,9 @@ export class InventoryService {
         const enrichedInventory = this.itemDataService.enrichItemInstances(response.inventory);
 
         this.inventory.set(enrichedInventory);
-        this.inventoryCapacity.set(response.capacity); // DEPRECATED
         this.carryingCapacity.set(response.carryingCapacity);
         this.currentWeight.set(response.currentWeight);
-        this.inventorySize.set(response.size); // DEPRECATED
+        this.inventorySize.set(enrichedInventory.length); // Calculate from array length
         this.inventoryValue.set(response.totalValue);
       })
     );

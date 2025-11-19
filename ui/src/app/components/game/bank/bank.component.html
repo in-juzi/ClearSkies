@@ -91,9 +91,9 @@
                 class="item-wrapper"
                 draggable="true"
                 (dragstart)="onBankItemDragStart($event, item)"
-                (dblclick)="onBankItemDoubleClick(item)"
+                (dblclick)="onBankItemDoubleClick($event, item)"
                 (contextmenu)="onBankItemRightClick($event, item)"
-                title="Double-click or right-click to withdraw, or drag to inventory"
+                title="Double-click or right-click to withdraw (hold Shift for partial), or drag to inventory"
               >
                 <app-item-mini [item]="item"></app-item-mini>
               </div>
@@ -154,9 +154,9 @@
                 [class.equipped]="item.equipped"
                 draggable="true"
                 (dragstart)="onInventoryItemDragStart($event, item)"
-                (dblclick)="onInventoryItemDoubleClick(item)"
+                (dblclick)="onInventoryItemDoubleClick($event, item)"
                 (contextmenu)="onInventoryItemRightClick($event, item)"
-                title="Double-click or right-click to deposit, or drag to bank"
+                title="Double-click or right-click to deposit (hold Shift for partial), or drag to bank"
               >
                 <app-item-mini [item]="item"></app-item-mini>
                 @if (item.equipped) {
@@ -181,7 +181,7 @@
 
       <!-- Footer Help Text -->
       <div class="bank-footer">
-        <p>💡 <strong>Tip:</strong> Drag items between bank and inventory, double-click, or right-click to deposit/withdraw</p>
+        <p>💡 <strong>Tip:</strong> Drag items between bank and inventory, or double-click/right-click to transfer. Hold <strong>Shift</strong> to split stacks.</p>
       </div>
     </div>
   </div>
