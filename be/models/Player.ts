@@ -1664,6 +1664,22 @@ playerSchema.methods.getActiveQuest = function(this: IPlayer, questId: string): 
 };
 
 // ============================================================================
+// Database Indexes
+// ============================================================================
+
+// Index on userId for authentication lookups (already unique, but explicit index improves query performance)
+playerSchema.index({ userId: 1 });
+
+// Index on currentLocation for location-based queries (frequently used in activity/travel operations)
+playerSchema.index({ currentLocation: 1 });
+
+// Compound index for active quests lookups (quest system frequently queries by questId)
+playerSchema.index({ 'quests.active.questId': 1 });
+
+// Index for completed quests (used in quest availability checks)
+playerSchema.index({ 'quests.completed': 1 });
+
+// ============================================================================
 // Model Export
 // ============================================================================
 

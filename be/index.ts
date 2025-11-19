@@ -24,6 +24,7 @@ import locationService from './services/locationService';
 import vendorService from './services/vendorService';
 import recipeService from './services/recipeService';
 import responseValidator from './middleware/responseValidator';
+import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import chatHandler from './sockets/chatHandler';
 import activityHandler from './sockets/activityHandler';
 import craftingHandler from './sockets/craftingHandler';
@@ -116,15 +117,11 @@ app.use('/api/storage', storageRoutes);
 app.use('/api/quests', questRoutes);
 app.use('/api/housing', housingRoutes);
 
-// Error handling middleware
-app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error(err.stack);
-  res.status(500).json({
-    success: false,
-    message: 'Something went wrong!',
-    error: process.env.NODE_ENV === 'development' ? err.message : undefined
-  });
-});
+// 404 handler (must be AFTER all routes, BEFORE error handler)
+app.use(notFoundHandler);
+
+// Error handling middleware (must be last)
+app.use(errorHandler);
 
 // Initialize Socket.io
 const io = new Server(server, {

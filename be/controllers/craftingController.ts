@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import Player from '../models/Player';
 import recipeService from '../services/recipeService';
 import itemService from '../services/itemService';
+import playerInventoryService from '../services/playerInventoryService';
 
 // ============================================================================
 // Type Definitions for Request Bodies
@@ -225,7 +226,7 @@ export const completeCrafting = async (req: Request, res: Response): Promise<voi
       if (instanceIds && instanceIds.length > 0) {
         // Use selected instances
         for (const instanceId of instanceIds) {
-          const item = player.getItem(instanceId);
+          const item = playerInventoryService.getItem(player, instanceId);
 
           if (!item) {
             res.status(400).json({
@@ -238,7 +239,7 @@ export const completeCrafting = async (req: Request, res: Response): Promise<voi
           ingredientInstances.push(item);
 
           // Remove one of this instance
-          player.removeItem(instanceId, 1);
+          playerInventoryService.removeItem(player, instanceId, 1);
         }
       } else {
         // Auto-select instances (original behavior)
@@ -246,7 +247,7 @@ export const completeCrafting = async (req: Request, res: Response): Promise<voi
 
         if (ingredient.itemId) {
           // Specific item requirement
-          items = player.getItemsByItemId(ingredient.itemId);
+          items = playerInventoryService.getItemsByItemId(player, ingredient.itemId);
         } else if (ingredient.subcategory) {
           // Subcategory requirement - get all items matching subcategory
           items = player.inventory.filter((item: any) => {
@@ -276,7 +277,7 @@ export const completeCrafting = async (req: Request, res: Response): Promise<voi
           }
 
           // Remove from inventory
-          player.removeItem(item.instanceId, toRemove);
+          playerInventoryService.removeItem(player, item.instanceId, toRemove);
           remaining -= toRemove;
         }
 
@@ -302,7 +303,7 @@ export const completeCrafting = async (req: Request, res: Response): Promise<voi
 
     // Add all outputs to inventory
     for (const outputItem of outputItems) {
-      player.addItem(outputItem);
+      playerInventoryService.addItem(player, outputItem);
     }
 
     // Award XP

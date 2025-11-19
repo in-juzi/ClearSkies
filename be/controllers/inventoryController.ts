@@ -1,9 +1,12 @@
 import { Request, Response } from 'express';
 import Player from '../models/Player';
 import itemService from '../services/itemService';
+import equipmentService from '../services/equipmentService';
+import playerInventoryService from '../services/playerInventoryService';
 import { QualityMap, TraitMap, ItemCategory, ConsumableItem, isWeaponItem, isArmorItem } from '@shared/types';
 import effectEvaluator from '../services/effectEvaluator';
 import { EffectContext } from '@shared/types/effect-system';
+import { convertMapsToObjects, convertItemForClient } from '@shared/utils/mongoose-helpers';
 
 // ============================================================================
 // Type Definitions for Request Bodies
@@ -40,25 +43,13 @@ interface UseItemRequest {
 }
 
 // ============================================================================
-// Helper Functions
+// Helper Functions (now imported from shared utilities)
 // ============================================================================
 
 /**
- * Convert Mongoose Maps to plain objects for JSON serialization
- */
-function convertMapsToObjects(item: any): any {
-  const plainItem = item.toObject ? item.toObject() : item;
-  if (plainItem.qualities instanceof Map) {
-    plainItem.qualities = Object.fromEntries(plainItem.qualities);
-  }
-  if (plainItem.traits instanceof Map) {
-    plainItem.traits = Object.fromEntries(plainItem.traits);
-  }
-  return plainItem;
-}
-
-/**
  * Calculate equipment stats with quality/trait effects
+ * TODO: Phase 2 - Migrate this complex logic to equipmentService
+ * For now, basic stat aggregation is available via equipmentService.calculateEquipmentStats()
  */
 function calculateEquipmentStats(player: any, equippedItems: Record<string, any>) {
   const stats = {
@@ -235,10 +226,8 @@ export const getInventory = async (req: Request, res: Response): Promise<void> =
 
     res.json({
       inventory: minimalInventory,
-      capacity: player.inventoryCapacity, // DEPRECATED: use carryingCapacity instead
       carryingCapacity: player.carryingCapacity, // in kg
       currentWeight: player.currentWeight, // in kg
-      size: player.getInventorySize(), // DEPRECATED: item count no longer used for capacity
       totalValue: player.getInventoryValue()
     });
   } catch (error) {
@@ -270,7 +259,7 @@ export const addItem = async (req: Request<{}, {}, AddItemRequest>, res: Respons
     const itemInstance = itemService.createItemInstance(itemId, quantity, qualities, traits);
 
     // Add to player inventory
-    player.addItem(itemInstance);
+    playerInventoryService.addItem(player, itemInstance);
     await player.save();
 
     // Get enhanced item details
@@ -314,7 +303,7 @@ export const addRandomItem = async (req: Request<{}, {}, AddRandomItemRequest>, 
     const itemInstance = itemService.createItemInstance(itemId, quantity, qualities, traits);
 
     // Add to player inventory
-    player.addItem(itemInstance);
+    playerInventoryService.addItem(player, itemInstance);
     await player.save();
 
     // Get enhanced item details
@@ -351,7 +340,7 @@ export const removeItem = async (req: Request<{}, {}, RemoveItemRequest>, res: R
     }
 
     // Remove item
-    const removedItem = player.removeItem(instanceId, quantity || null);
+    const removedItem = playerInventoryService.removeItem(player, instanceId, quantity || null);
     await player.save();
 
     res.json({
@@ -378,7 +367,7 @@ export const getItem = async (req: Request<{ instanceId: string }>, res: Respons
       return;
     }
 
-    const item = player.getItem(instanceId);
+    const item = playerInventoryService.getItem(player, instanceId);
     if (!item) {
       res.status(404).json({ message: 'Item not found in inventory' });
       return;
@@ -408,7 +397,7 @@ export const getItemCombatStats = async (req: Request<{ instanceId: string }>, r
       return;
     }
 
-    const item = player.getItem(instanceId);
+    const item = playerInventoryService.getItem(player, instanceId);
     if (!item) {
       res.status(404).json({ message: 'Item not found in inventory' });
       return;
@@ -593,51 +582,6 @@ export const getItemCombatStats = async (req: Request<{ instanceId: string }>, r
 };
 
 /**
- * Get all available item definitions
- * @deprecated Frontend now uses ItemDataService with direct backend registry import
- * This endpoint is no longer used and can be removed in a future version
- */
-export const getItemDefinitions = async (req: Request<{}, {}, {}, { category?: ItemCategory }>, res: Response): Promise<void> => {
-  try {
-    const { category } = req.query;
-
-    let items;
-    if (category) {
-      items = itemService.getItemsByCategory(category);
-    } else {
-      items = itemService.getAllItemDefinitions();
-    }
-
-    res.json({ items });
-  } catch (error) {
-    console.error('Get item definitions error:', error);
-    res.status(500).json({ message: 'Error fetching item definitions', error: (error as Error).message });
-  }
-};
-
-/**
- * Get single item definition
- * @deprecated Frontend now uses ItemDataService with direct backend registry import
- * This endpoint is no longer used and can be removed in a future version
- */
-export const getItemDefinition = async (req: Request<{ itemId: string }>, res: Response): Promise<void> => {
-  try {
-    const { itemId } = req.params;
-
-    const item = itemService.getItemDefinition(itemId);
-    if (!item) {
-      res.status(404).json({ message: 'Item definition not found' });
-      return;
-    }
-
-    res.json(item);
-  } catch (error) {
-    console.error('Get item definition error:', error);
-    res.status(500).json({ message: 'Error fetching item definition', error: (error as Error).message });
-  }
-};
-
-/**
  * Reload item definitions (admin function)
  */
 export const reloadDefinitions = async (req: Request, res: Response): Promise<void> => {
@@ -674,7 +618,10 @@ export const equipItem = async (req: Request<{}, {}, EquipItemRequest>, res: Res
     }
 
     // Equip the item
-    const result = await player.equipItem(instanceId, slotName);
+    const result = await playerInventoryService.equipItem(player, instanceId, slotName);
+
+    // Invalidate effect cache since equipment changed
+    effectEvaluator.invalidateCache(player._id.toString());
 
     // Trigger quest system for equipment check (for FullyEquipped quest)
     try {
@@ -692,7 +639,7 @@ export const equipItem = async (req: Request<{}, {}, EquipItemRequest>, res: Res
       message: 'Item equipped successfully',
       slot: result.slot,
       item: itemDetails,
-      equippedItems: player.getEquippedItems()
+      equippedItems: playerInventoryService.getEquippedItems(player)
     });
   } catch (error) {
     console.error('Equip item error:', error);
@@ -720,7 +667,10 @@ export const unequipItem = async (req: Request<{}, {}, UnequipItemRequest>, res:
     }
 
     // Unequip the item
-    const result = await player.unequipItem(slotName);
+    const result = await playerInventoryService.unequipItem(player, slotName);
+
+    // Invalidate effect cache since equipment changed
+    effectEvaluator.invalidateCache(player._id.toString());
 
     // Trigger quest system for equipment check (for FullyEquipped quest)
     try {
@@ -737,7 +687,7 @@ export const unequipItem = async (req: Request<{}, {}, UnequipItemRequest>, res:
       message: 'Item unequipped successfully',
       slot: result.slot,
       item: itemDetails,
-      equippedItems: player.getEquippedItems()
+      equippedItems: playerInventoryService.getEquippedItems(player)
     });
   } catch (error) {
     console.error('Unequip item error:', error);
@@ -756,7 +706,7 @@ export const getEquippedItems = async (req: Request, res: Response): Promise<voi
       return;
     }
 
-    const equippedItems = player.getEquippedItems();
+    const equippedItems = playerInventoryService.getEquippedItems(player);
 
     // Enhance equipped items with details
     const enhancedEquipped: Record<string, any> = {};
@@ -796,7 +746,7 @@ export const getEquipmentStats = async (req: Request, res: Response): Promise<vo
       return;
     }
 
-    const equippedItems = player.getEquippedItems();
+    const equippedItems = playerInventoryService.getEquippedItems(player);
     const stats = calculateEquipmentStats(player, equippedItems);
 
     res.json(stats);
@@ -875,7 +825,7 @@ export const useItem = async (req: Request<{}, {}, UseItemRequest>, res: Respons
     const effects = combatService.useConsumableOutOfCombat(player, itemInstance, itemService);
 
     // Remove one instance of the item from inventory
-    player.removeItem(instanceId, 1);
+    playerInventoryService.removeItem(player, instanceId, 1);
 
     await player.save();
 

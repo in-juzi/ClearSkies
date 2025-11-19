@@ -3,6 +3,7 @@ import Player from '../models/Player';
 import vendorService from '../services/vendorService';
 import itemService from '../services/itemService';
 import questService from '../services/questService';
+import playerInventoryService from '../services/playerInventoryService';
 
 // ============================================================================
 // Type Definitions for Request Bodies
@@ -133,7 +134,7 @@ export const buyItem = async (
     // Create item instances and add to inventory
     for (let i = 0; i < quantity; i++) {
       const itemInstance = itemService.createItemInstance(itemId, 1);
-      player.addItem(itemInstance);
+      playerInventoryService.addItem(player, itemInstance);
     }
 
     // Update quest progress for item acquisition
@@ -246,7 +247,7 @@ export const sellItem = async (
     const totalSellPrice = sellPricePerItem * quantity;
 
     // Remove items from inventory
-    player.removeItem(instanceId, quantity);
+    playerInventoryService.removeItem(player, instanceId, quantity);
 
     // Add gold to player
     player.addGold(totalSellPrice);

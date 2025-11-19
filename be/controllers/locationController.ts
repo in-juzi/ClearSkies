@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import Player from '../models/Player';
 import locationService from '../services/locationService';
 import itemService from '../services/itemService';
+import playerInventoryService from '../services/playerInventoryService';
 
 // ============================================================================
 // Type Definitions for Request Bodies
@@ -635,8 +636,11 @@ export const completeActivity = async (req: Request, res: Response): Promise<voi
       }
     }
 
-    // Award items
+    // Award items - batch fetch item definitions to avoid N+1 queries
     const itemsAdded: any[] = [];
+    const itemIds = rewards.items.map(item => item.itemId);
+    const itemDefinitions = itemService.getItemDefinitions(itemIds);
+
     for (const itemReward of rewards.items) {
       const qualities = itemService.generateRandomQualities(itemReward.itemId);
       const traits = itemService.generateRandomTraits(itemReward.itemId);
@@ -650,10 +654,10 @@ export const completeActivity = async (req: Request, res: Response): Promise<voi
       // Store the instanceId before adding to player (to avoid circular ref after add)
       const instanceId = itemInstance.instanceId;
 
-      player.addItem(itemInstance);
+      playerInventoryService.addItem(player, itemInstance);
 
-      // Get item definition for display
-      const itemDef = itemService.getItemDefinition(itemReward.itemId);
+      // Get item definition from batch-fetched map (O(1) lookup)
+      const itemDef = itemDefinitions.get(itemReward.itemId);
 
       // Convert Maps to plain objects for JSON response
       const plainQualities = qualities instanceof Map ? Object.fromEntries(qualities) : qualities;
@@ -798,10 +802,13 @@ export const getDropTable = async (
       return;
     }
 
-    // Enrich drop table entries with item definitions
+    // Enrich drop table entries with item definitions - batch fetch to avoid N+1
+    const itemIds = dropTable.drops.map(drop => drop.itemId).filter((id): id is string => !!id);
+    const itemDefinitions = itemService.getItemDefinitions(itemIds);
+
     const enrichedDrops = dropTable.drops.map(drop => {
       if (drop.itemId) {
-        const itemDef = itemService.getItemDefinition(drop.itemId);
+        const itemDef = itemDefinitions.get(drop.itemId);
         return {
           ...drop,
           itemDef: itemDef || null

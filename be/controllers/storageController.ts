@@ -1,14 +1,16 @@
 import { Request, Response } from 'express';
 import Player from '../models/Player';
 import storageService from '../services/storageService';
+import playerStorageService from '../services/playerStorageService';
+import { AuthenticatedRequest } from '../types/express';
 
 /**
  * Get storage container information and items
  * GET /api/storage/items/:containerId
  */
-export const getStorageItems = async (req: Request, res: Response) => {
+export const getStorageItems = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const userId = (req as any).user._id;
+    const userId = req.user._id;
     const { containerId } = req.params;
 
     const player = await Player.findOne({ userId });
@@ -37,9 +39,9 @@ export const getStorageItems = async (req: Request, res: Response) => {
  * POST /api/storage/deposit
  * Body: { containerId: string, instanceId: string, quantity?: number | null }
  */
-export const depositItem = async (req: Request, res: Response) => {
+export const depositItem = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const userId = (req as any).user._id;
+    const userId = req.user._id;
     const { containerId, instanceId, quantity = null } = req.body;
 
     if (!containerId) {
@@ -80,9 +82,9 @@ export const depositItem = async (req: Request, res: Response) => {
  * POST /api/storage/withdraw
  * Body: { containerId: string, instanceId: string, quantity?: number | null }
  */
-export const withdrawItem = async (req: Request, res: Response) => {
+export const withdrawItem = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const userId = (req as any).user._id;
+    const userId = req.user._id;
     const { containerId, instanceId, quantity = null } = req.body;
 
     if (!containerId) {
@@ -122,9 +124,9 @@ export const withdrawItem = async (req: Request, res: Response) => {
  * Get storage container capacity information
  * GET /api/storage/capacity/:containerId
  */
-export const getStorageCapacity = async (req: Request, res: Response) => {
+export const getStorageCapacity = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const userId = (req as any).user._id;
+    const userId = req.user._id;
     const { containerId } = req.params;
 
     const player = await Player.findOne({ userId });
@@ -133,7 +135,7 @@ export const getStorageCapacity = async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'Player not found' });
     }
 
-    const container = player.getContainer(containerId);
+    const container = playerStorageService.getContainer(player, containerId);
 
     res.json({
       capacity: container.capacity,
@@ -153,9 +155,9 @@ export const getStorageCapacity = async (req: Request, res: Response) => {
  * Legacy endpoint - Get bank information and items (backward compatibility)
  * GET /api/storage/bank/items
  */
-export const getBankItems = async (req: Request, res: Response) => {
+export const getBankItems = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const userId = (req as any).user._id;
+    const userId = req.user._id;
     const player = await Player.findOne({ userId });
 
     if (!player) {
