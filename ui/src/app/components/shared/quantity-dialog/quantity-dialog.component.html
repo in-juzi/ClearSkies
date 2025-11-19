@@ -1,0 +1,68 @@
+@if (isOpen()) {
+  <div class="quantity-dialog-overlay" (click)="onOverlayClick($event)" (keydown)="onKeyDown($event)">
+    <div class="quantity-dialog-modal">
+      <div class="quantity-dialog-header">
+        <h3>Select Quantity</h3>
+        <button class="close-button" (click)="cancel()" aria-label="Close">×</button>
+      </div>
+
+      <div class="quantity-dialog-body">
+        <!-- Item Display -->
+        <div class="item-display">
+          @if (itemIcon()) {
+            <app-icon
+              [path]="itemIcon()!.path"
+              [material]="itemIcon()!.material"
+              [size]="32"
+            ></app-icon>
+          }
+          <span class="item-name">{{ itemName() }}</span>
+        </div>
+
+        <!-- Quantity Input -->
+        <div class="quantity-input-group">
+          <label for="quantity-input">Quantity (max: {{ maxQuantity() }})</label>
+          <div class="input-with-button">
+            <input
+              id="quantity-input"
+              type="number"
+              [value]="selectedQuantity()"
+              (input)="onQuantityInput($event)"
+              min="1"
+              [max]="maxQuantity()"
+              class="quantity-input"
+              autofocus
+            />
+            <button class="max-button" (click)="setMaxQuantity()" type="button">
+              Max
+            </button>
+          </div>
+
+          <!-- Slider Control -->
+          <div class="slider-container">
+            <input
+              id="quantity-slider"
+              type="range"
+              [value]="selectedQuantity()"
+              (input)="onSliderInput($event)"
+              min="1"
+              [max]="maxQuantity()"
+              class="quantity-slider"
+            />
+            <div class="slider-markers">
+              <span class="marker">1</span>
+              <span class="marker">{{ maxQuantity() }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="quantity-dialog-footer">
+        <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+        <button class="btn btn-primary" (click)="confirm()">
+          {{ actionLabel() }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
