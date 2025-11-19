@@ -121,7 +121,6 @@ export interface IPlayer extends Document {
 
   // Methods
   updateLastPlayed(): Promise<void>;
-  addExperience(amount: number): Promise<boolean>;
   addGold(amount: number): void;
   removeGold(amount: number): void;
   addAttributeExperience(attributeName: AttributeName, amount: number): Promise<{
@@ -131,7 +130,6 @@ export interface IPlayer extends Document {
     level?: number;
     attribute: AttributeName;
   }>;
-  getAttributeProgress(attributeName: AttributeName): number;
   addSkillExperience(skillName: SkillName, amount: number): Promise<{
     skill: {
       skill: SkillName;
@@ -149,7 +147,6 @@ export interface IPlayer extends Document {
       experience: number;
     };
   }>;
-  getSkillProgress(skillName: SkillName): number;
   getEnrichedSkills(): Record<string, {
     level: number;
     experience: number;
@@ -165,46 +162,21 @@ export interface IPlayer extends Document {
     percentToNextLevel: number;
     totalXP: number;
   }>;
-  addItem(itemInstance: any): any;
-  removeItem(instanceId: string, quantity?: number | null): InventoryItem;
   getItem(instanceId: string): InventoryItem | undefined;
-  getItemsByItemId(itemId: string): InventoryItem[];
-  getInventorySize(): number;
-  getInventoryValue(): number;
-  equipItem(instanceId: string, slotName: string): Promise<{ slot: string; item: InventoryItem }>;
-  unequipItem(slotName: string): Promise<{ slot: string; item: InventoryItem | undefined }>;
   getActiveCombatSkill(): string;
-  getEquippedItems(): Record<string, InventoryItem>;
-  isSlotAvailable(slotName: string): boolean;
-  addEquipmentSlot(slotName: string): Promise<string>;
   hasEquippedSubtype(subtype: string, itemService: any): boolean;
-  hasInventoryItem(itemId: string, minQuantity?: number): boolean;
-  getInventoryItemQuantity(itemId: string): number;
   getContainer(containerId: string): StorageContainer;
   getContainerItems(containerId: string): any[];
-  depositToContainer(containerId: string, instanceId: string, quantity?: number | null): any;
-  withdrawFromContainer(containerId: string, instanceId: string, quantity?: number | null): any;
   takeDamage(amount: number): Promise<boolean>;
   heal(amount: number): void;
   useMana(amount: number): void;
   restoreMana(amount: number): void;
-  useConsumableItem(itemInstance: any, itemDefinition: any): {
-    healthRestored: number;
-    manaRestored: number;
-  };
   isInCombat(): boolean;
-  addCombatLog(message: string, type?: CombatLogType, damageValue?: number, target?: 'player' | 'monster'): void;
   clearCombat(): void;
-  isAbilityOnCooldown(abilityId: string): boolean;
-  setAbilityCooldown(abilityId: string, cooldownTurns: number): void;
-  getAbilityCooldownRemaining(abilityId: string): number;
   addActiveBuff(buffData: any): void;
   removeActiveBuff(buffId: string): boolean;
-  getActiveBuffs(): any[];
-  getActiveBuffsForTarget(target: 'player' | 'monster'): any[];
   acceptQuest(questId: string, objectives: ObjectiveProgress[]): void;
   updateQuestObjective(questId: string, objectiveId: string, amount: number): ObjectiveProgress | null;
-  completeQuest(questId: string): void;
   isQuestActive(questId: string): boolean;
   isQuestCompleted(questId: string): boolean;
   getActiveQuest(questId: string): ActiveQuest | undefined;
@@ -599,25 +571,8 @@ playerSchema.methods.updateLastPlayed = async function(this: IPlayer): Promise<v
   await this.save();
 };
 
-// Add experience and handle leveling
-playerSchema.methods.addExperience = async function(this: IPlayer, amount: number): Promise<boolean> {
-  this.experience += amount;
-
-  // Simple leveling formula: level = floor(sqrt(experience / 100))
-  const newLevel = Math.floor(Math.sqrt(this.experience / 100)) + 1;
-
-  if (newLevel > this.level && newLevel <= 100) {
-    this.level = newLevel;
-    // HP/MP now come from attributes - fully restore on level up
-    this.stats.health.current = this.maxHP;
-    this.stats.mana.current = this.maxMP;
-    // Note: stats.strength/dexterity/intelligence/vitality are deprecated
-    // Character progression now happens through attribute leveling
-  }
-
-  await this.save();
-  return newLevel > this.level - 1; // Return true if leveled up
-};
+// NOTE: addExperience (player leveling) is deprecated.
+// Character progression now happens through skill/attribute leveling only.
 
 // Add gold
 playerSchema.methods.addGold = function(this: IPlayer, amount: number): void {
@@ -683,18 +638,7 @@ playerSchema.methods.addAttributeExperience = async function(
   return { leveledUp: false, level: attribute.level, attribute: attributeName };
 };
 
-// Get progress to next attribute level (0-100%)
-playerSchema.methods.getAttributeProgress = function(this: IPlayer, attributeName: AttributeName): number {
-  const { getPercentToNextLevel } = require('@shared/constants/attribute-constants');
-  const validAttributes: AttributeName[] = ['strength', 'endurance', 'wisdom', 'perception', 'dexterity', 'will', 'charisma'];
-
-  if (!validAttributes.includes(attributeName)) {
-    throw new Error(`Invalid attribute name: ${attributeName}`);
-  }
-
-  const attribute = this.attributes[attributeName];
-  return getPercentToNextLevel(attribute.level, attribute.experience);
-};
+// NOTE: getAttributeProgress is deprecated. Use getEnrichedAttributes() instead.
 
 // Add skill experience and handle skill leveling
 // Also awards XP to the skill's main attribute (50% of skill XP)
@@ -721,7 +665,7 @@ playerSchema.methods.addSkillExperience = async function(
 }> {
   const { getXPForLevel } = require('@shared/constants/attribute-constants');
   const validSkills: SkillName[] = [
-    'woodcutting', 'mining', 'fishing', 'gathering', 'smithing', 'cooking', 'alchemy',
+    'woodcutting', 'mining', 'fishing', 'gathering', 'smithing', 'cooking', 'alchemy', 'construction',
     'oneHanded', 'dualWield', 'twoHanded', 'ranged', 'casting', 'protection'
   ];
 
@@ -777,21 +721,7 @@ playerSchema.methods.addSkillExperience = async function(
   };
 };
 
-// Get progress to next skill level (0-100%)
-playerSchema.methods.getSkillProgress = function(this: IPlayer, skillName: SkillName): number {
-  const { getPercentToNextLevel } = require('@shared/constants/attribute-constants');
-  const validSkills: SkillName[] = [
-    'woodcutting', 'mining', 'fishing', 'gathering', 'smithing', 'cooking', 'alchemy',
-    'oneHanded', 'dualWield', 'twoHanded', 'ranged', 'casting', 'protection'
-  ];
-
-  if (!validSkills.includes(skillName)) {
-    throw new Error(`Invalid skill name: ${skillName}`);
-  }
-
-  const skill = this.skills[skillName];
-  return getPercentToNextLevel(skill.level, skill.experience);
-};
+// NOTE: getSkillProgress is deprecated. Use getEnrichedSkills() instead.
 
 // Get enriched skill data with progression info for UI
 playerSchema.methods.getEnrichedSkills = function(this: IPlayer) {
@@ -829,206 +759,22 @@ playerSchema.methods.getEnrichedAttributes = function(this: IPlayer) {
 // ============================================================================
 // Inventory Management Methods
 // ============================================================================
+// NOTE: Inventory methods (addItem, removeItem, getItem, getInventorySize, etc.)
+// have been migrated to playerInventoryService and are no longer defined here.
+// External code should use playerInventoryService for all inventory operations.
 
-// Add item to inventory
-playerSchema.methods.addItem = function(this: IPlayer, itemInstance: any): any {
-  // Import itemService for weight calculation
-  const itemService = require('../services/itemService').default;
-  const itemDef = itemService.getItemDefinition(itemInstance.itemId);
-
-  // Check weight-based carrying capacity
-  const itemWeight = itemDef?.properties?.weight || 0;
-  const totalItemWeight = itemWeight * itemInstance.quantity;
-  const currentWeight = this.currentWeight; // Uses virtual property
-  const capacity = this.carryingCapacity; // Uses virtual property
-
-  if (currentWeight + totalItemWeight > capacity) {
-    const available = capacity - currentWeight;
-    throw new Error(
-      `Cannot carry ${totalItemWeight.toFixed(1)}kg (${available.toFixed(1)}kg capacity remaining, ${capacity.toFixed(1)}kg total)`
-    );
-  }
-
-  // Try to stack with existing items
-  const existingItem = this.inventory.find(inv =>
-    itemService.canStack(inv, itemInstance)
-  );
-
-  if (existingItem) {
-
-    if (itemDef.stackable) {
-      existingItem.quantity += itemInstance.quantity;
-    } else {
-      // Can't stack, add as new item
-      this.inventory.push(itemInstance);
-    }
-  } else {
-    // New item, add to inventory
-    this.inventory.push(itemInstance);
-  }
-
-  return itemInstance;
-};
-
-// Remove item from inventory by instance ID
-playerSchema.methods.removeItem = function(
-  this: IPlayer,
-  instanceId: string,
-  quantity: number | null = null
-): InventoryItem {
-  const itemIndex = this.inventory.findIndex(item => item.instanceId === instanceId);
-
-  if (itemIndex === -1) {
-    throw new Error('Item not found in inventory');
-  }
-
-  const item = this.inventory[itemIndex];
-
-  if (quantity === null || quantity >= item.quantity) {
-    // Remove entire stack
-    this.inventory.splice(itemIndex, 1);
-  } else {
-    // Remove partial quantity
-    if (quantity <= 0) {
-      throw new Error('Quantity must be positive');
-    }
-    item.quantity -= quantity;
-  }
-
-  return item;
-};
-
-// Get item from inventory by instance ID
+// Get item from inventory by instance ID (internal use only)
+// NOTE: Still used internally by getActiveCombatSkill() - keep for now
+// External code should use playerInventoryService.getItem() instead
 playerSchema.methods.getItem = function(this: IPlayer, instanceId: string): InventoryItem | undefined {
   return this.inventory.find(item => item.instanceId === instanceId);
-};
-
-// Get all items of a specific itemId
-playerSchema.methods.getItemsByItemId = function(this: IPlayer, itemId: string): InventoryItem[] {
-  return this.inventory.filter(item => item.itemId === itemId);
-};
-
-// Get inventory size
-playerSchema.methods.getInventorySize = function(this: IPlayer): number {
-  return this.inventory.reduce((sum, item) => sum + item.quantity, 0);
-};
-
-// Get inventory value (total vendor price)
-playerSchema.methods.getInventoryValue = function(this: IPlayer): number {
-  const itemService = require('../services/itemService').default;
-  return this.inventory.reduce((sum, item) => {
-    const price = itemService.calculateVendorPrice(item);
-    return sum + (price * item.quantity);
-  }, 0);
 };
 
 // ============================================================================
 // Equipment Management Methods
 // ============================================================================
-
-// Equip an item to a slot
-playerSchema.methods.equipItem = async function(
-  this: IPlayer,
-  instanceId: string,
-  slotName: string
-): Promise<{ slot: string; item: InventoryItem }> {
-  const itemService = require('../services/itemService').default;
-
-  // Find the item in inventory
-  const item = this.getItem(instanceId);
-  if (!item) {
-    throw new Error('Item not found in inventory');
-  }
-
-  // Get item definition to check if it can be equipped
-  const itemDef = itemService.getItemDefinition(item.itemId);
-  if (!itemDef) {
-    throw new Error('Item definition not found');
-  }
-
-  // Check if item is equippable
-  if (itemDef.category !== 'equipment' || !itemDef.slot) {
-    throw new Error('Item cannot be equipped');
-  }
-
-  // Validate the slot exists
-  if (!this.equipmentSlots.has(slotName)) {
-    throw new Error(`Invalid equipment slot: ${slotName}`);
-  }
-
-  // Check if item can be equipped to this slot
-  if (itemDef.slot !== slotName) {
-    throw new Error(`Item cannot be equipped to ${slotName} slot. It can only be equipped to ${itemDef.slot}`);
-  }
-
-  // Two-handed weapon logic
-  const isTwoHandedWeapon = (itemDef as any).properties?.twoHanded === true;
-
-  if (isTwoHandedWeapon) {
-    // Two-handed weapon being equipped to mainHand
-    // Must unequip offHand if anything is there
-    const offHandEquipped = this.equipmentSlots.get('offHand');
-    if (offHandEquipped) {
-      await this.unequipItem('offHand');
-    }
-  } else if (slotName === 'mainHand' || slotName === 'offHand') {
-    // Equipping something to mainHand or offHand
-    // Check if a two-handed weapon is currently equipped
-    const mainHandInstanceId = this.equipmentSlots.get('mainHand');
-    if (mainHandInstanceId) {
-      const mainHandItem = this.getItem(mainHandInstanceId);
-      if (mainHandItem) {
-        const mainHandDef = itemService.getItemDefinition(mainHandItem.itemId);
-        if ((mainHandDef as any).properties?.twoHanded === true) {
-          // Unequip the two-handed weapon
-          await this.unequipItem('mainHand');
-        }
-      }
-    }
-  }
-
-  // Check if slot already has an item equipped
-  const currentlyEquipped = this.equipmentSlots.get(slotName);
-  if (currentlyEquipped) {
-    // Unequip current item first
-    await this.unequipItem(slotName);
-  }
-
-  // Equip the new item
-  this.equipmentSlots.set(slotName, instanceId);
-  item.equipped = true;
-
-  await this.save();
-  return { slot: slotName, item };
-};
-
-// Unequip an item from a slot
-playerSchema.methods.unequipItem = async function(
-  this: IPlayer,
-  slotName: string
-): Promise<{ slot: string; item: InventoryItem | undefined }> {
-  // Validate the slot exists
-  if (!this.equipmentSlots.has(slotName)) {
-    throw new Error(`Invalid equipment slot: ${slotName}`);
-  }
-
-  const instanceId = this.equipmentSlots.get(slotName);
-  if (!instanceId) {
-    throw new Error(`No item equipped in ${slotName} slot`);
-  }
-
-  // Find the item and mark as unequipped
-  const item = this.getItem(instanceId);
-  if (item) {
-    item.equipped = false;
-  }
-
-  // Clear the slot
-  this.equipmentSlots.set(slotName, null);
-
-  await this.save();
-  return { slot: slotName, item };
-};
+// NOTE: Equipment methods (equipItem, unequipItem, getEquippedItems, etc.)
+// have been migrated to playerInventoryService and are no longer defined here.
 
 // Get active combat skill based on currently equipped weapons
 playerSchema.methods.getActiveCombatSkill = function(this: IPlayer): string {
@@ -1074,74 +820,27 @@ playerSchema.methods.getActiveCombatSkill = function(this: IPlayer): string {
   return 'oneHanded';
 };
 
-// Get all currently equipped items
-playerSchema.methods.getEquippedItems = function(this: IPlayer): Record<string, InventoryItem> {
-  const equipped: Record<string, InventoryItem> = {};
-  for (const [slot, instanceId] of this.equipmentSlots.entries()) {
-    if (instanceId) {
-      const item = this.getItem(instanceId);
-      if (item) {
-        equipped[slot] = item;
-      }
-    }
-  }
-  return equipped;
-};
-
-// Check if a slot is available
-playerSchema.methods.isSlotAvailable = function(this: IPlayer, slotName: string): boolean {
-  if (!this.equipmentSlots.has(slotName)) {
-    return false;
-  }
-  return this.equipmentSlots.get(slotName) === null;
-};
-
-// Add a new equipment slot (for future extensibility)
-playerSchema.methods.addEquipmentSlot = async function(this: IPlayer, slotName: string): Promise<string> {
-  if (this.equipmentSlots.has(slotName)) {
-    throw new Error(`Equipment slot ${slotName} already exists`);
-  }
-  this.equipmentSlots.set(slotName, null);
-  await this.save();
-  return slotName;
-};
-
 // Check if player has an item with a specific subtype equipped (in any slot)
 playerSchema.methods.hasEquippedSubtype = function(this: IPlayer, subtype: string, itemService: any): boolean {
   if (!itemService) {
     throw new Error('itemService is required for hasEquippedSubtype');
   }
 
-  // Get all equipped items
-  const equippedItems = this.getEquippedItems();
-
-  // Check each equipped item for matching subtype
-  for (const item of Object.values(equippedItems)) {
-    const itemDef = itemService.getItemDefinition(item.itemId);
-    if (itemDef && itemDef.subtype === subtype) {
-      return true;
+  // Get all equipped items by checking equipmentSlots map
+  for (const [slot, instanceId] of this.equipmentSlots.entries()) {
+    if (instanceId) {
+      const item = this.inventory.find(i => i.instanceId === instanceId);
+      if (item) {
+        const itemDef = itemService.getItemDefinition(item.itemId);
+        // Check the subtype field (for equipment) or subcategories array (fallback)
+        if (itemDef?.subtype === subtype || itemDef?.subcategories?.includes(subtype)) {
+          return true;
+        }
+      }
     }
   }
 
   return false;
-};
-
-// Check if player has a specific item in inventory (equipped or not)
-playerSchema.methods.hasInventoryItem = function(this: IPlayer, itemId: string, minQuantity: number = 1): boolean {
-  const items = this.inventory.filter(item => item.itemId === itemId);
-
-  if (items.length === 0) {
-    return false;
-  }
-
-  const totalQuantity = items.reduce((sum, item) => sum + (item.quantity || 1), 0);
-  return totalQuantity >= minQuantity;
-};
-
-// Get total quantity of an item in inventory
-playerSchema.methods.getInventoryItemQuantity = function(this: IPlayer, itemId: string): number {
-  const items = this.inventory.filter(item => item.itemId === itemId);
-  return items.reduce((sum, item) => sum + (item.quantity || 1), 0);
 };
 
 // ============================================================================
@@ -1181,152 +880,11 @@ playerSchema.methods.getContainerItems = function(this: IPlayer, containerId: st
   });
 };
 
-// Deposit item from inventory to container
-playerSchema.methods.depositToContainer = function(
-  this: IPlayer,
-  containerId: string,
-  instanceId: string,
-  quantity: number | null = null
-): any {
-  const itemService = require('../services/itemService').default;
-
-  // Find item in inventory
-  const inventoryItem = this.getItem(instanceId);
-  if (!inventoryItem) {
-    throw new Error('Item not found in inventory');
-  }
-
-  // Prevent depositing equipped items
-  if (inventoryItem.equipped) {
-    throw new Error('Cannot deposit equipped items');
-  }
-
-  // Get container
-  const container = this.getContainer(containerId);
-
-  // Determine quantity to deposit
-  const depositQuantity = quantity === null ? inventoryItem.quantity : quantity;
-  if (depositQuantity > inventoryItem.quantity) {
-    throw new Error('Cannot deposit more than you have');
-  }
-
-  // Check container capacity (count unique item stacks)
-  const currentSlots = container.items.length;
-
-  // Try to find stackable item in container
-  const itemDef = itemService.getItemDefinition(inventoryItem.itemId);
-  const existingContainerItem = container.items.find((item: any) =>
-    itemService.canStack(item, inventoryItem)
-  );
-
-  if (existingContainerItem) {
-    // Stack with existing item
-    existingContainerItem.quantity += depositQuantity;
-  } else {
-    // Check if we have space for a new stack
-    if (currentSlots >= container.capacity) {
-      throw new Error(`Container is full (${container.capacity} slots used)`);
-    }
-
-    // Create new item in container
-    const newItem: InventoryItem = {
-      instanceId: inventoryItem.instanceId,
-      itemId: inventoryItem.itemId,
-      quantity: depositQuantity,
-      qualities: inventoryItem.qualities,
-      traits: inventoryItem.traits,
-      equipped: false,
-      acquiredAt: new Date()
-    };
-    container.items.push(newItem);
-  }
-
-  // Remove from inventory
-  if (depositQuantity === inventoryItem.quantity) {
-    // Remove entire stack
-    const itemIndex = this.inventory.findIndex(item => item.instanceId === instanceId);
-    this.inventory.splice(itemIndex, 1);
-  } else {
-    // Reduce quantity
-    inventoryItem.quantity -= depositQuantity;
-  }
-
-  return { depositQuantity, itemId: inventoryItem.itemId };
-};
-
-// Withdraw item from container to inventory
-playerSchema.methods.withdrawFromContainer = function(
-  this: IPlayer,
-  containerId: string,
-  instanceId: string,
-  quantity: number | null = null
-): any {
-  const itemService = require('../services/itemService').default;
-
-  // Get container
-  const container = this.getContainer(containerId);
-
-  // Find item in container
-  const containerItemIndex = container.items.findIndex((item: any) => item.instanceId === instanceId);
-  if (containerItemIndex === -1) {
-    throw new Error('Item not found in container');
-  }
-
-  const containerItem = container.items[containerItemIndex];
-  const itemDef = itemService.getItemDefinition(containerItem.itemId);
-
-  // Determine quantity to withdraw
-  const withdrawQuantity = quantity === null ? containerItem.quantity : quantity;
-  if (withdrawQuantity > containerItem.quantity) {
-    throw new Error('Cannot withdraw more than you have');
-  }
-
-  // Check weight capacity
-  const itemWeight = itemDef?.properties?.weight || 0;
-  const totalItemWeight = itemWeight * withdrawQuantity;
-  const currentWeight = this.currentWeight;
-  const capacity = this.carryingCapacity;
-
-  if (currentWeight + totalItemWeight > capacity) {
-    const available = capacity - currentWeight;
-    throw new Error(
-      `Cannot carry ${totalItemWeight.toFixed(1)}kg (${available.toFixed(1)}kg capacity remaining)`
-    );
-  }
-
-  // Try to stack with existing inventory item
-  const existingInventoryItem = this.inventory.find(inv =>
-    itemService.canStack(inv, containerItem)
-  );
-
-  if (existingInventoryItem && itemDef.stackable) {
-    // Stack with existing inventory item
-    existingInventoryItem.quantity += withdrawQuantity;
-  } else {
-    // Add as new item to inventory
-    const newItem = {
-      instanceId: containerItem.instanceId,
-      itemId: containerItem.itemId,
-      quantity: withdrawQuantity,
-      qualities: containerItem.qualities,
-      traits: containerItem.traits,
-      equipped: false,
-      acquiredAt: new Date()
-    };
-    this.inventory.push(newItem);
-  }
-
-  // Remove from container
-  if (withdrawQuantity === containerItem.quantity) {
-    // Remove entire stack
-    container.items.splice(containerItemIndex, 1);
-  } else {
-    // Reduce quantity
-    containerItem.quantity -= withdrawQuantity;
-  }
-
-  return { withdrawQuantity, itemId: containerItem.itemId };
-};
+// ============================================================================
+// Storage Container Methods
+// ============================================================================
+// NOTE: Storage methods (depositToContainer, withdrawFromContainer, etc.)
+// have been migrated to playerStorageService and are no longer defined here.
 
 // ============================================================================
 // Combat Management Methods
@@ -1380,85 +938,10 @@ playerSchema.methods.restoreMana = function(this: IPlayer, amount: number): void
   this.stats.mana.current = Math.min(this.maxMP, this.stats.mana.current + amount);
 };
 
-// Use a consumable item and apply its effects
-playerSchema.methods.useConsumableItem = function(
-  this: IPlayer,
-  itemInstance: any,
-  itemDefinition: any
-): {
-  healthRestored: number;
-  manaRestored: number;
-} {
-  if (!itemInstance || !itemDefinition) {
-    throw new Error('Item instance and definition are required');
-  }
-
-  if (itemDefinition.category !== 'consumable') {
-    throw new Error('Item is not consumable');
-  }
-
-  const effects = {
-    healthRestored: 0,
-    manaRestored: 0
-  };
-
-  // Apply health restoration
-  if (itemDefinition.properties?.healthRestore) {
-    const healAmount = itemDefinition.properties.healthRestore;
-    const beforeHealth = this.stats.health.current;
-    this.heal(healAmount);
-    effects.healthRestored = this.stats.health.current - beforeHealth;
-  }
-
-  // Apply mana restoration
-  if (itemDefinition.properties?.manaRestore) {
-    const manaAmount = itemDefinition.properties.manaRestore;
-    const beforeMana = this.stats.mana.current;
-    this.restoreMana(manaAmount);
-    effects.manaRestored = this.stats.mana.current - beforeMana;
-  }
-
-  // Add combat log entry if in combat
-  if (this.isInCombat()) {
-    let message = `Used ${itemDefinition.name}`;
-    if (effects.healthRestored > 0) {
-      message += ` - Restored ${effects.healthRestored} HP`;
-    }
-    if (effects.manaRestored > 0) {
-      message += ` - Restored ${effects.manaRestored} Mana`;
-    }
-    this.addCombatLog(message, 'heal');
-  }
-
-  return effects;
-};
-
 // Check if player is in combat
+// NOTE: Still used by other combat methods - keep for now
 playerSchema.methods.isInCombat = function(this: IPlayer): boolean {
   return !!(this.activeCombat && this.activeCombat.monsterId);
-};
-
-// Add combat log entry
-playerSchema.methods.addCombatLog = function(this: IPlayer, message: string, type: CombatLogType = 'system', damageValue?: number, target?: 'player' | 'monster'): void {
-  if (!this.activeCombat) {
-    throw new Error('Player is not in combat');
-  }
-
-  const logEntry = {
-    timestamp: new Date(),
-    message,
-    type,
-    damageValue,
-    target,
-    isNew: true
-  } as CombatLogEntry;
-
-  // Keep only last 50 entries to prevent bloat
-  if (this.activeCombat.combatLog.length >= 50) {
-    this.activeCombat.combatLog.shift();
-  }
-
-  (this.activeCombat.combatLog as any).push(logEntry);
 };
 
 // Clear active combat (used when combat ends)
@@ -1498,46 +981,12 @@ playerSchema.methods.clearCombat = function(this: IPlayer): void {
   };
 };
 
-// Check if ability is on cooldown
-playerSchema.methods.isAbilityOnCooldown = function(this: IPlayer, abilityId: string): boolean {
-  if (!this.activeCombat || !this.activeCombat.abilityCooldowns) {
-    return false;
-  }
-
-  const availableTurn = this.activeCombat.abilityCooldowns.get(abilityId);
-  if (!availableTurn) {
-    return false;
-  }
-
-  return this.activeCombat.turnCount < availableTurn;
-};
-
-// Set ability cooldown
-playerSchema.methods.setAbilityCooldown = function(this: IPlayer, abilityId: string, cooldownTurns: number): void {
-  if (!this.activeCombat) {
-    throw new Error('Player is not in combat');
-  }
-
-  const availableTurn = this.activeCombat.turnCount + cooldownTurns;
-  this.activeCombat.abilityCooldowns!.set(abilityId, availableTurn);
-};
-
-// Get ability cooldown remaining turns
-playerSchema.methods.getAbilityCooldownRemaining = function(this: IPlayer, abilityId: string): number {
-  if (!this.activeCombat || !this.activeCombat.abilityCooldowns) {
-    return 0;
-  }
-
-  const availableTurn = this.activeCombat.abilityCooldowns.get(abilityId);
-  if (!availableTurn) {
-    return 0;
-  }
-
-  const remaining = availableTurn - this.activeCombat.turnCount;
-  return Math.max(0, remaining);
-};
+// NOTE: Combat utility methods (addActiveBuff, removeActiveBuff, isAbilityOnCooldown, etc.)
+// are used internally by combatService and remain in the Player model for now.
+// These may be migrated to playerCombatService in a future refactor.
 
 // Add active buff
+// NOTE: Still used by combatService - keep for now
 playerSchema.methods.addActiveBuff = function(this: IPlayer, buffData: any): void {
   if (!this.activeCombat) {
     throw new Error('Player is not in combat');
@@ -1551,32 +1000,13 @@ playerSchema.methods.addActiveBuff = function(this: IPlayer, buffData: any): voi
 };
 
 // Remove active buff
+// NOTE: Still used by combatService - keep for now
 playerSchema.methods.removeActiveBuff = function(this: IPlayer, buffId: string): boolean {
   if (!this.activeCombat || !this.activeCombat.activeBuffs) {
     return false;
   }
 
   return this.activeCombat.activeBuffs.delete(buffId);
-};
-
-// Get all active buffs
-playerSchema.methods.getActiveBuffs = function(this: IPlayer): any[] {
-  if (!this.activeCombat || !this.activeCombat.activeBuffs) {
-    return [];
-  }
-
-  return Array.from(this.activeCombat.activeBuffs.values());
-};
-
-// Get active buffs for a specific target
-playerSchema.methods.getActiveBuffsForTarget = function(this: IPlayer, target: 'player' | 'monster'): any[] {
-  if (!this.activeCombat || !this.activeCombat.activeBuffs) {
-    return [];
-  }
-
-  return Array.from(this.activeCombat.activeBuffs.values()).filter(
-    (buff: any) => buff.target === target
-  );
 };
 
 // ============================================================================
@@ -1624,17 +1054,7 @@ playerSchema.methods.updateQuestObjective = function(
   return objective;
 };
 
-// Complete a quest (mark ready for turn-in)
-playerSchema.methods.completeQuest = function(this: IPlayer, questId: string): void {
-  if (!this.quests || !this.quests.active) {
-    return;
-  }
-
-  const quest = this.quests.active.find((q: ActiveQuest) => q.questId === questId);
-  if (quest) {
-    quest.turnedIn = false; // Ready to turn in but not yet turned in
-  }
-};
+// NOTE: completeQuest is deprecated. Quest completion is handled by questService.
 
 // Check if quest is active
 playerSchema.methods.isQuestActive = function(this: IPlayer, questId: string): boolean {
