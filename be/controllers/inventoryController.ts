@@ -228,7 +228,7 @@ export const getInventory = async (req: Request, res: Response): Promise<void> =
       inventory: minimalInventory,
       carryingCapacity: player.carryingCapacity, // in kg
       currentWeight: player.currentWeight, // in kg
-      totalValue: player.getInventoryValue()
+      totalValue: playerInventoryService.getInventoryValue(player)
     });
   } catch (error) {
     console.error('Get inventory error:', error);
@@ -268,7 +268,7 @@ export const addItem = async (req: Request<{}, {}, AddItemRequest>, res: Respons
     res.status(201).json({
       message: 'Item added to inventory',
       item: details,
-      inventorySize: player.getInventorySize()
+      inventorySize: playerInventoryService.getInventorySize(player)
     });
   } catch (error) {
     console.error('Add item error:', error);
@@ -312,7 +312,7 @@ export const addRandomItem = async (req: Request<{}, {}, AddRandomItemRequest>, 
     res.status(201).json({
       message: 'Item added to inventory',
       item: details,
-      inventorySize: player.getInventorySize()
+      inventorySize: playerInventoryService.getInventorySize(player)
     });
   } catch (error) {
     console.error('Add random item error:', error);
@@ -346,7 +346,7 @@ export const removeItem = async (req: Request<{}, {}, RemoveItemRequest>, res: R
     res.json({
       message: 'Item removed from inventory',
       item: removedItem,
-      inventorySize: player.getInventorySize()
+      inventorySize: playerInventoryService.getInventorySize(player)
     });
   } catch (error) {
     console.error('Remove item error:', error);
@@ -619,6 +619,7 @@ export const equipItem = async (req: Request<{}, {}, EquipItemRequest>, res: Res
 
     // Equip the item
     const result = await playerInventoryService.equipItem(player, instanceId, slotName);
+    await player.save();
 
     // Invalidate effect cache since equipment changed
     effectEvaluator.invalidateCache(player._id.toString());
@@ -668,6 +669,7 @@ export const unequipItem = async (req: Request<{}, {}, UnequipItemRequest>, res:
 
     // Unequip the item
     const result = await playerInventoryService.unequipItem(player, slotName);
+    await player.save();
 
     // Invalidate effect cache since equipment changed
     effectEvaluator.invalidateCache(player._id.toString());

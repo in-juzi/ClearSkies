@@ -144,6 +144,42 @@ class PlayerInventoryService {
       throw new Error('Item cannot be equipped');
     }
 
+    // Validate the slot exists
+    if (!player.equipmentSlots.has(slotName)) {
+      throw new Error(`Invalid equipment slot: ${slotName}`);
+    }
+
+    // Check if item can be equipped to this slot
+    if (itemDef.slot !== slotName) {
+      throw new Error(`Item cannot be equipped to ${slotName} slot. It can only be equipped to ${itemDef.slot}`);
+    }
+
+    // Two-handed weapon logic
+    const isTwoHandedWeapon = (itemDef as any).properties?.twoHanded === true;
+
+    if (isTwoHandedWeapon) {
+      // Two-handed weapon being equipped to mainHand
+      // Must unequip offHand if anything is there
+      const offHandEquipped = player.equipmentSlots.get('offHand');
+      if (offHandEquipped) {
+        await this.unequipItem(player, 'offHand');
+      }
+    } else if (slotName === 'mainHand' || slotName === 'offHand') {
+      // Equipping something to mainHand or offHand
+      // Check if a two-handed weapon is currently equipped
+      const mainHandInstanceId = player.equipmentSlots.get('mainHand');
+      if (mainHandInstanceId) {
+        const mainHandItem = this.getItem(player, mainHandInstanceId);
+        if (mainHandItem) {
+          const mainHandDef = itemService.getItemDefinition(mainHandItem.itemId);
+          if ((mainHandDef as any).properties?.twoHanded === true) {
+            // Unequip the two-handed weapon
+            await this.unequipItem(player, 'mainHand');
+          }
+        }
+      }
+    }
+
     // Unequip existing item in slot if any
     const existingItemId = player.equipmentSlots.get(slotName);
     if (existingItemId) {
