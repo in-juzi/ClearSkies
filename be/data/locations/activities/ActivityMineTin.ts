@@ -26,8 +26,7 @@ export const ActivityMineTin: ActivityUnion = {
       "mining": 20
     },
     "dropTables": [
-      "mining-tin",
-      "rare-low-mining"
+      "mining-tin"
     ]
   }
 } as const;

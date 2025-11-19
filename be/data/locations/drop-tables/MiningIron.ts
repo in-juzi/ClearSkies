@@ -47,9 +47,10 @@ export const MiningIron: DropTable = {
       "comment": "Rich iron deposit"
     },
     {
-      "dropNothing": true,
+      "type": "dropTable",
+      "dropTableId": "rare-low-mining",
       "weight": 5,
-      "comment": "Vein played out"
+      "comment": "Rare gemstone drops (5% chance) - rolls on shared rare table"
     }
   ]
 } as const;
