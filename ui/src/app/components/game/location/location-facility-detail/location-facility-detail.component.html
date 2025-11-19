@@ -53,31 +53,31 @@
       </div>
     }
 
-    <!-- Activities Section -->
-    @if (selectedFacility()?.activities && selectedFacility()!.activities.length > 0) {
+    <!-- Activities Section (skip for crafting facilities) -->
+    @if (selectedFacility()?.type !== 'crafting' && selectedFacility()?.activities && selectedFacility()!.activities.length > 0) {
       <h3>Activities</h3>
-    }
-    <div class="activities-list">
-      @for (activity of selectedFacility()?.activities; track activity.activityId) {
-        <div class="activity-card"
-          [class.available]="activity.available"
-          [class.unavailable]="!activity.available"
-          (click)="selectActivity(activity)">
-          <h4>{{ activity.name }}</h4>
-          <p>{{ activity.description }}</p>
-          <div class="activity-meta">
-            @if (activity.duration !== undefined && activity.duration > 0) {
-              <span>⏱️ {{ activity.duration }}s</span>
-            }
-            @if (activity.type === 'combat' && activity.monsterLevel) {
-              <span>⚔️ Level {{ activity.monsterLevel }}</span>
-            }
-            @if (!activity.available) {
-              <span class="unavailable-badge">Requirements Not Met</span>
-            }
+      <div class="activities-list">
+        @for (activity of selectedFacility()?.activities; track activity.activityId) {
+          <div class="activity-card"
+            [class.available]="activity.available"
+            [class.unavailable]="!activity.available"
+            (click)="selectActivity(activity)">
+            <h4>{{ activity.name }}</h4>
+            <p>{{ activity.description }}</p>
+            <div class="activity-meta">
+              @if (activity.duration !== undefined && activity.duration > 0) {
+                <span>⏱️ {{ activity.duration }}s</span>
+              }
+              @if (activity.type === 'combat' && activity.monsterLevel) {
+                <span>⚔️ Level {{ activity.monsterLevel }}</span>
+              }
+              @if (!activity.available) {
+                <span class="unavailable-badge">Requirements Not Met</span>
+              }
+            </div>
           </div>
-        </div>
-      }
-    </div>
+        }
+      </div>
+    }
   </div>
 }

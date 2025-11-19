@@ -14,6 +14,7 @@ import { Quest, ObjectiveType, ObjectiveProgress, ActiveQuest, QuestRewards } fr
 import QuestRegistry from '../data/quests/QuestRegistry';
 import Player, { IPlayer } from '../models/Player';
 import itemService from './itemService';
+import playerInventoryService from './playerInventoryService';
 
 // ============================================================================
 // Registry Management
@@ -70,7 +71,7 @@ export function meetsRequirements(player: IPlayer, quest: Quest): boolean {
   // Check required items
   if (requirements.items) {
     for (const itemId of requirements.items) {
-      if (!player.hasInventoryItem(itemId, 1)) {
+      if (!playerInventoryService.hasInventoryItem(player, itemId, 1)) {
         return false;
       }
     }

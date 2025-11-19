@@ -7,6 +7,7 @@ require('dotenv').config();
 const connectDB = require('../dist/be/config/database').default;
 const Player = require('../dist/be/models/Player').default;
 const itemService = require('../dist/be/services/itemService').default;
+const playerInventoryService = require('../dist/be/services/playerInventoryService').default;
 
 // ============================================================================
 // ITEM PRESETS - Reusable item sets for testing and development
@@ -117,7 +118,7 @@ async function addItemToPlayer() {
 
       const instance = itemService.createItemInstance(itemId, quantity, qualities, traits);
       instances.push({ itemId, quantity, traits, instance });
-      player.addItem(instance);
+      playerInventoryService.addItem(player, instance);
     }
 
     await player.save();

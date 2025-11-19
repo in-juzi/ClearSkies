@@ -16,8 +16,10 @@
   min-height: 0;
 }
 
-app-inventory-list-view {
+app-inventory-list-view, app-inventory-grouped-view {
   flex: 1;
+  overflow: auto;
+  overflow-x: hidden;
 }
 
 /* Item Details Panel - Shared component styles */

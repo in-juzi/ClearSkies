@@ -56,9 +56,10 @@ function scheduleActivityCompletion(
 
       // Format skill update
       const skillId = Object.keys(activity.rewards.experience)[0];
+      const skillXP = activity.rewards.experience[skillId];
       skillUpdates[skillId] = {
         ...xpRewards.skill,
-        experience: xpRewards.skill.experienceGained
+        experience: skillXP  // The actual XP amount awarded
       };
 
       // Format attribute update
@@ -466,9 +467,11 @@ export default function (io: Server): void {
               const attributeUpdates: any = {};
 
               for (const [skillName, xpResult] of Object.entries(result.xpRewards)) {
+                // Get the original XP amount from rewards.experience
+                const skillXP = rewards.experience?.[skillName] || 0;
                 skillUpdates[skillName] = {
                   ...xpResult.skill,
-                  experience: xpResult.skill.experienceGained
+                  experience: skillXP  // The actual XP amount awarded
                 };
                 if (xpResult.attribute) {
                   attributeUpdates[xpResult.attribute.attribute] = xpResult.attribute;

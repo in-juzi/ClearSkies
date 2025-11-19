@@ -64,7 +64,7 @@ class RecipeService {
     instanceId: string,
     ingredient: any
   ): ValidationResult {
-    const item = player.getItem(instanceId);
+    const item = playerInventoryService.getItem(player, instanceId);
     if (!item) {
       return {
         valid: false,
@@ -138,7 +138,7 @@ class RecipeService {
 
     if (ingredient.itemId) {
       // Specific item: use existing method
-      totalQuantity = player.getInventoryItemQuantity(ingredient.itemId);
+      totalQuantity = playerInventoryService.getInventoryItemQuantity(player, ingredient.itemId);
     } else if (ingredient.subcategory) {
       // Subcategory: count all matching items
       for (const item of player.inventory) {
@@ -256,7 +256,7 @@ class RecipeService {
       // Check required items (must have in inventory)
       if (recipe.unlockConditions.requiredItems && recipe.unlockConditions.requiredItems.length > 0) {
         const allRequiredOwned = recipe.unlockConditions.requiredItems.every(
-          itemId => player.hasInventoryItem && player.hasInventoryItem(itemId, 1)
+          itemId => playerInventoryService.hasInventoryItem(player, itemId, 1)
         );
         if (allRequiredOwned) {
           shouldUnlock = true;
@@ -548,7 +548,7 @@ class RecipeService {
 
     // 6. Update quest progress (lazy load to avoid circular dependency)
     const questService = require('./questService');
-    await questService.onCraftingComplete(player, recipe.recipeId, outputItems);
+    await questService.onRecipeCrafted(player, recipe.recipeId);
 
     console.log(`[Crafting] ${player.characterName} crafted ${recipe.name} - awarded ${recipe.experience} ${recipe.skill} XP`);
 
