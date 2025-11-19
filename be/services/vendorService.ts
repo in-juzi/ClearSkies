@@ -24,9 +24,13 @@ class VendorService {
       return [];
     }
 
+    // Batch fetch item definitions to avoid N+1 queries
+    const itemIds = vendor.stock.map(item => item.itemId);
+    const itemDefinitions = itemService.getItemDefinitions(itemIds);
+
     // Populate stock items with item definitions
     return vendor.stock.map(stockItem => {
-      const itemDef = itemService.getItemDefinition(stockItem.itemId);
+      const itemDef = itemDefinitions.get(stockItem.itemId);
 
       if (!itemDef) {
         console.warn(`⚠️  Vendor ${vendorId} references unknown item: ${stockItem.itemId}`);

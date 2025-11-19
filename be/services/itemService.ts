@@ -129,6 +129,24 @@ class ItemService {
   }
 
   /**
+   * Batch get item definitions by IDs
+   * Efficient alternative to calling getItemDefinition() in a loop
+   * @returns Map of itemId -> Item for O(1) lookups
+   */
+  getItemDefinitions(itemIds: string[]): Map<string, Item> {
+    const result = new Map<string, Item>();
+
+    for (const itemId of itemIds) {
+      const item = ItemRegistry.get(itemId);
+      if (item) {
+        result.set(itemId, item);
+      }
+    }
+
+    return result;
+  }
+
+  /**
    * Get all item definitions
    */
   getAllItemDefinitions(): Item[] {

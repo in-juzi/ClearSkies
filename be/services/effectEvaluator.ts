@@ -20,16 +20,109 @@ import { TraitRegistry } from '../data/items/traits/TraitRegistry';
 import { QualityRegistry } from '../data/items/qualities/QualityRegistry';
 import itemService from './itemService';
 
+/**
+ * Cache for effect evaluation results
+ * Reduces redundant calculations during combat/activities
+ */
+class EffectEvaluationCache {
+  private cache = new Map<string, { result: EffectEvaluationResult; timestamp: number }>();
+  private TTL = 5000; // 5 second TTL
+
+  /**
+   * Generate cache key from player ID and context
+   */
+  private getCacheKey(playerId: string, context: EffectContext, runtimeContext?: any): string {
+    // Include runtime context in key for different scenarios
+    const runtimeKey = runtimeContext
+      ? JSON.stringify({
+          activityId: runtimeContext.activityId,
+          target: runtimeContext.target?._id || runtimeContext.target?.monsterId,
+        })
+      : 'default';
+    return `${playerId}:${context}:${runtimeKey}`;
+  }
+
+  /**
+   * Get cached result if valid
+   */
+  get(playerId: string, context: EffectContext, runtimeContext?: any): EffectEvaluationResult | null {
+    const key = this.getCacheKey(playerId, context, runtimeContext);
+    const cached = this.cache.get(key);
+
+    if (cached && Date.now() - cached.timestamp < this.TTL) {
+      return cached.result;
+    }
+
+    // Expired - delete
+    if (cached) {
+      this.cache.delete(key);
+    }
+
+    return null;
+  }
+
+  /**
+   * Store result in cache
+   */
+  set(playerId: string, context: EffectContext, runtimeContext: any | undefined, result: EffectEvaluationResult): void {
+    const key = this.getCacheKey(playerId, context, runtimeContext);
+    this.cache.set(key, {
+      result: { ...result }, // Clone to prevent mutations
+      timestamp: Date.now(),
+    });
+  }
+
+  /**
+   * Invalidate all cache entries for a player
+   * Call when equipment changes
+   */
+  invalidate(playerId: string): void {
+    for (const key of this.cache.keys()) {
+      if (key.startsWith(`${playerId}:`)) {
+        this.cache.delete(key);
+      }
+    }
+  }
+
+  /**
+   * Clear entire cache (admin/debug)
+   */
+  clear(): void {
+    this.cache.clear();
+  }
+
+  /**
+   * Get cache stats
+   */
+  getStats() {
+    return {
+      size: this.cache.size,
+      keys: Array.from(this.cache.keys()),
+    };
+  }
+}
+
+// Global cache instance
+const effectCache = new EffectEvaluationCache();
+
 class EffectEvaluatorService {
   /**
    * Evaluate all effects from a player's equipped items and active buffs
-   * for a specific context
+   * for a specific context (with caching)
    */
   evaluatePlayerEffects(
     player: any,
     effectContext: EffectContext,
     runtimeContext?: EffectEvaluationContext['runtime']
   ): EffectEvaluationResult {
+    // Check cache first
+    const playerId = player._id?.toString() || player.userId;
+    const cached = effectCache.get(playerId, effectContext, runtimeContext);
+    if (cached) {
+      return cached;
+    }
+
+    // Cache miss - calculate effects
     const context: EffectEvaluationContext = {
       entity: player,
       effectContext,
@@ -64,6 +157,9 @@ class EffectEvaluatorService {
 
     // 3. Evaluate active buffs (future - buffs may grant temporary effects)
     // this.evaluateActiveBuffs(player, context, result);
+
+    // Store in cache
+    effectCache.set(playerId, effectContext, runtimeContext, result);
 
     return result;
   }
@@ -654,6 +750,28 @@ class EffectEvaluatorService {
     result: EffectEvaluationResult
   ): number {
     return (baseValue + result.flatBonus) * (1 + result.percentageBonus) * result.multiplier;
+  }
+
+  /**
+   * Invalidate effect cache for a player
+   * Call when equipment changes or buffs expire
+   */
+  invalidateCache(playerId: string): void {
+    effectCache.invalidate(playerId);
+  }
+
+  /**
+   * Clear entire effect cache (admin/debug)
+   */
+  clearCache(): void {
+    effectCache.clear();
+  }
+
+  /**
+   * Get cache statistics (admin/debug)
+   */
+  getCacheStats() {
+    return effectCache.getStats();
   }
 }
 

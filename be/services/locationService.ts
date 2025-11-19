@@ -1,4 +1,5 @@
 import dropTableService from './dropTableService';
+import playerInventoryService from './playerInventoryService';
 import {
   Location,
   Facility,
@@ -86,6 +87,13 @@ class LocationService {
     locations.forEach(location => {
       this.locations.set(location.locationId, location);
     });
+  }
+
+  /**
+   * Get a location by ID (simple accessor)
+   */
+  getLocation(locationId: string): any {
+    return this.locations.get(locationId);
   }
 
   /**
@@ -213,13 +221,27 @@ class LocationService {
     // Check inventory item requirements (with quantity)
     if (activity.requirements.inventory) {
       for (const invReq of activity.requirements.inventory) {
-        const { itemId, quantity = 1 } = invReq;
-        const hasItem = player.hasInventoryItem(itemId, quantity);
-        if (!hasItem) {
+        const { itemId, subcategory, quantity = 1 } = invReq;
+
+        if (itemId) {
+          // Specific item requirement
+          const hasItem = playerInventoryService.hasInventoryItem(player, itemId, quantity);
+          if (!hasItem) {
+            const itemService = require('./itemService').default;
+            const itemDef = itemService.getItemDefinition(itemId);
+            const itemName = itemDef?.name || itemId;
+            failures.push(`Requires ${quantity}x ${itemName} in inventory`);
+          }
+        } else if (subcategory) {
+          // Subcategory requirement (e.g., "any log")
           const itemService = require('./itemService').default;
-          const itemDef = itemService.getItemDefinition(itemId);
-          const itemName = itemDef?.name || itemId;
-          failures.push(`Requires ${quantity}x ${itemName} in inventory`);
+          const hasSubcategoryItem = player.inventory.some((item: any) => {
+            const itemDef = itemService.getItemDefinition(item.itemId);
+            return itemDef?.subcategories?.includes(subcategory) && item.quantity >= quantity;
+          });
+          if (!hasSubcategoryItem) {
+            failures.push(`Requires ${quantity}x any ${subcategory} in inventory`);
+          }
         }
       }
     }
@@ -325,6 +347,93 @@ class LocationService {
    */
   getDropTable(dropTableId: string): any {
     return this.dropTableService.getDropTable(dropTableId);
+  }
+
+  /**
+   * Process complete activity workflow with all rewards
+   * This is the single source of truth for activity completion
+   *
+   * @param player - Player completing the activity
+   * @param activity - Activity definition
+   * @param location - Location where activity occurred
+   * @returns Reward details (XP, loot, quest progress)
+   */
+  async processActivityCompletion(
+    player: any,
+    activity: any,
+    location: any
+  ): Promise<{
+    xpRewards: { skill: any; attribute: any };
+    lootItems: any[];
+    questProgress: any[];
+  }> {
+    const itemService = require('./itemService').default;
+    const questService = require('./questService');
+
+    // 1. Calculate rewards from drop tables
+    const rewards = this.calculateActivityRewards(activity, {
+      player,
+      dropTableService: this.dropTableService,
+      itemService
+    });
+
+    // 2. Award XP (first skill in rewards.experience)
+    const skillId = Object.keys(rewards.experience)[0];
+    const xp = rewards.experience[skillId];
+    const xpRewards = await player.addSkillExperience(skillId, xp);
+
+    console.log(`[Location] Activity ${activity.activityId} completion - Awarded ${xp} XP to ${skillId}`);
+
+    // 3. Generate item instances from rolled rewards
+    const lootItems: any[] = [];
+    if (rewards.items && rewards.items.length > 0) {
+      for (const itemReward of rewards.items) {
+        // Generate random qualities and traits for the item
+        const qualities = itemService.generateRandomQualities(itemReward.itemId);
+        const traits = itemService.generateRandomTraits(itemReward.itemId);
+
+        const itemInstance = itemService.createItemInstance(
+          itemReward.itemId,
+          itemReward.quantity,
+          qualities,
+          traits
+        );
+
+        // Add to player inventory
+        playerInventoryService.addItem(player, itemInstance);
+
+        // Get item definition for client response
+        const itemDef = itemService.getItemDefinition(itemReward.itemId);
+        lootItems.push({
+          itemId: itemReward.itemId,
+          name: itemDef?.name,
+          quantity: itemReward.quantity,
+          qualities: itemInstance.qualities instanceof Map ? Object.fromEntries(itemInstance.qualities) : itemInstance.qualities,
+          traits: itemInstance.traits instanceof Map ? Object.fromEntries(itemInstance.traits) : itemInstance.traits,
+          definition: itemDef ? {
+            icon: itemDef.icon
+          } : undefined
+        });
+      }
+    }
+
+    console.log(`[Location] Generated ${lootItems.length} loot items`);
+
+    // 4. Save player with new items and XP
+    await player.save();
+
+    // 5. Update quest progress
+    const questProgress = await questService.onActivityComplete(player, activity.activityId, lootItems);
+
+    if (questProgress && questProgress.length > 0) {
+      console.log(`[Location] Updated ${questProgress.length} quest objectives`);
+    }
+
+    return {
+      xpRewards,
+      lootItems,
+      questProgress: questProgress || []
+    };
   }
 }
 

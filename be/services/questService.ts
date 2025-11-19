@@ -263,35 +263,39 @@ export async function turnInQuest(player: IPlayer, questId: string): Promise<{ s
     return { success: false, message: 'Not all objectives are completed' };
   }
 
-  // Distribute rewards
+  // Import reward processor
+  const rewardProcessor = require('./rewardProcessor').default;
+
+  // Distribute rewards using centralized reward processor
   const rewards = quest.rewards;
 
-  // Award XP
+  // Separate skill XP from attribute XP (reward processor only handles skills)
+  const skillXP: Record<string, number> = {};
+  const attributeXP: Record<string, number> = {};
+
   if (rewards.experience) {
     for (const [skillOrAttribute, xpAmount] of Object.entries(rewards.experience)) {
       if (player.skills[skillOrAttribute as keyof typeof player.skills]) {
-        await player.addSkillExperience(skillOrAttribute as any, xpAmount);
+        skillXP[skillOrAttribute] = xpAmount;
       } else if (player.attributes[skillOrAttribute as keyof typeof player.attributes]) {
-        await player.addAttributeExperience(skillOrAttribute as any, xpAmount);
+        attributeXP[skillOrAttribute] = xpAmount;
       }
     }
   }
 
-  // Award gold
-  if (rewards.gold) {
-    player.addGold(rewards.gold);
+  // Process skill-based rewards through reward processor
+  if (Object.keys(skillXP).length > 0 || rewards.items || rewards.gold) {
+    await rewardProcessor.processRewards(player, {
+      experience: skillXP,
+      items: rewards.items,
+      gold: rewards.gold
+    });
   }
 
-  // Award items
-  if (rewards.items) {
-    for (const itemReward of rewards.items) {
-      const itemDef = itemService.getItemDefinition(itemReward.itemId);
-      if (itemDef) {
-        for (let i = 0; i < itemReward.quantity; i++) {
-          const instance = itemService.createItemInstance(itemReward.itemId);
-          player.addItem(instance);
-        }
-      }
+  // Process attribute XP separately (not handled by reward processor)
+  if (Object.keys(attributeXP).length > 0) {
+    for (const [attribute, xpAmount] of Object.entries(attributeXP)) {
+      await player.addAttributeExperience(attribute as any, xpAmount);
     }
   }
 
@@ -312,7 +316,11 @@ export async function turnInQuest(player: IPlayer, questId: string): Promise<{ s
     player.quests.completed.push(questId);
   }
 
-  await player.save();
+  // Player already saved by reward processor if there were skill/item/gold rewards
+  // Only save if we only had attribute XP or unlocks
+  if (Object.keys(skillXP).length === 0 && !rewards.items && !rewards.gold) {
+    await player.save();
+  }
 
   // Check for auto-accept quests that are now available
   await checkAutoAcceptQuests(player);

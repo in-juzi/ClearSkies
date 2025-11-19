@@ -17,6 +17,7 @@ import { AbilityRegistry } from '../data/abilities/AbilityRegistry';
 import { COMBAT_FORMULAS } from '../data/constants/combat-constants';
 import { ICombatEntity, PlayerCombatEntity, MonsterCombatEntity, WeaponData } from './combat/CombatEntity';
 import effectEvaluator from './effectEvaluator';
+import playerCombatService from './playerCombatService';
 
 /**
  * Cached passive ability effects for an entity
@@ -230,6 +231,136 @@ class CombatService {
    * @param itemPropertyKey - Key in item properties (armor, evasion)
    * @returns Total stat value after all bonuses applied
    */
+  /**
+   * Get base stat value from entity's combatStats
+   */
+  private getBaseCombatStat(entity: any, combatStatKey: string): number {
+    if (entity.combatStats && entity.combatStats[combatStatKey] !== undefined) {
+      return entity.combatStats[combatStatKey];
+    }
+    return 0;
+  }
+
+  /**
+   * Get passive ability bonuses for a stat
+   */
+  private getPassiveCombatBonus(entity: any, passiveEffectKey: string): number {
+    if (!passiveEffectKey) return 0;
+
+    const passiveEffects = this.getPassiveEffects(entity);
+    const bonusValue = passiveEffects[passiveEffectKey as keyof PassiveEffects];
+
+    return typeof bonusValue === 'number' ? bonusValue : 0;
+  }
+
+  /**
+   * Get equipment bonuses from item properties
+   */
+  private getEquipmentPropertyBonus(
+    entity: any,
+    itemService: any,
+    itemPropertyKey: string
+  ): number {
+    if (!entity.inventory || !entity.equipmentSlots) {
+      return 0;
+    }
+
+    const equippedItems = this.getEquippedItems(entity);
+    const itemIds = equippedItems.map(item => item.itemId);
+    const itemDefinitions = itemService.getItemDefinitions(itemIds);
+
+    let total = 0;
+    for (const item of equippedItems) {
+      const itemDef = itemDefinitions.get(item.itemId);
+      if (itemDef?.properties?.[itemPropertyKey] !== undefined) {
+        total += itemDef.properties[itemPropertyKey];
+      }
+    }
+
+    return total;
+  }
+
+  /**
+   * Get trait/quality/affix bonuses from effect system
+   */
+  private getEquipmentEffectBonus(
+    entity: any,
+    statName: BuffableStat | string,
+    baseValue: number
+  ): number {
+    if (!entity.inventory || !entity.equipmentSlots) {
+      return baseValue;
+    }
+
+    const contextMap: Record<string, EffectContext> = {
+      'damage': EffectContext.COMBAT_DAMAGE,
+      'armor': EffectContext.COMBAT_ARMOR,
+      'evasion': EffectContext.COMBAT_EVASION,
+      'critChance': EffectContext.COMBAT_CRIT_CHANCE,
+      'attackSpeed': EffectContext.COMBAT_ATTACK_SPEED,
+    };
+
+    const effectContext = contextMap[statName as string];
+    if (!effectContext) {
+      return baseValue;
+    }
+
+    // Calculate current HP percentage for conditional effects
+    const currentHP = entity.stats?.health?.current || 0;
+    const maxHP = entity.maxHP || 1;
+    const hpPercent = currentHP / maxHP;
+
+    const traitEffects = effectEvaluator.evaluatePlayerEffects(
+      entity,
+      effectContext,
+      { hpPercent, inCombat: true }
+    );
+
+    // Apply effect modifiers
+    let total = baseValue + traitEffects.flatBonus;
+
+    if (traitEffects.percentageBonus !== 0) {
+      total = Math.floor(total * (1 + traitEffects.percentageBonus));
+    }
+
+    if (traitEffects.multiplier !== 1.0) {
+      total = Math.floor(total * traitEffects.multiplier);
+    }
+
+    return total;
+  }
+
+  /**
+   * Get buff/debuff modifiers for a stat
+   */
+  private getBuffCombatBonus(
+    entity: any,
+    itemService: any,
+    player: any | undefined,
+    statName: BuffableStat | string,
+    baseValue: number
+  ): number {
+    if (!player?.activeCombat?.activeBuffs) {
+      return baseValue;
+    }
+
+    const combatEntity = this.wrapEntity(entity, itemService);
+    const target = combatEntity.getType();
+    const modifiers = this.getActiveBuffModifiers(player, target, statName);
+
+    let total = baseValue + modifiers.flat;
+
+    if (modifiers.percentage !== 0) {
+      total = Math.floor(total * (1 + modifiers.percentage));
+    }
+
+    return total;
+  }
+
+  /**
+   * Calculate final combat stat value
+   * Orchestrates smaller helper functions for better testability
+   */
   private calculateCombatStat(
     entity: any,
     itemService: any,
@@ -239,85 +370,20 @@ class CombatService {
     passiveEffectKey: string,
     itemPropertyKey: string
   ): number {
-    let total = 0;
+    // 1. Get base stat
+    let total = this.getBaseCombatStat(entity, combatStatKey);
 
-    // 1. Add base stat from combatStats
-    if (entity.combatStats && entity.combatStats[combatStatKey] !== undefined) {
-      total += entity.combatStats[combatStatKey];
-    }
+    // 2. Add passive bonuses
+    total += this.getPassiveCombatBonus(entity, passiveEffectKey);
 
-    // 2. Add bonuses from passive abilities (cached)
-    const passiveEffects = this.getPassiveEffects(entity);
-    if (passiveEffectKey && passiveEffects[passiveEffectKey as keyof PassiveEffects] !== undefined) {
-      const bonusValue = passiveEffects[passiveEffectKey as keyof PassiveEffects];
-      if (typeof bonusValue === 'number') {
-        total += bonusValue;
-      }
-    }
+    // 3. Add equipment property bonuses
+    total += this.getEquipmentPropertyBonus(entity, itemService, itemPropertyKey);
 
-    // 3. Add bonuses from equipped items (players only)
-    if (entity.inventory && entity.equipmentSlots) {
-      const equippedItems = this.getEquippedItems(entity);
+    // 4. Apply equipment effect bonuses (traits/qualities/affixes)
+    total = this.getEquipmentEffectBonus(entity, statName, total);
 
-      // 3a. Base item property bonuses
-      for (const item of equippedItems) {
-        const itemDef = itemService.getItemDefinition(item.itemId);
-        if (itemDef && itemDef.properties && itemDef.properties[itemPropertyKey] !== undefined) {
-          total += itemDef.properties[itemPropertyKey];
-        }
-      }
-
-      // 3b. Trait/quality/affix bonuses (new effect system)
-      const contextMap: Record<string, EffectContext> = {
-        'damage': EffectContext.COMBAT_DAMAGE,
-        'armor': EffectContext.COMBAT_ARMOR,
-        'evasion': EffectContext.COMBAT_EVASION,
-        'critChance': EffectContext.COMBAT_CRIT_CHANCE,
-        'attackSpeed': EffectContext.COMBAT_ATTACK_SPEED,
-      };
-
-      const effectContext = contextMap[statName as string];
-      if (effectContext) {
-        // Calculate current HP percentage for conditional effects
-        const currentHP = entity.stats?.health?.current || 0;
-        const maxHP = entity.maxHP || 1;
-        const hpPercent = currentHP / maxHP;
-
-        const traitEffects = effectEvaluator.evaluatePlayerEffects(
-          entity,
-          effectContext,
-          { hpPercent, inCombat: true }
-        );
-
-        // Apply flat bonuses from traits/qualities
-        total += traitEffects.flatBonus;
-
-        // Apply percentage bonuses
-        if (traitEffects.percentageBonus !== 0) {
-          total = Math.floor(total * (1 + traitEffects.percentageBonus));
-        }
-
-        // Apply multipliers
-        if (traitEffects.multiplier !== 1.0) {
-          total = Math.floor(total * traitEffects.multiplier);
-        }
-      }
-    }
-
-    // 4. Apply buff/debuff modifiers
-    if (player && player.activeCombat && player.activeCombat.activeBuffs) {
-      const combatEntity = this.wrapEntity(entity, itemService);
-      const target = combatEntity.getType();
-      const modifiers = this.getActiveBuffModifiers(player, target, statName);
-
-      // Apply flat modifiers
-      total += modifiers.flat;
-
-      // Apply percentage modifiers
-      if (modifiers.percentage !== 0) {
-        total = Math.floor(total * (1 + modifiers.percentage));
-      }
-    }
+    // 5. Apply buff/debuff modifiers
+    total = this.getBuffCombatBonus(entity, itemService, player, statName, total);
 
     return Math.max(0, total); // Ensure non-negative
   }
@@ -607,11 +673,11 @@ class CombatService {
     if (buff.target === 'monster') {
       monsterInstance.stats.health.current = Math.max(0, monsterInstance.stats.health.current - buff.damageOverTime);
       result.monsterDamage += buff.damageOverTime;
-      player.addCombatLog(`${buff.name} deals ${buff.damageOverTime} damage to ${monsterInstance.name}.`, 'debuff', buff.damageOverTime, 'monster');
+      playerCombatService.addCombatLog(player,`${buff.name} deals ${buff.damageOverTime} damage to ${monsterInstance.name}.`, 'debuff', buff.damageOverTime, 'monster');
     } else {
-      await player.takeDamage(buff.damageOverTime);
+      await playerCombatService.takeDamage(player,buff.damageOverTime);
       result.playerDamage += buff.damageOverTime;
-      player.addCombatLog(`${buff.name} deals ${buff.damageOverTime} damage to you.`, 'debuff', buff.damageOverTime, 'player');
+      playerCombatService.addCombatLog(player,`${buff.name} deals ${buff.damageOverTime} damage to you.`, 'debuff', buff.damageOverTime, 'player');
     }
   }
 
@@ -622,14 +688,14 @@ class CombatService {
     if (!buff.healOverTime) return;
 
     if (buff.target === 'player') {
-      player.heal(buff.healOverTime);
-      player.addCombatLog(`${buff.name} heals you for ${buff.healOverTime} HP.`, 'heal', buff.healOverTime, 'player');
+      playerCombatService.heal(player,buff.healOverTime);
+      playerCombatService.addCombatLog(player,`${buff.name} heals you for ${buff.healOverTime} HP.`, 'heal', buff.healOverTime, 'player');
     } else {
       monsterInstance.stats.health.current = Math.min(
         monsterInstance.stats.health.max,
         monsterInstance.stats.health.current + buff.healOverTime
       );
-      player.addCombatLog(`${buff.name} heals ${monsterInstance.name} for ${buff.healOverTime} HP.`, 'heal', buff.healOverTime, 'monster');
+      playerCombatService.addCombatLog(player,`${buff.name} heals ${monsterInstance.name} for ${buff.healOverTime} HP.`, 'heal', buff.healOverTime, 'monster');
     }
   }
 
@@ -644,7 +710,7 @@ class CombatService {
         player.maxMP, // Use dynamic MP from attributes
         player.stats.mana.current + buff.manaRegen
       );
-      player.addCombatLog(`${buff.name} restores ${buff.manaRegen} mana.`, 'buff');
+      playerCombatService.addCombatLog(player,`${buff.name} restores ${buff.manaRegen} mana.`, 'buff');
     }
   }
 
@@ -657,7 +723,7 @@ class CombatService {
     if (buff.target === 'monster') {
       monsterInstance.stats.mana.current = Math.max(0, monsterInstance.stats.mana.current - buff.manaDrain);
     } else {
-      player.useMana(buff.manaDrain);
+      playerCombatService.useMana(player,buff.manaDrain);
     }
   }
 
@@ -707,7 +773,7 @@ class CombatService {
         if (buff.duration <= 0) {
           result.expiredBuffs.push(buffId);
           const targetName = buff.target === 'player' ? 'you' : monsterInstance.name;
-          player.addCombatLog(`${buff.name} fades from ${targetName}.`, 'system');
+          playerCombatService.addCombatLog(player,`${buff.name} fades from ${targetName}.`, 'system');
         }
       }
     }
@@ -781,7 +847,7 @@ class CombatService {
       startTime: now
     };
 
-    player.addCombatLog(`Combat started with ${monsterInstance.name}!`, 'system');
+    playerCombatService.addCombatLog(player,`Combat started with ${monsterInstance.name}!`, 'system');
 
     return monsterInstance;
   }
@@ -793,7 +859,7 @@ class CombatService {
   startCombat(player: any, monsterId: string, activityId: string, itemService: any): any {
     try {
       // Check if player already in combat
-      if (player.isInCombat()) {
+      if (playerCombatService.isInCombat(player)) {
         return {
           success: false,
           message: 'Already in combat'
@@ -856,7 +922,7 @@ class CombatService {
    * Use ability in combat
    */
   async useAbility(player: any, abilityId: string, itemService: any): Promise<any> {
-    if (!player.isInCombat()) {
+    if (!playerCombatService.isInCombat(player)) {
       throw new Error('Player is not in combat');
     }
 
@@ -883,8 +949,8 @@ class CombatService {
     }
 
     // Check cooldown
-    if (player.isAbilityOnCooldown(abilityId)) {
-      throw new Error(`Ability is on cooldown for ${player.getAbilityCooldownRemaining(abilityId)} more turn(s)`);
+    if (playerCombatService.isAbilityOnCooldown(player, abilityId)) {
+      throw new Error(`Ability is on cooldown for ${playerCombatService.getAbilityCooldownRemaining(player, abilityId)} more turn(s)`);
     }
 
     // Check mana cost
@@ -893,7 +959,7 @@ class CombatService {
     }
 
     // Use mana
-    player.useMana(ability.manaCost);
+    playerCombatService.useMana(player,ability.manaCost);
 
     // Award XP if ability has xpOnUse (for protection/support skills)
     if (ability.xpOnUse && ability.xpOnUse > 0) {
@@ -927,15 +993,15 @@ class CombatService {
 
     // Log ability use
     if (attackResult.isDodge) {
-      player.addCombatLog(`${ability.name} missed - ${monsterInstance.name} dodged!`, 'miss');
+      playerCombatService.addCombatLog(player,`${ability.name} missed - ${monsterInstance.name} dodged!`, 'miss');
     } else if (attackResult.isCrit) {
-      player.addCombatLog(`CRITICAL ${ability.name}! You deal ${attackResult.damage} damage!`, 'ability', attackResult.damage, 'monster');
+      playerCombatService.addCombatLog(player,`CRITICAL ${ability.name}! You deal ${attackResult.damage} damage!`, 'ability', attackResult.damage, 'monster');
     } else {
-      player.addCombatLog(`You use ${ability.name} for ${attackResult.damage} damage!`, 'ability', attackResult.damage, 'monster');
+      playerCombatService.addCombatLog(player,`You use ${ability.name} for ${attackResult.damage} damage!`, 'ability', attackResult.damage, 'monster');
     }
 
     // Set cooldown
-    player.setAbilityCooldown(abilityId, ability.cooldown);
+    playerCombatService.setAbilityCooldown(player,abilityId, ability.cooldown);
 
     // Increment turn counter (using an ability counts as a turn)
     combat.turnCount++;
@@ -946,7 +1012,7 @@ class CombatService {
 
     // Apply DoT/HoT damage from buffs
     if (buffTickResults.playerDamage > 0) {
-      await player.takeDamage(buffTickResults.playerDamage);
+      await playerCombatService.takeDamage(player,buffTickResults.playerDamage);
     }
     if (buffTickResults.monsterDamage > 0) {
       monsterInstance.stats.health.current = Math.max(0, monsterInstance.stats.health.current - buffTickResults.monsterDamage);
@@ -957,7 +1023,7 @@ class CombatService {
     if (ability.effects && ability.effects.applyBuff) {
       appliedBuff = this.applyBuff(player, abilityId, ability.effects.applyBuff, combat.turnCount);
       const targetName = appliedBuff.target === 'player' ? 'you' : monsterInstance.name;
-      player.addCombatLog(`${appliedBuff.name} applied to ${targetName}!`, appliedBuff.target === 'player' ? 'buff' : 'debuff');
+      playerCombatService.addCombatLog(player,`${appliedBuff.name} applied to ${targetName}!`, appliedBuff.target === 'player' ? 'buff' : 'debuff');
     }
 
     // Update monster instance
@@ -966,7 +1032,7 @@ class CombatService {
     // Check if monster is defeated
     const monsterDefeated = monsterInstance.stats.health.current <= 0;
     if (monsterDefeated) {
-      player.addCombatLog(`You defeated ${monsterInstance.name}!`, 'system');
+      playerCombatService.addCombatLog(player,`You defeated ${monsterInstance.name}!`, 'system');
     }
 
     return {
@@ -982,9 +1048,11 @@ class CombatService {
    * End combat and award rewards
    */
   async awardCombatRewards(player: any, victory: boolean, itemService: any, dropTableService: any): Promise<any> {
-    if (!player.isInCombat()) {
+    if (!playerCombatService.isInCombat(player)) {
       throw new Error('Player is not in combat');
     }
+
+    const rewardProcessor = require('./rewardProcessor').default;
 
     const combat = player.activeCombat;
     const monsterInstance = Object.fromEntries(combat.monsterInstance);
@@ -998,42 +1066,44 @@ class CombatService {
     };
 
     if (victory && monsterDef) {
-      // Award gold
+      // Calculate gold amount
       const goldAmount = Math.floor(
         Math.random() * (monsterDef.goldDrop.max - monsterDef.goldDrop.min + 1) + monsterDef.goldDrop.min
       );
-      player.addGold(goldAmount);
-      rewards.gold = goldAmount;
 
-      // Award XP (use active combat skill based on equipment)
-      const activeCombatSkill = player.getActiveCombatSkill();
-      const xpResult = await player.addSkillExperience(activeCombatSkill, monsterDef.experience);
-      rewards.experience = monsterDef.experience;
-      rewards.skillResult = xpResult;
-
-      // Award loot from drop tables
+      // Roll loot from drop tables
       const droppedItems = dropTableService.rollMultipleDropTables(monsterDef.lootTables);
-      for (const dropResult of droppedItems) {
-        // Generate random qualities and traits for combat drops
-        const qualities = itemService.generateRandomQualities(dropResult.itemId);
-        const traits = itemService.generateRandomTraits(dropResult.itemId);
 
-        // Use itemService to create proper item instances with Maps
-        const itemInstance = itemService.createItemInstance(
-          dropResult.itemId,
-          dropResult.quantity,
-          qualities,
-          traits
-        );
+      // Get active combat skill for XP
+      const activeCombatSkill = player.getActiveCombatSkill();
 
-        player.addItem(itemInstance);
-        rewards.items.push(itemInstance);
+      // Process rewards using centralized reward processor
+      const result = await rewardProcessor.processRewardsWithQuests(
+        player,
+        {
+          experience: { [activeCombatSkill]: monsterDef.experience },
+          items: droppedItems,
+          gold: goldAmount
+        },
+        {
+          monsterId: monsterInstance.monsterId
+        }
+      );
+
+      // Build response format expected by handler
+      rewards.gold = result.goldAdded;
+      rewards.experience = monsterDef.experience;
+      rewards.items = result.itemsAdded;
+
+      // Extract skill result for backward compatibility with handler
+      if (result.xpRewards[activeCombatSkill]) {
+        rewards.skillResult = result.xpRewards[activeCombatSkill];
       }
 
       // Update combat stats
       player.combatStats.monstersDefeated++;
 
-      player.addCombatLog(`Victory! Earned ${goldAmount} gold and ${monsterDef.experience} XP.`, 'system');
+      playerCombatService.addCombatLog(player,`Victory! Earned ${goldAmount} gold and ${monsterDef.experience} XP.`, 'system');
     } else {
       // Player defeated
       player.combatStats.deaths++;
@@ -1043,7 +1113,7 @@ class CombatService {
       player.gold = 0;
       rewards.goldLost = goldLost;
 
-      player.addCombatLog(`Defeated! Lost ${goldLost} gold.`, 'system');
+      playerCombatService.addCombatLog(player,`Defeated! Lost ${goldLost} gold.`, 'system');
 
       // Restore player to full health (using dynamic HP from attributes)
       player.stats.health.current = player.maxHP;
@@ -1052,7 +1122,10 @@ class CombatService {
     // Clear combat state
     player.clearCombat();
 
-    await player.save();
+    // Player already saved by rewardProcessor in victory case
+    if (!victory) {
+      await player.save();
+    }
 
     return rewards;
   }
@@ -1129,7 +1202,7 @@ class CombatService {
     // Apply healing
     const beforeHealth = player.stats.health.current;
     if (totalHealing > 0) {
-      player.heal(totalHealing);
+      playerCombatService.heal(player,totalHealing);
     }
     const actualHealing = player.stats.health.current - beforeHealth;
 

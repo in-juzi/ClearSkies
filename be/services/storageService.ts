@@ -1,4 +1,6 @@
 import itemService from './itemService';
+import playerInventoryService from './playerInventoryService';
+import playerStorageService from './playerStorageService';
 
 /**
  * Storage Service
@@ -10,8 +12,8 @@ class StorageService {
    */
   canDeposit(player: any, containerId: string, instanceId: string, quantity: number | null): { valid: boolean; error?: string } {
     try {
-      // Find item in inventory
-      const inventoryItem = player.getItem(instanceId);
+      // Find item in inventory using service
+      const inventoryItem = playerInventoryService.getItem(player, instanceId);
       if (!inventoryItem) {
         return { valid: false, error: 'Item not found in inventory' };
       }
@@ -27,17 +29,17 @@ class StorageService {
         return { valid: false, error: 'Cannot deposit more than you have' };
       }
 
-      // Check container exists
+      // Check container exists using service
       let container;
       try {
-        container = player.getContainer(containerId);
+        container = playerStorageService.getContainer(player, containerId);
       } catch (err) {
         return { valid: false, error: 'Container not found' };
       }
 
       // Check if we need a new slot (item doesn't stack with existing)
       const existingContainerItem = container.items.find((item: any) =>
-        itemService.canStack(item, inventoryItem)
+        itemService.canStack(item as any, inventoryItem as any)
       );
 
       if (!existingContainerItem) {
@@ -59,10 +61,10 @@ class StorageService {
    */
   canWithdraw(player: any, containerId: string, instanceId: string, quantity: number | null): { valid: boolean; error?: string } {
     try {
-      // Check container exists
+      // Check container exists using service
       let container;
       try {
-        container = player.getContainer(containerId);
+        container = playerStorageService.getContainer(player, containerId);
       } catch (err) {
         return { valid: false, error: 'Container not found' };
       }
@@ -111,8 +113,8 @@ class StorageService {
       throw new Error(validation.error);
     }
 
-    // Perform deposit using Player method
-    const result = player.depositToContainer(containerId, instanceId, quantity);
+    // Perform deposit using service
+    const result = playerStorageService.depositToContainer(player, containerId, instanceId, quantity);
 
     // Save player
     await player.save();
@@ -131,8 +133,8 @@ class StorageService {
       throw new Error(validation.error);
     }
 
-    // Perform withdrawal using Player method
-    const result = player.withdrawFromContainer(containerId, instanceId, quantity);
+    // Perform withdrawal using service
+    const result = playerStorageService.withdrawFromContainer(player, containerId, instanceId, quantity);
 
     // Save player
     await player.save();
@@ -144,8 +146,8 @@ class StorageService {
    * Get container info (capacity, used slots, items)
    */
   getContainerInfo(player: any, containerId: string): any {
-    const container = player.getContainer(containerId);
-    const items = player.getContainerItems(containerId);
+    const container = playerStorageService.getContainer(player, containerId);
+    const items = playerStorageService.getContainerItems(player, containerId);
 
     return {
       containerId: container.containerId,
@@ -170,8 +172,8 @@ class StorageService {
    */
   canAccessContainer(player: any, containerId: string, operation: 'view' | 'deposit' | 'withdraw'): { allowed: boolean; reason?: string } {
     try {
-      // Check if container exists
-      const container = player.getContainer(containerId);
+      // Check if container exists using service
+      const container = playerStorageService.getContainer(player, containerId);
 
       // For now, all player-owned containers (bank, future house storage) are accessible
       // Future: Add guild permission checks here
