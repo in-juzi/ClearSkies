@@ -96,29 +96,22 @@
 - ✅ Player housing system (completed - property ownership, building slots, construction projects)
 - ✅ Backend type system consolidation (completed - removed redundant be/types/, all imports use @shared/types)
 - ✅ Frontend type system consolidation (completed - cleaned up model re-exports, components import directly from @shared/types)
+- ✅ Backend service refactoring (completed - extracted player services, centralized reward processing, improved code organization)
+- ✅ Quantity dialog component (completed - reusable modal for bulk item operations)
+- ✅ Bank bulk operations (completed - integrated quantity dialog for improved UX)
+- ✅ Error handling standardization (completed - custom error classes and middleware)
 
 **Recent Changes** (Last 10 commits):
-- refactor: update crafting components to import from @shared/types
-- refactor: clean up frontend model re-exports
-- docs: update CLAUDE.md with backend type consolidation
-- refactor: remove redundant backend type files
-- refactor: migrate all backend imports to @shared/types
-- chore: update Claude Code local settings
-- chore: code formatting and minor registry updates
-- docs: add player housing and construction system documentation
-- feat: add database migrations for construction and housing
-- feat: add housing system frontend components
-- feat: add housing system API and WebSocket handlers
-- feat: add player housing and construction system backend
-- refactor: enhance location type system with crafting activities
-- feat: add construction crafting recipes
-- feat: add construction resource gathering activities
-- refactor: standardize component class names with Component suffix
-- refactor: migrate components to use inject() instead of constructor DI
-- docs: update CLAUDE.md with frontend logging cleanup
-- refactor: remove debug console.log statements from frontend
-- feat: add centralized item sorting utilities
-- feat: add rarity transformation pipes for consistent styling
+- docs: add comprehensive backend refactoring documentation
+- feat: add construction materials and processing activities
+- feat: improve bank component with bulk operations and better UX
+- feat: add quantity dialog component for bulk item operations
+- feat: add standardized error handling middleware and utilities
+- refactor: update controllers and models to use new service architecture
+- refactor: simplify socket handlers using centralized services
+- refactor: consolidate service methods and improve code organization
+- refactor: add centralized reward processor for consistent reward handling
+- refactor: extract player service modules for better separation of concerns
 
 **Known Issues**:
 - None currently identified
@@ -170,10 +163,12 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 ### Frequently Modified Files
 
 **Backend Core:**
-- Controllers: [be/controllers/inventoryController.js](be/controllers/inventoryController.js), [be/controllers/locationController.js](be/controllers/locationController.js), [be/controllers/skillsController.js](be/controllers/skillsController.js), [be/controllers/attributesController.js](be/controllers/attributesController.js), [be/controllers/authController.js](be/controllers/authController.js), [be/controllers/manualController.js](be/controllers/manualController.js), [be/controllers/vendorController.js](be/controllers/vendorController.js), [be/controllers/craftingController.js](be/controllers/craftingController.js), [be/controllers/combatController.js](be/controllers/combatController.js), [be/controllers/storageController.ts](be/controllers/storageController.ts), [be/controllers/questController.ts](be/controllers/questController.ts), [be/controllers/housingController.ts](be/controllers/housingController.ts)
+- Controllers: [be/controllers/inventoryController.ts](be/controllers/inventoryController.ts), [be/controllers/locationController.ts](be/controllers/locationController.ts), [be/controllers/skillsController.js](be/controllers/skillsController.js), [be/controllers/attributesController.js](be/controllers/attributesController.js), [be/controllers/authController.js](be/controllers/authController.js), [be/controllers/manualController.js](be/controllers/manualController.js), [be/controllers/vendorController.ts](be/controllers/vendorController.ts), [be/controllers/craftingController.ts](be/controllers/craftingController.ts), [be/controllers/combatController.js](be/controllers/combatController.js), [be/controllers/storageController.ts](be/controllers/storageController.ts), [be/controllers/questController.ts](be/controllers/questController.ts), [be/controllers/housingController.ts](be/controllers/housingController.ts)
 - Models: [be/models/Player.ts](be/models/Player.ts), [be/models/User.js](be/models/User.js), [be/models/ChatMessage.js](be/models/ChatMessage.js), [be/models/Property.ts](be/models/Property.ts), [be/models/ConstructionProject.ts](be/models/ConstructionProject.ts)
 - Services (TypeScript): [be/services/itemService.ts](be/services/itemService.ts), [be/services/locationService.ts](be/services/locationService.ts), [be/services/dropTableService.ts](be/services/dropTableService.ts), [be/services/vendorService.ts](be/services/vendorService.ts), [be/services/recipeService.ts](be/services/recipeService.ts), [be/services/combatService.ts](be/services/combatService.ts), [be/services/storageService.ts](be/services/storageService.ts), [be/services/effectEvaluator.ts](be/services/effectEvaluator.ts), [be/services/questService.ts](be/services/questService.ts), [be/services/propertyService.ts](be/services/propertyService.ts), [be/services/constructionService.ts](be/services/constructionService.ts)
+- Player Services (NEW): [be/services/playerInventoryService.ts](be/services/playerInventoryService.ts), [be/services/playerCombatService.ts](be/services/playerCombatService.ts), [be/services/playerStorageService.ts](be/services/playerStorageService.ts), [be/services/equipmentService.ts](be/services/equipmentService.ts), [be/services/rewardProcessor.ts](be/services/rewardProcessor.ts), [be/services/gameEvents.ts](be/services/gameEvents.ts)
 - Routes: [be/routes/inventory.js](be/routes/inventory.js), [be/routes/locations.js](be/routes/locations.js), [be/routes/skills.js](be/routes/skills.js), [be/routes/attributes.js](be/routes/attributes.js), [be/routes/auth.js](be/routes/auth.js), [be/routes/manual.js](be/routes/manual.js), [be/routes/vendors.js](be/routes/vendors.js), [be/routes/crafting.js](be/routes/crafting.js), [be/routes/combat.js](be/routes/combat.js), [be/routes/storage.ts](be/routes/storage.ts), [be/routes/quests.ts](be/routes/quests.ts), [be/routes/housing.ts](be/routes/housing.ts)
+- Middleware: [be/middleware/errorHandler.ts](be/middleware/errorHandler.ts)
 - Sockets: [be/sockets/chatHandler.js](be/sockets/chatHandler.js), [be/sockets/activityHandler.ts](be/sockets/activityHandler.ts), [be/sockets/craftingHandler.ts](be/sockets/craftingHandler.ts), [be/sockets/combatHandler.ts](be/sockets/combatHandler.ts), [be/sockets/storageHandler.ts](be/sockets/storageHandler.ts), [be/sockets/questHandler.ts](be/sockets/questHandler.ts), [be/sockets/constructionHandler.ts](be/sockets/constructionHandler.ts)
 
 **Frontend Core:**
@@ -197,9 +192,9 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 - Quest Components: [quest-tracker/](ui/src/app/components/game/quest-tracker/), [quest-journal/](ui/src/app/components/game/quest-journal/)
 - Housing Components: [housing/](ui/src/app/components/game/housing/), [construction-browser/](ui/src/app/components/game/construction-browser/)
 - Manual: [ui/src/app/components/manual/manual.component.ts](ui/src/app/components/manual/manual.component.ts), [ui/src/app/components/manual/sections/](ui/src/app/components/manual/sections/)
-- Shared Components: [ui/src/app/components/shared/item-mini/item-mini.component.ts](ui/src/app/components/shared/item-mini/item-mini.component.ts), [ui/src/app/components/shared/item-modifiers/item-modifiers.component.ts](ui/src/app/components/shared/item-modifiers/item-modifiers.component.ts), [ui/src/app/components/shared/item-details-panel/item-details-panel.component.ts](ui/src/app/components/shared/item-details-panel/item-details-panel.component.ts), [ui/src/app/components/shared/icon/icon.component.ts](ui/src/app/components/shared/icon/icon.component.ts), [ui/src/app/components/shared/xp-mini/xp-mini.component.ts](ui/src/app/components/shared/xp-mini/xp-mini.component.ts), [ui/src/app/components/shared/ability-button/ability-button.component.ts](ui/src/app/components/shared/ability-button/ability-button.component.ts), [ui/src/app/components/shared/item-button/item-button.component.ts](ui/src/app/components/shared/item-button/item-button.component.ts), [ui/src/app/components/shared/buff-icon/buff-icon.component.ts](ui/src/app/components/shared/buff-icon/buff-icon.component.ts), [ui/src/app/components/shared/activity-log/activity-log.component.ts](ui/src/app/components/shared/activity-log/activity-log.component.ts), [notification-display/](ui/src/app/components/shared/notification-display/)
+- Shared Components: [ui/src/app/components/shared/item-mini/item-mini.component.ts](ui/src/app/components/shared/item-mini/item-mini.component.ts), [ui/src/app/components/shared/item-modifiers/item-modifiers.component.ts](ui/src/app/components/shared/item-modifiers/item-modifiers.component.ts), [ui/src/app/components/shared/item-details-panel/item-details-panel.component.ts](ui/src/app/components/shared/item-details-panel/item-details-panel.component.ts), [ui/src/app/components/shared/icon/icon.component.ts](ui/src/app/components/shared/icon/icon.component.ts), [ui/src/app/components/shared/xp-mini/xp-mini.component.ts](ui/src/app/components/shared/xp-mini/xp-mini.component.ts), [ui/src/app/components/shared/ability-button/ability-button.component.ts](ui/src/app/components/shared/ability-button/ability-button.component.ts), [ui/src/app/components/shared/item-button/item-button.component.ts](ui/src/app/components/shared/item-button/item-button.component.ts), [ui/src/app/components/shared/buff-icon/buff-icon.component.ts](ui/src/app/components/shared/buff-icon/buff-icon.component.ts), [ui/src/app/components/shared/activity-log/activity-log.component.ts](ui/src/app/components/shared/activity-log/activity-log.component.ts), [notification-display/](ui/src/app/components/shared/notification-display/), [quantity-dialog/](ui/src/app/components/shared/quantity-dialog/)
   - Item-details-panel Sub-components: [item-detail-header/](ui/src/app/components/shared/item-details-panel/item-detail-header/), [item-basic-info/](ui/src/app/components/shared/item-details-panel/item-basic-info/), [item-stats-display/](ui/src/app/components/shared/item-details-panel/item-stats-display/), [item-modifiers-display/](ui/src/app/components/shared/item-details-panel/item-modifiers-display/), [item-actions/](ui/src/app/components/shared/item-details-panel/item-actions/)
-- Services: [ui/src/app/services/inventory.service.ts](ui/src/app/services/inventory.service.ts), [ui/src/app/services/location.service.ts](ui/src/app/services/location.service.ts), [ui/src/app/services/skills.service.ts](ui/src/app/services/skills.service.ts), [ui/src/app/services/auth.service.ts](ui/src/app/services/auth.service.ts), [ui/src/app/services/manual.service.ts](ui/src/app/services/manual.service.ts), [ui/src/app/services/chat.service.ts](ui/src/app/services/chat.service.ts), [ui/src/app/services/vendor.service.ts](ui/src/app/services/vendor.service.ts), [ui/src/app/services/recipe.service.ts](ui/src/app/services/recipe.service.ts), [ui/src/app/services/crafting.service.ts](ui/src/app/services/crafting.service.ts), [ui/src/app/services/combat.service.ts](ui/src/app/services/combat.service.ts), [ui/src/app/services/icon.service.ts](ui/src/app/services/icon.service.ts), [ui/src/app/services/storage.service.ts](ui/src/app/services/storage.service.ts), [ui/src/app/services/quest.service.ts](ui/src/app/services/quest.service.ts), [ui/src/app/services/notification.service.ts](ui/src/app/services/notification.service.ts), [ui/src/app/services/item-filter.service.ts](ui/src/app/services/item-filter.service.ts), [ui/src/app/services/housing.service.ts](ui/src/app/services/housing.service.ts)
+- Services: [ui/src/app/services/inventory.service.ts](ui/src/app/services/inventory.service.ts), [ui/src/app/services/location.service.ts](ui/src/app/services/location.service.ts), [ui/src/app/services/skills.service.ts](ui/src/app/services/skills.service.ts), [ui/src/app/services/auth.service.ts](ui/src/app/services/auth.service.ts), [ui/src/app/services/manual.service.ts](ui/src/app/services/manual.service.ts), [ui/src/app/services/chat.service.ts](ui/src/app/services/chat.service.ts), [ui/src/app/services/vendor.service.ts](ui/src/app/services/vendor.service.ts), [ui/src/app/services/recipe.service.ts](ui/src/app/services/recipe.service.ts), [ui/src/app/services/crafting.service.ts](ui/src/app/services/crafting.service.ts), [ui/src/app/services/combat.service.ts](ui/src/app/services/combat.service.ts), [ui/src/app/services/icon.service.ts](ui/src/app/services/icon.service.ts), [ui/src/app/services/storage.service.ts](ui/src/app/services/storage.service.ts), [ui/src/app/services/quest.service.ts](ui/src/app/services/quest.service.ts), [ui/src/app/services/notification.service.ts](ui/src/app/services/notification.service.ts), [ui/src/app/services/item-filter.service.ts](ui/src/app/services/item-filter.service.ts), [ui/src/app/services/housing.service.ts](ui/src/app/services/housing.service.ts), [ui/src/app/services/quantity-dialog.service.ts](ui/src/app/services/quantity-dialog.service.ts)
 - Utilities: [ui/src/app/utils/item-sort.utils.ts](ui/src/app/utils/item-sort.utils.ts)
 - Pipes: [ui/src/app/pipes/rarity-class.pipe.ts](ui/src/app/pipes/rarity-class.pipe.ts), [ui/src/app/pipes/rarity-color.pipe.ts](ui/src/app/pipes/rarity-color.pipe.ts), [ui/src/app/pipes/rarity-name.pipe.ts](ui/src/app/pipes/rarity-name.pipe.ts)
 - Constants: [ui/src/app/constants/material-colors.constants.ts](ui/src/app/constants/material-colors.constants.ts), [ui/src/app/constants/game-data.constants.ts](ui/src/app/constants/game-data.constants.ts)
@@ -232,6 +227,7 @@ ClearSkies is a medieval fantasy browser-based game built with a modern tech sta
 - [be/utils/check-player-location.js](be/utils/check-player-location.js) - Debug player location and stats
 - [be/utils/content-generator.js](be/utils/content-generator.js) - Interactive content creation
 - [be/utils/test-xp-scaling.js](be/utils/test-xp-scaling.js) - XP formula testing
+- [be/utils/errors.ts](be/utils/errors.ts) - Custom error classes (ValidationError, NotFoundError, etc.)
 - [be/scripts/validate-game-data.ts](be/scripts/validate-game-data.ts) - Validate cross-references (npm run validate)
 - [project/utils/split-svg-paths.js](project/utils/split-svg-paths.js) - Split SVG paths (basic, no normalization)
 - [project/utils/split-svg-paths-normalized.js](project/utils/split-svg-paths-normalized.js) - Split SVG paths with coordinate normalization (recommended)
@@ -246,16 +242,20 @@ shared/
 
 be/
 ├── controllers/     # inventoryController, locationController, skillsController, attributesController, authController
-├── models/          # Player.js (inventory, skills, equipment), User.js
-├── services/        # itemService, locationService, dropTableService, combatService (all use @shared/types)
-│   └── combat/      # CombatEntity.ts (base class for future refactoring)
+├── models/          # Player.ts (inventory, skills, equipment), User.js
+├── services/        # Core services (itemService, locationService, combatService)
+│   ├── combat/      # CombatEntity.ts (base class for future refactoring)
+│   ├── player*/     # Player-specific services (playerInventoryService, playerCombatService, playerStorageService)
+│   ├── rewardProcessor.ts  # Centralized reward distribution
+│   └── equipmentService.ts # Equipment validation
+├── middleware/      # errorHandler.ts (centralized error handling)
 ├── data/
 │   ├── constants/   # combat-constants.ts (formulas), item-constants.ts (re-exports from shared)
 │   ├── items/definitions/    # Item TypeScript modules (90+ items use constants)
 │   └── locations/   # Location, activity, drop table TypeScript modules
 ├── migrations/      # Database migration scripts
 ├── types/           # Compatibility layer (re-exports from @shared/types)
-└── utils/          # Dev tools (add-item.js, content-generator.js, test-xp-scaling.js)
+└── utils/          # Dev tools (add-item.js, content-generator.js, errors.ts)
 
 project/docs/        # Combat refactoring roadmap, shared types guidelines
 
