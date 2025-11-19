@@ -23,7 +23,7 @@ export const ProcessLogsIntoPlanks: Recipe = {
     {
       "itemId": "planks",
       "quantity": 3,
-      "qualityModifier": "inherit"
+      "qualityModifier": "fixed"
     }
   ],
   "experience": 15

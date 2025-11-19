@@ -5,14 +5,14 @@
  */
 
 import { ResourceItem } from '@shared/types';
-import { CATEGORY, RARITY, TIER, QUALITY_SETS, TRAIT_SETS, SUBCATEGORIES, MATERIAL, SKILL_SOURCE } from '../../../constants/item-constants';
+import { CATEGORY, RARITY, TIER, QUALITY_SETS, TRAIT_SETS, SUBCATEGORY, MATERIAL, SKILL_SOURCE } from '../../../constants/item-constants';
 
 export const Planks: ResourceItem = {
   "itemId": "planks",
   "name": "Planks",
   "description": "Processed wood planks suitable for construction projects",
   "category": CATEGORY.RESOURCE,
-  "subcategories": SUBCATEGORIES.WOOD_LOG_BUILDING,
+  "subcategories": [SUBCATEGORY.WOOD, SUBCATEGORY.TIMBER, SUBCATEGORY.BUILDING_MATERIAL],
   "baseValue": 10,
   "rarity": RARITY.COMMON,
   "stackable": true,
@@ -22,10 +22,10 @@ export const Planks: ResourceItem = {
     "tier": TIER.T1,
     "skillSource": SKILL_SOURCE.CONSTRUCTION
   },
-  "allowedQualities": QUALITY_SETS.WOOD,
-  "allowedTraits": TRAIT_SETS.EQUIPMENT_PRISTINE,
+  "allowedQualities": [],
+  "allowedTraits": [],
   "icon": {
-    "path": "items/planks",
+    "path": "items/planks.svg",
     "material": "planks"
   }
 } as const;

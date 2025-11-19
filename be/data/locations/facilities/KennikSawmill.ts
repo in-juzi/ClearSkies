@@ -12,8 +12,6 @@ export const KennikSawmill: Facility = {
   "type": "crafting",
   "icon": "construction",
   "craftingSkills": ["construction"],
-  "activities": [
-    "activity-sawmill"
-  ],
+  "activities": [],
   "vendorIds": []
 };
