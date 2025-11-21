@@ -3,52 +3,52 @@
 .recipe-list-container {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--spacing-l);
 }
 
 .header-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.5rem;
+  margin-bottom: var(--spacing-s);
 
   h2 {
     margin: 0;
-    font-size: 1.5rem;
+    font-size: var(--font-size-xl);
     color: var(--text-primary);
   }
 
   .recipe-count {
     color: var(--text-secondary);
-    font-size: 0.9rem;
+    font-size: var(--font-size-s);
   }
 }
 
 .recipe-filters {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  padding: 1rem;
+  gap: var(--spacing-m);
+  padding: var(--spacing-l);
   background-color: rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
 }
 
 .filter-row {
   display: flex;
-  gap: 1rem;
+  gap: var(--spacing-l);
   align-items: center;
   flex-wrap: wrap;
 }
 
 .search-input {
   flex: 1;
-  min-width: 200px;
-  padding: 0.5rem;
+  min-width: var(--spacing-7xl);
+  padding: var(--spacing-s);
   background-color: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
+  border: var(--border-width-thin) solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-xs);
   color: var(--text-primary);
-  font-size: 0.9rem;
+  font-size: var(--font-size-s);
 
   &:focus {
     outline: none;
@@ -63,7 +63,7 @@
 .filter-checkbox {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--spacing-s);
   cursor: pointer;
   user-select: none;
 
@@ -73,27 +73,27 @@
 
   span {
     color: var(--text-primary);
-    font-size: 0.9rem;
+    font-size: var(--font-size-s);
   }
 }
 
 .filter-sort {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--spacing-s);
 
   label {
     color: var(--text-secondary);
-    font-size: 0.9rem;
+    font-size: var(--font-size-s);
   }
 
   .sort-select {
-    padding: 0.4rem 0.6rem;
+    padding: var(--spacing-xs) var(--spacing-s);
     background-color: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
+    border: var(--border-width-thin) solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-xs);
     color: var(--text-primary);
-    font-size: 0.9rem;
+    font-size: var(--font-size-s);
     cursor: pointer;
 
     &:focus {
@@ -104,14 +104,14 @@
 }
 
 .btn-clear-filters {
-  padding: 0.4rem 0.8rem;
+  padding: var(--spacing-xs) var(--spacing-m);
   background-color: rgba(139, 92, 246, 0.2);
-  border: 1px solid rgba(139, 92, 246, 0.4);
-  border-radius: 4px;
+  border: var(--border-width-thin) solid rgba(139, 92, 246, 0.4);
+  border-radius: var(--radius-xs);
   color: #a78bfa;
-  font-size: 0.9rem;
+  font-size: var(--font-size-s);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--transition-fast);
 
   &:hover {
     background-color: rgba(139, 92, 246, 0.3);
@@ -121,34 +121,34 @@
 
 .loading {
   text-align: center;
-  padding: 2rem;
+  padding: var(--spacing-2xl);
   color: var(--text-secondary);
   font-style: italic;
 }
 
 .empty-message {
   text-align: center;
-  padding: 2rem;
+  padding: var(--spacing-2xl);
   color: var(--text-secondary);
   font-style: italic;
   background-color: rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
 }
 
 .recipe-list {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--spacing-m);
   overflow-y: auto;
 }
 
 .recipe-card {
-  padding: 1rem;
+  padding: var(--spacing-l);
   background-color: rgba(0, 0, 0, 0.3);
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
+  border: var(--spacing-2xs) solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-s);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--transition-fast);
 
   &.can-craft {
     border-color: rgba(34, 197, 94, 0.5);
@@ -186,65 +186,65 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.5rem;
+  margin-bottom: var(--spacing-s);
 }
 
 .recipe-name {
-  font-size: 1.1rem;
+  font-size: var(--font-size-l);
   font-weight: 600;
   color: var(--text-primary);
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--spacing-s);
 
   .lock-icon {
-    font-size: 1rem;
+    font-size: var(--font-size-m);
   }
 }
 
 .recipe-level {
-  font-size: 0.9rem;
+  font-size: var(--font-size-s);
   color: var(--text-secondary);
   background-color: rgba(139, 92, 246, 0.2);
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
+  padding: var(--spacing-2xs) var(--spacing-s);
+  border-radius: var(--radius-xs);
 }
 
 .recipe-description {
-  font-size: 0.9rem;
+  font-size: var(--font-size-s);
   color: var(--text-secondary);
-  margin-bottom: 0.75rem;
+  margin-bottom: var(--spacing-m);
   font-style: italic;
 }
 
 .unlock-hint {
-  font-size: 0.85rem;
+  font-size: var(--font-size-xs);
   color: #fbbf24;
-  margin-bottom: 0.75rem;
+  margin-bottom: var(--spacing-m);
   font-style: italic;
 }
 
 .recipe-ingredients {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: var(--spacing-s);
 }
 
 .ingredient {
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.85rem;
+  padding: var(--spacing-2xs) var(--spacing-s);
+  border-radius: var(--radius-xs);
+  font-size: var(--font-size-xs);
   font-weight: 500;
 
   &.has-enough {
     background-color: rgba(34, 197, 94, 0.2);
-    border: 1px solid rgba(34, 197, 94, 0.4);
+    border: var(--border-width-thin) solid rgba(34, 197, 94, 0.4);
     color: #6ee7b7;
   }
 
   &.not-enough {
     background-color: rgba(239, 68, 68, 0.2);
-    border: 1px solid rgba(239, 68, 68, 0.4);
+    border: var(--border-width-thin) solid rgba(239, 68, 68, 0.4);
     color: #fca5a5;
   }
 }

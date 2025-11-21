@@ -32,18 +32,18 @@
 
 // Location node styling
 .location-node {
-  min-width: 120px;
-  min-height: 80px;
+  min-width: var(--spacing-7xl);
+  min-height: var(--spacing-5xl);
   padding: var(--spacing-m);
   border-radius: var(--radius-button);
-  border: 2px solid var(--color-surface-border);
+  border: var(--border-default);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all var(--transition-normal);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 var(--spacing-2xs) var(--spacing-s) rgba(0, 0, 0, 0.3);
   position: relative;
 
   .location-name {
@@ -51,27 +51,27 @@
     font-weight: var(--font-weight-medium);
     font-size: var(--font-size-m);
     text-align: center;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    text-shadow: 0 var(--spacing-2xs) var(--spacing-2xs) rgba(0, 0, 0, 0.8);
   }
 
   .quest-marker {
     position: absolute;
-    top: -8px;
-    right: -8px;
-    color: #ffd700; // Gold color for quest marker
-    font-size: 24px;
+    top: calc(-1 * var(--spacing-s));
+    right: calc(-1 * var(--spacing-s));
+    color: var(--color-gold);
+    font-size: var(--spacing-2xl);
     background: rgba(20, 20, 40, 0.9);
     border-radius: 50%;
-    padding: 4px;
-    box-shadow: 0 0 12px rgba(255, 215, 0, 0.6),
-                0 2px 8px rgba(0, 0, 0, 0.5);
+    padding: var(--spacing-xs);
+    box-shadow: var(--shadow-glow-gold),
+                0 var(--spacing-2xs) var(--spacing-s) rgba(0, 0, 0, 0.5);
     animation: questPulse 2s infinite;
     z-index: 10;
   }
 
   &:hover {
     border-color: var(--color-secondary);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 var(--spacing-xs) var(--spacing-m) rgba(0, 0, 0, 0.5);
   }
 
   &.has-quest {
@@ -80,9 +80,9 @@
 
   &.current {
     border-color: var(--color-secondary);
-    border-width: 3px;
-    box-shadow: 0 0 20px var(--color-secondary),
-      0 4px 12px rgba(0, 0, 0, 0.5);
+    border-width: var(--spacing-2xs);
+    box-shadow: 0 0 var(--spacing-xl) var(--color-secondary),
+      0 var(--spacing-xs) var(--spacing-m) rgba(0, 0, 0, 0.5);
     animation: pulse 2s infinite;
 
     .location-name {
@@ -107,7 +107,7 @@
     &:hover {
       stroke: var(--color-secondary);
       stroke-width: 5;
-      filter: drop-shadow(0 0 8px var(--color-secondary));
+      filter: drop-shadow(0 0 var(--spacing-s) var(--color-secondary));
     }
   }
 
@@ -126,11 +126,11 @@
 // Travel time label
 ::ng-deep .travel-time-label {
   fill: var(--color-text-muted);
-  font-size: 12px;
+  font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
   font-family: var(--font-family-primary);
   pointer-events: none;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  text-shadow: 0 var(--spacing-2xs) var(--spacing-2xs) rgba(0, 0, 0, 0.8);
 }
 
 // Map legend
@@ -142,8 +142,8 @@
   border: var(--border-default);
   border-radius: var(--radius-card);
   padding: var(--spacing-m);
-  min-width: 180px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  min-width: var(--spacing-7xl);
+  box-shadow: 0 var(--spacing-xs) var(--spacing-m) rgba(0, 0, 0, 0.3);
 
   h4 {
     margin: 0 0 var(--spacing-s) 0;
@@ -161,25 +161,29 @@
     font-size: var(--font-size-s);
 
     .legend-color {
-      width: 20px;
-      height: 12px;
+      width: var(--spacing-xl);
+      height: var(--spacing-m);
       border-radius: var(--radius-button);
       display: block;
 
       &.current {
         background: var(--color-secondary);
-        border: 2px solid var(--color-secondary);
-        box-shadow: 0 0 8px var(--color-secondary);
+        border: var(--border-default);
+        border-color: var(--color-secondary);
+        box-shadow: 0 0 var(--spacing-s) var(--color-secondary);
       }
 
       &.available {
         background: transparent;
-        border: 2px solid var(--color-accent-blue);
+        border: var(--border-default);
+        border-color: var(--color-accent-blue);
       }
 
       &.unavailable {
         background: transparent;
-        border: 2px dashed var(--color-error);
+        border: var(--border-default);
+        border-style: dashed;
+        border-color: var(--color-error);
       }
     }
   }
@@ -190,14 +194,14 @@
 
   0%,
   100% {
-    box-shadow: 0 0 20px var(--color-secondary),
-      0 4px 12px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 var(--spacing-xl) var(--color-secondary),
+      0 var(--spacing-xs) var(--spacing-m) rgba(0, 0, 0, 0.5);
   }
 
   50% {
-    box-shadow: 0 0 30px var(--color-secondary),
-      0 0 15px var(--color-secondary),
-      0 4px 12px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 var(--spacing-3xl) var(--color-secondary),
+      0 0 var(--spacing-l) var(--color-secondary),
+      0 var(--spacing-xs) var(--spacing-m) rgba(0, 0, 0, 0.5);
   }
 }
 
@@ -207,20 +211,20 @@
   0%,
   100% {
     transform: scale(1);
-    box-shadow: 0 0 12px rgba(255, 215, 0, 0.6),
-                0 2px 8px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 var(--spacing-m) rgba(255, 215, 0, 0.6),
+                0 var(--spacing-2xs) var(--spacing-s) rgba(0, 0, 0, 0.5);
   }
 
   50% {
     transform: scale(1.1);
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.8),
-                0 0 10px rgba(255, 215, 0, 0.6),
-                0 2px 8px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 var(--spacing-xl) rgba(255, 215, 0, 0.8),
+                0 0 var(--spacing-m) rgba(255, 215, 0, 0.6),
+                0 var(--spacing-2xs) var(--spacing-s) rgba(0, 0, 0, 0.5);
   }
 }
 
 // Responsive adjustments
-@media (max-width: 767px) {
+@media (max-width: var(--breakpoint-tablet)) {
   .world-map-container.fullscreen {
     height: 60vh;
     padding: var(--spacing-s);
@@ -230,12 +234,12 @@
     bottom: var(--spacing-s);
     right: var(--spacing-s);
     font-size: var(--font-size-xs);
-    min-width: 150px;
+    min-width: var(--spacing-6xl);
   }
 
   ::ng-deep .location-node {
-    min-width: 100px;
-    min-height: 60px;
+    min-width: var(--spacing-6xl);
+    min-height: var(--spacing-6xl);
     padding: var(--spacing-s);
 
     .location-name {

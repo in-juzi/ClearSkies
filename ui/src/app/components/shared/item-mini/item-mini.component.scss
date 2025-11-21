@@ -8,7 +8,7 @@
   font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
   height: var(--spacing-3xl);
-  min-width: 50px;
+  min-width: var(--spacing-4xl);
 
   .item-icon {
     font-size: var(--font-size-m);

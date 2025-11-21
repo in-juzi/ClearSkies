@@ -2,24 +2,24 @@
 
 .notification-container {
   position: fixed;
-  top: 1rem;
-  right: 1rem;
+  top: var(--spacing-l);
+  right: var(--spacing-l);
   z-index: 9999;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  max-width: 400px;
+  gap: var(--spacing-m);
+  max-width: var(--spacing-8xl);
   pointer-events: none;
 }
 
 .notification {
   pointer-events: all;
   background: rgba(30, 30, 50, 0.98);
-  border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  border-radius: var(--radius-s);
+  box-shadow: 0 var(--spacing-s) var(--spacing-xl) rgba(0, 0, 0, 0.4);
   overflow: hidden;
-  animation: slideIn 0.3s ease-out;
-  border-left: 4px solid;
+  animation: slideIn var(--transition-normal) ease-out;
+  border-left: var(--spacing-xs) solid;
 
   &.notification-success {
     border-left-color: var(--color-success);
@@ -46,14 +46,14 @@
 .notification-content {
   display: flex;
   align-items: flex-start;
-  gap: 0.75rem;
-  padding: 1rem;
+  gap: var(--spacing-m);
+  padding: var(--spacing-l);
 }
 
 .notification-icon {
-  font-size: 1.5rem;
+  font-size: var(--font-size-2xl);
   flex-shrink: 0;
-  margin-top: 0.125rem;
+  margin-top: var(--spacing-2xs);
 
   .notification-success & {
     color: var(--color-success);
@@ -83,16 +83,16 @@
 
 .notification-title {
   color: var(--color-text-primary);
-  font-size: 0.95rem;
+  font-size: var(--font-size-m);
   font-weight: 600;
-  margin: 0 0 0.25rem 0;
+  margin: 0 0 var(--spacing-xs) 0;
 }
 
 .notification-message {
   color: var(--color-text-secondary);
-  font-size: 0.85rem;
+  font-size: var(--font-size-s);
   margin: 0;
-  line-height: 1.4;
+  line-height: var(--line-height-normal);
 }
 
 .notification-close {
@@ -102,13 +102,13 @@
   color: var(--color-text-secondary);
   cursor: pointer;
   padding: 0;
-  width: 24px;
-  height: 24px;
+  width: var(--spacing-xl);
+  height: var(--spacing-xl);
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
-  transition: all 0.2s ease;
+  border-radius: var(--radius-xs);
+  transition: all var(--transition-fast) ease;
 
   &:hover {
     background: rgba(255, 255, 255, 0.1);
@@ -116,7 +116,7 @@
   }
 
   .material-symbols-outlined {
-    font-size: 1.25rem;
+    font-size: var(--font-size-xl);
   }
 }
 

@@ -5,7 +5,7 @@
   border: var(--border-light);
   border-radius: var(--radius-card);
   padding: var(--spacing-l);
-  max-height: 300px;
+  max-height: var(--spacing-7xl);
   overflow-y: auto;
 
   h3 {
@@ -28,7 +28,7 @@
   padding: var(--spacing-s);
   background-color: rgba(74, 78, 105, 0.2);
   border-radius: var(--radius-s);
-  border-left: 3px solid var(--color-accent-purple);
+  border-left: var(--spacing-xs) solid var(--color-accent-purple);
   font-size: var(--font-size-s);
   transition: background-color var(--transition-fast) ease;
 
@@ -41,7 +41,7 @@
   color: var(--color-text-muted);
   font-family: var(--font-monospace);
   font-size: var(--font-size-xs);
-  min-width: 60px;
+  min-width: var(--spacing-5xl);
   flex-shrink: 0;
   align-content: center;
 }
@@ -69,18 +69,18 @@
 .gold-reward {
   display: inline-flex;
   align-items: center;
-  gap: 0.2rem;
-  padding: 0.15rem 0.4rem;
+  gap: var(--spacing-2xs);
+  padding: var(--spacing-2xs) var(--spacing-xs);
   background-color: var(--color-bg-overlay);
-  border-radius: 3px;
-  color: var(--color-accent-gold);
+  border-radius: var(--radius-2xs);
+  color: var(--color-gold);
   font-weight: var(--font-weight-medium);
   white-space: nowrap;
 }
 
 // Scrollbar styling
 .activity-log::-webkit-scrollbar {
-  width: 8px;
+  width: var(--spacing-s);
 }
 
 .activity-log::-webkit-scrollbar-track {

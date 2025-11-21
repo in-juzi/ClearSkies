@@ -7,46 +7,46 @@
 .buff-icon {
   width: 100%;
   height: 100%;
-  border: 3px solid;
-  border-radius: 6px;
+  border: var(--spacing-2xs) solid;
+  border-radius: var(--radius-s);
   display: flex;
   align-items: center;
   justify-content: center;
   background: rgba(0, 0, 0, 0.5);
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
 
   &:hover {
     transform: scale(1.1);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 var(--spacing-xs) var(--spacing-s) rgba(0, 0, 0, 0.5);
   }
 }
 
 .buff-duration {
   position: absolute;
-  bottom: 2px;
-  right: 2px;
+  bottom: var(--spacing-2xs);
+  right: var(--spacing-2xs);
   background: rgba(0, 0, 0, 0.8);
   color: #fff;
-  font-size: 11px;
+  font-size: var(--font-size-2xs);
   font-weight: bold;
-  padding: 1px 4px;
-  border-radius: 3px;
-  min-width: 16px;
+  padding: var(--border-width-thin) var(--spacing-xs);
+  border-radius: var(--radius-2xs);
+  min-width: var(--spacing-l);
   text-align: center;
   pointer-events: none;
 }
 
 .buff-stack {
   position: absolute;
-  top: 2px;
-  right: 2px;
+  top: var(--spacing-2xs);
+  right: var(--spacing-2xs);
   background: rgba(139, 92, 246, 0.9); // purple
   color: #fff;
-  font-size: 10px;
+  font-size: var(--font-size-3xs);
   font-weight: bold;
-  padding: 1px 4px;
-  border-radius: 3px;
-  min-width: 14px;
+  padding: var(--border-width-thin) var(--spacing-xs);
+  border-radius: var(--radius-2xs);
+  min-width: var(--spacing-m);
   text-align: center;
   pointer-events: none;
 }

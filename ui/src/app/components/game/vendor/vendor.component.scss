@@ -74,8 +74,8 @@
 
   &.success {
     background: rgba(76, 175, 80, 0.2);
-    color: #4caf50;
-    border-bottom: var(--border-width-medium) solid #4caf50;
+    color: var(--color-quality-4);
+    border-bottom: var(--border-width-medium) solid var(--color-quality-4);
   }
 
   &.error {
@@ -145,7 +145,7 @@
   &:hover {
     border-color: var(--color-accent-purple);
     background: var(--color-bg-tertiary);
-    transform: translateY(-2px);
+    transform: translateY(calc(-1 * var(--spacing-2xs)));
   }
 
   &.selected {
@@ -166,8 +166,8 @@
   }
 
   .item-icon {
-    width: 48px;
-    height: 48px;
+    width: var(--spacing-4xl);
+    height: var(--spacing-4xl);
     background: var(--color-bg-overlay);
     border-radius: var(--radius-s);
     display: flex;
@@ -191,9 +191,9 @@
       color: var(--color-text-primary);
 
       &.rarity-common { color: #9e9e9e; }
-      &.rarity-uncommon { color: #4caf50; }
-      &.rarity-rare { color: #2196f3; }
-      &.rarity-epic { color: #9c27b0; }
+      &.rarity-uncommon { color: var(--color-quality-4); }
+      &.rarity-rare { color: var(--color-quality-3); }
+      &.rarity-epic { color: var(--color-quality-5); }
       &.rarity-legendary { color: #ff9800; }
     }
 
@@ -251,7 +251,7 @@
     transition: all var(--transition-normal);
 
     &:hover {
-      transform: translateY(-1px);
+      transform: translateY(calc(-1 * var(--border-width-thin)));
       box-shadow: var(--shadow-glow-purple);
     }
 
@@ -276,7 +276,7 @@
 // Drop zone styling
 .drop-zone {
   position: relative;
-  min-height: 300px;
+  min-height: var(--spacing-7xl);
   transition: all var(--transition-normal);
 
   // Ensure all child elements allow drag events to bubble
@@ -316,7 +316,7 @@
 
 // Scrollbar styling
 .tab-content::-webkit-scrollbar {
-  width: 8px;
+  width: var(--spacing-s);
 }
 
 .tab-content::-webkit-scrollbar-track {

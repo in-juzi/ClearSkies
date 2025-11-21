@@ -3,7 +3,7 @@
 .xp-mini {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: var(--spacing-xs);
   padding: var(--spacing-xs) var(--spacing-s);
   background: var(--color-bg-overlay);
   border-radius: var(--radius-s);
@@ -15,7 +15,7 @@
   // Compact mode (smaller, tighter spacing)
   &.compact {
     font-size: calc(var(--font-size-xs) * 0.9);
-    gap: 0.25rem;
+    gap: var(--spacing-2xs);
     padding: calc(var(--spacing-xs) * 0.75) var(--spacing-xs);
   }
 
@@ -37,7 +37,7 @@
   .xp-amount {
     display: inline-flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: var(--spacing-2xs);
     font-weight: 500;
     color: var(--color-success);
 

@@ -5,7 +5,7 @@
   left: 50%;
   transform: translate(-50%, -50%);
   width: 90%;
-  max-width: 500px;
+  max-width: var(--spacing-9xl);
   max-height: 80vh;
   background: var(--gradient-card);
   border: var(--border-default);
@@ -60,7 +60,7 @@
 
 /* Scrollbar styling */
 .details-content::-webkit-scrollbar {
-  width: 8px;
+  width: var(--spacing-s);
 }
 
 .details-content::-webkit-scrollbar-track {

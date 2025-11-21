@@ -15,14 +15,14 @@
 .bank-modal {
   background: linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%);
   border: 2px solid var(--color-secondary);
-  border-radius: 12px;
+  border-radius: var(--radius-m);
   padding: 0;
   width: 90%;
-  max-width: 1200px;
+  max-width: var(--spacing-10xl);
   max-height: 90vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-xl);
   animation: slideIn 0.3s ease-out;
   position: absolute;
 }
@@ -31,7 +31,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 1.5rem;
+  padding: var(--spacing-l) var(--spacing-2xl);
   border-bottom: 1px solid var(--color-surface-border);
   background: linear-gradient(to right, rgba(255, 215, 0, 0.1), transparent);
 
@@ -49,19 +49,19 @@
     color: var(--color-secondary);
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    font-size: 1.5rem;
+    gap: var(--spacing-s);
+    font-size: var(--font-size-2xl);
   }
 
   .close-button {
     background: none;
     border: none;
     color: var(--color-text-secondary);
-    font-size: 2rem;
+    font-size: var(--font-size-4xl);
     cursor: pointer;
     padding: 0;
-    width: 32px;
-    height: 32px;
+    width: var(--spacing-3xl);
+    height: var(--spacing-3xl);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -75,14 +75,14 @@
 }
 
 .capacity-section {
-  padding: 1rem 1.5rem;
+  padding: var(--spacing-l) var(--spacing-2xl);
   border-bottom: 1px solid var(--color-surface-border);
 
   .capacity-label {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 0.5rem;
-    font-size: 0.875rem;
+    margin-bottom: var(--spacing-s);
+    font-size: var(--font-size-s);
     color: var(--color-text-secondary);
 
     .capacity-percentage {
@@ -91,9 +91,9 @@
   }
 
   .capacity-bar {
-    height: 8px;
+    height: var(--spacing-s);
     background: var(--color-bg-primary);
-    border-radius: 4px;
+    border-radius: var(--radius-xs);
     overflow: hidden;
     border: 1px solid var(--color-surface-border);
 
@@ -102,15 +102,15 @@
       transition: width 0.3s ease-in-out;
 
       &.capacity-normal {
-        background: linear-gradient(90deg, var(--color-success), #5fd7cf);
+        background: linear-gradient(90deg, var(--color-success-dark), var(--color-success));
       }
 
       &.capacity-warning {
-        background: linear-gradient(90deg, var(--color-warning), #f5b735);
+        background: linear-gradient(90deg, var(--color-warning-dark), var(--color-warning));
       }
 
       &.capacity-critical {
-        background: linear-gradient(90deg, var(--color-error), #ff6666);
+        background: linear-gradient(90deg, var(--color-error-dark), var(--color-error));
       }
     }
   }
@@ -118,11 +118,11 @@
 
 // Bank Actions
 .bank-actions {
-  padding: 0.75rem 1.5rem;
+  padding: var(--spacing-m) var(--spacing-2xl);
   border-bottom: 1px solid var(--color-surface-border);
   background: rgba(0, 0, 0, 0.2);
   display: flex;
-  gap: 0.75rem;
+  gap: var(--spacing-m);
 
   .btn-action {
     padding: var(--spacing-m) var(--spacing-l);
@@ -139,7 +139,7 @@
     gap: var(--spacing-s);
 
     &:hover:not(:disabled) {
-      transform: translateY(-1px);
+      transform: translateY(calc(-1 * var(--border-width-thin)));
       box-shadow: var(--shadow-glow-purple);
     }
 
@@ -162,12 +162,12 @@
 
     // Primary action styling
     &.btn-action-primary {
-      background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-      color: #1a1a2e;
+      background: var(--gradient-button-secondary);
+      color: var(--color-text-inverse);
       font-weight: 600;
 
       &:hover:not(:disabled) {
-        box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+        box-shadow: var(--shadow-glow-gold);
       }
     }
   }
@@ -175,8 +175,8 @@
 
 .bank-content {
   display: flex;
-  gap: 1rem;
-  padding: 1rem 1.5rem;
+  gap: var(--spacing-l);
+  padding: var(--spacing-l) var(--spacing-2xl);
   flex: 1;
   overflow: hidden;
 }
@@ -188,44 +188,44 @@
   flex-direction: column;
   overflow: hidden;
   background: rgba(0, 0, 0, 0.2);
-  border-radius: 8px;
-  padding: 1rem;
+  border-radius: var(--radius-l);
+  padding: var(--spacing-l);
   border: 1px solid var(--color-surface-border);
 
   .section-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--spacing-s);
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: var(--spacing-s);
 
     h3 {
       margin: 0;
       color: var(--color-text-primary);
-      font-size: 1.1rem;
+      font-size: var(--font-size-l);
     }
 
     .weight-info {
       color: var(--color-text-secondary);
-      font-size: 0.875rem;
+      font-size: var(--font-size-s);
     }
   }
 
   .filters {
     display: flex;
-    gap: 0.5rem;
+    gap: var(--spacing-s);
     width: 100%;
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--spacing-s);
 
     .category-filter,
     .search-input {
       background: var(--color-bg-primary);
       border: 1px solid var(--color-surface-border);
-      border-radius: 4px;
-      padding: 0.375rem 0.75rem;
+      border-radius: var(--radius-xs);
+      padding: var(--spacing-xs) var(--spacing-m);
       color: var(--color-text-primary);
-      font-size: 0.875rem;
+      font-size: var(--font-size-s);
 
       &:focus {
         outline: none;
@@ -244,22 +244,22 @@
 
   .sort-buttons {
     display: flex;
-    gap: 0.375rem;
-    margin-bottom: 0.75rem;
+    gap: var(--spacing-xs);
+    margin-bottom: var(--spacing-m);
 
     .sort-btn {
       flex: 1;
-      padding: 0.375rem 0.5rem;
+      padding: var(--spacing-xs) var(--spacing-s);
       background: var(--color-bg-primary);
       border: 1px solid var(--color-surface-border);
-      border-radius: 4px;
+      border-radius: var(--radius-xs);
       color: var(--color-text-secondary);
-      font-size: 0.75rem;
+      font-size: var(--font-size-xs);
       font-weight: 500;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all var(--transition-fast) ease;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: var(--border-width-thin);
 
       &:hover {
         background: var(--color-bg-secondary);
@@ -272,7 +272,7 @@
         border-color: var(--color-accent-blue);
         color: var(--color-text-primary);
         font-weight: 600;
-        box-shadow: 0 2px 8px rgba(79, 172, 254, 0.3);
+        box-shadow: 0 var(--spacing-xs) var(--spacing-s) rgba(79, 172, 254, 0.3);
       }
 
       &:active:not(.active) {
@@ -286,11 +286,11 @@
     flex-flow: row wrap;
     flex: 1;
     align-content: flex-start;
-    gap: 0.5rem;
+    gap: var(--spacing-s);
     overflow-y: auto;
-    padding: 0.5rem;
+    padding: var(--spacing-s);
     background: rgba(0, 0, 0, 0.1);
-    border-radius: 4px;
+    border-radius: var(--radius-xs);
 
     .item-wrapper {
       position: relative;
@@ -316,14 +316,14 @@
 
         .equipped-badge {
           position: absolute;
-          top: 2px;
-          right: 2px;
+          top: var(--spacing-2xs);
+          right: var(--spacing-2xs);
           background: var(--color-secondary);
           color: var(--color-bg-primary);
-          font-size: 0.625rem;
+          font-size: var(--font-size-2xs);
           font-weight: 700;
-          padding: 2px 4px;
-          border-radius: 3px;
+          padding: var(--spacing-2xs) var(--spacing-xs);
+          border-radius: var(--radius-2xs);
         }
       }
 
@@ -335,15 +335,15 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 2rem;
+      padding: var(--spacing-3xl);
       color: var(--color-text-secondary);
       text-align: center;
 
       p {
-        margin: 0.5rem 0;
+        margin: var(--spacing-s) 0;
 
         &.hint {
-          font-size: 0.875rem;
+          font-size: var(--font-size-s);
           color: var(--color-text-tertiary);
         }
       }
@@ -359,14 +359,14 @@
 }
 
 .bank-footer {
-  padding: 1rem 1.5rem;
+  padding: var(--spacing-l) var(--spacing-2xl);
   border-top: 1px solid var(--color-surface-border);
   background: rgba(0, 0, 0, 0.2);
 
   p {
     margin: 0;
     color: var(--color-text-secondary);
-    font-size: 0.875rem;
+    font-size: var(--font-size-s);
   }
 }
 
@@ -383,7 +383,7 @@
 
 @keyframes slideIn {
   from {
-    transform: translateY(-20px);
+    transform: translateY(calc(-1 * var(--spacing-xl)));
     opacity: 0;
   }
 
@@ -395,17 +395,17 @@
 
 // Scrollbar styling
 .items-grid::-webkit-scrollbar {
-  width: 8px;
+  width: var(--spacing-s);
 }
 
 .items-grid::-webkit-scrollbar-track {
   background: var(--color-bg-primary);
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
 }
 
 .items-grid::-webkit-scrollbar-thumb {
   background: var(--color-surface-border);
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
 
   &:hover {
     background: var(--color-surface-border-light);

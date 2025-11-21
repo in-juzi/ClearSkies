@@ -2,29 +2,29 @@
 
 .quest-journal {
   background: rgba(20, 20, 40, 0.95);
-  border-radius: 8px;
-  padding: 2rem;
-  max-width: 1200px;
+  border-radius: var(--radius-l);
+  padding: var(--spacing-2xl);
+  max-width: var(--spacing-8xl);
   margin: 0 auto;
-  min-height: 600px;
+  min-height: var(--spacing-8xl);
   height: 100%;
 }
 
 .journal-header {
-  margin-bottom: 2rem;
+  margin-bottom: var(--spacing-2xl);
   text-align: center;
 
   .journal-title {
     color: var(--color-accent-blue);
-    font-size: 2rem;
-    margin: 0 0 0.5rem 0;
+    font-size: var(--font-size-4xl);
+    margin: 0 0 var(--spacing-xs) 0;
     text-transform: uppercase;
-    letter-spacing: 2px;
+    letter-spacing: var(--spacing-2xs);
   }
 
   .journal-subtitle {
     color: var(--color-text-secondary);
-    font-size: 0.95rem;
+    font-size: var(--font-size-s);
     margin: 0;
     font-style: italic;
   }
@@ -32,21 +32,21 @@
 
 .journal-tabs {
   display: flex;
-  gap: 0.5rem;
-  border-bottom: 2px solid rgba(100, 150, 255, 0.2);
-  margin-bottom: 2rem;
+  gap: var(--spacing-xs);
+  border-bottom: var(--spacing-2xs) solid rgba(100, 150, 255, 0.2);
+  margin-bottom: var(--spacing-2xl);
 
   .tab-button {
     background: transparent;
     border: none;
     color: var(--color-text-secondary);
-    padding: 1rem 1.5rem;
+    padding: var(--spacing-m) var(--spacing-l);
     cursor: pointer;
-    font-size: 1rem;
-    font-weight: 600;
+    font-size: var(--font-size-m);
+    font-weight: var(--font-weight-semibold);
     position: relative;
-    transition: all 0.3s ease;
-    border-bottom: 3px solid transparent;
+    transition: all var(--transition-normal) ease;
+    border-bottom: var(--spacing-2xs) solid transparent;
 
     &:hover {
       color: var(--color-text-primary);
@@ -62,26 +62,26 @@
 }
 
 .journal-content {
-  min-height: 400px;
+  min-height: var(--spacing-8xl);
 }
 
 .quest-list {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: var(--spacing-l);
 }
 
 .quest-card {
   background: rgba(30, 30, 50, 0.8);
-  border: 2px solid rgba(100, 150, 255, 0.3);
-  border-radius: 8px;
-  padding: 1.5rem;
-  transition: all 0.3s ease;
+  border: var(--spacing-2xs) solid rgba(100, 150, 255, 0.3);
+  border-radius: var(--radius-l);
+  padding: var(--spacing-l);
+  transition: all var(--transition-normal) ease;
 
   &:hover {
     border-color: var(--color-primary);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(100, 150, 255, 0.2);
+    transform: translateY(calc(-1 * var(--spacing-2xs)));
+    box-shadow: 0 var(--spacing-xs) var(--spacing-m) rgba(100, 150, 255, 0.2);
   }
 
   &.complete {
@@ -103,11 +103,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: var(--spacing-m);
 
   .quest-title {
     color: var(--color-text-primary);
-    font-size: 1.3rem;
+    font-size: var(--font-size-xl);
     margin: 0;
     flex: 1;
   }
@@ -115,56 +115,56 @@
   .quest-progress-badge {
     background: var(--gradient-primary);
     color: white;
-    padding: 0.25rem 0.75rem;
-    border-radius: 12px;
-    font-size: 0.9rem;
-    font-weight: bold;
+    padding: var(--spacing-2xs) var(--spacing-s);
+    border-radius: var(--radius-m);
+    font-size: var(--font-size-s);
+    font-weight: var(--font-weight-bold);
   }
 
   .quest-category-badge {
     background: rgba(255, 215, 0, 0.2);
     color: var(--color-accent-blue);
-    padding: 0.25rem 0.75rem;
-    border-radius: 12px;
-    font-size: 0.85rem;
-    font-weight: bold;
+    padding: var(--spacing-2xs) var(--spacing-s);
+    border-radius: var(--radius-m);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: var(--border-width-thin);
   }
 
   .completed-icon {
     color: var(--color-success);
-    font-size: 2rem;
+    font-size: var(--font-size-4xl);
   }
 }
 
 .quest-description {
   color: var(--color-text-secondary);
-  line-height: 1.6;
-  margin: 0 0 1.5rem 0;
-  font-size: 0.95rem;
+  line-height: var(--line-height-loose);
+  margin: 0 0 var(--spacing-l) 0;
+  font-size: var(--font-size-s);
 }
 
 .quest-objectives {
   background: rgba(0, 0, 0, 0.2);
-  border-left: 3px solid var(--color-primary);
-  padding: 1rem;
-  margin-bottom: 1.5rem;
-  border-radius: 4px;
+  border-left: var(--spacing-2xs) solid var(--color-primary);
+  padding: var(--spacing-m);
+  margin-bottom: var(--spacing-l);
+  border-radius: var(--radius-xs);
 
   .objectives-title {
     color: var(--color-text-primary);
-    font-size: 1rem;
-    margin: 0 0 0.75rem 0;
-    font-weight: 600;
+    font-size: var(--font-size-m);
+    margin: 0 0 var(--spacing-s) 0;
+    font-weight: var(--font-weight-semibold);
   }
 }
 
 .objective-item {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.5rem 0;
+  gap: var(--spacing-s);
+  padding: var(--spacing-xs) 0;
   color: var(--color-text-secondary);
 
   &.completed {
@@ -173,35 +173,35 @@
   }
 
   .objective-icon {
-    font-size: 1.25rem;
+    font-size: var(--font-size-xl);
     flex-shrink: 0;
   }
 
   .objective-text {
     flex: 1;
-    font-size: 0.9rem;
+    font-size: var(--font-size-s);
   }
 }
 
 .quest-actions {
   display: flex;
-  gap: 0.75rem;
+  gap: var(--spacing-s);
   justify-content: flex-end;
 
   .btn {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-s) var(--spacing-l);
     border: none;
-    border-radius: 6px;
-    font-weight: 600;
+    border-radius: var(--radius-s);
+    font-weight: var(--font-weight-semibold);
     cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 0.95rem;
+    transition: all var(--transition-fast) ease;
+    font-size: var(--font-size-s);
 
     .material-symbols-outlined {
-      font-size: 1.25rem;
+      font-size: var(--font-size-xl);
     }
 
     &.btn-primary {
@@ -210,15 +210,15 @@
 
       &:hover {
         background: linear-gradient(135deg, #5ed9c7 0%, var(--color-success) 100%);
-        transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(46, 204, 113, 0.3);
+        transform: translateY(calc(-1 * var(--border-width-thin)));
+        box-shadow: 0 var(--spacing-xs) var(--spacing-s) rgba(46, 204, 113, 0.3);
       }
     }
 
     &.btn-secondary {
       background: rgba(255, 255, 255, 0.1);
       color: var(--color-text-secondary);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border: var(--border-width-thin) solid rgba(255, 255, 255, 0.2);
 
       &:hover {
         background: rgba(255, 255, 255, 0.15);
@@ -234,21 +234,21 @@
 
 .empty-state {
   text-align: center;
-  padding: 4rem 2rem;
+  padding: var(--spacing-4xl) var(--spacing-2xl);
   color: var(--color-text-secondary);
 
   .empty-icon {
-    font-size: 4rem;
+    font-size: var(--font-size-5xl);
     color: rgba(255, 255, 255, 0.2);
-    margin-bottom: 1rem;
+    margin-bottom: var(--spacing-m);
   }
 
   p {
-    margin: 0.5rem 0;
-    font-size: 1.1rem;
+    margin: var(--spacing-xs) 0;
+    font-size: var(--font-size-l);
 
     &.empty-hint {
-      font-size: 0.9rem;
+      font-size: var(--font-size-s);
       font-style: italic;
       color: rgba(255, 255, 255, 0.4);
     }

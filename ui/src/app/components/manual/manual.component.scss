@@ -27,7 +27,7 @@
   bottom: 0;
   background: rgba(0, 0, 0, 0.7);
   z-index: 999;
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(var(--spacing-xs));
 }
 
 .manual-card {
@@ -37,7 +37,7 @@
   border-radius: var(--radius-l);
   box-shadow: var(--shadow-xl);
   width: 100%;
-  max-width: 1200px;
+  max-width: var(--spacing-10xl);
   height: 85vh;
   display: flex;
   flex-direction: column;
@@ -83,7 +83,7 @@
 }
 
 .manual-sidebar {
-  width: 200px;
+  width: var(--spacing-7xl);
   background: var(--color-bg-secondary);
   border-right: var(--border-width-thin) solid var(--color-surface-border);
   padding: var(--spacing-l);
@@ -141,7 +141,7 @@
 /* Scrollbar styling */
 .manual-sidebar::-webkit-scrollbar,
 .manual-main::-webkit-scrollbar {
-  width: 8px;
+  width: var(--spacing-s);
 }
 
 .manual-sidebar::-webkit-scrollbar-track,

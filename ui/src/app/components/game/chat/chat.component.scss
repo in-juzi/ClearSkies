@@ -10,7 +10,7 @@
   position: relative;
   width: 100%;
   background: var(--color-bg-secondary);
-  border: var(--border-width-medium) solid var(--color-border-primary);
+  border: var(--border-default);
   border-radius: var(--radius-m);
   box-shadow: var(--shadow-overlay);
   display: flex;
@@ -19,13 +19,13 @@
   margin-top: var(--spacing-m);
 
   &.collapsed {
-    height: 50px;
+    height: var(--spacing-5xl);
   }
 }
 
 .chat-body {
   display: flex;
   flex-direction: column;
-  height: 400px;
+  height: var(--spacing-8xl);
   max-height: 50vh;
 }

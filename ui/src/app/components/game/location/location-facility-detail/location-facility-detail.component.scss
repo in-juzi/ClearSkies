@@ -25,7 +25,7 @@
 
 .vendors-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(var(--spacing-7xl), 1fr));
   gap: var(--spacing-m);
   margin-top: var(--spacing-m);
 }
@@ -48,8 +48,8 @@
   &:hover {
     background-color: var(--color-bg-tertiary);
     border-color: var(--color-secondary);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(138, 43, 226, 0.3);
+    transform: translateY(calc(-1 * var(--spacing-2xs)));
+    box-shadow: 0 var(--spacing-xs) var(--spacing-m) rgba(138, 43, 226, 0.3);
   }
 
   &.has-quest {
@@ -58,15 +58,15 @@
 
   .quest-indicator {
     position: absolute;
-    top: -6px;
-    right: -6px;
-    color: #ffd700;
-    font-size: 28px;
+    top: calc(-1 * var(--spacing-s));
+    right: calc(-1 * var(--spacing-s));
+    color: var(--color-gold);
+    font-size: var(--font-size-3xl);
     background: rgba(20, 20, 40, 0.95);
     border-radius: 50%;
-    padding: 6px;
-    box-shadow: 0 0 16px rgba(255, 215, 0, 0.7),
-                0 2px 8px rgba(0, 0, 0, 0.5);
+    padding: var(--spacing-s);
+    box-shadow: var(--shadow-glow-gold),
+                0 var(--spacing-2xs) var(--spacing-s) rgba(0, 0, 0, 0.5);
     animation: questIndicatorPulse 2s infinite;
     z-index: 10;
   }
@@ -96,7 +96,7 @@
 // Activities list
 .activities-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(var(--spacing-7xl), 1fr));
   gap: var(--spacing-l);
 }
 
@@ -111,7 +111,7 @@
   &.available:hover {
     background-color: var(--color-bg-tertiary);
     border-color: var(--color-text-label);
-    transform: translateY(-2px);
+    transform: translateY(calc(-1 * var(--spacing-2xs)));
   }
 
   &.unavailable {
@@ -141,7 +141,7 @@
 
   .unavailable-badge {
     background-color: rgba(139, 0, 0, 0.5);
-    padding: 0.2rem var(--spacing-s);
+    padding: var(--spacing-2xs) var(--spacing-s);
     border-radius: var(--radius-s);
     font-size: var(--font-size-xs);
     color: var(--color-error-light);
@@ -193,7 +193,7 @@
     gap: var(--spacing-m);
 
     &:hover {
-      transform: translateY(-2px);
+      transform: translateY(calc(-1 * var(--spacing-2xs)));
       box-shadow: var(--shadow-glow-purple);
     }
 
@@ -220,14 +220,14 @@
   0%,
   100% {
     transform: scale(1);
-    box-shadow: 0 0 16px rgba(255, 215, 0, 0.7),
-                0 2px 8px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 var(--spacing-l) rgba(255, 215, 0, 0.7),
+                0 var(--spacing-2xs) var(--spacing-s) rgba(0, 0, 0, 0.5);
   }
 
   50% {
     transform: scale(1.15);
-    box-shadow: 0 0 24px rgba(255, 215, 0, 0.9),
-                0 0 12px rgba(255, 215, 0, 0.7),
-                0 2px 8px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 var(--spacing-2xl) rgba(255, 215, 0, 0.9),
+                0 0 var(--spacing-m) rgba(255, 215, 0, 0.7),
+                0 var(--spacing-2xs) var(--spacing-s) rgba(0, 0, 0, 0.5);
   }
 }

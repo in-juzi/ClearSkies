@@ -17,7 +17,7 @@
   color: var(--color-secondary-dark);
   text-align: center;
   margin: 0 0 var(--spacing-2xl) 0;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  text-shadow: var(--spacing-2xs) var(--spacing-2xs) var(--spacing-xs) rgba(0, 0, 0, 0.5);
   letter-spacing: var(--letter-spacing-wider);
   text-transform: uppercase;
 }
@@ -26,7 +26,7 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--spacing-m);
-  max-width: 500px;
+  max-width: var(--spacing-8xl);
   margin: 0 auto;
   width: 100%;
 }
@@ -47,7 +47,7 @@
   &:hover {
     border-color: var(--color-secondary-dark);
     box-shadow: var(--shadow-glow-secondary);
-    transform: translateY(-2px);
+    transform: translateY(calc(-1 * var(--spacing-2xs)));
   }
 
   &.drag-over {
@@ -126,10 +126,10 @@
 
   .item-rarity-badge {
     position: absolute;
-    top: 2px;
-    right: 2px;
+    top: var(--spacing-2xs);
+    right: var(--spacing-2xs);
     font-size: var(--font-size-xs);
-    padding: 0.125rem var(--spacing-xs);
+    padding: var(--spacing-2xs) var(--spacing-xs);
     border-radius: var(--radius-s);
     background: var(--color-bg-overlay-strong);
     text-transform: uppercase;
@@ -220,7 +220,7 @@
     color: var(--color-secondary-dark);
     text-align: center;
     margin: 0 0 var(--spacing-l) 0;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    text-shadow: var(--spacing-2xs) var(--spacing-2xs) var(--spacing-xs) rgba(0, 0, 0, 0.5);
     letter-spacing: var(--letter-spacing-wide);
     text-transform: uppercase;
   }
@@ -235,7 +235,7 @@
 
   .summary-content {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(var(--spacing-7xl), 1fr));
     gap: var(--spacing-l);
   }
 
@@ -246,7 +246,7 @@
     border: var(--border-light);
 
     &.offensive {
-      border-left: 3px solid var(--color-warning);
+      border-left: var(--spacing-2xs) solid var(--color-warning);
 
       .stat-group-title {
         color: var(--color-warning);
@@ -254,7 +254,7 @@
     }
 
     &.defensive {
-      border-left: 3px solid var(--color-info);
+      border-left: var(--spacing-2xs) solid var(--color-info);
 
       .stat-group-title {
         color: var(--color-info);
@@ -308,7 +308,7 @@
 
     &.damage-hover {
       cursor: help;
-      border-bottom: 1px dotted var(--color-text-tertiary);
+      border-bottom: var(--border-width-thin) dotted var(--color-text-tertiary);
       transition: all var(--transition-fast);
 
       &:hover {

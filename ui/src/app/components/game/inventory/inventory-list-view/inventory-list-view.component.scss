@@ -12,7 +12,7 @@
 
   /* Scrollbar styling */
   &::-webkit-scrollbar {
-    width: 8px;
+    width: var(--spacing-s);
   }
 
   &::-webkit-scrollbar-track {
@@ -44,19 +44,19 @@
   transition: all var(--transition-fast);
 
   &:hover {
-    transform: translateX(2px);
+    transform: translateX(var(--spacing-2xs));
     box-shadow: var(--shadow-m);
   }
 
   /* Alt+Click visual feedback */
   &.alt-drop-mode {
-    border-color: #ef4444 !important; /* Red for drop */
-    box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+    border-color: var(--color-error) !important;
+    box-shadow: var(--shadow-glow-error);
   }
 
   &.alt-sell-mode {
-    border-color: #10b981 !important; /* Green for sell */
-    box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+    border-color: var(--color-success) !important;
+    box-shadow: var(--shadow-glow-success);
   }
 
   /* Drag and drop styles */
@@ -76,16 +76,16 @@
     &::after {
       content: "⚔️";
       position: absolute;
-      top: 4px;
-      right: 4px;
+      top: var(--spacing-xs);
+      right: var(--spacing-xs);
       font-size: var(--font-size-m);
     }
   }
 }
 
 .item-icon {
-  width: 40px;
-  height: 40px;
+  width: var(--spacing-4xl);
+  height: var(--spacing-4xl);
   flex-shrink: 0;
   background: radial-gradient(circle, var(--color-bg-tertiary) 0%, var(--color-bg-elevated) 100%);
   border-radius: var(--radius-s);
@@ -144,7 +144,7 @@
 .trait-badge {
   font-size: var(--font-size-s);
   font-weight: var(--font-weight-bold);
-  padding: 2px 4px;
+  padding: var(--spacing-2xs) var(--spacing-xs);
 }
 
 .empty-message {

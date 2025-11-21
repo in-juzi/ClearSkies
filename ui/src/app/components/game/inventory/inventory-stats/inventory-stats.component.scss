@@ -30,13 +30,13 @@
   &:hover {
     background: var(--color-bg-tertiary);
     border-color: var(--color-surface-border);
-    transform: translateY(-1px);
+    transform: translateY(calc(-1 * var(--border-width-thin)));
   }
 }
 
 .stat-icon {
   font-size: var(--font-size-xl);
-  line-height: 1;
+  line-height: var(--line-height-none);
   margin-bottom: var(--spacing-xs);
 }
 
@@ -44,7 +44,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.125rem;
+  gap: var(--spacing-2xs);
   min-width: 0;
   width: 100%;
 }
@@ -98,7 +98,7 @@
 
 .floating-gold-container {
   position: absolute;
-  top: -10px;
+  top: calc(-1 * var(--spacing-s));
   left: 50%;
   transform: translateX(-50%);
   pointer-events: none;
@@ -110,16 +110,16 @@
 
 .floating-gold {
   position: absolute;
-  font-size: 1.4rem;
+  font-size: var(--font-size-2xl);
   font-weight: bold;
   font-family: monospace;
   color: var(--color-secondary-dark);
   opacity: 0;
   animation: floatUpGold 1s ease-out forwards;
   text-shadow:
-    0 0 8px currentColor,
-    0 0 16px rgba(255, 215, 0, 0.6),
-    0 2px 4px rgba(0, 0, 0, 0.8);
+    0 0 var(--spacing-s) currentColor,
+    0 0 var(--spacing-l) rgba(255, 215, 0, 0.6),
+    0 var(--spacing-2xs) var(--spacing-xs) rgba(0, 0, 0, 0.8);
   pointer-events: none;
 }
 
@@ -129,13 +129,13 @@
     transform: translateY(0) scale(1);
   }
   20% {
-    transform: translateY(-10px) scale(1.15);
+    transform: translateY(calc(-1 * var(--spacing-s))) scale(1.15);
   }
   70% {
     opacity: 1;
   }
   100% {
     opacity: 0;
-    transform: translateY(-60px) scale(0.9);
+    transform: translateY(calc(-1 * var(--spacing-5xl))) scale(0.9);
   }
 }

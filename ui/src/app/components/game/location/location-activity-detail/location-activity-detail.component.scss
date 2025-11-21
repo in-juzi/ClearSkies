@@ -72,15 +72,15 @@
   gap: var(--spacing-s);
 
   .skill-icon-small {
-    width: 20px;
-    height: 20px;
+    width: var(--spacing-xl);
+    height: var(--spacing-xl);
     object-fit: contain;
     flex-shrink: 0;
   }
 
   .skill-icon-large {
-    width: 40px;
-    height: 40px;
+    width: var(--spacing-3xl);
+    height: var(--spacing-3xl);
     object-fit: contain;
     flex-shrink: 0;
   }
@@ -121,7 +121,7 @@
   transition: all var(--transition-normal) ease;
 
   &:hover:not(:disabled) {
-    transform: translateY(-2px);
+    transform: translateY(calc(-1 * var(--spacing-2xs)));
     box-shadow: var(--shadow-glow-purple);
   }
 

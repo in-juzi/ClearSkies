@@ -1,7 +1,7 @@
 /* Item Basic Info Component */
 .detail-icon-description-section {
   display: grid;
-  grid-template-columns: auto 80px 1fr;
+  grid-template-columns: auto var(--spacing-5xl) 1fr;
   grid-template-rows: auto auto;
   gap: var(--spacing-m);
   align-items: flex-start;
@@ -24,8 +24,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 80px;
-  height: 80px;
+  width: var(--spacing-5xl);
+  height: var(--spacing-5xl);
 }
 
 .detail-icon-description-section .item-description {
@@ -38,7 +38,7 @@
   color: var(--color-text-label);
   font-style: italic;
   margin: 0;
-  line-height: 1.6;
+  line-height: var(--line-height-loose);
 }
 
 /* Category Display */
@@ -62,7 +62,7 @@
 
 .category-tag:hover {
   background: var(--color-accent-blue);
-  transform: translateY(-1px);
+  transform: translateY(calc(-1 * var(--border-width-thin)));
 }
 
 /* Basic Info Grid */
@@ -122,7 +122,7 @@
 
 .subcategory-tag:hover {
   background: var(--color-accent-purple);
-  transform: translateY(-1px);
+  transform: translateY(calc(-1 * var(--border-width-thin)));
 }
 
 .detail-section {

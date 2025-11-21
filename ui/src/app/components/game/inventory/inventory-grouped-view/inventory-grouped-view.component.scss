@@ -18,10 +18,10 @@
   border-radius: var(--radius-s);
   cursor: pointer;
   transition: all var(--transition-fast);
-  min-height: 60px;
+  min-height: var(--spacing-6xl);
 
   &:hover {
-    transform: translateX(2px);
+    transform: translateX(var(--spacing-2xs));
     box-shadow: var(--shadow-m);
     background: var(--color-bg-tertiary);
   }
@@ -88,7 +88,7 @@
     position: relative;
 
     &:hover {
-      transform: translateY(-2px);
+      transform: translateY(calc(-1 * var(--spacing-2xs)));
       box-shadow: var(--shadow-s);
     }
 
@@ -99,21 +99,21 @@
       &::after {
         content: "⚔️";
         position: absolute;
-        top: 2px;
-        right: 2px;
+        top: var(--spacing-2xs);
+        right: var(--spacing-2xs);
         font-size: var(--font-size-xs);
       }
     }
 
     /* Alt+Click visual feedback for item-mini instances */
     &.alt-drop-mode {
-      border-color: #ef4444 !important;
-      box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+      border-color: var(--color-error) !important;
+      box-shadow: var(--shadow-glow-error);
     }
 
     &.alt-sell-mode {
-      border-color: #10b981 !important;
-      box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+      border-color: var(--color-success) !important;
+      box-shadow: var(--shadow-glow-success);
     }
   }
 }

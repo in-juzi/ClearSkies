@@ -12,7 +12,7 @@
 
   /* Custom scrollbar */
   &::-webkit-scrollbar {
-    width: 8px;
+    width: var(--spacing-s);
   }
 
   &::-webkit-scrollbar-track {
@@ -20,11 +20,11 @@
   }
 
   &::-webkit-scrollbar-thumb {
-    background: var(--color-border-primary);
+    background: var(--color-border-subtle);
     border-radius: var(--radius-s);
 
     &:hover {
-      background: var(--color-border-secondary);
+      background: var(--color-border-moderate);
     }
   }
 }
@@ -41,7 +41,7 @@
   align-items: baseline;
   gap: var(--spacing-xs);
   word-wrap: break-word;
-  line-height: 1.5;
+  line-height: var(--line-height-relaxed);
 
   &.own-message {
     .message-username {
@@ -58,7 +58,7 @@
 
 .message-username {
   font-weight: var(--font-weight-bold);
-  color: var(--color-accent-gold);
+  color: var(--color-gold);
   font-size: var(--font-size-s);
   flex-shrink: 0;
 }

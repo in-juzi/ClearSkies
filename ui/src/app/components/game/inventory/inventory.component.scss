@@ -29,7 +29,7 @@ app-inventory-list-view, app-inventory-grouped-view {
   left: 50%;
   transform: translate(-50%, -50%);
   width: 90%;
-  max-width: 500px;
+  max-width: var(--spacing-9xl);
   max-height: 80vh;
   background: var(--gradient-card);
   border: var(--border-default);
@@ -43,7 +43,7 @@ app-inventory-list-view, app-inventory-grouped-view {
 
   &.dragging {
     cursor: move !important;
-    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.7);
+    box-shadow: 0 var(--spacing-m) var(--spacing-4xl) rgba(0, 0, 0, 0.7);
     border-color: var(--color-surface-border);
   }
 }
@@ -85,7 +85,7 @@ app-inventory-list-view, app-inventory-grouped-view {
 
   /* Scrollbar styling */
   &::-webkit-scrollbar {
-    width: 8px;
+    width: var(--spacing-s);
   }
 
   &::-webkit-scrollbar-track {
@@ -118,8 +118,8 @@ app-inventory-list-view, app-inventory-grouped-view {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 80px;
-  height: 80px;
+  width: var(--spacing-5xl);
+  height: var(--spacing-5xl);
 }
 
 .detail-section {
@@ -175,7 +175,7 @@ app-inventory-list-view, app-inventory-grouped-view {
 
   &:hover {
     background: var(--color-accent-purple);
-    transform: translateY(-1px);
+    transform: translateY(calc(-1 * var(--border-width-thin)));
   }
 }
 
@@ -190,12 +190,12 @@ app-inventory-list-view, app-inventory-grouped-view {
   padding: var(--spacing-m);
   background: var(--color-bg-elevated);
   border-radius: var(--radius-s);
-  border-left: 4px solid var(--color-info);
+  border-left: var(--spacing-xs) solid var(--color-info);
   transition: all var(--transition-fast);
 
   &:hover {
     background: var(--color-bg-tertiary);
-    transform: translateX(2px);
+    transform: translateX(var(--spacing-2xs));
   }
 }
 
@@ -213,12 +213,12 @@ app-inventory-list-view, app-inventory-grouped-view {
 }
 
 .quality-level-badge {
-  padding: 2px 8px;
+  padding: var(--spacing-2xs) var(--spacing-s);
   border-radius: var(--radius-s);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-bold);
   background: rgba(59, 130, 246, 0.2);
-  border: 1px solid currentColor;
+  border: var(--border-width-thin) solid currentColor;
 }
 
 .quality-level-name {
@@ -238,12 +238,12 @@ app-inventory-list-view, app-inventory-grouped-view {
   padding: var(--spacing-m);
   background: var(--color-bg-elevated);
   border-radius: var(--radius-s);
-  border-left: 4px solid var(--color-accent-purple);
+  border-left: var(--spacing-xs) solid var(--color-accent-purple);
   transition: all var(--transition-fast);
 
   &:hover {
     background: var(--color-bg-tertiary);
-    transform: translateX(2px);
+    transform: translateX(var(--spacing-2xs));
   }
 
   /* Trait rarity border colors */
@@ -279,12 +279,12 @@ app-inventory-list-view, app-inventory-grouped-view {
 
 .trait-rarity-badge,
 .trait-level-badge {
-  padding: 2px 8px;
+  padding: var(--spacing-2xs) var(--spacing-s);
   border-radius: var(--radius-s);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-bold);
   text-transform: uppercase;
-  border: 1px solid currentColor;
+  border: var(--border-width-thin) solid currentColor;
 }
 
 .trait-rarity-badge {
@@ -390,7 +390,7 @@ app-inventory-list-view, app-inventory-grouped-view {
 }
 
 .quantity-input {
-  width: 80px;
+  width: var(--spacing-5xl);
   padding: var(--spacing-xs) var(--spacing-s);
   background: var(--color-bg-tertiary);
   border: var(--border-default);
@@ -402,7 +402,7 @@ app-inventory-list-view, app-inventory-grouped-view {
   &:focus {
     outline: none;
     border-color: var(--color-accent);
-    box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+    box-shadow: 0 0 0 var(--spacing-2xs) rgba(139, 92, 246, 0.2);
   }
 
   &:disabled {
@@ -419,11 +419,11 @@ app-inventory-list-view, app-inventory-grouped-view {
 
 .quantity-slider {
   width: 100%;
-  height: 8px;
+  height: var(--spacing-s);
   -webkit-appearance: none;
   appearance: none;
   background: var(--color-bg-tertiary);
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   outline: none;
   border: var(--border-light);
   cursor: pointer;
@@ -437,53 +437,53 @@ app-inventory-list-view, app-inventory-grouped-view {
   &::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 24px;
-    height: 24px;
-    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-    border: 3px solid #a78bfa;
+    width: var(--spacing-2xl);
+    height: var(--spacing-2xl);
+    background: var(--gradient-slider-thumb);
+    border: 3px solid var(--color-bronze);
     border-radius: 50%;
     cursor: grab;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(139, 92, 246, 0.3);
+    box-shadow: 0 var(--spacing-2xs) var(--spacing-s) rgba(0, 0, 0, 0.5), var(--shadow-glow-bronze);
     transition: all 0.2s ease;
 
     &:hover {
-      background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
-      border-color: #c4b5fd;
+      background: linear-gradient(135deg, var(--color-bronze-light) 0%, var(--color-bronze) 100%);
+      border-color: var(--color-bronze-light);
       transform: scale(1.15);
-      box-shadow: 0 0 12px rgba(139, 92, 246, 0.8), 0 2px 8px rgba(0, 0, 0, 0.6);
+      box-shadow: var(--shadow-glow-bronze), 0 var(--spacing-2xs) var(--spacing-s) rgba(0, 0, 0, 0.6);
       cursor: grab;
     }
 
     &:active {
       transform: scale(1.05);
       cursor: grabbing;
-      box-shadow: 0 0 16px rgba(139, 92, 246, 1), 0 2px 8px rgba(0, 0, 0, 0.6);
+      box-shadow: var(--shadow-glow-gold), 0 var(--spacing-2xs) var(--spacing-s) rgba(0, 0, 0, 0.6);
     }
   }
 
   /* Firefox */
   &::-moz-range-thumb {
-    width: 24px;
-    height: 24px;
-    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-    border: 3px solid #a78bfa;
+    width: var(--spacing-2xl);
+    height: var(--spacing-2xl);
+    background: var(--gradient-slider-thumb);
+    border: 3px solid var(--color-bronze);
     border-radius: 50%;
     cursor: grab;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(139, 92, 246, 0.3);
+    box-shadow: 0 var(--spacing-2xs) var(--spacing-s) rgba(0, 0, 0, 0.5), var(--shadow-glow-bronze);
     transition: all 0.2s ease;
 
     &:hover {
-      background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
-      border-color: #c4b5fd;
+      background: linear-gradient(135deg, var(--color-bronze-light) 0%, var(--color-bronze) 100%);
+      border-color: var(--color-bronze-light);
       transform: scale(1.15);
-      box-shadow: 0 0 12px rgba(139, 92, 246, 0.8), 0 2px 8px rgba(0, 0, 0, 0.6);
+      box-shadow: var(--shadow-glow-bronze), 0 var(--spacing-2xs) var(--spacing-s) rgba(0, 0, 0, 0.6);
       cursor: grab;
     }
 
     &:active {
       transform: scale(1.05);
       cursor: grabbing;
-      box-shadow: 0 0 16px rgba(139, 92, 246, 1), 0 2px 8px rgba(0, 0, 0, 0.6);
+      box-shadow: var(--shadow-glow-gold), 0 var(--spacing-2xs) var(--spacing-s) rgba(0, 0, 0, 0.6);
     }
   }
 
@@ -491,8 +491,8 @@ app-inventory-list-view, app-inventory-grouped-view {
   &::-moz-range-track {
     background: var(--color-bg-tertiary);
     border: var(--border-light);
-    border-radius: 4px;
-    height: 8px;
+    border-radius: var(--radius-xs);
+    height: var(--spacing-s);
   }
 }
 

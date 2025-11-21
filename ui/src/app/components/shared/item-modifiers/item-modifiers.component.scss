@@ -6,7 +6,7 @@
 
   // Size variants
   &.mini {
-    gap: 0.2rem;
+    gap: var(--spacing-2xs);
 
     .quality-badge,
     .trait-badge,
@@ -67,7 +67,7 @@
   transition: all var(--transition-fast);
 
   &:hover {
-    transform: translateY(-1px);
+    transform: translateY(calc(-1 * var(--spacing-2xs)));
   }
 }
 
@@ -75,27 +75,27 @@
 .quality-badge {
   &.level-5 {
     background: rgba(156, 39, 176, 0.3);
-    color: #9c27b0;
+    color: var(--color-quality-5);
   }
 
   &.level-4 {
     background: rgba(76, 175, 80, 0.3);
-    color: #4caf50;
+    color: var(--color-quality-4);
   }
 
   &.level-3 {
     background: rgba(33, 150, 243, 0.3);
-    color: #2196f3;
+    color: var(--color-quality-3);
   }
 
   &.level-2 {
     background: rgba(255, 193, 7, 0.3);
-    color: #ffc107;
+    color: var(--color-quality-2);
   }
 
   &.level-1 {
     background: rgba(244, 67, 54, 0.3);
-    color: #f44336;
+    color: var(--color-quality-1);
   }
 }
 
@@ -103,17 +103,17 @@
 .trait-badge {
   &.trait-3 {
     background: rgba(156, 39, 176, 0.3);
-    color: #9c27b0;
+    color: var(--color-quality-5);
   }
 
   &.trait-2 {
     background: rgba(33, 150, 243, 0.3);
-    color: #2196f3;
+    color: var(--color-quality-3);
   }
 
   &.trait-1 {
     background: rgba(76, 175, 80, 0.3);
-    color: #4caf50;
+    color: var(--color-quality-4);
   }
 }
 
@@ -131,17 +131,17 @@
 
   &.epic {
     background: rgba(156, 39, 176, 0.2);
-    color: #9c27b0;
+    color: var(--color-quality-5);
   }
 
   &.rare {
     background: rgba(33, 150, 243, 0.2);
-    color: #2196f3;
+    color: var(--color-quality-3);
   }
 
   &.uncommon {
     background: rgba(76, 175, 80, 0.2);
-    color: #4caf50;
+    color: var(--color-quality-4);
   }
 
   &.common {
@@ -160,7 +160,7 @@
   transition: all var(--transition-fast);
 
   &:hover {
-    transform: translateY(-1px);
+    transform: translateY(calc(-1 * var(--spacing-2xs)));
   }
 }
 
@@ -168,27 +168,27 @@
 .quality-badge-name {
   &.level-5 {
     background: rgba(156, 39, 176, 0.3);
-    color: #9c27b0;
+    color: var(--color-quality-5);
   }
 
   &.level-4 {
     background: rgba(76, 175, 80, 0.3);
-    color: #4caf50;
+    color: var(--color-quality-4);
   }
 
   &.level-3 {
     background: rgba(33, 150, 243, 0.3);
-    color: #2196f3;
+    color: var(--color-quality-3);
   }
 
   &.level-2 {
     background: rgba(255, 193, 7, 0.3);
-    color: #ffc107;
+    color: var(--color-quality-2);
   }
 
   &.level-1 {
     background: rgba(244, 67, 54, 0.3);
-    color: #f44336;
+    color: var(--color-quality-1);
   }
 }
 
@@ -196,17 +196,17 @@
 .trait-badge-name {
   &.trait-3 {
     background: rgba(156, 39, 176, 0.3);
-    color: #9c27b0;
+    color: var(--color-quality-5);
   }
 
   &.trait-2 {
     background: rgba(33, 150, 243, 0.3);
-    color: #2196f3;
+    color: var(--color-quality-3);
   }
 
   &.trait-1 {
     background: rgba(76, 175, 80, 0.3);
-    color: #4caf50;
+    color: var(--color-quality-4);
   }
 }
 

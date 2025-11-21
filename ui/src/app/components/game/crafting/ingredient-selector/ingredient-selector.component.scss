@@ -40,7 +40,7 @@
   .recipe-description-detail {
     color: var(--color-text-secondary);
     font-style: italic;
-    line-height: 1.5;
+    line-height: var(--line-height-relaxed);
     margin-top: var(--spacing-xs);
     font-size: var(--font-size-s);
 
@@ -146,7 +146,7 @@
 
         &:hover {
           border-color: var(--color-accent-purple);
-          transform: translateX(4px);
+          transform: translateX(var(--spacing-xs));
         }
 
         &.selected {
@@ -191,17 +191,17 @@
 
             &.uncommon {
               background: rgba(76, 175, 80, 0.3);
-              color: #4caf50;
+              color: var(--color-quality-4);
             }
 
             &.rare {
               background: rgba(33, 150, 243, 0.3);
-              color: #2196f3;
+              color: var(--color-quality-3);
             }
 
             &.epic {
               background: rgba(156, 39, 176, 0.3);
-              color: #9c27b0;
+              color: var(--color-quality-5);
             }
 
             &.legendary {
@@ -277,7 +277,7 @@
       }
 
       .output-quantity {
-        color: var(--color-accent-gold);
+        color: var(--color-gold);
         font-weight: var(--font-weight-medium);
       }
     }
@@ -306,7 +306,7 @@
       transition: all var(--transition-normal);
 
       &:hover {
-        transform: translateY(-2px);
+        transform: translateY(calc(-1 * var(--spacing-2xs)));
         box-shadow: var(--shadow-glow-purple);
       }
     }
@@ -325,7 +325,7 @@
 
 // Scrollbar styling
 .recipe-details::-webkit-scrollbar {
-  width: 8px;
+  width: var(--spacing-s);
 }
 
 .recipe-details::-webkit-scrollbar-track {

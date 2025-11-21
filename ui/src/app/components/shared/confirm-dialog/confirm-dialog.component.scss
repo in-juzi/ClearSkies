@@ -5,12 +5,12 @@
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(var(--spacing-xs));
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 9999;
-  animation: fadeIn 0.2s ease-out;
+  animation: fadeIn var(--transition-fast) ease-out;
 }
 
 .dialog-container {
@@ -18,14 +18,14 @@
   border: var(--border-default);
   border-radius: var(--radius-modal);
   box-shadow: var(--shadow-xl);
-  min-width: 400px;
-  max-width: 500px;
-  animation: slideIn 0.2s ease-out;
+  min-width: var(--spacing-8xl);
+  max-width: var(--spacing-9xl);
+  animation: slideIn var(--transition-fast) ease-out;
 }
 
 .dialog-header {
   padding: var(--spacing-l);
-  border-bottom: 1px solid var(--color-surface-border);
+  border-bottom: var(--border-width-thin) solid var(--color-surface-border);
   background: linear-gradient(to bottom, rgba(255, 255, 255, 0.05), transparent);
 
   h2 {
@@ -49,7 +49,7 @@
 
 .dialog-footer {
   padding: var(--spacing-l);
-  border-top: 1px solid var(--color-surface-border);
+  border-top: var(--border-width-thin) solid var(--color-surface-border);
   display: flex;
   gap: var(--spacing-m);
   justify-content: flex-end;
@@ -63,16 +63,16 @@
   font-weight: var(--font-weight-medium);
   cursor: pointer;
   transition: all var(--transition-fast);
-  border: 1px solid transparent;
-  min-width: 100px;
+  border: var(--border-width-thin) solid transparent;
+  min-width: var(--spacing-6xl);
 
   &:focus {
-    outline: 2px solid var(--color-accent-blue);
-    outline-offset: 2px;
+    outline: var(--spacing-2xs) solid var(--color-accent-blue);
+    outline-offset: var(--spacing-2xs);
   }
 
   &:active {
-    transform: scale(0.98);
+    transform: scale(var(--scale-press));
   }
 }
 
@@ -94,7 +94,7 @@
 
   &:hover {
     box-shadow: var(--shadow-glow-primary);
-    filter: brightness(1.1);
+    filter: brightness(var(--brightness-hover));
   }
 }
 
@@ -110,7 +110,7 @@
 
 @keyframes slideIn {
   from {
-    transform: translateY(-20px);
+    transform: translateY(calc(-1 * var(--spacing-xl)));
     opacity: 0;
   }
   to {

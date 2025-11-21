@@ -10,7 +10,7 @@
     margin: 0 0 var(--spacing-l) 0;
     font-size: var(--font-size-2xl);
     text-align: center;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    text-shadow: var(--spacing-2xs) var(--spacing-2xs) var(--spacing-xs) rgba(0, 0, 0, 0.5);
   }
 
   .loading,
@@ -41,7 +41,7 @@
     position: relative;
 
     &:hover {
-      transform: translateY(-2px);
+      transform: translateY(calc(-1 * var(--spacing-2xs)));
       box-shadow: var(--shadow-l);
       border-color: var(--color-primary);
       z-index: 100;
@@ -59,8 +59,8 @@
       margin-bottom: var(--spacing-xs);
 
       .attribute-icon {
-        width: 28px;
-        height: 28px;
+        width: var(--spacing-3xl);
+        height: var(--spacing-3xl);
         object-fit: contain;
         flex-shrink: 0;
       }
@@ -68,7 +68,7 @@
       .attribute-title {
         display: flex;
         flex-direction: column;
-        gap: 2px;
+        gap: var(--spacing-2xs);
         flex: 1;
         min-width: 0;
       }
@@ -78,7 +78,7 @@
         margin: 0;
         font-size: var(--font-size-s);
         font-weight: var(--font-weight-bold);
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        text-shadow: var(--border-width-thin) var(--border-width-thin) var(--spacing-2xs) rgba(0, 0, 0, 0.5);
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -94,7 +94,7 @@
     .progress-container {
       .progress-bar {
         width: 100%;
-        height: 8px;
+        height: var(--spacing-s);
         background: var(--color-bg-overlay-strong);
         border-radius: var(--radius-full);
         overflow: hidden;
@@ -114,12 +114,12 @@
       position: absolute;
       top: 100%;
       margin-top: var(--spacing-s);
-      min-width: 280px;
+      min-width: var(--spacing-7xl);
       background: var(--gradient-card);
-      border: 2px solid var(--color-primary);
+      border: var(--spacing-2xs) solid var(--color-primary);
       border-radius: var(--radius-card);
       padding: var(--spacing-m);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 var(--spacing-s) var(--spacing-2xl) rgba(0, 0, 0, 0.6);
       opacity: 0;
       visibility: hidden;
       transition: all var(--transition-normal);
@@ -130,12 +130,12 @@
       &::before {
         content: '';
         position: absolute;
-        top: -8px;
+        top: calc(-1 * var(--spacing-s));
         width: 0;
         height: 0;
-        border-left: 8px solid transparent;
-        border-right: 8px solid transparent;
-        border-bottom: 8px solid var(--color-primary);
+        border-left: var(--spacing-s) solid transparent;
+        border-right: var(--spacing-s) solid transparent;
+        border-bottom: var(--spacing-s) solid var(--color-primary);
       }
 
       .hover-header {
@@ -144,13 +144,13 @@
         gap: var(--spacing-m);
         margin-bottom: var(--spacing-m);
         padding-bottom: var(--spacing-s);
-        border-bottom: 1px solid var(--color-bg-tertiary);
+        border-bottom: var(--border-width-thin) solid var(--color-bg-tertiary);
 
         .hover-icon {
-          width: 40px;
-          height: 40px;
+          width: var(--spacing-4xl);
+          height: var(--spacing-4xl);
           object-fit: contain;
-          filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5));
+          filter: drop-shadow(var(--spacing-2xs) var(--spacing-2xs) var(--spacing-xs) rgba(0, 0, 0, 0.5));
         }
 
         .hover-title {
@@ -189,7 +189,7 @@
 
           &.highlight {
             background: var(--color-bg-overlay-strong);
-            border: 1px solid var(--color-accent-blue);
+            border: var(--border-width-thin) solid var(--color-accent-blue);
           }
 
           .stat-label {
@@ -206,7 +206,7 @@
 
       .hover-footer {
         padding-top: var(--spacing-s);
-        border-top: 1px solid var(--color-bg-tertiary);
+        border-top: var(--border-width-thin) solid var(--color-bg-tertiary);
 
         .description {
           text-align: center;
@@ -225,14 +225,14 @@
   .attribute-hover-card {
     // Default: prevent overflow on both sides
     max-width: calc(100vw - 2 * var(--spacing-l));
-    max-width: calc(var(--sidebar-width-right) - 2 * var(--spacing-l) - 16px); // Adjust for sidebar width and extra padding
+    max-width: calc(var(--sidebar-width-right) - 2 * var(--spacing-l) - var(--spacing-l)); // Adjust for sidebar width and extra padding
   }
 }
 
 .attribute-card:nth-child(3n+1) .attribute-hover-card {
   // Left column - align to left edge
   left: 0;
-  transform: translateX(0) translateY(-8px);
+  transform: translateX(0) translateY(calc(-1 * var(--spacing-s)));
 
   &::before {
     left: var(--spacing-l);
@@ -244,7 +244,7 @@
   // Middle column - keep centered but prevent overflow
   left: 50%;
   right: auto;
-  transform: translateX(-50%) translateY(-8px);
+  transform: translateX(-50%) translateY(calc(-1 * var(--spacing-s)));
 
   &::before {
     left: 50%;
@@ -257,7 +257,7 @@
   // Right column - align to right edge
   left: auto;
   right: 0;
-  transform: translateX(0) translateY(-8px);
+  transform: translateX(0) translateY(calc(-1 * var(--spacing-s)));
 
   &::before {
     left: auto;
