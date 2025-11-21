@@ -18,8 +18,8 @@
   border: var(--border-default);
   border-radius: var(--radius-modal);
   box-shadow: var(--shadow-xl);
-  min-width: var(--spacing-8xl);
-  max-width: var(--spacing-9xl);
+  min-width: var(--container-s);
+  max-width: var(--container-m);
   animation: slideIn var(--transition-fast) ease-out;
 }
 

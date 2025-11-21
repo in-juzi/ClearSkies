@@ -26,8 +26,8 @@
   border: var(--spacing-2xs) solid var(--color-secondary);
   border-radius: var(--radius-l);
   box-shadow: 0 var(--spacing-xs) var(--spacing-4xl) rgba(0, 0, 0, 0.5);
-  min-width: var(--spacing-8xl);
-  max-width: var(--spacing-9xl);
+  min-width: var(--container-s);
+  max-width: var(--container-m);
   animation: slideIn var(--transition-fast) ease-out;
 }
 
