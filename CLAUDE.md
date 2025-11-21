@@ -103,18 +103,19 @@
 - ✅ Player model cleanup (completed - removed deprecated methods, migrated to services)
 - ✅ Two-handed weapon equip logic (completed - auto-unequip conflicting items, slot validation)
 - ✅ Bank UI enhancements (completed - Store All button, sorting controls for bank/inventory)
+- ✅ Design System v2.0 (completed - medieval fantasy theme with bronze/gold/brown palette, 400+ tokens, 53 components migrated)
 
 **Recent Changes** (Last 10 commits):
+- style: migrate all components to design system v2.0
+- docs: add comprehensive design system v2.0 documentation and tooling
+- feat: implement design system v2.0 with medieval fantasy theme
+- chore: allow node script execution in settings
 - style: minor UI polish and cleanup
 - feat: add 5 new item icons for future content
 - feat: enhance bank UI with Store All and sorting controls
 - fix: correct planks item definition and remove sawmill activity
 - fix: correct bank storage capacity validation logic
 - feat: add two-handed weapon equip logic and validation
-- refactor: remove deprecated Player model methods
-- docs: update CLAUDE.md with backend refactoring changes
-- docs: add comprehensive backend refactoring documentation
-- feat: add construction materials and processing activities
 
 **Known Issues**:
 - None currently identified
@@ -291,6 +292,24 @@ cd be && node utils/add-item.js
 **How to modify:** Edit line 28 in `be/utils/add-item.js` to change `itemId` and quantity.
 
 **Item examples:** See [be/data/items/](be/data/items/) for full catalog organized by category (consumables, equipment, resources).
+
+### Design System Audit
+
+**Script**: `project/utils/audit-design-tokens.js`
+
+```bash
+cd project/utils && node audit-design-tokens.js
+```
+
+**Purpose**: Scans all component SCSS files for hardcoded values and design token issues.
+
+**Detects**:
+- Hardcoded hex colors (`#8b5cf6`, `#ffd700`)
+- Hardcoded spacing (`1rem`, `20px`)
+- Undefined tokens (`var(--color-accent-gold)`)
+- Legacy purple/gold gradients
+
+**Output**: Summary of issues with file-by-file breakdown, line numbers, and migration priority ranking.
 
 ## Common Code Patterns (Quick Reference)
 
@@ -471,6 +490,120 @@ const instanceIds = selectedIngredients.get
 **Content Validator** (`.claude/agents/content-validator.md`): Run "validate all game content" to check references, detect broken links, find unused content.
 
 See [project/docs/005-content-generator-agent.md](project/docs/005-content-generator-agent.md) for full documentation.
+
+## Design System v2.0 - Medieval Fantasy Theme
+
+**Overview**: Comprehensive design token system with 400+ tokens for consistent medieval fantasy aesthetic across all 53 components.
+
+### Visual Theme
+- **Before**: Generic purple/blue modern web app aesthetic
+- **After**: Intentional medieval fantasy theme with warm, earthy tones
+
+**Color Palette**:
+- **Bronze** (`--color-bronze`) - Primary accent for buttons, borders, interactive elements
+- **Gold** (`--color-gold`) - Secondary accent for important elements (currency, rewards, achievements) - use sparingly
+- **Iron/Steel** (`--color-iron`, `--color-steel`) - Neutral metallic accents
+- **Warm Browns** (`--color-bg-primary/secondary/tertiary`) - Background surfaces
+
+**Design Philosophy**:
+- Intentional color usage (not every element needs accent colors)
+- Reduced gradients (use for emphasis only: health/mana bars, primary buttons)
+- Clean, readable hierarchy
+- Medieval fantasy game aesthetic (not modern SaaS)
+
+### Key Files
+- **Design Tokens**: [ui/src/design-tokens.scss](ui/src/design-tokens.scss) - 400+ tokens (colors, spacing, typography, shadows, gradients)
+- **Migration Guide**: [project/docs/066-design-system-v2-migration-guide.md](project/docs/066-design-system-v2-migration-guide.md) - Step-by-step component migration patterns
+- **Style Guide**: [project/docs/067-design-system-v2-style-guide.md](project/docs/067-design-system-v2-style-guide.md) - Visual reference and usage guidelines
+- **Summary**: [project/docs/068-design-system-v2-summary.md](project/docs/068-design-system-v2-summary.md) - Quick onboarding overview
+- **Audit Script**: [project/utils/audit-design-tokens.js](project/utils/audit-design-tokens.js) - Automated validation tool
+
+### Token Categories
+1. **Colors** (30+ with variants): Medieval fantasy palette (bronze, gold, iron, warm browns)
+2. **Spacing** (10 levels): 4px base unit (xs to 10xl)
+3. **Typography** (10 sizes, 4 weights, 3 line heights): Complete type scale
+4. **Shadows** (5 elevations + glow effects): Standard shadows + bronze/gold/purple glows
+5. **Gradients** (use sparingly): Bronze, gold, health, mana, XP
+6. **Component Tokens**: Buttons, cards, inputs, modals, scrollbar
+
+### Common Patterns
+
+**Backgrounds**:
+```scss
+background: var(--color-bg-secondary);
+```
+
+**Borders**:
+```scss
+border: var(--border-bronze);
+border-radius: var(--radius-card);
+```
+
+**Spacing**:
+```scss
+padding: var(--card-padding);
+gap: var(--spacing-l);
+margin-bottom: var(--spacing-section-gap);
+```
+
+**Typography**:
+```scss
+color: var(--color-text-primary);
+font-size: var(--font-size-base);
+font-weight: var(--font-weight-medium);
+```
+
+**Shadows & Effects**:
+```scss
+box-shadow: var(--card-shadow);
+
+&:hover {
+  box-shadow: var(--shadow-glow-bronze);
+}
+```
+
+**Gradients** (use sparingly):
+```scss
+// YES: Primary buttons, health/mana/XP bars
+background: var(--gradient-button-primary);
+
+// NO: Every surface, standard borders, background panels
+```
+
+### Usage Guidelines
+
+**Bronze** (Primary Accent):
+- Primary buttons
+- Interactive borders
+- Hover states
+- Active elements
+- Accent highlights
+
+**Gold** (Use Sparingly!):
+- Currency displays
+- Quest rewards
+- Achievement badges
+- Important notifications
+- Special item highlights
+
+**NOT for**:
+- Every heading
+- Default borders
+- Standard buttons
+
+### Migration Status
+- ✅ 53 components migrated to design system v2.0
+- ✅ Zero hardcoded colors or spacing
+- ✅ Consistent medieval fantasy aesthetic
+- ✅ All components use design tokens
+
+### Validation
+Run audit script to detect issues:
+```bash
+cd project/utils && node audit-design-tokens.js
+```
+
+**Full Documentation**: See migration guide for detailed patterns, style guide for visual reference, and summary for quick onboarding.
 
 ## Optimization Guidelines for AI
 
