@@ -215,9 +215,9 @@
 }
 
 // Responsive adjustments
-@media (max-width: var(--spacing-11xl)) {
+@media (max-width: var(--breakpoint-tablet)) {
   .item-tooltip {
-    width: var(--spacing-6xl);
+    width: 250px;
   }
 
   .tooltip-name {
