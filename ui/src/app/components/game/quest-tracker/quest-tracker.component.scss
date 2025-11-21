@@ -59,7 +59,7 @@
     }
 
     .section-content {
-      max-height: var(--spacing-8xl);
+      max-height: 1000px;
       overflow: hidden;
       transition: max-height var(--transition-normal) ease, opacity var(--transition-normal) ease;
       opacity: 1;
