@@ -389,7 +389,7 @@
   font-size: var(--font-size-l);
   padding: var(--spacing-l) var(--spacing-3xl);
   width: 100%;
-  max-width: var(--spacing-7xl);
+  max-width: var(--container-xs);
 
   &:hover:not(:disabled) {
     box-shadow: var(--shadow-glow-success);
@@ -413,7 +413,7 @@
   border-radius: var(--radius-l);
   border: var(--border-width-thin) solid var(--color-surface-border);
   overflow: hidden;
-  max-height: var(--spacing-7xl);
+  max-height: 200px;
 }
 
 .combat-log-header {
@@ -580,7 +580,7 @@
   border: var(--spacing-2xs) solid var(--color-surface-border);
   border-radius: var(--radius-m);
   padding: var(--spacing-3xl);
-  max-width: var(--spacing-9xl);
+  max-width: var(--container-m);
   width: 90%;
   max-height: 80vh;
   overflow-y: auto;

@@ -26,7 +26,7 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--spacing-m);
-  max-width: var(--spacing-8xl);
+  max-width: var(--container-m);
   margin: 0 auto;
   width: 100%;
 }

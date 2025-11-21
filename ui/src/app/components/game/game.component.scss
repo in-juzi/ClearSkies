@@ -617,9 +617,9 @@
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-xl);
   width: 90vw;
-  max-width: var(--spacing-10xl);
+  max-width: var(--container-3xl);
   height: 85vh;
-  max-height: var(--spacing-11xl);
+  max-height: 900px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -692,9 +692,9 @@
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-glow-gold), var(--shadow-xl);
   width: 90vw;
-  max-width: var(--spacing-10xl);
+  max-width: var(--container-3xl);
   height: 85vh;
-  max-height: var(--spacing-11xl);
+  max-height: 900px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
