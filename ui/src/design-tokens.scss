@@ -150,6 +150,18 @@
   --spacing-stack-gap: var(--spacing-l);             /* 16px */
 
   /* ========================================
+     CONTAINER MAX-WIDTHS
+     ======================================== */
+
+  --container-xs: 300px;   /* Small buttons, compact UI elements */
+  --container-s: 400px;    /* Login forms, small modals */
+  --container-m: 500px;    /* Standard modals, dialogs */
+  --container-l: 600px;    /* Medium breakpoint, larger modals */
+  --container-xl: 800px;   /* Wide modals, equipment grids */
+  --container-2xl: 1000px; /* Large content areas */
+  --container-3xl: 1200px; /* Bank, game containers, main content */
+
+  /* ========================================
      TYPOGRAPHY
      ======================================== */
 
