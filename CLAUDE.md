@@ -104,18 +104,19 @@
 - ✅ Two-handed weapon equip logic (completed - auto-unequip conflicting items, slot validation)
 - ✅ Bank UI enhancements (completed - Store All button, sorting controls for bank/inventory)
 - ✅ Design System v2.0 (completed - medieval fantasy theme with bronze/gold/brown palette, 400+ tokens, 53 components migrated)
+- ✅ Container max-width tokens (completed - semantic tokens for width constraints, replaces invalid spacing tokens)
 
 **Recent Changes** (Last 10 commits):
+- docs: add container max-width tokens documentation
+- feat: enhance audit script to detect invalid spacing token usage
+- fix: replace invalid spacing tokens with container tokens in misc components
+- fix: replace invalid spacing tokens with breakpoint tokens in media queries
+- fix: replace invalid spacing tokens with container tokens in shared components
+- fix: replace invalid spacing tokens with container tokens in auth components
+- fix: replace invalid spacing tokens with container tokens in game components
+- feat: add container max-width tokens to design system
 - style: migrate all components to design system v2.0
 - docs: add comprehensive design system v2.0 documentation and tooling
-- feat: implement design system v2.0 with medieval fantasy theme
-- chore: allow node script execution in settings
-- style: minor UI polish and cleanup
-- feat: add 5 new item icons for future content
-- feat: enhance bank UI with Store All and sorting controls
-- fix: correct planks item definition and remove sawmill activity
-- fix: correct bank storage capacity validation logic
-- feat: add two-handed weapon equip logic and validation
 
 **Known Issues**:
 - None currently identified
@@ -512,19 +513,21 @@ See [project/docs/005-content-generator-agent.md](project/docs/005-content-gener
 - Medieval fantasy game aesthetic (not modern SaaS)
 
 ### Key Files
-- **Design Tokens**: [ui/src/design-tokens.scss](ui/src/design-tokens.scss) - 400+ tokens (colors, spacing, typography, shadows, gradients)
+- **Design Tokens**: [ui/src/design-tokens.scss](ui/src/design-tokens.scss) - 400+ tokens (colors, spacing, containers, typography, shadows, gradients)
 - **Migration Guide**: [project/docs/066-design-system-v2-migration-guide.md](project/docs/066-design-system-v2-migration-guide.md) - Step-by-step component migration patterns
 - **Style Guide**: [project/docs/067-design-system-v2-style-guide.md](project/docs/067-design-system-v2-style-guide.md) - Visual reference and usage guidelines
 - **Summary**: [project/docs/068-design-system-v2-summary.md](project/docs/068-design-system-v2-summary.md) - Quick onboarding overview
+- **Container Tokens**: [project/docs/069-container-max-width-tokens.md](project/docs/069-container-max-width-tokens.md) - Container max-width token system
 - **Audit Script**: [project/utils/audit-design-tokens.js](project/utils/audit-design-tokens.js) - Automated validation tool
 
 ### Token Categories
 1. **Colors** (30+ with variants): Medieval fantasy palette (bronze, gold, iron, warm browns)
-2. **Spacing** (10 levels): 4px base unit (xs to 10xl)
-3. **Typography** (10 sizes, 4 weights, 3 line heights): Complete type scale
-4. **Shadows** (5 elevations + glow effects): Standard shadows + bronze/gold/purple glows
-5. **Gradients** (use sparingly): Bronze, gold, health, mana, XP
-6. **Component Tokens**: Buttons, cards, inputs, modals, scrollbar
+2. **Spacing** (10 levels): 4px base unit (xxs to 5xl) - for padding, margin, gap
+3. **Container Max-Widths** (7 levels): 300px to 1200px (xs to 3xl) - for width constraints
+4. **Typography** (10 sizes, 4 weights, 3 line heights): Complete type scale
+5. **Shadows** (5 elevations + glow effects): Standard shadows + bronze/gold/purple glows
+6. **Gradients** (use sparingly): Bronze, gold, health, mana, XP
+7. **Component Tokens**: Buttons, cards, inputs, modals, scrollbar
 
 ### Common Patterns
 
@@ -544,6 +547,13 @@ border-radius: var(--radius-card);
 padding: var(--card-padding);
 gap: var(--spacing-l);
 margin-bottom: var(--spacing-section-gap);
+```
+
+**Width Constraints**:
+```scss
+// Use container tokens for max-width, not spacing tokens
+max-width: var(--container-m);  // 500px - standard modals
+max-width: var(--container-3xl); // 1200px - large content areas
 ```
 
 **Typography**:
