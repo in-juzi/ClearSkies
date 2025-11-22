@@ -34,7 +34,7 @@
     <div class="detail-actions">
       @if (category === 'consumable') {
         <button
-          class="btn-primary"
+          class="button-primary"
           (click)="onUse()"
           [disabled]="isUsingItem">
           {{ isUsingItem ? 'Using...' : 'Use' }}
@@ -42,21 +42,21 @@
       }
       @if (category === 'equipment' && !isEquipped) {
         <button
-          class="btn-primary"
+          class="button-primary"
           (click)="onEquip()">
           Equip
         </button>
       }
       @if (category === 'equipment' && isEquipped) {
         <button
-          class="btn-secondary"
+          class="button-tertiary"
           (click)="onUnequip()">
           Unequip
         </button>
       }
       @if (showDropControls && quantity > 1) {
         <button
-          class="btn-danger"
+          class="button-danger"
           (click)="onRemove()"
           [disabled]="isEquipped">
           Drop ({{ dropQuantity }})
@@ -64,7 +64,7 @@
       }
       @if (showDropControls) {
         <button
-          class="btn-danger"
+          class="button-danger"
           (click)="onRemoveAll()"
           [disabled]="isEquipped">
           {{ quantity === 1 ? 'Drop' : 'Drop All' }}

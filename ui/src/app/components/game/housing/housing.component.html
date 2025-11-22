@@ -47,7 +47,7 @@
       @if (properties().length === 0) {
         <div class="empty-state">
           <p>You don't own any properties yet.</p>
-          <button class="btn-primary" (click)="selectView('purchase')">
+          <button class="button-primary" (click)="selectView('purchase')">
             Purchase Your First Plot
           </button>
         </div>
@@ -124,7 +124,7 @@
 
         <div class="purchase-actions">
           <button
-            class="btn-primary"
+            class="button-primary"
             [disabled]="!canAffordTier(selectedTier()) || !currentLocation()"
             (click)="purchasePlot()">
             Purchase {{ getTierDisplayName(selectedTier()) }} Plot

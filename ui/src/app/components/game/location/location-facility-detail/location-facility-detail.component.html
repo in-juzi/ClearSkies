@@ -1,7 +1,7 @@
 <!-- Facility Detail View (shown when facility is selected but vendor is not open and not in combat) -->
 @if (selectedFacility() && !selectedActivityId() && !vendorService.isVendorOpen() && !inCombat() && !combatService.combatEnded() && !startingActivity()) {
   <div class="facility-detail">
-    <button (click)="backToFacilities()" class="btn-back">← Back to Facilities</button>
+    <button (click)="backToFacilities()" class="button-quaternary">← Back to Facilities</button>
     <h2>{{ selectedFacility()?.name }}</h2>
     <p>{{ selectedFacility()?.description }}</p>
 
@@ -34,7 +34,7 @@
     <!-- Bank Section (for bank-type facilities) -->
     @if (selectedFacility()?.type === 'bank') {
       <div class="bank-section">
-        <button class="btn-bank" (click)="openBank()">
+        <button class="button-tertiary" (click)="openBank()">
           <app-icon class="bank-icon" [path]="'ui/ui_bank.svg'" [size]="28"></app-icon>
           Access Bank Storage
         </button>

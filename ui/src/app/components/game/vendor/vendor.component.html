@@ -1,7 +1,7 @@
 @if (vendor(); as currentVendor) {
   <div class="vendor-container">
     <!-- Back Button -->
-    <button (click)="closeVendor()" class="btn-back">← Back to Facility</button>
+    <button (click)="closeVendor()" class="button-quaternary">← Back to Facility</button>
 
     <!-- Header -->
     <div class="vendor-header">
@@ -63,13 +63,13 @@
                   }
                 </div>
                 <div class="item-actions">
-                  <button class="buy-btn" (click)="buyItem(stockItem.itemId, 1)">
+                  <button class="button-secondary" (click)="buyItem(stockItem.itemId, 1)">
                     Buy 1
                   </button>
-                  <button class="buy-btn" (click)="buyItem(stockItem.itemId, 5)">
+                  <button class="button-secondary" (click)="buyItem(stockItem.itemId, 5)">
                     Buy 5
                   </button>
-                  <button class="buy-btn" (click)="buyItem(stockItem.itemId, 10)">
+                  <button class="button-secondary" (click)="buyItem(stockItem.itemId, 10)">
                     Buy 10
                   </button>
                 </div>
@@ -130,21 +130,21 @@
                   </div>
                 </div>
                 <div class="item-actions">
-                  <button class="button-primary" (click)="sellItem(item.instanceId, 1)">
+                  <button class="button-secondary" (click)="sellItem(item.instanceId, 1)">
                     Sell 1
                   </button>
                   @if (item.quantity >= 5) {
-                    <button class="sell-btn" (click)="sellItem(item.instanceId, 5)">
+                    <button class="button-secondary" (click)="sellItem(item.instanceId, 5)">
                       Sell 5
                     </button>
                   }
                   @if (item.quantity >= 10) {
-                    <button class="sell-btn" (click)="sellItem(item.instanceId, 10)">
+                    <button class="button-secondary" (click)="sellItem(item.instanceId, 10)">
                       Sell 10
                     </button>
                   }
                   @if (item.quantity > 1) {
-                    <button class="sell-btn sell-all" (click)="sellItem(item.instanceId, item.quantity)">
+                    <button class="button-secondary" (click)="sellItem(item.instanceId, item.quantity)">
                       Sell All ({{ item.quantity }})
                     </button>
                   }

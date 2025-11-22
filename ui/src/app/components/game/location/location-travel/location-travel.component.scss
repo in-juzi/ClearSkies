@@ -39,19 +39,3 @@
 }
 
 // Buttons
-.btn-danger {
-  background: linear-gradient(135deg, var(--color-error) 0%, var(--color-error-light) 100%);
-  border: none;
-  color: var(--color-text-primary);
-  padding: var(--spacing-m) var(--spacing-2xl);
-  border-radius: var(--radius-button);
-  cursor: pointer;
-  font-size: var(--font-size-l);
-  font-weight: var(--font-weight-bold);
-  transition: all var(--transition-normal) ease;
-
-  &:hover {
-    transform: translateY(calc(-1 * var(--spacing-2xs)));
-    box-shadow: 0 var(--spacing-xs) var(--spacing-m) rgba(139, 0, 0, 0.4);
-  }
-}

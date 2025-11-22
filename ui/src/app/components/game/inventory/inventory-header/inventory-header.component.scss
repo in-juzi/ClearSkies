@@ -24,14 +24,10 @@
   border: var(--border-light);
 }
 
-.view-toggle-btn {
+// View toggle buttons now use .button-tertiary from design-tokens.scss
+.button-tertiary {
   padding: var(--spacing-xs) var(--spacing-m);
-  background: var(--color-bg-elevated);
-  border: none;
   border-right: var(--border-light);
-  color: var(--color-text-label);
-  cursor: pointer;
-  transition: all var(--transition-fast);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -45,13 +41,9 @@
     font-size: var(--spacing-xl);
   }
 
-  &:hover {
-    background: var(--color-bg-tertiary);
-  }
-
   &.active {
-    background: var(--color-accent-purple);
-    color: var(--color-text-primary);
+    background: var(--color-accent-moon);
+    color: var(--color-bg-primary);
   }
 }
 

@@ -66,7 +66,7 @@
     border-radius: 50%;
     padding: var(--spacing-s);
     box-shadow: var(--shadow-glow-gold),
-                0 var(--spacing-2xs) var(--spacing-s) rgba(0, 0, 0, 0.5);
+      0 var(--spacing-2xs) var(--spacing-s) rgba(0, 0, 0, 0.5);
     animation: questIndicatorPulse 2s infinite;
     z-index: 10;
   }
@@ -148,62 +148,23 @@
   }
 }
 
-// Back button
-.btn-back {
-  background-color: transparent;
-  border: var(--border-light);
-  color: var(--color-text-muted);
-  padding: var(--spacing-s) var(--spacing-l);
-  border-radius: var(--radius-s);
-  cursor: pointer;
-  font-size: var(--font-size-m);
-  transition: all var(--transition-fast) ease;
-
-  &:hover {
-    background-color: var(--color-bg-elevated);
-    border-color: var(--color-text-label);
-    color: var(--color-text-tertiary);
-  }
-}
-
 // Bank section
 .bank-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-m);
   margin: var(--spacing-2xl) 0;
   padding: var(--spacing-l);
   background: var(--color-bg-elevated);
   border: var(--border-default);
   border-radius: var(--radius-card);
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-m);
 
-  .btn-bank {
-    padding: var(--spacing-l);
-    background: var(--button-bg-primary);
-    border: none;
-    color: var(--button-text-primary);
-    border-radius: var(--radius-button);
-    font-size: var(--font-size-l);
-    font-weight: var(--font-weight-bold);
-    cursor: pointer;
-    transition: all var(--transition-normal);
+  .button-tertiary {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: var(--spacing-m);
-
-    &:hover {
-      transform: translateY(calc(-1 * var(--spacing-2xs)));
-      box-shadow: var(--shadow-glow-purple);
-    }
-
-    &:active {
-      transform: translateY(0);
-    }
-
-    .bank-icon {
-      filter: brightness(1.2);
-    }
+    gap: var(--spacing-l);
+    padding: var(--spacing-s) var(--spacing-m);
   }
 
   .bank-info {
@@ -221,13 +182,13 @@
   100% {
     transform: scale(1);
     box-shadow: 0 0 var(--spacing-l) rgba(255, 215, 0, 0.7),
-                0 var(--spacing-2xs) var(--spacing-s) rgba(0, 0, 0, 0.5);
+      0 var(--spacing-2xs) var(--spacing-s) rgba(0, 0, 0, 0.5);
   }
 
   50% {
     transform: scale(1.15);
     box-shadow: 0 0 var(--spacing-2xl) rgba(255, 215, 0, 0.9),
-                0 0 var(--spacing-m) rgba(255, 215, 0, 0.7),
-                0 var(--spacing-2xs) var(--spacing-s) rgba(0, 0, 0, 0.5);
+      0 0 var(--spacing-m) rgba(255, 215, 0, 0.7),
+      0 var(--spacing-2xs) var(--spacing-s) rgba(0, 0, 0, 0.5);
   }
 }

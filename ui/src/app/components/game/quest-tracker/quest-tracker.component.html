@@ -34,7 +34,7 @@
 
           <!-- Turn In Button -->
           <button *ngIf="isQuestComplete(quest)"
-                  class="turn-in-btn"
+                  class="button-primary"
                   (click)="turnInQuest(quest.questId)">
             Turn In Quest
           </button>
@@ -70,7 +70,7 @@
           </div>
 
           <!-- Accept Button -->
-          <button class="accept-btn" (click)="acceptQuest(quest.questId)">
+          <button class="button-primary" (click)="acceptQuest(quest.questId)">
             Accept Quest
           </button>
         </div>

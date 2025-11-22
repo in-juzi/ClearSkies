@@ -36,27 +36,15 @@
   border-bottom: var(--spacing-2xs) solid rgba(100, 150, 255, 0.2);
   margin-bottom: var(--spacing-2xl);
 
-  .tab-button {
-    background: transparent;
-    border: none;
-    color: var(--color-text-secondary);
-    padding: var(--spacing-m) var(--spacing-l);
-    cursor: pointer;
-    font-size: var(--font-size-m);
-    font-weight: var(--font-weight-semibold);
+  // Tab buttons now use .button-tertiary from design-tokens.scss
+  .button-tertiary {
     position: relative;
-    transition: all var(--transition-normal) ease;
     border-bottom: var(--spacing-2xs) solid transparent;
 
-    &:hover {
-      color: var(--color-text-primary);
-      background: rgba(100, 150, 255, 0.1);
-    }
-
     &.active {
-      color: var(--color-accent-blue);
-      border-bottom-color: var(--color-accent-blue);
-      background: rgba(255, 215, 0, 0.05);
+      color: var(--color-accent-moon);
+      border-bottom-color: var(--color-accent-moon);
+      background: rgba(var(--color-accent-moon-rgb), 0.1);
     }
   }
 }
@@ -188,46 +176,14 @@
   gap: var(--spacing-s);
   justify-content: flex-end;
 
-  .btn {
+  // Quest action buttons now use standardized button classes from design-tokens.scss
+  button {
     display: flex;
     align-items: center;
     gap: var(--spacing-xs);
-    padding: var(--spacing-s) var(--spacing-l);
-    border: none;
-    border-radius: var(--radius-s);
-    font-weight: var(--font-weight-semibold);
-    cursor: pointer;
-    transition: all var(--transition-fast) ease;
-    font-size: var(--font-size-s);
 
     .material-symbols-outlined {
       font-size: var(--font-size-xl);
-    }
-
-    &.btn-primary {
-      background: linear-gradient(135deg, var(--color-success) 0%, #3ab395 100%);
-      color: white;
-
-      &:hover {
-        background: linear-gradient(135deg, #5ed9c7 0%, var(--color-success) 100%);
-        transform: translateY(calc(-1 * var(--border-width-thin)));
-        box-shadow: 0 var(--spacing-xs) var(--spacing-s) rgba(46, 204, 113, 0.3);
-      }
-    }
-
-    &.btn-secondary {
-      background: rgba(255, 255, 255, 0.1);
-      color: var(--color-text-secondary);
-      border: var(--border-width-thin) solid rgba(255, 255, 255, 0.2);
-
-      &:hover {
-        background: rgba(255, 255, 255, 0.15);
-        color: var(--color-text-primary);
-      }
-    }
-
-    &:active {
-      transform: translateY(0);
     }
   }
 }

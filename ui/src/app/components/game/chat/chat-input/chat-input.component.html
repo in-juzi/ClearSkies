@@ -35,7 +35,7 @@
     maxlength="500"
   />
   <button
-    class="send-btn"
+    class="button-tertiary"
     type="button"
     (click)="onSend()"
     [disabled]="!messageInput().trim() || sendingMessage || connectionStatus !== 'connected'"

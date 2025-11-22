@@ -1,7 +1,7 @@
 <!-- Activity Detail View -->
 @if ((selectedActivity() || startingActivity()) && !inCombat() && !combatService.combatEnded()) {
   <div class="activity-detail">
-    <button (click)="backToActivities()" class="btn-back" [disabled]="startingActivity()">← Back to
+    <button (click)="backToActivities()" class="button-quaternary" [disabled]="startingActivity()">← Back to
       Activities</button>
     <h2>{{ selectedActivity()!.name }}</h2>
     <p>{{ selectedActivity()!.description }}</p>
@@ -89,7 +89,7 @@
     }
 
     <button (click)="startActivity()" [disabled]="!selectedActivity()?.available || startingActivity()"
-      [class.btn-disabled]="!selectedActivity()?.available || startingActivity()" class="btn-primary">
+      class="button-primary">
       {{ startingActivity() ? 'Starting...' : (selectedActivity()?.available ? 'Start Activity' : 'Requirements Not
       Met') }}
     </button>

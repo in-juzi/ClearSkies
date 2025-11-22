@@ -149,30 +149,6 @@
   }
 }
 
-.btn-cancel {
-  padding: var(--spacing-m) var(--spacing-2xl);
-  background-color: var(--color-overlay-light);
-  border: var(--border-default);
-  border-color: var(--color-error);
-  border-radius: var(--radius-s);
-  color: var(--color-error);
-  font-size: var(--font-size-l);
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-
-  &:hover {
-    background-color: var(--color-overlay-medium);
-    border-color: var(--color-error);
-    box-shadow: var(--shadow-glow-error);
-    transform: scale(1.02);
-  }
-
-  &:active {
-    transform: scale(0.98);
-  }
-}
-
 .crafting-result {
   padding: var(--spacing-2xl);
   background: linear-gradient(135deg, rgba(107, 157, 122, 0.15), rgba(90, 138, 104, 0.15));
@@ -202,29 +178,6 @@
       font-size: var(--font-size-m);
       color: var(--color-gold);
       font-weight: 500;
-    }
-  }
-
-  .btn-close {
-    padding: var(--spacing-m) var(--spacing-2xl);
-    background-color: var(--color-overlay-light);
-    border: var(--border-default);
-    border-color: var(--color-success);
-    border-radius: var(--radius-s);
-    color: var(--color-success);
-    font-size: var(--font-size-l);
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-
-    &:hover {
-      background-color: rgba(34, 197, 94, 0.3);
-      border-color: rgba(34, 197, 94, 0.7);
-      transform: scale(1.02);
-    }
-
-    &:active {
-      transform: scale(0.98);
     }
   }
 }

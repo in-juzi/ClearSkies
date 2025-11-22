@@ -306,34 +306,10 @@
     }
   }
 
-  .btn-contribute {
+  // Action buttons now use standardized button classes from design-tokens.scss
+  .button-secondary,
+  .button-danger {
     flex: 1;
-    background: var(--color-gold);
-    color: var(--color-bg-primary);
-
-    &:hover:not(:disabled) {
-      background: rgb(223, 191, 89);
-    }
-  }
-
-  .btn-contribute-5 {
-    flex: 1;
-    background: rgb(229, 201, 110);
-    color: var(--color-bg-primary);
-
-    &:hover:not(:disabled) {
-      background: rgb(235, 211, 131);
-    }
-  }
-
-  .btn-abandon {
-    flex: 1;
-    background: var(--color-error);
-    color: white;
-
-    &:hover:not(:disabled) {
-      background: rgb(228, 96, 111);
-    }
   }
 }
 

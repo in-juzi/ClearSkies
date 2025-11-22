@@ -76,28 +76,6 @@
   }
 }
 
-.btn-cancel {
-  background: var(--color-surface);
-  color: var(--color-text-secondary);
-  border-color: var(--color-surface-border);
-
-  &:hover {
-    background: var(--color-bg-elevated);
-    border-color: var(--color-surface-border-light);
-  }
-}
-
-.btn-confirm {
-  background: var(--gradient-primary);
-  color: var(--color-text-primary);
-  border-color: var(--color-primary);
-
-  &:hover {
-    box-shadow: var(--shadow-glow-primary);
-    filter: brightness(var(--brightness-hover));
-  }
-}
-
 // Animations
 @keyframes fadeIn {
   from {

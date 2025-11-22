@@ -57,23 +57,7 @@
     margin: 0;
   }
 
-  .close-button {
-    color: var(--color-accent-purple);
-    background: transparent;
-    text-decoration: none;
-    font-weight: var(--font-weight-semibold);
-    padding: var(--spacing-s) var(--spacing-l);
-    border: var(--border-width-medium) solid var(--color-accent-purple);
-    border-radius: var(--radius-button);
-    cursor: pointer;
-    font-size: var(--font-size-m);
-    transition: all var(--transition-normal);
-
-    &:hover {
-      background: var(--color-accent-purple);
-      color: var(--color-text-primary);
-    }
-  }
+  // Close button now uses .button-quaternary from design-tokens.scss
 }
 
 .manual-content {

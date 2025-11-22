@@ -88,20 +88,7 @@
     font-size: var(--font-size-l);
   }
 
-  .btn-primary {
-    padding: var(--spacing-s) var(--spacing-2xl);
-    background: var(--color-gold);
-    border: none;
-    border-radius: var(--spacing-s);
-    color: var(--color-bg-primary);
-    font-weight: 600;
-    cursor: pointer;
-    transition: background var(--transition-fast);
-
-    &:hover {
-      background: var(--color-secondary-light);
-    }
-  }
+  // Purchase button now uses .button-primary from design-tokens.scss
 }
 
 .properties-list {
@@ -292,26 +279,6 @@
   background: var(--color-bg-secondary);
   border: var(--border-width-thin) solid var(--color-surface-border);
   border-radius: var(--spacing-l);
-
-  .btn-primary {
-    padding: var(--spacing-s) var(--spacing-2xl);
-    background: var(--color-gold);
-    border: none;
-    border-radius: var(--spacing-s);
-    color: var(--color-bg-primary);
-    font-weight: 600;
-    cursor: pointer;
-    transition: background var(--transition-fast);
-
-    &:hover:not(:disabled) {
-      background: var(--color-secondary-light);
-    }
-
-    &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-  }
 
   .gold-display {
     color: var(--color-gold);

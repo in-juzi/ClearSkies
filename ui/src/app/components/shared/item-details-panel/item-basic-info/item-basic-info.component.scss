@@ -1,8 +1,7 @@
 /* Item Basic Info Component */
 .detail-icon-description-section {
-  display: grid;
-  grid-template-columns: auto var(--spacing-5xl) 1fr;
-  grid-template-rows: auto auto;
+  display: flex;
+  flex-direction: row;
   gap: var(--spacing-m);
   align-items: flex-start;
   margin-bottom: var(--spacing-l);
@@ -24,8 +23,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: var(--spacing-5xl);
-  height: var(--spacing-5xl);
 }
 
 .detail-icon-description-section .item-description {

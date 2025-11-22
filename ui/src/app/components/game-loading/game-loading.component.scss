@@ -248,36 +248,12 @@
     opacity: 1;
   }
 
-  .continue-button {
+  // Continue button now uses .button-primary from design-tokens.scss
+  .button-primary {
     padding: var(--spacing-m) var(--spacing-3xl);
     font-size: var(--font-size-xl);
-    font-weight: var(--font-weight-semibold);
-    color: #000000;
-    background: linear-gradient(135deg, var(--color-gold) 0%, #ffed4e 100%);
-    border: none;
-    border-radius: var(--radius-l);
-    cursor: pointer;
-    transition: all var(--transition-normal) ease;
-    box-shadow: 0 var(--spacing-xs) var(--spacing-l) rgba(255, 215, 0, 0.4);
     text-transform: uppercase;
     letter-spacing: var(--border-width-thin);
-    font-family: inherit;
-
-    &:hover {
-      transform: translateY(calc(-1 * var(--spacing-2xs)));
-      box-shadow: 0 var(--spacing-s) var(--spacing-xl) rgba(255, 215, 0, 0.6);
-      background: linear-gradient(135deg, #ffed4e 0%, var(--color-gold) 100%);
-    }
-
-    &:active {
-      transform: translateY(0);
-      box-shadow: 0 var(--spacing-2xs) var(--spacing-m) rgba(255, 215, 0, 0.4);
-    }
-
-    &:focus {
-      outline: var(--spacing-2xs) solid var(--color-gold);
-      outline-offset: var(--spacing-xs);
-    }
   }
 
   .hint-text {

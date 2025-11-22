@@ -39,7 +39,7 @@
         @if (inCombat() || combatService.combatEnded()) {
           <div class="combat-section">
             <!-- Return to Facility Button (shown during combat or after combat ends) -->
-            <button (click)="fleeCombat()" class="btn-back">← Return to Facility</button>
+            <button (click)="fleeCombat()" class="button-quaternary">← Return to Facility</button>
 
             <app-combat></app-combat>
           </div>

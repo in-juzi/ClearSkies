@@ -45,32 +45,9 @@
   }
 }
 
-.send-btn {
-  padding: var(--spacing-s) var(--spacing-l);
-  background: var(--color-accent-purple);
-  border: var(--border-width-thin) solid var(--color-accent-purple);
-  border-radius: var(--radius-m);
-  color: var(--color-text-primary);
-  font-size: var(--font-size-m);
-  font-weight: var(--font-weight-bold);
-  cursor: pointer;
-  transition: all var(--transition-fast);
+// Send button now uses .button-tertiary from design-tokens.scss
+.button-tertiary {
   white-space: nowrap;
-
-  &:hover:not(:disabled) {
-    background: var(--color-accent-purple-light);
-    transform: translateY(calc(-1 * var(--border-width-thin)));
-    box-shadow: var(--shadow-button-hover);
-  }
-
-  &:active:not(:disabled) {
-    transform: translateY(0);
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
 }
 
 // Autocomplete Dropdown

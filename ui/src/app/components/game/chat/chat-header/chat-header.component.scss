@@ -54,16 +54,7 @@
   }
 }
 
-.collapse-btn {
-  background: transparent;
-  border: none;
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-l);
-  cursor: pointer;
+// Collapse button now uses .button-quaternary from design-tokens.scss
+.button-quaternary {
   padding: var(--spacing-xs);
-  transition: color var(--transition-fast);
-
-  &:hover {
-    color: var(--color-text-primary);
-  }
 }

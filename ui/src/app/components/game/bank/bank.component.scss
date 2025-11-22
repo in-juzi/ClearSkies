@@ -123,54 +123,6 @@
   background: rgba(0, 0, 0, 0.2);
   display: flex;
   gap: var(--spacing-m);
-
-  .btn-action {
-    padding: var(--spacing-m) var(--spacing-l);
-    background: var(--button-bg-primary);
-    border: none;
-    color: var(--button-text-primary);
-    border-radius: var(--radius-button);
-    font-size: var(--font-size-m);
-    font-weight: var(--font-weight-medium);
-    cursor: pointer;
-    transition: all var(--transition-normal);
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-s);
-
-    &:hover:not(:disabled) {
-      transform: translateY(calc(-1 * var(--border-width-thin)));
-      box-shadow: var(--shadow-glow-purple);
-    }
-
-    &:active:not(:disabled) {
-      transform: translateY(0);
-    }
-
-    &:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .action-icon {
-      font-size: 1.2em;
-    }
-
-    .action-text {
-      font-weight: var(--font-weight-medium);
-    }
-
-    // Primary action styling
-    &.btn-action-primary {
-      background: var(--gradient-button-secondary);
-      color: var(--color-text-inverse);
-      font-weight: 600;
-
-      &:hover:not(:disabled) {
-        box-shadow: var(--shadow-glow-gold);
-      }
-    }
-  }
 }
 
 .bank-content {

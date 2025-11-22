@@ -502,45 +502,6 @@ app-inventory-list-view, app-inventory-grouped-view {
   flex-wrap: wrap;
 }
 
-.btn-primary,
-.btn-secondary,
-.btn-danger {
-  flex: 1;
-  padding: var(--spacing-m);
-  border: none;
-  border-radius: var(--radius-button);
-  font-weight: var(--font-weight-semibold);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.btn-primary {
-  background: var(--color-success);
-  color: var(--color-text-primary);
-
-  &:hover {
-    background: var(--color-accent-blue);
-  }
-}
-
-.btn-secondary {
-  background: var(--color-info);
-  color: var(--color-text-primary);
-
-  &:hover {
-    background: var(--color-accent-blue-dark);
-  }
-}
-
-.btn-danger {
-  background: var(--color-error);
-  color: var(--color-text-primary);
-
-  &:hover {
-    background: var(--color-error-light);
-  }
-}
-
 /* Color utilities for rarity */
 .text-gold-400 {
   color: var(--color-secondary-dark);

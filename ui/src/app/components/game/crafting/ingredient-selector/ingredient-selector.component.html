@@ -1,5 +1,5 @@
 <div class="recipe-details">
-  <button class="btn-back" (click)="back()">
+  <button class="button-quaternary" (click)="back()">
     ← Back to Recipes
   </button>
 
@@ -45,7 +45,7 @@
 
     <div class="craft-actions">
       @if (canCraft) {
-        <button class="btn-craft" (click)="startCrafting()">
+        <button class="button-primary" (click)="startCrafting()">
           Start Crafting
         </button>
       } @else {
@@ -68,11 +68,11 @@
           </div>
 
           <div class="ingredient-actions">
-            <button class="btn-auto-select"
+            <button class="button-tertiary"
                     (click)="autoSelectBestQuality()">
               Auto-select Best
             </button>
-            <button class="btn-clear-selection"
+            <button class="button-quaternary"
                     (click)="clearSelection()">
               Clear Selection
             </button>

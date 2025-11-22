@@ -3,10 +3,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--spacing-l);
+  padding: 0 var(--spacing-l);
   background: var(--color-bg-elevated);
   border-bottom: var(--border-light);
   flex-shrink: 0;
+  padding: var(--spacing-s);
 }
 
 .details-header h3 {
@@ -14,15 +15,8 @@
   font-size: var(--font-size-xl);
 }
 
-.close-btn {
-  background: transparent;
-  border: none;
-  color: var(--color-text-label);
+// Close button now uses .button-quaternary from design-tokens.scss
+.button-quaternary {
   font-size: var(--font-size-2xl);
-  cursor: pointer;
-  padding: var(--spacing-xs) var(--spacing-s);
-}
-
-.close-btn:hover {
-  color: var(--color-text-primary);
+  padding: var(--spacing-s) var(--spacing-m);
 }

@@ -6,9 +6,9 @@
     <div class="header-right">
       @if (currentUser()) {
         <span class="username">{{ currentUser()!.username }}</span>
-        <button class="quest-link" (click)="openQuestJournal()">Quests</button>
-        <button class="manual-link" (click)="openManual()">Manual</button>
-        <button class="logout-btn" (click)="onLogout()">Logout</button>
+        <button class="button-quaternary" (click)="openQuestJournal()">Quests</button>
+        <button class="button-quaternary" (click)="openManual()">Manual</button>
+        <button class="button-quaternary" (click)="onLogout()">Logout</button>
       }
     </div>
   </header>
@@ -63,7 +63,7 @@
 
               <!-- Collapse Button (inside nav when expanded) -->
               <button
-                class="sidebar-collapse-btn"
+                class="button-quaternary"
                 (click)="toggleLeftSidebar()"
                 title="Collapse sidebar">
                 <span class="material-symbols-outlined">left_panel_close</span>
@@ -111,7 +111,7 @@
             <!-- World Map Minimap -->
             <div class="minimap-wrapper">
               <app-world-map mode="minimap" (travelRequested)="handleTravelRequest($event)"></app-world-map>
-              <button class="expand-map-btn" (click)="openMapDialog()" title="Open full map">
+              <button class="button-quaternary" (click)="openMapDialog()" title="Open full map">
                 <span class="material-symbols-outlined">map</span>
               </button>
             </div>
@@ -120,7 +120,7 @@
             <div class="sidebar-nav">
               <!-- Collapse Button (inside nav when expanded) -->
               <button
-                class="sidebar-collapse-btn"
+                class="button-quaternary"
                 (click)="toggleRightSidebar()"
                 title="Collapse sidebar">
                 <span class="material-symbols-outlined">right_panel_close</span>
@@ -241,7 +241,7 @@
       <div class="map-dialog-content" (click)="$event.stopPropagation()">
         <div class="dialog-header">
           <h2>World Map</h2>
-          <button class="close-btn" (click)="closeMapDialog()" title="Close map">
+          <button class="button-quaternary" (click)="closeMapDialog()" title="Close map">
             <span class="material-symbols-outlined">close</span>
           </button>
         </div>
@@ -258,7 +258,7 @@
     <div class="quest-journal-overlay" (click)="closeQuestJournal()">
       <div class="quest-journal-content" (click)="$event.stopPropagation()">
         <div class="dialog-header">
-          <button class="close-btn" (click)="closeQuestJournal()" title="Close quest journal">
+          <button class="button-quaternary" (click)="closeQuestJournal()" title="Close quest journal">
             <span class="material-symbols-outlined">close</span>
           </button>
         </div>

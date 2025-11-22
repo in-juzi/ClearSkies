@@ -7,19 +7,19 @@
   <!-- Tab Navigation -->
   <div class="journal-tabs">
     <button
-      class="tab-button"
+      class="button-tertiary"
       [class.active]="activeTab() === 'active'"
       (click)="setTab('active')">
       Active ({{ activeQuests.length }})
     </button>
     <button
-      class="tab-button"
+      class="button-tertiary"
       [class.active]="activeTab() === 'available'"
       (click)="setTab('available')">
       Available ({{ availableQuests.length }})
     </button>
     <button
-      class="tab-button"
+      class="button-tertiary"
       [class.active]="activeTab() === 'completed'"
       (click)="setTab('completed')">
       Completed ({{ completedQuests.length }})
@@ -65,12 +65,12 @@
 
             <div class="quest-actions">
               @if (isQuestComplete(quest)) {
-                <button class="btn btn-primary" (click)="turnInQuest(quest.questId)">
+                <button class="button-primary" (click)="turnInQuest(quest.questId)">
                   <span class="material-symbols-outlined">assignment_turned_in</span>
                   Turn In Quest
                 </button>
               }
-              <button class="btn btn-secondary" (click)="abandonQuest(quest.questId)">
+              <button class="button-tertiary" (click)="abandonQuest(quest.questId)">
                 <span class="material-symbols-outlined">close</span>
                 Abandon
               </button>
@@ -101,7 +101,7 @@
             <p class="quest-description">{{ getQuestDescription(quest) }}</p>
 
             <div class="quest-actions">
-              <button class="btn btn-primary" (click)="acceptQuest(quest.questId)">
+              <button class="button-primary" (click)="acceptQuest(quest.questId)">
                 <span class="material-symbols-outlined">add_task</span>
                 Accept Quest
               </button>

@@ -38,38 +38,7 @@
       font-size: var(--font-size-m);
     }
 
-    .quest-link,
-    .manual-link {
-      color: var(--color-gold);
-      background: transparent;
-      border: none;
-      font-weight: var(--font-weight-semibold);
-      font-size: var(--font-size-m);
-      cursor: pointer;
-      padding: 0;
-      transition: opacity var(--transition-normal);
-
-      &:hover {
-        opacity: var(--opacity-hover);
-        text-decoration: underline;
-      }
-    }
-
-    .logout-btn {
-      padding: var(--spacing-xs) var(--spacing-l);
-      background: var(--color-bg-elevated);
-      color: var(--color-text-primary);
-      border: none;
-      border-radius: var(--radius-button);
-      cursor: pointer;
-      font-weight: var(--font-weight-semibold);
-      font-size: var(--font-size-s);
-      transition: background var(--transition-normal);
-
-      &:hover {
-        background: var(--color-primary-dark);
-      }
-    }
+    // Header navigation buttons now use .button-quaternary from design-tokens.scss
   }
 }
 
@@ -221,25 +190,15 @@
       }
     }
 
-    .sidebar-collapse-btn {
+    // Sidebar collapse buttons now use .button-quaternary from design-tokens.scss
+    .button-quaternary {
       padding: var(--spacing-s);
-      background: transparent;
-      border: none;
-      color: var(--color-text-label);
-      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all var(--transition-fast);
-      border-radius: var(--radius-s);
 
       .material-icons {
         font-size: var(--spacing-xl);
-      }
-
-      &:hover {
-        background: var(--color-bg-tertiary);
-        color: var(--color-accent-purple);
       }
     }
   }
@@ -366,25 +325,15 @@
     flex-shrink: 0;
     align-items: center;
 
-    .sidebar-collapse-btn {
+    // Sidebar collapse buttons now use .button-quaternary from design-tokens.scss
+    .button-quaternary {
       padding: var(--spacing-s);
-      background: transparent;
-      border: none;
-      color: var(--color-text-label);
-      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all var(--transition-fast);
-      border-radius: var(--radius-s);
 
       .material-icons {
         font-size: var(--spacing-xl);
-      }
-
-      &:hover {
-        background: var(--color-bg-tertiary);
-        color: var(--color-accent-purple);
       }
     }
 
@@ -560,28 +509,14 @@
   gap: var(--spacing-s);
   align-items: flex-start;
 
-  .expand-map-btn {
+  // Expand map button now uses .button-quaternary from design-tokens.scss
+  .button-quaternary {
     display: flex;
     align-items: center;
     gap: var(--spacing-xs);
-    padding: var(--spacing-s) var(--spacing-m);
-    background: var(--color-bg-elevated);
-    color: var(--color-text-primary);
-    border: var(--border-default);
-    border-radius: var(--radius-button);
-    cursor: pointer;
-    font-size: var(--font-size-s);
-    font-weight: var(--font-weight-medium);
-    transition: all var(--transition-fast);
     position: absolute;
     top: var(--spacing-l);
     left: var(--spacing-l);
-
-    &:hover {
-      background: var(--color-bg-tertiary);
-      border-color: var(--color-secondary);
-      color: var(--color-secondary);
-    }
 
     .material-symbols-outlined {
       font-size: var(--spacing-xl);
@@ -640,22 +575,12 @@
       font-weight: var(--font-weight-bold);
     }
 
-    .close-btn {
-      background: transparent;
-      border: none;
-      color: var(--color-text-muted);
-      cursor: pointer;
+    // Close button now uses .button-quaternary from design-tokens.scss
+    .button-quaternary {
       padding: var(--spacing-xs);
-      border-radius: var(--radius-button);
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all var(--transition-fast);
-
-      &:hover {
-        background: var(--color-bg-elevated);
-        color: var(--color-text-primary);
-      }
 
       .material-symbols-outlined {
         font-size: var(--spacing-2xl);

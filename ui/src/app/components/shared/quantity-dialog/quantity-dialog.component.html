@@ -3,7 +3,7 @@
     <div class="quantity-dialog-modal">
       <div class="quantity-dialog-header">
         <h3>Select Quantity</h3>
-        <button class="close-button" (click)="cancel()" aria-label="Close">×</button>
+        <button class="button-quaternary" (click)="cancel()" aria-label="Close">×</button>
       </div>
 
       <div class="quantity-dialog-body">
@@ -33,7 +33,7 @@
               class="quantity-input"
               autofocus
             />
-            <button class="max-button" (click)="setMaxQuantity()" type="button">
+            <button class="button-secondary" (click)="setMaxQuantity()" type="button">
               Max
             </button>
           </div>
@@ -58,8 +58,8 @@
       </div>
 
       <div class="quantity-dialog-footer">
-        <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
-        <button class="btn btn-primary" (click)="confirm()">
+        <button class="button-quaternary" (click)="cancel()">Cancel</button>
+        <button class="button-primary" (click)="confirm()">
           {{ actionLabel() }}
         </button>
       </div>

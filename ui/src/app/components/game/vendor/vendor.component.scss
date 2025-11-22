@@ -5,23 +5,10 @@
   overflow: hidden;
 }
 
-.btn-back {
-  background-color: transparent;
-  border: var(--border-light);
-  color: var(--color-text-muted);
-  padding: var(--spacing-s) var(--spacing-l);
-  border-radius: var(--radius-s);
-  cursor: pointer;
-  font-size: var(--font-size-m);
+// Back button now uses .button-quaternary from design-tokens.scss
+.button-quaternary {
   margin-bottom: var(--spacing-l);
-  transition: all var(--transition-fast) ease;
   align-self: flex-start; // Prevents button from stretching full width
-
-  &:hover {
-    background-color: var(--color-bg-elevated);
-    border-color: var(--color-text-label);
-    color: var(--color-text-tertiary);
-  }
 }
 
 .vendor-header {
@@ -238,41 +225,7 @@
     flex-wrap: wrap;
   }
 
-  .buy-btn,
-  .sell-btn {
-    padding: var(--spacing-s) var(--spacing-l);
-    background: var(--button-bg-primary);
-    color: var(--button-text-primary);
-    border: none;
-    border-radius: var(--radius-button);
-    cursor: pointer;
-    font-size: var(--font-size-m);
-    font-weight: var(--font-weight-medium);
-    transition: all var(--transition-normal);
-
-    &:hover {
-      transform: translateY(calc(-1 * var(--border-width-thin)));
-      box-shadow: var(--shadow-glow-purple);
-    }
-
-    &:active {
-      transform: translateY(0);
-    }
-  }
-
-  .sell-btn {
-    background: var(--color-bg-base);
-    color: var(--color-text-moon);
-
-    &:hover {
-      box-shadow: var(--shadow-glow-secondary);
-    }
-
-    &.sell-all {
-      background: var(--button-bg-primary);
-      color: var(--color-bg-primary);
-    }
-  }
+  // Buy/sell buttons now use .button-secondary from design-tokens.scss
 }
 
 // Drop zone styling

@@ -103,21 +103,7 @@
   }
 }
 
-.btn-clear-filters {
-  padding: var(--spacing-xs) var(--spacing-m);
-  background-color: rgba(139, 92, 246, 0.2);
-  border: var(--border-width-thin) solid rgba(139, 92, 246, 0.4);
-  border-radius: var(--radius-xs);
-  color: #a78bfa;
-  font-size: var(--font-size-s);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-
-  &:hover {
-    background-color: rgba(139, 92, 246, 0.3);
-    border-color: rgba(139, 92, 246, 0.6);
-  }
-}
+// Clear filters button now uses .button-quaternary from design-tokens.scss
 
 .loading {
   text-align: center;

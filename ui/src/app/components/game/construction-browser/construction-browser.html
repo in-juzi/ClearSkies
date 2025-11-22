@@ -94,7 +94,7 @@
           <div class="project-actions">
             @if (canContribute(project)) {
               <button
-                class="btn-contribute"
+                class="button-secondary"
                 (click)="contribute(project.projectId)"
                 [disabled]="isContributing() === project.projectId"
               >
@@ -102,7 +102,7 @@
               </button>
 
               <button
-                class="btn-contribute-5"
+                class="button-secondary"
                 (click)="contribute(project.projectId, 5)"
                 [disabled]="isContributing() === project.projectId"
               >
@@ -112,7 +112,7 @@
 
             @if (isPlayerOwner(project) && project.status === 'in-progress') {
               <button
-                class="btn-abandon"
+                class="button-danger"
                 (click)="abandonProject(project.projectId)"
               >
                 Abandon Project
