@@ -168,7 +168,7 @@ app-inventory-list-view, app-inventory-grouped-view {
   background: var(--color-accent-purple-dark);
   color: var(--color-text-primary);
   border-radius: var(--radius-s);
-  border: var(--border-width-thin) solid var(--color-accent-purple);
+  border: var(--border-width-thin) solid var(--color-border-secondary-accent);
   text-transform: lowercase;
   font-weight: var(--font-weight-medium);
   transition: all var(--transition-fast);
@@ -238,7 +238,7 @@ app-inventory-list-view, app-inventory-grouped-view {
   padding: var(--spacing-m);
   background: var(--color-bg-elevated);
   border-radius: var(--radius-s);
-  border-left: var(--spacing-xs) solid var(--color-accent-purple);
+  border-left: var(--spacing-xs) solid var(--color-border-secondary-accent);
   transition: all var(--transition-fast);
 
   &:hover {
@@ -256,7 +256,7 @@ app-inventory-list-view, app-inventory-grouped-view {
   }
 
   &.trait-rarity-epic {
-    border-left-color: var(--color-accent-purple);
+    border-left-color: var(--color-border-secondary-accent);
   }
 }
 
@@ -520,7 +520,7 @@ app-inventory-list-view, app-inventory-grouped-view {
 }
 
 .text-purple-400 {
-  color: var(--color-accent-purple);
+  color: var(--color-text-accent-secondary);
 }
 
 .text-orange-400 {

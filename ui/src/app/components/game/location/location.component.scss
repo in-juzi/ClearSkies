@@ -103,7 +103,7 @@
   margin-top: var(--spacing-2xl);
   padding: var(--spacing-l);
   background: linear-gradient(135deg, rgba(138, 43, 226, 0.15) 0%, rgba(74, 78, 105, 0.15) 100%);
-  border: var(--border-width-medium) solid var(--color-accent-purple);
+  border: var(--border-width-medium) solid var(--color-border-secondary-accent);
   border-radius: var(--radius-card);
 }
 
@@ -273,7 +273,7 @@
   padding: var(--spacing-s);
   background-color: rgba(74, 78, 105, 0.2);
   border-radius: var(--radius-s);
-  border-left: var(--spacing-xs) solid var(--color-accent-purple);
+  border-left: var(--spacing-xs) solid var(--color-border-secondary-accent);
   font-size: var(--font-size-s);
   transition: background-color var(--transition-fast) ease;
 
