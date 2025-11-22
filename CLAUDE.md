@@ -106,18 +106,20 @@
 - ✅ Design System v2.0 (completed - medieval fantasy theme with bronze/gold/brown palette, 400+ tokens, 53 components migrated)
 - ✅ Container max-width tokens (completed - semantic tokens for width constraints, replaces invalid spacing tokens)
 - ✅ Night Sky Theme Migration (completed - dark blue/moon yellow palette replacing medieval bronze/gold, 600+ tokens updated)
+- ✅ Button design token classes (completed - .button-primary/secondary/tertiary/danger for all 53 components)
+- ✅ Construction transaction safety (completed - rollback logic prevents gold loss on project creation failures)
 
 **Recent Changes** (Last 10 commits):
+- style: migrate all component buttons to design token classes
+- docs: add button migration plan for design system v3
+- feat: add button-danger design token class
+- fix: add transaction rollback to construction project creation
 - fix: correct chat component HTML structure and apply night sky theme
 - style: apply night sky theme tokens to auth and manual components
 - style: apply night sky theme tokens to vendor component
 - style: apply night sky theme tokens to game components
 - style: migrate design system from medieval fantasy to night sky theme
 - docs: add container max-width tokens documentation
-- feat: enhance audit script to detect invalid spacing token usage
-- fix: replace invalid spacing tokens with container tokens in misc components
-- fix: replace invalid spacing tokens with breakpoint tokens in media queries
-- fix: replace invalid spacing tokens with container tokens in shared components
 
 **Known Issues**:
 - None currently identified
@@ -611,6 +613,8 @@ background: var(--gradient-button-primary);
 - ✅ Consistent celestial/night sky aesthetic
 - ✅ All components use updated design tokens
 - ✅ Medieval fantasy theme (v2.0) replaced with immersive night atmosphere
+- ✅ All component buttons migrated to design token classes (.button-primary/secondary/tertiary/danger)
+- ✅ 1000+ lines of duplicate button styles removed (replaced with 4 reusable token classes)
 
 ### Validation
 Run audit script to detect issues:
