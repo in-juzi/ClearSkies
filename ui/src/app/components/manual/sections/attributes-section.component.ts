@@ -213,7 +213,7 @@ import { ManualService, ManualAttribute, AttributesResponse } from '../../../ser
           color: var(--color-text-secondary);
 
           strong {
-            color: var(--color-accent-purple);
+            color: var(--color-text-accent-secondary);
             text-transform: capitalize;
           }
 

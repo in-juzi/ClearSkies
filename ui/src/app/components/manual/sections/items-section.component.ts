@@ -355,7 +355,7 @@ import { IconComponent } from '../../shared/icon/icon.component';
 
             .level-num {
               font-weight: var(--font-weight-bold);
-              color: var(--color-accent-purple);
+              color: var(--color-text-accent-secondary);
               min-width: 30px;
             }
 

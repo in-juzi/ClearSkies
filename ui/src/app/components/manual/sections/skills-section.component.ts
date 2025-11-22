@@ -164,7 +164,7 @@ import { ManualService, ManualSkill, SkillsResponse } from '../../../services/ma
         transition: border-color var(--transition-normal);
 
         &:hover {
-          border-color: var(--color-accent-purple);
+          border-color: var(--color-text-accent-secondary);
         }
       }
 
@@ -194,7 +194,7 @@ import { ManualService, ManualSkill, SkillsResponse } from '../../../services/ma
           color: var(--color-text-secondary);
 
           strong {
-            color: var(--color-accent-purple);
+            color: var(--color-text-accent-secondary);
             text-transform: capitalize;
           }
         }

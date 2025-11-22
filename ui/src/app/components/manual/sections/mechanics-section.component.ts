@@ -162,7 +162,7 @@ import { CommonModule } from '@angular/common';
 
       h4 {
         font-size: var(--font-size-xl);
-        color: var(--color-accent-purple);
+        color: var(--color-text-accent-secondary);
         margin-bottom: var(--spacing-m);
       }
 
