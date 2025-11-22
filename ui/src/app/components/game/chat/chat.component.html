@@ -14,8 +14,8 @@
         [messages]="chatService.messages()"
         [shouldScrollToBottom]="shouldScrollToBottom()">
       </app-chat-messages>
-
-      <!-- Chat Input (Decomposed Component) -->
+    </div>
+    <!-- Chat Input (Decomposed Component) -->
       <app-chat-input
         [connectionStatus]="chatService.connectionStatus()"
         [errorMessage]="errorMessage()"
@@ -29,6 +29,5 @@
         (keyPress)="onKeyPress($event)"
         (keyDown)="onKeyDown($event)">
       </app-chat-input>
-    </div>
   }
 </div>

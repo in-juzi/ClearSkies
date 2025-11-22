@@ -26,6 +26,11 @@
 .chat-body {
   display: flex;
   flex-direction: column;
-  height: var(--spacing-8xl);
+  height: var(--container-xs);
   max-height: 50vh;
+  overflow-y: auto;
+}
+
+app-chat-messages {
+  flex: 1;
 }
