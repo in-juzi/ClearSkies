@@ -222,7 +222,7 @@ class RewardProcessor {
         result.itemsAdded
       );
     } else if (context.monsterId) {
-      questProgress = await questService.onCombatVictory(
+      questProgress = await questService.onMonsterDefeated(
         player,
         context.monsterId
       );

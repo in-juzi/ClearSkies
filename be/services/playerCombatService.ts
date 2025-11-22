@@ -99,9 +99,10 @@ class PlayerCombatService {
 
   /**
    * Check if player is currently in combat
+   * Matches Player model's isInCombat() - requires both activeCombat AND monsterId
    */
   isInCombat(player: IPlayer): boolean {
-    return !!player.activeCombat;
+    return !!(player.activeCombat && player.activeCombat.monsterId);
   }
 
   /**

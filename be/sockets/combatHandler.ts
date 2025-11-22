@@ -852,6 +852,10 @@ async function handleCombatVictory(player: any, io: Server, userId: string): Pro
       }
     }
 
+    // Clear combat state (player can start new encounters)
+    player.clearCombat();
+    await player.save();
+
     // Emit victory event
     io.to(`user:${userId}`).emit('combat:victory', {
       success: true,
