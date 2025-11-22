@@ -126,9 +126,9 @@
 
   .btn-action {
     padding: var(--spacing-m) var(--spacing-l);
-    background: var(--gradient-purple);
+    background: var(--button-bg-primary);
     border: none;
-    color: var(--color-text-primary);
+    color: var(--button-text-primary);
     border-radius: var(--radius-button);
     font-size: var(--font-size-m);
     font-weight: var(--font-weight-medium);
@@ -268,7 +268,6 @@
       }
 
       &.active {
-        background: linear-gradient(135deg, var(--color-accent-blue), var(--color-accent-purple));
         border-color: var(--color-accent-blue);
         color: var(--color-text-primary);
         font-weight: 600;

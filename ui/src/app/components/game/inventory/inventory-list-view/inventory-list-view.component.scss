@@ -38,7 +38,6 @@
   gap: var(--spacing-m);
   padding: var(--spacing-s);
   background: var(--color-bg-elevated);
-  border: var(--border-width-medium) solid;
   border-radius: var(--radius-s);
   cursor: pointer;
   transition: all var(--transition-fast);
@@ -70,8 +69,10 @@
   }
 
   &.equipped {
-    border-color: var(--color-accent-purple);
-    background: linear-gradient(135deg, var(--color-accent-purple-dark) 0%, var(--color-bg-elevated) 100%);
+    border: var(--border-width-medium) solid;
+    border-color: var(--color-border-starlight);
+    background: var(--gradient-bg-elevated);
+    box-shadow: var(--shadow-glow-starlight);
 
     &::after {
       content: "⚔️";
@@ -79,6 +80,7 @@
       top: var(--spacing-xs);
       right: var(--spacing-xs);
       font-size: var(--font-size-m);
+      filter: drop-shadow(0 0 var(--spacing-xs) rgba(224, 231, 255, 0.6));
     }
   }
 }

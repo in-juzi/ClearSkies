@@ -60,6 +60,9 @@
   &.occupied {
     border-color: var(--color-accent-purple);
     background: linear-gradient(135deg, var(--color-accent-purple-dark) 0%, var(--color-bg-secondary) 100%);
+    border: var(--border-width-medium) solid;
+      border-color: var(--color-border-starlight);
+      background: var(--color-bg-elevated);
   }
 }
 

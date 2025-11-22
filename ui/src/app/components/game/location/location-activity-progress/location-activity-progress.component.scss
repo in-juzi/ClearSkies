@@ -40,9 +40,10 @@
 .skill-training {
   margin-top: var(--spacing-2xl);
   padding: var(--spacing-l);
-  background: linear-gradient(135deg, rgba(138, 43, 226, 0.15) 0%, rgba(74, 78, 105, 0.15) 100%);
-  border: var(--border-width-medium) solid var(--color-accent-purple);
+  background: var(--gradient-bg-elevated);
+  border: var(--border-width-medium) solid var(--color-border-starlight);
   border-radius: var(--radius-card);
+  box-shadow: var(--shadow-glow-starlight);
 }
 
 .skill-training-header {
@@ -54,7 +55,7 @@
   .skill-icon {
     width: var(--spacing-4xl);
     height: var(--spacing-4xl);
-    filter: drop-shadow(0 var(--spacing-2xs) var(--spacing-s) rgba(138, 43, 226, 0.4));
+    filter: drop-shadow(0 var(--spacing-xs) var(--spacing-s) rgba(224, 231, 255, 0.5));
   }
 
   .skill-title-section {
@@ -63,14 +64,14 @@
     gap: var(--spacing-xs);
 
     h3 {
-      color: var(--color-secondary);
+      color: var(--color-text-moon);
       margin: 0;
       font-size: var(--font-size-xl);
       font-weight: var(--font-weight-bold);
     }
 
     .training-label {
-      color: var(--color-text-label);
+      color: var(--color-text-starlight);
       font-size: var(--font-size-s);
       font-style: italic;
       opacity: var(--opacity-muted);
@@ -92,12 +93,12 @@
   font-size: var(--font-size-m);
 
   .skill-level {
-    color: var(--color-secondary);
+    color: var(--color-text-moon);
     font-weight: var(--font-weight-bold);
   }
 
   .skill-xp {
-    color: var(--color-text-label);
+    color: var(--color-text-starlight);
     font-family: var(--font-monospace);
   }
 }
@@ -114,21 +115,22 @@
 
 .xp-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--color-accent-purple) 0%, var(--color-secondary) 100%);
+  background: var(--gradient-experience);
   transition: width var(--transition-normal) ease;
-  box-shadow: 0 0 var(--spacing-s) rgba(138, 43, 226, 0.5);
+  box-shadow: var(--shadow-glow-moon);
 }
 
 // Rewards display
 .rewards-display {
-  background-color: rgba(255, 215, 0, 0.1);
-  border: var(--border-width-medium) solid var(--color-secondary);
+  background: var(--gradient-bg-elevated);
+  border: var(--border-width-medium) solid var(--color-border-moon);
   border-radius: var(--radius-card);
   padding: var(--spacing-2xl);
   margin-top: var(--spacing-2xl);
+  box-shadow: var(--shadow-glow-moon);
 
   h3 {
-    color: var(--color-secondary);
+    color: var(--color-text-moon);
     margin-top: 0;
     text-align: center;
   }
@@ -155,8 +157,9 @@
 
   .level-up {
     margin-left: auto;
-    color: var(--color-secondary);
+    color: var(--color-text-moon);
     font-weight: var(--font-weight-bold);
+    text-shadow: var(--shadow-glow-moon);
     animation: pulse 1s ease-in-out infinite;
   }
 }
@@ -176,7 +179,7 @@
 // Activity Log
 .activity-log {
   margin-top: var(--spacing-2xl);
-  background-color: rgba(26, 26, 46, 0.5);
+  background: var(--gradient-bg-primary);
   border: var(--border-light);
   border-radius: var(--radius-card);
   padding: var(--spacing-l);
@@ -184,7 +187,7 @@
   overflow-y: auto;
 
   h3 {
-    color: var(--color-secondary);
+    color: var(--color-text-moon);
     margin: 0 0 var(--spacing-l) 0;
     font-size: var(--font-size-l);
     text-align: center;
@@ -201,14 +204,14 @@
   display: flex;
   gap: var(--spacing-m);
   padding: var(--spacing-s);
-  background-color: rgba(74, 78, 105, 0.2);
+  background-color: var(--color-bg-tertiary);
   border-radius: var(--radius-s);
-  border-left: var(--spacing-xs) solid var(--color-accent-purple);
+  border-left: var(--spacing-xs) solid var(--color-border-starlight);
   font-size: var(--font-size-s);
   transition: background-color var(--transition-fast) ease;
 
   &:hover {
-    background-color: rgba(74, 78, 105, 0.3);
+    background-color: var(--color-bg-hover);
   }
 }
 
@@ -262,12 +265,13 @@
   display: inline-flex;
   align-items: center;
   padding: var(--spacing-2xs) var(--spacing-xs);
-  background-color: rgba(255, 215, 0, 0.2);
-  border: var(--border-width-thin) solid rgba(255, 215, 0, 0.4);
+  background: var(--gradient-moon);
+  border: var(--border-width-thin) solid var(--color-border-moon);
   border-radius: var(--radius-2xs);
-  color: var(--color-secondary);
+  color: var(--color-bg-primary);
   font-weight: var(--font-weight-bold);
   font-size: var(--font-size-xs);
+  box-shadow: var(--shadow-glow-moon);
   animation: pulse 1s ease-in-out infinite;
 }
 
