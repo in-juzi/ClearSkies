@@ -59,6 +59,8 @@
    --color-border-moderate: #3a4a6a;
    /* Emphasized borders */
    --color-border-strong: #4a5a8a;
+   --color-border-secondary-accent: var(--color-starlight);
+   --color-border-secondary-accent-dark: var(--color-starlight-dark);
    /* Strong emphasis - night blue */
    --color-border-moon: var(--color-moon-yellow);
    --color-border-starlight: var(--color-starlight);
@@ -80,6 +82,7 @@
    --color-text-secondary: #e0d4bc;
    /* Softer yellow */
    --color-text-tertiary: #c7bda0;
+   --color-text-accent-secondary: var(--color-starlight);
    /* Muted yellow */
    --color-text-muted: #a89e8a;
    /* Very muted */
