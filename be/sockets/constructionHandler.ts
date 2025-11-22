@@ -49,6 +49,10 @@ export default function constructionHandler(io: Server) {
    * Create a new construction project
    */
   socket.on('construction:createProject', async (data, callback) => {
+    let project: any = null;
+    let goldDeducted = false;
+    let savedPlayer: IPlayer | null = null;
+
     try {
       const { projectType, tier, location, propertyId, roomType } = data;
 
@@ -56,25 +60,32 @@ export default function constructionHandler(io: Server) {
         return callback?.({ error: 'projectType and location are required' });
       }
 
-      let project;
+      // Refresh player data from database to ensure we have latest skill levels
+      const freshPlayer = await Player.findById(player._id);
+      if (!freshPlayer) {
+        return callback?.({ error: 'Player not found' });
+      }
 
       if (projectType === 'house') {
         if (!tier) {
           return callback?.({ error: 'tier is required for house projects' });
         }
 
-        // Create house project
-        project = await constructionService.createHouseProject(player, tier as PropertyTier, location);
+        // Create house project (validates requirements but doesn't deduct gold)
+        project = await constructionService.createHouseProject(freshPlayer, tier as PropertyTier, location);
 
-        // Pay for the plot
-        await constructionService.payProjectGold(project, player);
+        // Pay for the plot - critical transaction point
+        await constructionService.payProjectGold(project, freshPlayer);
+        goldDeducted = true;
+
       } else if (projectType === 'room') {
         if (!propertyId || !roomType) {
           return callback?.({ error: 'propertyId and roomType are required for room projects' });
         }
 
         // Create room project
-        project = await constructionService.createRoomProject(player, propertyId, roomType, location);
+        project = await constructionService.createRoomProject(freshPlayer, propertyId, roomType, location);
+
       } else {
         return callback?.({ error: 'Invalid project type' });
       }
@@ -83,6 +94,7 @@ export default function constructionHandler(io: Server) {
       if (!player.activeConstructionProjects.includes(project.projectId)) {
         player.activeConstructionProjects.push(project.projectId);
         await player.save();
+        savedPlayer = player;
       }
 
       // Convert to plain object
@@ -98,8 +110,42 @@ export default function constructionHandler(io: Server) {
       socket.to(`location:${location}`).emit('construction:projectCreated', { project: plainProject });
 
       callback?.({ project: plainProject });
+
     } catch (error: any) {
       console.error('Error creating project:', error);
+
+      // ROLLBACK: If gold was deducted but something failed, refund it
+      if (goldDeducted && project) {
+        try {
+          const rollbackPlayer = await Player.findById(player._id);
+          if (rollbackPlayer) {
+            rollbackPlayer.gold += project.requiredGold;
+
+            // Also remove from active projects if it was added
+            if (savedPlayer) {
+              rollbackPlayer.activeConstructionProjects = rollbackPlayer.activeConstructionProjects.filter(
+                (pid: string) => pid !== project.projectId
+              );
+            }
+
+            await rollbackPlayer.save();
+            console.log(`✅ Refunded ${project.requiredGold}g to player due to project creation failure`);
+
+            // Mark the project as failed and delete it
+            if (project._id) {
+              await project.deleteOne();
+              console.log(`✅ Deleted failed project ${project.projectId}`);
+            }
+          }
+        } catch (rollbackError) {
+          console.error('❌ CRITICAL: Failed to rollback gold deduction:', rollbackError);
+          console.error('   Project ID:', project.projectId);
+          console.error('   Player ID:', player._id);
+          console.error('   Gold amount:', project.requiredGold);
+          // This needs manual intervention - log details for admin
+        }
+      }
+
       callback?.({ error: error.message || 'Failed to create project' });
     }
   });
