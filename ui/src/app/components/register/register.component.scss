@@ -62,7 +62,7 @@
 
     &:focus {
       outline: none;
-      border-color: var(--color-accent-purple);
+      border-color: var(--color-text-accent-secondary);
     }
 
     &.invalid {
@@ -114,7 +114,7 @@ button {
   color: var(--color-text-disabled);
 
   a {
-    color: var(--color-accent-purple);
+    color: var(--color-text-accent-secondary);
     text-decoration: none;
     font-weight: var(--font-weight-semibold);
 

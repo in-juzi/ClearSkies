@@ -58,8 +58,8 @@
   }
 
   &.occupied {
-    border-color: var(--color-accent-purple);
-    background: linear-gradient(135deg, var(--color-accent-purple-dark) 0%, var(--color-bg-secondary) 100%);
+    border-color: var(--color-border-secondary-accent);
+    background: linear-gradient(135deg, var(--color-border-secondary-accent) 0%, var(--color-bg-secondary) 100%);
     border: var(--border-width-medium) solid;
       border-color: var(--color-border-starlight);
       background: var(--color-bg-elevated);
@@ -173,11 +173,11 @@
 
 .rarity-epic {
   .item-name {
-    color: var(--color-accent-purple);
+    color: var(--color-text-accent-secondary);
   }
   .item-rarity-badge {
-    color: var(--color-accent-purple);
-    border: var(--border-width-thin) solid var(--color-accent-purple);
+    color: var(--color-text-accent-secondary);
+    border: var(--border-width-thin) solid var(--color-border-secondary-accent);
   }
 }
 

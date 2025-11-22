@@ -14,7 +14,7 @@
 .vendor-header {
   padding: var(--spacing-xl);
   background: var(--gradient-card);
-  border-bottom: var(--border-width-medium) solid var(--color-accent-purple);
+  border-bottom: var(--border-width-medium) solid var(--color-border-secondary-accent);
 
   h2 {
     margin: 0 0 var(--spacing-s) 0;
@@ -94,8 +94,8 @@
     }
 
     &.active {
-      color: var(--color-accent-purple);
-      border-bottom-color: var(--color-accent-purple);
+      color: var(--color-text-accent-secondary);
+      border-bottom-color: var(--color-border-secondary-accent);
       background: rgba(102, 126, 234, 0.1);
     }
   }
@@ -210,7 +210,7 @@
     }
 
     .equipped-notice {
-      color: var(--color-accent-purple);
+      color: var(--color-text-accent-secondary);
       font-style: italic;
     }
 
@@ -241,7 +241,7 @@
 
   &.drag-over {
     background: rgba(102, 126, 234, 0.1);
-    border: var(--border-width-medium) dashed var(--color-accent-purple);
+    border: var(--border-width-medium) dashed var(--color-border-secondary-accent);
     border-radius: var(--radius-card);
 
     &::after {
@@ -251,14 +251,14 @@
       left: 50%;
       transform: translate(-50%, -50%);
       font-size: var(--font-size-2xl);
-      color: var(--color-accent-purple);
+      color: var(--color-text-accent-secondary);
       font-weight: var(--font-weight-bold);
       pointer-events: none;
       text-align: center;
       background: var(--color-bg-primary);
       padding: var(--spacing-xl);
       border-radius: var(--radius-card);
-      border: var(--border-width-medium) solid var(--color-accent-purple);
+      border: var(--border-width-medium) solid var(--color-border-secondary-accent);
       box-shadow: var(--shadow-glow-purple);
       z-index: 10; // Ensure overlay appears above content
     }

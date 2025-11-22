@@ -31,7 +31,7 @@
 
   &:focus {
     outline: none;
-    border-color: var(--color-accent-purple);
+    border-color: var(--color-border-secondary-accent);
     box-shadow: 0 0 0 var(--spacing-2xs) rgba(138, 43, 226, 0.1);
   }
 
@@ -58,7 +58,7 @@
   right: calc(var(--spacing-m) + var(--spacing-5xl)); // Account for send button
   margin-bottom: var(--spacing-xs);
   background: var(--color-bg-secondary);
-  border: var(--border-width-medium) solid var(--color-accent-purple);
+  border: var(--border-width-medium) solid var(--color-border-secondary-accent);
   border-radius: var(--radius-m);
   box-shadow: var(--shadow-overlay);
   max-height: 200px;
@@ -100,7 +100,7 @@
   &:hover,
   &.selected {
     background: var(--color-accent-purple-dark);
-    border-color: var(--color-accent-purple);
+    border-color: var(--color-border-secondary-accent);
   }
 
   &.selected {
