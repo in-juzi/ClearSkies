@@ -13,7 +13,7 @@
   overflow: visible;
 
   &:hover {
-    border-color: var(--color-accent-purple);
+    border-color: var(--color-text-accent-secondary);
     background: linear-gradient(135deg, rgba(26, 26, 46, 0.9), rgba(22, 33, 62, 0.7));
     transform: translateY(-2px);
     box-shadow: 0 var(--spacing-xs) var(--spacing-m) rgba(102, 126, 234, 0.3);
@@ -52,21 +52,21 @@
 
 // Size variants
 .ability-button-small {
-  width: var(--spacing-4xl);
-  height: var(--spacing-4xl);
+  width: 40px;  // Using explicit size (spacing tokens don't go beyond 5xl)
+  height: 40px;
   padding: var(--spacing-s);
 }
 
 .ability-button-medium {
-  width: var(--spacing-6xl);
-  height: var(--spacing-6xl);
+  width: 64px;  // Using explicit size (spacing tokens don't go beyond 5xl)
+  height: 64px;
   padding: var(--spacing-s);
 }
 
 .ability-button-large {
-  width: var(--spacing-8xl);
+  width: 96px;  // Using explicit size (spacing tokens don't go beyond 5xl)
   height: auto;
-  min-height: var(--spacing-8xl);
+  min-height: 96px;
   padding: var(--spacing-m);
   gap: var(--spacing-s);
 }
@@ -207,7 +207,7 @@
   bottom: calc(100% + var(--spacing-m));
   left: 50%;
   transform: translateX(-50%) translateY(var(--spacing-xs));
-  width: var(--spacing-7xl);
+  width: var(--container-xs);  // 300px - appropriate for tooltip width
   max-width: 90vw;
   padding: var(--spacing-l);
   background: linear-gradient(135deg, rgba(26, 26, 46, 0.98), rgba(22, 33, 62, 0.98));
@@ -314,7 +314,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: var(--border-width-thin);
-  color: var(--color-accent-purple);
+  color: var(--color-text-accent-secondary);
   margin-bottom: var(--spacing-xs);
   padding-bottom: var(--spacing-xs);
   border-bottom: var(--border-width-thin) solid rgba(102, 126, 234, 0.2);
@@ -432,7 +432,7 @@
 }
 
 .explanation-bullet {
-  color: var(--color-accent-purple);
+  color: var(--color-text-accent-secondary);
   flex-shrink: 0;
   font-weight: var(--font-weight-bold);
   margin-top: var(--border-width-thin);
@@ -499,7 +499,7 @@
 }
 
 .stat-value {
-  color: var(--color-accent-purple);
+  color: var(--color-text-accent-secondary);
   font-weight: var(--font-weight-semibold);
 }
 
