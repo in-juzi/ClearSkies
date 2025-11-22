@@ -105,18 +105,19 @@
 - ✅ Bank UI enhancements (completed - Store All button, sorting controls for bank/inventory)
 - ✅ Design System v2.0 (completed - medieval fantasy theme with bronze/gold/brown palette, 400+ tokens, 53 components migrated)
 - ✅ Container max-width tokens (completed - semantic tokens for width constraints, replaces invalid spacing tokens)
+- ✅ Night Sky Theme Migration (completed - dark blue/moon yellow palette replacing medieval bronze/gold, 600+ tokens updated)
 
 **Recent Changes** (Last 10 commits):
+- fix: correct chat component HTML structure and apply night sky theme
+- style: apply night sky theme tokens to auth and manual components
+- style: apply night sky theme tokens to vendor component
+- style: apply night sky theme tokens to game components
+- style: migrate design system from medieval fantasy to night sky theme
 - docs: add container max-width tokens documentation
 - feat: enhance audit script to detect invalid spacing token usage
 - fix: replace invalid spacing tokens with container tokens in misc components
 - fix: replace invalid spacing tokens with breakpoint tokens in media queries
 - fix: replace invalid spacing tokens with container tokens in shared components
-- fix: replace invalid spacing tokens with container tokens in auth components
-- fix: replace invalid spacing tokens with container tokens in game components
-- feat: add container max-width tokens to design system
-- style: migrate all components to design system v2.0
-- docs: add comprehensive design system v2.0 documentation and tooling
 
 **Known Issues**:
 - None currently identified
@@ -492,28 +493,30 @@ const instanceIds = selectedIngredients.get
 
 See [project/docs/005-content-generator-agent.md](project/docs/005-content-generator-agent.md) for full documentation.
 
-## Design System v2.0 - Medieval Fantasy Theme
+## Design System v3.0 - Night Sky Theme
 
-**Overview**: Comprehensive design token system with 400+ tokens for consistent medieval fantasy aesthetic across all 53 components.
+**Overview**: Comprehensive design token system with 600+ tokens for consistent night sky aesthetic across all 53 components.
 
 ### Visual Theme
-- **Before**: Generic purple/blue modern web app aesthetic
-- **After**: Intentional medieval fantasy theme with warm, earthy tones
+- **v1.0**: Generic purple/blue modern web app aesthetic
+- **v2.0**: Medieval fantasy theme with bronze/gold/warm browns
+- **v3.0**: Night sky theme with deep blues and moon yellow accents
 
 **Color Palette**:
-- **Bronze** (`--color-bronze`) - Primary accent for buttons, borders, interactive elements
-- **Gold** (`--color-gold`) - Secondary accent for important elements (currency, rewards, achievements) - use sparingly
-- **Iron/Steel** (`--color-iron`, `--color-steel`) - Neutral metallic accents
-- **Warm Browns** (`--color-bg-primary/secondary/tertiary`) - Background surfaces
+- **Deep Navy/Midnight Blue** (`--color-bg-primary/secondary/tertiary`) - Background surfaces creating night sky atmosphere
+- **Moon Yellow** (`--color-accent-moon`) - Primary accent for buttons, highlights, and interactive elements
+- **Twilight/Sky Blues** (`--color-accent-twilight`, `--color-sky-*`) - Secondary accents for depth and variation
+- **Starlit Effects** - Subtle glows and highlights simulating starlight
 
 **Design Philosophy**:
-- Intentional color usage (not every element needs accent colors)
-- Reduced gradients (use for emphasis only: health/mana bars, primary buttons)
-- Clean, readable hierarchy
-- Medieval fantasy game aesthetic (not modern SaaS)
+- Immersive night sky atmosphere (deep blues, celestial theme)
+- Moon yellow for intentional highlights (not overused)
+- Starlit aesthetic with subtle glows
+- Clean, readable hierarchy with strong contrast
+- Fantasy game aesthetic with celestial/cosmic theme
 
 ### Key Files
-- **Design Tokens**: [ui/src/design-tokens.scss](ui/src/design-tokens.scss) - 400+ tokens (colors, spacing, containers, typography, shadows, gradients)
+- **Design Tokens**: [ui/src/design-tokens.scss](ui/src/design-tokens.scss) - 600+ tokens (colors, spacing, containers, typography, shadows, gradients)
 - **Migration Guide**: [project/docs/066-design-system-v2-migration-guide.md](project/docs/066-design-system-v2-migration-guide.md) - Step-by-step component migration patterns
 - **Style Guide**: [project/docs/067-design-system-v2-style-guide.md](project/docs/067-design-system-v2-style-guide.md) - Visual reference and usage guidelines
 - **Summary**: [project/docs/068-design-system-v2-summary.md](project/docs/068-design-system-v2-summary.md) - Quick onboarding overview
@@ -521,12 +524,12 @@ See [project/docs/005-content-generator-agent.md](project/docs/005-content-gener
 - **Audit Script**: [project/utils/audit-design-tokens.js](project/utils/audit-design-tokens.js) - Automated validation tool
 
 ### Token Categories
-1. **Colors** (30+ with variants): Medieval fantasy palette (bronze, gold, iron, warm browns)
+1. **Colors** (40+ with variants): Night sky palette (navy, midnight blue, twilight blue, moon yellow)
 2. **Spacing** (10 levels): 4px base unit (xxs to 5xl) - for padding, margin, gap
 3. **Container Max-Widths** (7 levels): 300px to 1200px (xs to 3xl) - for width constraints
 4. **Typography** (10 sizes, 4 weights, 3 line heights): Complete type scale
-5. **Shadows** (5 elevations + glow effects): Standard shadows + bronze/gold/purple glows
-6. **Gradients** (use sparingly): Bronze, gold, health, mana, XP
+5. **Shadows** (5 elevations + glow effects): Standard shadows + moon/starlit/twilight glows
+6. **Gradients** (use sparingly): Moon yellow, twilight blue, health, mana, XP
 7. **Component Tokens**: Buttons, cards, inputs, modals, scrollbar
 
 ### Common Patterns
@@ -538,7 +541,7 @@ background: var(--color-bg-secondary);
 
 **Borders**:
 ```scss
-border: var(--border-bronze);
+border: var(--border-primary);
 border-radius: var(--radius-card);
 ```
 
@@ -568,7 +571,7 @@ font-weight: var(--font-weight-medium);
 box-shadow: var(--card-shadow);
 
 &:hover {
-  box-shadow: var(--shadow-glow-bronze);
+  box-shadow: var(--shadow-glow-moon);
 }
 ```
 
@@ -582,30 +585,32 @@ background: var(--gradient-button-primary);
 
 ### Usage Guidelines
 
-**Bronze** (Primary Accent):
-- Primary buttons
-- Interactive borders
-- Hover states
-- Active elements
-- Accent highlights
-
-**Gold** (Use Sparingly!):
-- Currency displays
-- Quest rewards
-- Achievement badges
-- Important notifications
+**Moon Yellow** (Primary Accent - Use Intentionally):
+- Primary buttons and CTAs
+- Important highlights and notifications
+- Currency/gold displays
+- Quest rewards and achievements
+- Interactive element hover states
 - Special item highlights
 
+**Twilight/Sky Blues** (Secondary Accents):
+- Secondary buttons and actions
+- Informational highlights
+- Skill/attribute indicators
+- Mana/magic-related elements
+- Depth and variation in UI
+
 **NOT for**:
-- Every heading
-- Default borders
-- Standard buttons
+- Every heading (maintain contrast)
+- Default borders (use subtle blues)
+- Standard text (keep readable with whites/grays)
 
 ### Migration Status
-- ✅ 53 components migrated to design system v2.0
+- ✅ 53 components migrated to night sky theme (v3.0)
 - ✅ Zero hardcoded colors or spacing
-- ✅ Consistent medieval fantasy aesthetic
-- ✅ All components use design tokens
+- ✅ Consistent celestial/night sky aesthetic
+- ✅ All components use updated design tokens
+- ✅ Medieval fantasy theme (v2.0) replaced with immersive night atmosphere
 
 ### Validation
 Run audit script to detect issues:
