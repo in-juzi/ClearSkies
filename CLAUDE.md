@@ -108,18 +108,20 @@
 - ✅ Night Sky Theme Migration (completed - dark blue/moon yellow palette replacing medieval bronze/gold, 600+ tokens updated)
 - ✅ Button design token classes (completed - .button-primary/secondary/tertiary/danger for all 53 components)
 - ✅ Construction transaction safety (completed - rollback logic prevents gold loss on project creation failures)
+- ✅ Secondary accent token system (completed - starlight color tokens for borders/text, eliminates legacy purple references)
+- ✅ Combat state management improvements (completed - fixed isInCombat() validation, proper state cleanup after victory)
 
 **Recent Changes** (Last 10 commits):
+- chore: add combat state debugging utilities
+- style: migrate auth and remaining game components to secondary accent tokens
+- style: migrate shared components to secondary accent tokens
+- style: migrate game components to secondary accent tokens
+- style: migrate combat component to secondary accent tokens
+- style: migrate manual sections to secondary accent tokens
+- style: add secondary accent tokens to design system
+- fix: improve combat state management and cleanup
 - style: migrate all component buttons to design token classes
 - docs: add button migration plan for design system v3
-- feat: add button-danger design token class
-- fix: add transaction rollback to construction project creation
-- fix: correct chat component HTML structure and apply night sky theme
-- style: apply night sky theme tokens to auth and manual components
-- style: apply night sky theme tokens to vendor component
-- style: apply night sky theme tokens to game components
-- style: migrate design system from medieval fantasy to night sky theme
-- docs: add container max-width tokens documentation
 
 **Known Issues**:
 - None currently identified
@@ -602,6 +604,14 @@ background: var(--gradient-button-primary);
 - Mana/magic-related elements
 - Depth and variation in UI
 
+**Starlight** (Tertiary Accents - NEW):
+- `--color-text-accent-secondary` - Text highlights replacing legacy purple
+- `--color-border-secondary-accent` - Border accents for secondary elements
+- `--color-border-secondary-accent-dark` - Darker border variant
+- System messages and informational elements
+- VS text and combat log system messages
+- Reward headers and emphasized headings
+
 **NOT for**:
 - Every heading (maintain contrast)
 - Default borders (use subtle blues)
@@ -615,6 +625,8 @@ background: var(--gradient-button-primary);
 - ✅ Medieval fantasy theme (v2.0) replaced with immersive night atmosphere
 - ✅ All component buttons migrated to design token classes (.button-primary/secondary/tertiary/danger)
 - ✅ 1000+ lines of duplicate button styles removed (replaced with 4 reusable token classes)
+- ✅ Secondary accent tokens added (starlight color for legacy purple replacements)
+- ✅ Zero legacy purple references (all migrated to semantic tokens)
 
 ### Validation
 Run audit script to detect issues:
