@@ -3,7 +3,7 @@
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: var(--gradient-purple);
+  background: var(--color-bg-primary);
   padding: var(--spacing-xl);
 }
 
@@ -82,8 +82,8 @@
 button {
   width: 100%;
   padding: var(--spacing-m);
-  background: var(--gradient-purple);
-  color: var(--color-text-primary);
+  background: var(--button-bg-primary);
+  color: var(--button-text-primary);
   border: none;
   border-radius: var(--radius-button);
   font-size: var(--font-size-l);
