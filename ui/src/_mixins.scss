@@ -1,0 +1,407 @@
+/**
+ * ClearSkies Design System - SCSS Mixin Library
+ *
+ * Reusable mixins for common UI patterns.
+ * All mixins use design tokens from design-tokens.scss for consistency.
+ *
+ * Usage:
+ *   @import 'mixins';
+ *   .my-modal { @include modal-container(); }
+ */
+
+/* ========================================
+   MODAL & DIALOG MIXINS
+   ======================================== */
+
+/**
+ * Modal Container
+ * Creates a centered, fixed-position modal dialog
+ *
+ * @param {token} $max-width - Maximum width of modal (default: var(--container-m))
+ * @param {token} $max-height - Maximum height of modal (default: 80vh)
+ *
+ * Example:
+ *   .my-modal { @include modal-container(var(--container-3xl), 90vh); }
+ */
+@mixin modal-container($max-width: var(--container-m), $max-height: 80vh) {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: $max-width;
+  max-height: $max-height;
+  background: var(--gradient-card);
+  border: var(--border-default);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-xl);
+  z-index: var(--z-modal);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/**
+ * Modal Header
+ * Creates a consistent modal header with flexbox layout
+ * Supports title and close button patterns
+ *
+ * @param {token} $padding - Horizontal padding (default: var(--spacing-xl))
+ *
+ * Example:
+ *   .modal-header { @include modal-header(); }
+ */
+@mixin modal-header($padding: var(--spacing-xl)) {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-l) $padding;
+  background: var(--color-bg-elevated);
+  border-bottom: var(--border-light);
+  flex-shrink: 0;
+
+  h1, h2, h3 {
+    margin: 0;
+    color: var(--color-text-primary);
+  }
+}
+
+/**
+ * Close Button
+ * Creates a standardized close button for modals/dialogs
+ *
+ * Example:
+ *   .close-button { @include close-button(); }
+ */
+@mixin close-button() {
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-3xl);
+  cursor: pointer;
+  transition: color var(--transition-fast), transform var(--transition-fast);
+  padding: 0;
+  line-height: 1;
+
+  &:hover {
+    color: var(--color-text-primary);
+    transform: scale(1.1);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+/* ========================================
+   SCROLLBAR MIXINS
+   ======================================== */
+
+/**
+ * Custom Scrollbar
+ * Creates consistent custom scrollbar styling
+ *
+ * @param {token} $thumb-color - Scrollbar thumb color (default: var(--color-surface-border))
+ * @param {token} $track-color - Scrollbar track color (default: var(--color-bg-primary))
+ *
+ * Example:
+ *   .scrollable-content {
+ *     overflow-y: auto;
+ *     @include custom-scrollbar();
+ *   }
+ */
+@mixin custom-scrollbar($thumb-color: var(--color-surface-border), $track-color: var(--color-bg-primary)) {
+  // Webkit browsers (Chrome, Safari, Edge)
+  &::-webkit-scrollbar {
+    width: var(--spacing-s);
+    height: var(--spacing-s);
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $track-color;
+    border-radius: var(--radius-s);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $thumb-color;
+    border-radius: var(--radius-s);
+    transition: background var(--transition-fast);
+
+    &:hover {
+      background: var(--color-bg-tertiary);
+    }
+  }
+
+  // Firefox
+  scrollbar-width: thin;
+  scrollbar-color: $thumb-color $track-color;
+}
+
+/* ========================================
+   FORM INPUT MIXINS
+   ======================================== */
+
+/**
+ * Input Field
+ * Creates consistent form input styling
+ * Includes focus states and placeholder styling
+ *
+ * Example:
+ *   .search-input { @include input-field(); }
+ */
+@mixin input-field() {
+  background: var(--color-bg-primary);
+  border: var(--border-width-thin) solid var(--color-surface-border);
+  border-radius: var(--radius-xs);
+  padding: var(--spacing-xs) var(--spacing-m);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-s);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-border-moon);
+    box-shadow: 0 0 0 var(--spacing-2xs) rgba(244, 233, 155, 0.2);
+  }
+
+  &::placeholder {
+    color: var(--color-text-label);
+    opacity: 0.6;
+  }
+
+  &:disabled {
+    opacity: var(--opacity-disabled);
+    cursor: not-allowed;
+  }
+}
+
+/* ========================================
+   CARD & PANEL MIXINS
+   ======================================== */
+
+/**
+ * Hover Card
+ * Creates an interactive card with hover effects
+ *
+ * @param {token} $border-color - Default border color (default: var(--color-surface-border))
+ *
+ * Example:
+ *   .item-card { @include hover-card(); }
+ */
+@mixin hover-card($border-color: var(--color-surface-border)) {
+  padding: var(--spacing-l);
+  background: var(--color-bg-elevated);
+  border: var(--border-width-thin) solid $border-color;
+  border-radius: var(--radius-card);
+  transition: all var(--transition-normal);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--color-bg-tertiary);
+    border-color: var(--color-border-secondary-accent-dark);
+    transform: translateY(calc(-1 * var(--spacing-2xs)));
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+/**
+ * Panel
+ * Creates a basic panel/card container
+ *
+ * @param {token} $padding - Panel padding (default: var(--spacing-xl))
+ *
+ * Example:
+ *   .info-panel { @include panel(); }
+ */
+@mixin panel($padding: var(--spacing-xl)) {
+  background: var(--color-bg-secondary);
+  border: var(--border-default);
+  border-radius: var(--radius-card);
+  padding: $padding;
+  box-shadow: var(--card-shadow);
+}
+
+/* ========================================
+   LAYOUT MIXINS
+   ======================================== */
+
+/**
+ * Flex Grid
+ * Creates a flexbox grid layout
+ *
+ * @param {token} $gap - Gap between items (default: var(--spacing-m))
+ * @param {string} $direction - Flex direction (default: row wrap)
+ *
+ * Example:
+ *   .items-grid { @include flex-grid(var(--spacing-l), column); }
+ */
+@mixin flex-grid($gap: var(--spacing-m), $direction: row wrap) {
+  display: flex;
+  flex-flow: $direction;
+  gap: $gap;
+  align-content: flex-start;
+}
+
+/* ========================================
+   EMPTY STATE MIXINS
+   ======================================== */
+
+/**
+ * Empty State
+ * Creates consistent empty state messaging
+ *
+ * @param {token} $padding - Padding around message (default: var(--spacing-3xl))
+ *
+ * Example:
+ *   .no-items { @include empty-state(); }
+ */
+@mixin empty-state($padding: var(--spacing-3xl)) {
+  text-align: center;
+  padding: $padding;
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+/* ========================================
+   BUTTON MIXINS
+   ======================================== */
+
+/**
+ * Action Button
+ * Creates a primary action button with gradient background
+ *
+ * @param {token} $bg-gradient - Background gradient (default: var(--gradient-button-primary))
+ * @param {token} $border-color - Border color (default: var(--color-moon-yellow-dark))
+ *
+ * Example:
+ *   .craft-button { @include action-button(var(--gradient-button-secondary), var(--color-night-blue-light)); }
+ */
+@mixin action-button($bg-gradient: var(--gradient-button-primary), $border-color: var(--color-moon-yellow-dark)) {
+  padding: var(--spacing-m) var(--spacing-xl);
+  background: $bg-gradient;
+  color: var(--color-text-inverse);
+  border: var(--border-width-medium) solid $border-color;
+  border-radius: var(--radius-l);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-base);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-s);
+
+  &:hover:not(:disabled) {
+    transform: translateY(calc(-1 * var(--spacing-2xs)));
+    box-shadow: var(--shadow-glow-moon);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: var(--shadow-xs);
+  }
+
+  &:disabled {
+    opacity: var(--opacity-disabled);
+    cursor: not-allowed;
+  }
+}
+
+/**
+ * Secondary Action Button
+ * Creates a secondary action button with night blue theme
+ *
+ * Example:
+ *   .cancel-button { @include secondary-action-button(); }
+ */
+@mixin secondary-action-button() {
+  @include action-button(var(--gradient-button-secondary), var(--color-night-blue-light));
+  color: var(--color-text-starlight);
+
+  &:hover:not(:disabled) {
+    box-shadow: var(--shadow-glow-secondary);
+  }
+}
+
+/* ========================================
+   TEXT & TYPOGRAPHY MIXINS
+   ======================================== */
+
+/**
+ * Section Header
+ * Creates consistent section headers
+ *
+ * Example:
+ *   .section-title { @include section-header(); }
+ */
+@mixin section-header() {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-l) 0;
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+/**
+ * Truncate Text
+ * Truncates text with ellipsis
+ *
+ * Example:
+ *   .item-name { @include truncate-text(); }
+ */
+@mixin truncate-text() {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ========================================
+   UTILITY MIXINS
+   ======================================== */
+
+/**
+ * Visually Hidden
+ * Hides element visually but keeps it accessible to screen readers
+ *
+ * Example:
+ *   .sr-only { @include visually-hidden(); }
+ */
+@mixin visually-hidden() {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/**
+ * Aspect Ratio Box
+ * Creates a box with a specific aspect ratio
+ *
+ * @param {number} $width - Width ratio (default: 1)
+ * @param {number} $height - Height ratio (default: 1)
+ *
+ * Example:
+ *   .square-box { @include aspect-ratio(1, 1); }
+ */
+@mixin aspect-ratio($width: 1, $height: 1) {
+  position: relative;
+
+  &::before {
+    content: '';
+    display: block;
+    padding-top: percentage($height / $width);
+  }
+
+  > * {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+}
