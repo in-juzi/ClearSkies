@@ -301,8 +301,6 @@
    /* 0.5rem - Absolutely tiny labels */
    --font-size-2xs: 9px;
    /* 0.5625rem - Extra tiny labels */
-   --font-size-xs: 10px;
-   /* 0.625rem - Tiny labels */
    --font-size-s: 11px;
    /* 0.6875rem - Small text */
    --font-size-m: 12px;
@@ -689,10 +687,6 @@
 }
 
 /* --- Font Size Utilities --- */
-.text-xs {
-   font-size: var(--font-size-xs);
-}
-
 .text-s {
    font-size: var(--font-size-s);
 }
@@ -1087,4 +1081,154 @@
       opacity: var(--opacity-disabled);
       cursor: not-allowed;
    }
+}
+
+/* ========================================
+   ADDITIONAL UTILITY CLASSES
+   ======================================== */
+
+/* --- Flex Layout Utilities --- */
+
+.flex-between {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+}
+
+.flex-start {
+   display: flex;
+   justify-content: flex-start;
+   align-items: center;
+}
+
+.flex-end {
+   display: flex;
+   justify-content: flex-end;
+   align-items: center;
+}
+
+.flex-column-gap {
+   display: flex;
+   flex-direction: column;
+   gap: var(--spacing-m);
+}
+
+.flex-row-gap {
+   display: flex;
+   flex-direction: row;
+   gap: var(--spacing-m);
+}
+
+/* --- Spacing Shortcut Utilities --- */
+
+.p-card {
+   padding: var(--card-padding);
+}
+
+.p-section {
+   padding: var(--spacing-section-padding);
+}
+
+.mb-section {
+   margin-bottom: var(--spacing-section-gap);
+}
+
+.mt-section {
+   margin-top: var(--spacing-section-gap);
+}
+
+/* --- Border Utilities --- */
+
+.border-bottom {
+   border-bottom: var(--border-light);
+}
+
+.border-top {
+   border-top: var(--border-light);
+}
+
+.border-default {
+   border: var(--border-default);
+}
+
+.border-radius-card {
+   border-radius: var(--radius-card);
+}
+
+.border-radius-button {
+   border-radius: var(--radius-button);
+}
+
+/* --- State Utilities --- */
+
+.disabled-state {
+   opacity: var(--opacity-disabled);
+   cursor: not-allowed;
+   pointer-events: none;
+}
+
+.loading-state {
+   opacity: 0.6;
+   pointer-events: none;
+}
+
+.clickable {
+   cursor: pointer;
+   user-select: none;
+}
+
+.no-select {
+   user-select: none;
+}
+
+/* --- Text Alignment Utilities --- */
+
+.text-left {
+   text-align: left;
+}
+
+.text-right {
+   text-align: right;
+}
+
+/* --- Overflow Utilities --- */
+
+.overflow-hidden {
+   overflow: hidden;
+}
+
+.overflow-auto {
+   overflow: auto;
+}
+
+.overflow-y-auto {
+   overflow-y: auto;
+}
+
+.overflow-x-auto {
+   overflow-x: auto;
+}
+
+/* --- Width/Height Utilities --- */
+
+.w-full {
+   width: 100%;
+}
+
+.h-full {
+   height: 100%;
+}
+
+/* --- Position Utilities --- */
+
+.relative {
+   position: relative;
+}
+
+.absolute {
+   position: absolute;
+}
+
+.fixed {
+   position: fixed;
 }
