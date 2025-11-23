@@ -1,0 +1,209 @@
+<div class="monsters-container">
+  <!-- Monster List Sidebar -->
+  <aside class="monster-list-sidebar">
+    <div class="sidebar-header">
+      <h3>Monsters</h3>
+      <span class="monster-count">{{ filteredMonsters().length }} / {{ allMonsters.length }}</span>
+    </div>
+
+    <!-- Search -->
+    <div class="search-box">
+      <span class="material-symbols-outlined">search</span>
+      <input
+        type="text"
+        placeholder="Search monsters..."
+        [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event); applyFilters()"
+      />
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+      <div class="filter-group">
+        <label>Sort By</label>
+        <select
+          [ngModel]="sortBy()"
+          (ngModelChange)="sortBy.set($event); applyFilters()"
+        >
+          <option value="name">Name</option>
+          <option value="level">Level</option>
+          <option value="health">Health</option>
+          <option value="damage">Damage</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Monster List -->
+    <div class="monster-list">
+      @for (monster of filteredMonsters(); track monster.monsterId) {
+        <div
+          class="monster-list-item"
+          [class.selected]="selectedMonster()?.monsterId === monster.monsterId"
+          (click)="selectMonster(monster)"
+        >
+          <div class="monster-info">
+            <span class="monster-name">{{ monster.name }}</span>
+            <span class="monster-id">{{ monster.monsterId }}</span>
+          </div>
+          <div class="monster-stats-preview">
+            <span class="stat-badge level">Lvl {{ monster.level }}</span>
+            <span class="stat-badge health">{{ getHealth(monster) }} HP</span>
+          </div>
+        </div>
+      } @empty {
+        <div class="empty-state">
+          <span class="material-symbols-outlined">pets</span>
+          <p>No monsters found</p>
+        </div>
+      }
+    </div>
+  </aside>
+
+  <!-- Monster Detail Panel -->
+  <main class="monster-detail-panel">
+    @if (selectedMonster(); as monster) {
+      <div class="detail-content">
+        <!-- Header -->
+        <div class="detail-header">
+          <div class="header-info">
+            <h2>{{ monster.name }}</h2>
+            <code class="monster-id-display">{{ monster.monsterId }}</code>
+          </div>
+          <div class="header-actions">
+            <button
+              class="button-tertiary"
+              [disabled]="true"
+              (click)="toggleEditMode()"
+              title="Edit mode coming soon"
+            >
+              <span class="material-symbols-outlined">edit</span>
+              Edit Mode (Coming Soon)
+            </button>
+          </div>
+        </div>
+
+        <!-- Basic Info Section -->
+        <section class="detail-section">
+          <h3>Basic Information</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Name</label>
+              <span>{{ monster.name }}</span>
+            </div>
+            <div class="info-item">
+              <label>Monster ID</label>
+              <span>{{ monster.monsterId }}</span>
+            </div>
+            <div class="info-item">
+              <label>Level</label>
+              <span class="stat-badge level">Level {{ monster.level }}</span>
+            </div>
+            <div class="info-item full-width">
+              <label>Description</label>
+              <span>{{ monster.description }}</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Combat Stats Section -->
+        <section class="detail-section">
+          <h3>Combat Stats</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Health</label>
+              <span class="stat-value">{{ getHealth(monster) }} HP</span>
+            </div>
+            <div class="info-item">
+              <label>Damage Roll</label>
+              <span class="stat-value">{{ getDamageRoll(monster) }}</span>
+            </div>
+            <div class="info-item">
+              <label>Average Damage</label>
+              <span class="stat-value">{{ getAverageDamage(monster).toFixed(1) }}</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Abilities Section -->
+        @if (getAbilities(monster).length > 0) {
+          <section class="detail-section">
+            <h3>Abilities</h3>
+            <div class="abilities-list">
+              @for (abilityId of getAbilities(monster); track abilityId) {
+                <div class="ability-card">
+                  <span class="ability-name">{{ abilityId }}</span>
+                </div>
+              }
+            </div>
+          </section>
+        }
+
+        <!-- Loot Section -->
+        @if (getLoot(monster)) {
+          <section class="detail-section">
+            <h3>Loot</h3>
+            <div class="info-grid">
+              @if (getLoot(monster).dropTableId) {
+                <div class="info-item full-width">
+                  <label>Drop Table ID</label>
+                  <code>{{ getLoot(monster).dropTableId }}</code>
+                </div>
+              }
+              @if (getLoot(monster).goldMin !== undefined && getLoot(monster).goldMax !== undefined) {
+                <div class="info-item">
+                  <label>Gold Drop</label>
+                  <span>{{ getLoot(monster).goldMin }} - {{ getLoot(monster).goldMax }} gold</span>
+                </div>
+              }
+              @if (getLoot(monster).experienceReward) {
+                <div class="info-item full-width">
+                  <label>Experience Rewards</label>
+                  <div class="xp-rewards">
+                    @for (skill of getSkillKeys(getLoot(monster).experienceReward); track skill) {
+                      <span class="xp-badge">{{ skill }}: {{ getLoot(monster).experienceReward[skill] }} XP</span>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </section>
+        }
+
+        <!-- Icon Configuration Section -->
+        @if (getIcon(monster)) {
+          <section class="detail-section">
+            <h3>Icon Configuration</h3>
+            <div class="info-grid">
+              <div class="info-item full-width">
+                <label>Icon Path</label>
+                <code>{{ getIcon(monster).path }}</code>
+              </div>
+              @if (getIcon(monster).material) {
+                <div class="info-item">
+                  <label>Material</label>
+                  <span>{{ getIcon(monster).material }}</span>
+                </div>
+              }
+            </div>
+          </section>
+        }
+
+        <!-- Edit Actions (Disabled) -->
+        <div class="edit-actions">
+          <button class="button-primary" [disabled]="true" (click)="saveChanges()">
+            Save Changes
+          </button>
+          <button class="button-tertiary" [disabled]="true" (click)="cancelEdit()">
+            Cancel
+          </button>
+        </div>
+      </div>
+    } @else {
+      <div class="empty-state-detail">
+        <span class="material-symbols-outlined">arrow_back</span>
+        <h3>No Monster Selected</h3>
+        <p>Select a monster from the list to view its details</p>
+      </div>
+    }
+  </main>
+</div>

@@ -1,0 +1,263 @@
+<div class="locations-container">
+  <!-- Location List Sidebar -->
+  <aside class="location-list-sidebar">
+    <div class="sidebar-header">
+      <h3>Locations</h3>
+      <span class="location-count">{{ filteredLocations().length }} / {{ allLocations.length }}</span>
+    </div>
+
+    <!-- Search -->
+    <div class="search-box">
+      <span class="material-symbols-outlined">search</span>
+      <input
+        type="text"
+        placeholder="Search locations..."
+        [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event); applyFilters()"
+      />
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+      <div class="filter-group">
+        <label>Biome</label>
+        <select
+          [ngModel]="selectedBiome()"
+          (ngModelChange)="selectedBiome.set($event); applyFilters()"
+        >
+          @for (biome of getBiomes(); track biome) {
+            <option [value]="biome">{{ biome === 'all' ? 'All Biomes' : biome }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Sort By</label>
+        <select
+          [ngModel]="sortBy()"
+          (ngModelChange)="sortBy.set($event); applyFilters()"
+        >
+          <option value="name">Name</option>
+          <option value="biome">Biome</option>
+          <option value="facilities">Facilities</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Location List -->
+    <div class="location-list">
+      @for (location of filteredLocations(); track location.locationId) {
+        <div
+          class="location-list-item"
+          [class.selected]="selectedLocation()?.locationId === location.locationId"
+          (click)="selectLocation(location)"
+        >
+          <div class="location-info">
+            <span class="location-name">{{ location.name }}</span>
+            <span class="location-id">{{ location.locationId }}</span>
+          </div>
+          <div class="location-meta">
+            <span class="badge biome-badge">{{ location.biome }}</span>
+            @if (location.facilities && location.facilities.length > 0) {
+              <span class="badge facilities-badge">{{ location.facilities.length }} facilities</span>
+            }
+          </div>
+        </div>
+      } @empty {
+        <div class="empty-state">
+          <span class="material-symbols-outlined">place</span>
+          <p>No locations found</p>
+        </div>
+      }
+    </div>
+  </aside>
+
+  <!-- Location Detail Panel -->
+  <main class="location-detail-panel">
+    @if (selectedLocation(); as location) {
+      <div class="detail-content">
+        <!-- Header -->
+        <div class="detail-header">
+          <div class="header-info">
+            <h2>{{ location.name }}</h2>
+            <code class="location-id-display">{{ location.locationId }}</code>
+          </div>
+          <div class="header-actions">
+            <button
+              class="button-tertiary"
+              [disabled]="true"
+              (click)="toggleEditMode()"
+              title="Edit mode coming soon"
+            >
+              <span class="material-symbols-outlined">edit</span>
+              Edit Mode (Coming Soon)
+            </button>
+          </div>
+        </div>
+
+        <!-- Basic Info Section -->
+        <section class="detail-section">
+          <h3>Basic Information</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Name</label>
+              <span>{{ location.name }}</span>
+            </div>
+            <div class="info-item">
+              <label>Location ID</label>
+              <span>{{ location.locationId }}</span>
+            </div>
+            <div class="info-item">
+              <label>Biome</label>
+              <span class="badge biome-badge">{{ location.biome }}</span>
+            </div>
+            <div class="info-item full-width">
+              <label>Description</label>
+              <span>{{ location.description }}</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Coordinates Section -->
+        @if (getCoordinates(location)) {
+          <section class="detail-section">
+            <h3>Map Coordinates</h3>
+            <div class="info-grid">
+              <div class="info-item">
+                <label>X Position</label>
+                <span>{{ getCoordinates(location).x }}</span>
+              </div>
+              <div class="info-item">
+                <label>Y Position</label>
+                <span>{{ getCoordinates(location).y }}</span>
+              </div>
+            </div>
+          </section>
+        }
+
+        <!-- Facilities Section -->
+        @if (location.facilities && location.facilities.length > 0) {
+          <section class="detail-section">
+            <h3>Facilities ({{ location.facilities.length }})</h3>
+            <div class="facilities-list">
+              @for (facilityId of location.facilities; track facilityId) {
+                @if (getFacility(facilityId); as facility) {
+                  <div class="facility-card">
+                    <div class="facility-header">
+                      <div class="facility-title">
+                        <app-icon
+                          [path]="getFacilityIconPath(facility.icon)"
+                          [material]="getFacilityIconMaterial(facility.type)"
+                          [size]="32">
+                        </app-icon>
+                        <h4>{{ facility.name }}</h4>
+                      </div>
+                      <span class="badge" [class]="getFacilityTypeClass(facility.type)">
+                        {{ facility.type }}
+                      </span>
+                    </div>
+                    <div class="facility-body">
+                      <p class="facility-description">{{ facility.description }}</p>
+                      <code class="facility-id">{{ facility.facilityId }}</code>
+
+                      <!-- Activities -->
+                      @if (facility.activities && facility.activities.length > 0) {
+                        <div class="facility-meta">
+                          <label>Activities</label>
+                          <div class="meta-badges">
+                            @for (activityId of facility.activities; track activityId) {
+                              <span class="mini-badge">{{ activityId }}</span>
+                            }
+                          </div>
+                        </div>
+                      }
+
+                      <!-- Vendors -->
+                      @if (facility.vendorIds && facility.vendorIds.length > 0) {
+                        <div class="facility-meta">
+                          <label>Vendors</label>
+                          <div class="meta-badges">
+                            @for (vendorId of facility.vendorIds; track vendorId) {
+                              <span class="mini-badge vendor-badge">{{ vendorId }}</span>
+                            }
+                          </div>
+                        </div>
+                      }
+
+                      <!-- Crafting Skills -->
+                      @if (facility.craftingSkills && facility.craftingSkills.length > 0) {
+                        <div class="facility-meta">
+                          <label>Crafting Skills</label>
+                          <div class="meta-badges">
+                            @for (skill of facility.craftingSkills; track skill) {
+                              <span class="mini-badge skill-badge">{{ skill }}</span>
+                            }
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                } @else {
+                  <div class="facility-card error">
+                    <span class="facility-name">{{ facilityId }}</span>
+                    <span class="error-text">(Not found in registry)</span>
+                  </div>
+                }
+              }
+            </div>
+          </section>
+        }
+
+        <!-- Required Items Section -->
+        @if (getRequiredItems(location).length > 0) {
+          <section class="detail-section">
+            <h3>Required Items</h3>
+            <div class="required-items-list">
+              @for (item of getRequiredItems(location); track item.itemId) {
+                <div class="required-item">
+                  <span class="item-id">{{ item.itemId }}</span>
+                  <span class="item-quantity">x{{ item.quantity }}</span>
+                </div>
+              }
+            </div>
+          </section>
+        }
+
+        <!-- Icon Configuration Section -->
+        @if (getIcon(location)) {
+          <section class="detail-section">
+            <h3>Icon Configuration</h3>
+            <div class="info-grid">
+              <div class="info-item full-width">
+                <label>Icon Path</label>
+                <code>{{ getIcon(location).path }}</code>
+              </div>
+              @if (getIcon(location).material) {
+                <div class="info-item">
+                  <label>Material</label>
+                  <span>{{ getIcon(location).material }}</span>
+                </div>
+              }
+            </div>
+          </section>
+        }
+
+        <!-- Edit Actions (Disabled) -->
+        <div class="edit-actions">
+          <button class="button-primary" [disabled]="true" (click)="saveChanges()">
+            Save Changes
+          </button>
+          <button class="button-tertiary" [disabled]="true" (click)="cancelEdit()">
+            Cancel
+          </button>
+        </div>
+      </div>
+    } @else {
+      <div class="empty-state-detail">
+        <span class="material-symbols-outlined">arrow_back</span>
+        <h3>No Location Selected</h3>
+        <p>Select a location from the list to view its details</p>
+      </div>
+    }
+  </main>
+</div>

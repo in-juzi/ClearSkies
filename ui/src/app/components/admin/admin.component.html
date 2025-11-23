@@ -1,0 +1,64 @@
+<div class="admin-container">
+  <!-- Header -->
+  <header class="admin-header">
+    <button class="button-secondary back-button" (click)="navigateToGame()">
+      <span class="material-symbols-outlined">arrow_back</span>
+      Back to Game
+    </button>
+    <h1>Admin Panel</h1>
+  </header>
+
+  <!-- Main Content -->
+  <div class="admin-content">
+    <!-- Sidebar Navigation -->
+    <aside class="admin-sidebar">
+      <nav class="admin-nav">
+        <a
+          routerLink="/admin/dashboard"
+          routerLinkActive="active"
+          class="nav-item"
+        >
+          <span class="material-symbols-outlined">dashboard</span>
+          Dashboard
+        </a>
+        <a
+          routerLink="/admin/items"
+          routerLinkActive="active"
+          class="nav-item"
+        >
+          <span class="material-symbols-outlined">inventory_2</span>
+          Items
+        </a>
+        <a
+          routerLink="/admin/monsters"
+          routerLinkActive="active"
+          class="nav-item"
+        >
+          <span class="material-symbols-outlined">pets</span>
+          Monsters
+        </a>
+        <a
+          routerLink="/admin/locations"
+          routerLinkActive="active"
+          class="nav-item"
+        >
+          <span class="material-symbols-outlined">place</span>
+          Locations
+        </a>
+        <a
+          routerLink="/admin/design-system"
+          routerLinkActive="active"
+          class="nav-item"
+        >
+          <span class="material-symbols-outlined">palette</span>
+          Design System
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main Panel -->
+    <main class="admin-main">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

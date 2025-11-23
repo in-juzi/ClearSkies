@@ -8,6 +8,7 @@
         <span class="username">{{ currentUser()!.username }}</span>
         <button class="button-quaternary" (click)="openQuestJournal()">Quests</button>
         <button class="button-quaternary" (click)="openManual()">Manual</button>
+        <button class="button-quaternary" routerLink="/admin">Admin</button>
         <button class="button-quaternary" (click)="onLogout()">Logout</button>
       }
     </div>

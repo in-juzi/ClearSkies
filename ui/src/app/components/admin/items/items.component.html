@@ -1,0 +1,304 @@
+<div class="items-container">
+  <!-- Item List Sidebar -->
+  <aside class="item-list-sidebar">
+    <div class="sidebar-header">
+      <h3>Items</h3>
+      <span class="item-count">{{ filteredItems().length }} / {{ allItems.length }}</span>
+    </div>
+
+    <!-- Search -->
+    <div class="search-box">
+      <span class="material-symbols-outlined">search</span>
+      <input
+        type="text"
+        placeholder="Search items..."
+        [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event); applyFilters()"
+      />
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+      <div class="filter-group">
+        <label>Category</label>
+        <select
+          [ngModel]="selectedCategory()"
+          (ngModelChange)="selectedCategory.set($event); applyFilters()"
+        >
+          @for (category of getCategories(); track category) {
+            <option [value]="category">{{ category === 'all' ? 'All Categories' : category }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Subcategory</label>
+        <select
+          [ngModel]="selectedSubcategory()"
+          (ngModelChange)="selectedSubcategory.set($event); applyFilters()"
+        >
+          @for (subcategory of getSubcategories(); track subcategory) {
+            <option [value]="subcategory">{{ subcategory === 'all' ? 'All Subcategories' : subcategory }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Rarity</label>
+        <select
+          [ngModel]="selectedRarity()"
+          (ngModelChange)="selectedRarity.set($event); applyFilters()"
+        >
+          @for (rarity of getRarities(); track rarity) {
+            <option [value]="rarity">{{ rarity === 'all' ? 'All Rarities' : rarity }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Sort By</label>
+        <select
+          [ngModel]="sortBy()"
+          (ngModelChange)="sortBy.set($event); applyFilters()"
+        >
+          <option value="name">Name</option>
+          <option value="category">Category</option>
+          <option value="rarity">Rarity</option>
+          <option value="tier">Tier</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Item List -->
+    <div class="item-list">
+      @for (item of filteredItems(); track item.itemId) {
+        <div
+          class="item-list-item"
+          [class.selected]="selectedItem()?.itemId === item.itemId"
+          (click)="selectItem(item)"
+        >
+          <div class="item-info">
+            <span class="item-name">{{ item.name }}</span>
+            <span class="item-id">{{ item.itemId }}</span>
+          </div>
+          <div class="item-badges">
+            <span class="badge category-badge">{{ item.category }}</span>
+            <span class="badge rarity-badge" [class]="'rarity-' + item.rarity">{{ item.rarity }}</span>
+          </div>
+        </div>
+      } @empty {
+        <div class="empty-state">
+          <span class="material-symbols-outlined">inventory_2</span>
+          <p>No items found</p>
+        </div>
+      }
+    </div>
+  </aside>
+
+  <!-- Item Detail Panel -->
+  <main class="item-detail-panel">
+    @if (selectedItem(); as item) {
+      <div class="detail-content">
+        <!-- Header -->
+        <div class="detail-header">
+          <div class="header-info">
+            <h2>{{ item.name }}</h2>
+            <code class="item-id-display">{{ item.itemId }}</code>
+          </div>
+          <div class="header-actions">
+            <button
+              class="button-tertiary"
+              [disabled]="true"
+              (click)="toggleEditMode()"
+              title="Edit mode coming soon"
+            >
+              <span class="material-symbols-outlined">edit</span>
+              Edit Mode (Coming Soon)
+            </button>
+          </div>
+        </div>
+
+        <!-- Basic Info Section -->
+        <section class="detail-section">
+          <h3>Basic Information</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Name</label>
+              <span>{{ item.name }}</span>
+            </div>
+            <div class="info-item">
+              <label>Item ID</label>
+              <span>{{ item.itemId }}</span>
+            </div>
+            <div class="info-item">
+              <label>Category</label>
+              <span class="badge category-badge">{{ item.category }}</span>
+            </div>
+            <div class="info-item">
+              <label>Rarity</label>
+              <span class="badge rarity-badge" [class]="'rarity-' + item.rarity">{{ item.rarity }}</span>
+            </div>
+            <div class="info-item full-width">
+              <label>Description</label>
+              <span>{{ item.description }}</span>
+            </div>
+            <div class="info-item">
+              <label>Base Value</label>
+              <span>{{ item.baseValue }} gold</span>
+            </div>
+            <div class="info-item">
+              <label>Stackable</label>
+              <span>{{ item.stackable ? 'Yes' : 'No' }}</span>
+            </div>
+            @if (getWeight(item) !== undefined) {
+              <div class="info-item">
+                <label>Weight</label>
+                <span>{{ getWeight(item) }} kg</span>
+              </div>
+            }
+          </div>
+        </section>
+
+        <!-- Subcategories Section -->
+        @if (item.subcategories && item.subcategories.length > 0) {
+          <section class="detail-section">
+            <h3>Subcategories</h3>
+            <div class="badge-list">
+              @for (subcategory of item.subcategories; track subcategory) {
+                <span class="badge subcategory-badge">{{ subcategory }}</span>
+              }
+            </div>
+          </section>
+        }
+
+        <!-- Properties Section -->
+        @if (item.properties) {
+          <section class="detail-section">
+            <h3>Properties</h3>
+            <div class="info-grid">
+              @if (item.properties.tier !== undefined) {
+                <div class="info-item">
+                  <label>Tier</label>
+                  <span>T{{ item.properties.tier }}</span>
+                </div>
+              }
+              @if (item.properties.material) {
+                <div class="info-item">
+                  <label>Material</label>
+                  <span>{{ item.properties.material }}</span>
+                </div>
+              }
+              @if (item.properties['slot']) {
+                <div class="info-item">
+                  <label>Equipment Slot</label>
+                  <span>{{ item.properties['slot'] }}</span>
+                </div>
+              }
+              @if (item.properties['weaponSubtype']) {
+                <div class="info-item">
+                  <label>Weapon Subtype</label>
+                  <span>{{ item.properties['weaponSubtype'] }}</span>
+                </div>
+              }
+              @if (item.properties['damageRoll']) {
+                <div class="info-item">
+                  <label>Damage</label>
+                  <span>{{ item.properties['damageRoll'] }}</span>
+                </div>
+              }
+              @if (item.properties['armor'] !== undefined) {
+                <div class="info-item">
+                  <label>Armor</label>
+                  <span>{{ item.properties['armor'] }}</span>
+                </div>
+              }
+              @if (item.properties['evasion'] !== undefined) {
+                <div class="info-item">
+                  <label>Evasion</label>
+                  <span>{{ item.properties['evasion'] }}</span>
+                </div>
+              }
+              @if (item.properties['attackSpeed'] !== undefined) {
+                <div class="info-item">
+                  <label>Attack Speed</label>
+                  <span>{{ item.properties['attackSpeed'] }}s</span>
+                </div>
+              }
+              @if (item.properties['healthRestore'] !== undefined) {
+                <div class="info-item">
+                  <label>Health Restore</label>
+                  <span>{{ item.properties['healthRestore'] }} HP</span>
+                </div>
+              }
+              @if (item.properties['manaRestore'] !== undefined) {
+                <div class="info-item">
+                  <label>Mana Restore</label>
+                  <span>{{ item.properties['manaRestore'] }} MP</span>
+                </div>
+              }
+            </div>
+          </section>
+        }
+
+        <!-- Quality System Section -->
+        @if (item.allowedQualities && item.allowedQualities.length > 0) {
+          <section class="detail-section">
+            <h3>Allowed Qualities</h3>
+            <div class="badge-list">
+              @for (qualityId of item.allowedQualities; track qualityId) {
+                <span class="badge quality-badge">{{ qualityId }}</span>
+              }
+            </div>
+          </section>
+        }
+
+        <!-- Trait System Section -->
+        @if (item.allowedTraits && item.allowedTraits.length > 0) {
+          <section class="detail-section">
+            <h3>Allowed Traits</h3>
+            <div class="badge-list">
+              @for (traitId of item.allowedTraits; track traitId) {
+                <span class="badge trait-badge">{{ traitId }}</span>
+              }
+            </div>
+          </section>
+        }
+
+        <!-- Icon Configuration Section -->
+        @if (item.icon) {
+          <section class="detail-section">
+            <h3>Icon Configuration</h3>
+            <div class="info-grid">
+              <div class="info-item full-width">
+                <label>Icon Path</label>
+                <code>{{ item.icon.path }}</code>
+              </div>
+              @if (item.icon.material) {
+                <div class="info-item">
+                  <label>Material</label>
+                  <span>{{ item.icon.material }}</span>
+                </div>
+              }
+            </div>
+          </section>
+        }
+
+        <!-- Edit Actions (Disabled) -->
+        <div class="edit-actions">
+          <button class="button-primary" [disabled]="true" (click)="saveChanges()">
+            Save Changes
+          </button>
+          <button class="button-tertiary" [disabled]="true" (click)="cancelEdit()">
+            Cancel
+          </button>
+        </div>
+      </div>
+    } @else {
+      <div class="empty-state-detail">
+        <span class="material-symbols-outlined">arrow_back</span>
+        <h3>No Item Selected</h3>
+        <p>Select an item from the list to view its details</p>
+      </div>
+    }
+  </main>
+</div>
