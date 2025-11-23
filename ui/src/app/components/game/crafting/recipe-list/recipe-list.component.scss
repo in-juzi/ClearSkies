@@ -204,7 +204,7 @@
 }
 
 .unlock-hint {
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-s);
   color: #fbbf24;
   margin-bottom: var(--spacing-m);
   font-style: italic;
@@ -219,7 +219,7 @@
 .ingredient {
   padding: var(--spacing-2xs) var(--spacing-s);
   border-radius: var(--radius-xs);
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-s);
   font-weight: 500;
 
   &.has-enough {

@@ -347,7 +347,7 @@
   }
 
   .ability-cost {
-    font-size: var(--font-size-xs);
+    font-size: var(--font-size-s);
     color: rgba(255, 255, 255, 0.7);
   }
 
@@ -357,7 +357,7 @@
     right: var(--spacing-xs);
     background: rgba(0, 0, 0, 0.7);
     color: var(--color-damage-crit);
-    font-size: var(--font-size-xs);
+    font-size: var(--font-size-s);
     font-weight: bold;
     padding: var(--spacing-2xs) var(--spacing-xs);
     border-radius: var(--radius-xs);
@@ -445,7 +445,7 @@
 
   .log-timestamp {
     color: var(--color-text-muted);
-    font-size: var(--font-size-xs);
+    font-size: var(--font-size-s);
     font-family: monospace;
     margin-right: var(--spacing-s);
     opacity: 0.7;

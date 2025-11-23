@@ -8,7 +8,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  z-index: var(--z-modal);
   color: var(--color-text-primary);
   font-family: inherit;
 }
@@ -312,7 +312,7 @@
     }
 
     .hint-text {
-      font-size: var(--font-size-xs);
+      font-size: var(--font-size-s);
     }
   }
 }

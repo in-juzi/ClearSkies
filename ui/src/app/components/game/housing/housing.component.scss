@@ -127,7 +127,7 @@
 
     .property-location {
       color: var(--color-text-secondary);
-      font-size: var(--font-size-xs);
+      font-size: var(--font-size-s);
     }
   }
 
@@ -136,7 +136,7 @@
 
     .capacity-info {
       color: var(--color-text-secondary);
-      font-size: var(--font-size-xs);
+      font-size: var(--font-size-s);
       margin-bottom: var(--spacing-xs);
     }
 
@@ -155,7 +155,7 @@
     padding-top: var(--spacing-s);
     border-top: var(--border-width-thin) solid var(--color-surface-border);
     color: var(--color-text-secondary);
-    font-size: var(--font-size-xs);
+    font-size: var(--font-size-s);
   }
 }
 
@@ -261,7 +261,7 @@
   .tier-requirements {
     margin-bottom: var(--spacing-s);
     color: var(--color-text-secondary);
-    font-size: var(--font-size-xs);
+    font-size: var(--font-size-s);
   }
 
   .tier-cost {

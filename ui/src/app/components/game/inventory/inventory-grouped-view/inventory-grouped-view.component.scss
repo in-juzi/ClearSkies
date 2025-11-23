@@ -46,7 +46,7 @@
 .group-meta {
   display: flex;
   gap: var(--spacing-m);
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-s);
   color: var(--color-text-label);
 }
 
@@ -102,7 +102,7 @@
         position: absolute;
         top: var(--spacing-2xs);
         right: var(--spacing-2xs);
-        font-size: var(--font-size-xs);
+        font-size: var(--font-size-s);
       }
     }
 

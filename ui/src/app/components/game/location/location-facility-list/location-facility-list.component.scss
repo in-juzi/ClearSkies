@@ -44,7 +44,7 @@
     padding: var(--spacing-xs) var(--spacing-s);
     background-color: rgba(138, 43, 226, 0.3);
     border-radius: var(--radius-s);
-    font-size: var(--font-size-xs);
+    font-size: var(--font-size-s);
     color: var(--color-text-label);
     margin-top: var(--spacing-s);
   }
@@ -106,7 +106,7 @@
     justify-content: space-between;
     align-items: center;
     margin: var(--spacing-m) 0;
-    font-size: var(--font-size-xs);
+    font-size: var(--font-size-s);
     color: var(--color-text-muted);
   }
 
@@ -114,7 +114,7 @@
     background-color: rgba(139, 0, 0, 0.5);
     padding: var(--spacing-xs) var(--spacing-s);
     border-radius: var(--radius-s);
-    font-size: var(--font-size-xs);
+    font-size: var(--font-size-s);
     color: var(--color-text-label);
   }
 

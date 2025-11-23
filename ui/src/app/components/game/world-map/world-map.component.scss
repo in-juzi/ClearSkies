@@ -126,7 +126,7 @@
 // Travel time label
 ::ng-deep .travel-time-label {
   fill: var(--color-text-muted);
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-s);
   font-weight: var(--font-weight-medium);
   font-family: var(--font-family-primary);
   pointer-events: none;
@@ -233,7 +233,7 @@
   .map-legend {
     bottom: var(--spacing-s);
     right: var(--spacing-s);
-    font-size: var(--font-size-xs);
+    font-size: var(--font-size-s);
     min-width: var(--spacing-6xl);
   }
 

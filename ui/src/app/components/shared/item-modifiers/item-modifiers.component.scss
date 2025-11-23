@@ -11,13 +11,13 @@
     .quality-badge,
     .trait-badge,
     .tier-badge {
-      font-size: var(--font-size-xs);
+      font-size: var(--font-size-s);
       padding: var(--spacing-xxs);
     }
 
     .quality-badge-name,
     .trait-badge-name {
-      font-size: var(--font-size-xs);
+      font-size: var(--font-size-s);
       padding: var(--spacing-xxs);
     }
   }
@@ -213,6 +213,6 @@
 // Inline-Text styling
 .inline-text {
   color: var(--color-text-muted);
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-s);
   font-style: italic;
 }

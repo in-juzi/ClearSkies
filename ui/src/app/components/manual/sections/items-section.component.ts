@@ -307,7 +307,7 @@ import { IconComponent } from '../../shared/icon/icon.component';
           margin-bottom: var(--spacing-s);
 
           .subcategory-tag {
-            font-size: var(--font-size-xs);
+            font-size: var(--font-size-s);
             padding: 2px var(--spacing-xs);
             background: var(--color-accent-purple-dark);
             color: var(--color-text-primary);
@@ -386,7 +386,7 @@ import { IconComponent } from '../../shared/icon/icon.component';
           .rarity-badge {
             padding: var(--spacing-xs) var(--spacing-s);
             border-radius: var(--radius-s);
-            font-size: var(--font-size-xs);
+            font-size: var(--font-size-s);
             font-weight: var(--font-weight-semibold);
             text-transform: uppercase;
           }

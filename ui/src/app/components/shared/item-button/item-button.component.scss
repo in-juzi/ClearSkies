@@ -179,7 +179,7 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-s);
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-s);
 }
 
 .effect-icon {
@@ -225,6 +225,6 @@
   }
 
   .tooltip-description {
-    font-size: var(--font-size-xs);
+    font-size: var(--font-size-s);
   }
 }

@@ -215,7 +215,7 @@ app-inventory-list-view, app-inventory-grouped-view {
 .quality-level-badge {
   padding: var(--spacing-2xs) var(--spacing-s);
   border-radius: var(--radius-s);
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-s);
   font-weight: var(--font-weight-bold);
   background: rgba(59, 130, 246, 0.2);
   border: var(--border-width-thin) solid currentColor;
@@ -281,7 +281,7 @@ app-inventory-list-view, app-inventory-grouped-view {
 .trait-level-badge {
   padding: var(--spacing-2xs) var(--spacing-s);
   border-radius: var(--radius-s);
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-s);
   font-weight: var(--font-weight-bold);
   text-transform: uppercase;
   border: var(--border-width-thin) solid currentColor;
@@ -316,7 +316,7 @@ app-inventory-list-view, app-inventory-grouped-view {
 }
 
 .effect-label {
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-s);
   color: var(--color-text-label);
   text-transform: uppercase;
   letter-spacing: var(--letter-spacing-wide);
@@ -563,7 +563,7 @@ app-inventory-list-view, app-inventory-grouped-view {
   border: var(--border-light);
   border-radius: var(--radius-s);
   color: var(--color-text-primary);
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-s);
   cursor: pointer;
 
   &:hover {

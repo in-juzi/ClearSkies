@@ -166,7 +166,7 @@
 
 // Ability name
 .ability-name {
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-s);
   font-weight: 600;
   color: var(--color-text-primary);
   text-align: center;
@@ -333,7 +333,7 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-xs);
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-s);
   color: var(--color-text-primary);
   padding: var(--spacing-xs) 0;
 
@@ -381,7 +381,7 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-xs);
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-s);
   padding: var(--spacing-xs) 0;
 
   &:not(:last-child) {
@@ -456,7 +456,7 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-xs);
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-s);
   color: var(--color-text-primary);
   padding: var(--spacing-2xs) 0;
 
@@ -490,7 +490,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-s);
 }
 
 .stat-label {
@@ -536,7 +536,7 @@
   }
 
   .tooltip-description {
-    font-size: var(--font-size-xs);
+    font-size: var(--font-size-s);
   }
 }
 
@@ -551,7 +551,7 @@
 
 .section-title {
   color: var(--color-secondary-dark);
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-s);
   margin-bottom: var(--spacing-s);
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -569,7 +569,7 @@
   justify-content: space-between;
   padding: var(--spacing-xs) 0;
   border-bottom: var(--border-width-thin) solid rgba(102, 126, 234, 0.1);
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-s);
 
   &:last-child {
     border-bottom: none;

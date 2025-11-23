@@ -13,7 +13,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: 1000;
+    z-index: var(--z-modal);
     padding: 0;
     background: transparent;
   }
@@ -26,13 +26,13 @@
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.7);
-  z-index: 999;
+  z-index: var(--z-modal-backdrop);
   backdrop-filter: blur(var(--spacing-xs));
 }
 
 .manual-card {
   position: relative;
-  z-index: 1001;
+  z-index: var(--z-modal);
   background: var(--color-bg-primary);
   border-radius: var(--radius-l);
   box-shadow: var(--shadow-xl);

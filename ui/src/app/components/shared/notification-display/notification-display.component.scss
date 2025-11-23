@@ -4,7 +4,7 @@
   position: fixed;
   top: var(--spacing-l);
   right: var(--spacing-l);
-  z-index: 9999;
+  z-index: var(--z-notification);
   display: flex;
   flex-direction: column;
   gap: var(--spacing-m);

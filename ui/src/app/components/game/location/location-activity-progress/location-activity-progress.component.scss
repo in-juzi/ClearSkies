@@ -218,7 +218,7 @@
 .log-timestamp {
   color: var(--color-text-muted);
   font-family: var(--font-monospace);
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-s);
   min-width: var(--spacing-5xl);
   flex-shrink: 0;
   align-content: center;
@@ -241,7 +241,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--spacing-s);
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-s);
 }
 
 .reward-mini {
@@ -270,7 +270,7 @@
   border-radius: var(--radius-2xs);
   color: var(--color-bg-primary);
   font-weight: var(--font-weight-bold);
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-s);
   box-shadow: var(--shadow-glow-moon);
   animation: pulse 1s ease-in-out infinite;
 }

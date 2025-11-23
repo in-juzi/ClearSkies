@@ -135,7 +135,7 @@
     justify-content: space-between;
     align-items: center;
     margin-top: var(--spacing-m);
-    font-size: var(--font-size-xs);
+    font-size: var(--font-size-s);
     color: var(--color-text-muted);
   }
 
@@ -143,7 +143,7 @@
     background-color: rgba(139, 0, 0, 0.5);
     padding: var(--spacing-2xs) var(--spacing-s);
     border-radius: var(--radius-s);
-    font-size: var(--font-size-xs);
+    font-size: var(--font-size-s);
     color: var(--color-error-light);
   }
 }

@@ -7,14 +7,14 @@
   padding: var(--spacing-xs) var(--spacing-s);
   background: var(--color-bg-overlay);
   border-radius: var(--radius-s);
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-s);
   color: var(--color-text-primary);
   line-height: 1.4;
   height: var(--spacing-3xl);
 
   // Compact mode (smaller, tighter spacing)
   &.compact {
-    font-size: calc(var(--font-size-xs) * 0.9);
+    font-size: calc(var(--font-size-s) * 0.9);
     gap: var(--spacing-2xs);
     padding: calc(var(--spacing-xs) * 0.75) var(--spacing-xs);
   }

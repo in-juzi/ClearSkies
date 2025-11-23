@@ -285,7 +285,7 @@
 .log-timestamp {
   color: var(--color-text-muted);
   font-family: var(--font-monospace);
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-s);
   min-width: var(--spacing-5xl);
   flex-shrink: 0;
   align-content: center;
@@ -308,7 +308,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--spacing-s);
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-s);
 }
 
 .reward-mini {
@@ -331,7 +331,7 @@
 .quality-badge-mini {
   padding: var(--border-width-thin) var(--spacing-xs);
   border-radius: var(--radius-s);
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-s);
   font-weight: var(--font-weight-medium);
 
   &.common {
@@ -362,7 +362,7 @@
 
 .item-details-mini {
   color: var(--color-text-muted);
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-s);
   font-style: italic;
 }
 
@@ -418,7 +418,7 @@
     padding: var(--spacing-xs) var(--spacing-s);
     background-color: rgba(138, 43, 226, 0.3);
     border-radius: var(--radius-s);
-    font-size: var(--font-size-xs);
+    font-size: var(--font-size-s);
     color: var(--color-text-label);
     margin-top: var(--spacing-s);
   }
@@ -466,7 +466,7 @@
     justify-content: space-between;
     align-items: center;
     margin-top: var(--spacing-m);
-    font-size: var(--font-size-xs);
+    font-size: var(--font-size-s);
     color: var(--color-text-muted);
   }
 
@@ -474,7 +474,7 @@
     background-color: rgba(139, 0, 0, 0.5);
     padding: 0.2rem var(--spacing-s);
     border-radius: var(--radius-s);
-    font-size: var(--font-size-xs);
+    font-size: var(--font-size-s);
     color: var(--color-error-light);
   }
 }
@@ -664,7 +664,7 @@
     justify-content: space-between;
     align-items: center;
     margin: var(--spacing-m) 0;
-    font-size: var(--font-size-xs);
+    font-size: var(--font-size-s);
     color: var(--color-text-muted);
   }
 

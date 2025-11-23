@@ -82,7 +82,7 @@
   }
 
   .slot-label {
-    font-size: var(--font-size-xs);
+    font-size: var(--font-size-s);
     color: var(--color-text-label-alt);
     text-transform: uppercase;
     letter-spacing: var(--letter-spacing-wide);
@@ -122,7 +122,7 @@
   }
 
   .item-stat {
-    font-size: var(--font-size-xs);
+    font-size: var(--font-size-s);
     color: var(--color-text-tertiary);
     text-align: center;
   }
@@ -131,7 +131,7 @@
     position: absolute;
     top: var(--spacing-2xs);
     right: var(--spacing-2xs);
-    font-size: var(--font-size-xs);
+    font-size: var(--font-size-s);
     padding: var(--spacing-2xs) var(--spacing-xs);
     border-radius: var(--radius-s);
     background: var(--color-bg-overlay-strong);
