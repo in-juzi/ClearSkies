@@ -110,18 +110,22 @@
 - ✅ Construction transaction safety (completed - rollback logic prevents gold loss on project creation failures)
 - ✅ Secondary accent token system (completed - starlight color tokens for borders/text, eliminates legacy purple references)
 - ✅ Combat state management improvements (completed - fixed isInCombat() validation, proper state cleanup after victory)
+- ✅ SCSS mixin library (completed - 14 reusable mixins for modals/scrollbars/inputs/cards/buttons, eliminates 330+ lines of duplicate code)
+- ✅ Design system utility classes (completed - 30+ utilities for flex/spacing/borders/state/overflow patterns)
+- ✅ Component SCSS migration to mixins (completed - all 53 components use centralized mixin patterns, 15-35% file size reduction)
+- ✅ Admin panel (completed - development tool with design system preview and game data browser)
 
 **Recent Changes** (Last 10 commits):
+- docs: update design system documentation
+- refactor: migrate all components to use SCSS mixins and utility classes
+- feat: add admin panel with design system preview
+- build: configure Angular to use SCSS mixin library
+- refactor: migrate bank component to use SCSS mixins
+- feat: add utility classes to design system
+- feat: add SCSS mixin library for reusable UI patterns
 - chore: add combat state debugging utilities
 - style: migrate auth and remaining game components to secondary accent tokens
 - style: migrate shared components to secondary accent tokens
-- style: migrate game components to secondary accent tokens
-- style: migrate combat component to secondary accent tokens
-- style: migrate manual sections to secondary accent tokens
-- style: add secondary accent tokens to design system
-- fix: improve combat state management and cleanup
-- style: migrate all component buttons to design token classes
-- docs: add button migration plan for design system v3
 
 **Known Issues**:
 - None currently identified
@@ -535,6 +539,29 @@ See [project/docs/005-content-generator-agent.md](project/docs/005-content-gener
 5. **Shadows** (5 elevations + glow effects): Standard shadows + moon/starlit/twilight glows
 6. **Gradients** (use sparingly): Moon yellow, twilight blue, health, mana, XP
 7. **Component Tokens**: Buttons, cards, inputs, modals, scrollbar
+8. **Utility Classes** (30+ classes): Flex layout, spacing shortcuts, borders, state, overflow
+
+### Utility Classes
+Pre-built CSS classes for common patterns in templates:
+
+**Flex Layout**:
+- `.flex-between`, `.flex-start`, `.flex-end` - Flexbox alignment
+- `.flex-column-gap`, `.flex-row-gap` - Flex with spacing
+
+**Spacing Shortcuts**:
+- `.p-card`, `.p-section` - Padding presets
+- `.mb-section`, `.mt-section` - Margin presets
+
+**Borders**:
+- `.border-bottom`, `.border-top`, `.border-default` - Border utilities
+- `.border-radius-card`, `.border-radius-button` - Border radius presets
+
+**State**:
+- `.disabled-state`, `.loading-state` - Interaction states
+- `.clickable`, `.no-select` - Cursor and selection
+
+**Overflow**:
+- `.overflow-hidden`, `.overflow-auto`, `.overflow-y-auto` - Overflow control
 
 ### Common Patterns
 
@@ -635,6 +662,173 @@ cd project/utils && node audit-design-tokens.js
 ```
 
 **Full Documentation**: See migration guide for detailed patterns, style guide for visual reference, and summary for quick onboarding.
+
+## SCSS Mixin Library
+
+**Overview**: Reusable SCSS mixins that eliminate code duplication and standardize common UI patterns across components.
+
+**Location**: [ui/src/_mixins.scss](ui/src/_mixins.scss)
+
+**Benefits**:
+- ✅ Eliminates ~330 lines of duplicate code across 53 components
+- ✅ Reduces component SCSS file sizes by 15-35%
+- ✅ Standardizes modals, scrollbars, inputs, cards, buttons
+- ✅ Easier global updates (change mixin instead of 50+ files)
+
+### Quick Reference
+
+**Core Mixins** (most commonly used):
+```scss
+@import 'mixins';
+
+// Modal/Dialog
+.my-modal { @include modal-container(var(--container-m), 80vh); }
+.modal-header { @include modal-header(); }
+.close-button { @include close-button(); }
+
+// Scrollbar
+.scrollable-list { @include custom-scrollbar(); }
+
+// Forms
+.search-input { @include input-field(); }
+
+// Cards
+.item-card { @include hover-card(); }
+.info-panel { @include panel(); }
+
+// Layout
+.items-grid { @include flex-grid(var(--spacing-s), row wrap); }
+
+// Empty States
+.no-items { @include empty-state(); }
+
+// Buttons
+.craft-button { @include action-button(); }
+.cancel-button { @include secondary-action-button(); }
+```
+
+### Available Mixins
+
+| Mixin | Purpose | Saves |
+|-------|---------|-------|
+| `modal-container()` | Fixed-position modal dialog | ~18 lines |
+| `modal-header()` | Modal header with title/close | ~8 lines |
+| `close-button()` | Standardized X button | ~12 lines |
+| `custom-scrollbar()` | Consistent scrollbar styling | ~16 lines |
+| `input-field()` | Form input appearance | ~14 lines |
+| `hover-card()` | Interactive card with hover | ~12 lines |
+| `panel()` | Basic panel/card container | ~6 lines |
+| `flex-grid()` | Flexbox grid layout | ~4 lines |
+| `empty-state()` | Empty state messages | ~4 lines |
+| `action-button()` | Primary action button | ~17 lines |
+| `secondary-action-button()` | Secondary action button | ~17 lines |
+| `section-header()` | Consistent section headers | ~5 lines |
+| `truncate-text()` | Text truncation with ellipsis | ~3 lines |
+| `visually-hidden()` | Hide but keep accessible | ~8 lines |
+| `aspect-ratio()` | Fixed aspect ratio containers | ~10 lines |
+
+### Migration Example
+
+**Before** (Bank component - 364 lines):
+```scss
+.bank-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: var(--container-3xl);
+  max-height: 90vh;
+  background: var(--gradient-card);
+  border: var(--border-default);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-xl);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.bank-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-l) var(--spacing-2xl);
+  border-bottom: 1px solid var(--color-surface-border);
+  background: var(--color-bg-elevated);
+}
+
+.close-button {
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-4xl);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--color-text-primary);
+  }
+}
+```
+
+**After** (Bank component - 304 lines, **16.5% reduction**):
+```scss
+@import 'mixins';
+
+.bank-modal {
+  @include modal-container(var(--container-3xl), 90vh);
+}
+
+.bank-header {
+  @include modal-header(var(--spacing-2xl));
+}
+
+.close-button {
+  @include close-button();
+}
+```
+
+### When to Use Mixins vs. Utility Classes
+
+**Use Mixins** when:
+- Pattern needs customization (parameters)
+- Multiple related styles applied together
+- Complex nesting or pseudo-elements
+
+**Use Utility Classes** when:
+- Simple, non-customizable patterns
+- Frequently used in templates
+- Composing multiple simple styles
+
+**Examples**:
+```scss
+// Mixins (customizable)
+@include modal-container(var(--container-3xl), 90vh);
+@include custom-scrollbar(var(--color-accent-blue));
+
+// Utility Classes (fixed patterns)
+.flex-between
+.border-bottom
+.text-muted
+.overflow-hidden
+```
+
+### Migration Checklist
+
+When migrating a component:
+- [ ] Import mixins: `@import 'mixins';`
+- [ ] Replace modal containers → `@include modal-container()`
+- [ ] Replace modal headers → `@include modal-header()`
+- [ ] Replace close buttons → `@include close-button()`
+- [ ] Replace scrollbars → `@include custom-scrollbar()`
+- [ ] Replace form inputs → `@include input-field()`
+- [ ] Replace flex grids → `@include flex-grid()`
+- [ ] Replace empty states → `@include empty-state()`
+- [ ] Replace action buttons → `@include action-button()`
+- [ ] Test visually in browser
+- [ ] Verify no regressions
+
+**Full Documentation**: [project/docs/071-mixin-library-guide.md](project/docs/071-mixin-library-guide.md) - Complete guide with all mixins, parameters, and migration patterns
 
 ## Optimization Guidelines for AI
 
