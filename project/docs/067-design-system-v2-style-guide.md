@@ -160,7 +160,6 @@
 
 ### Font Scale
 ```
---font-size-xs:   10px  /* Tiny labels */
 --font-size-s:    11px  /* Small text */
 --font-size-m:    12px  /* Body text */
 --font-size-base: 14px  /* Default body */

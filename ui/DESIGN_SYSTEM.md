@@ -134,9 +134,9 @@ The spacing system uses a 4px base unit for consistency:
 
 #### Font Sizes
 ```scss
---font-size-xs: 11px
---font-size-s: 12px
---font-size-m: 14px
+--font-size-s: 11px
+--font-size-m: 12px
+--font-size-base: 14px
 --font-size-l: 16px
 --font-size-xl: 18px
 --font-size-2xl: 20px
