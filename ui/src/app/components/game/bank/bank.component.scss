@@ -1,3 +1,5 @@
+@use 'mixins' as *;
+
 .bank-overlay {
   position: fixed;
   top: 0;
@@ -8,31 +10,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: var(--z-modal);
   animation: fadeIn 0.2s ease-in-out;
 }
 
 .bank-modal {
-  background: linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%);
-  border: 2px solid var(--color-secondary);
-  border-radius: var(--radius-m);
-  padding: 0;
-  width: 90%;
-  max-width: var(--container-3xl);
-  max-height: 90vh;
-  display: flex;
-  flex-direction: column;
-  box-shadow: var(--shadow-xl);
+  @include modal-container(var(--container-3xl), 90vh);
   animation: slideIn 0.3s ease-out;
   position: absolute;
 }
 
 .bank-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--spacing-l) var(--spacing-2xl);
-  border-bottom: 1px solid var(--color-surface-border);
+  @include modal-header(var(--spacing-2xl));
   background: linear-gradient(to right, rgba(255, 215, 0, 0.1), transparent);
 
   &.draggable-header {
@@ -45,7 +34,6 @@
   }
 
   h2 {
-    margin: 0;
     color: var(--color-secondary);
     display: flex;
     align-items: center;
@@ -54,29 +42,13 @@
   }
 
   .close-button {
-    background: none;
-    border: none;
-    color: var(--color-text-secondary);
-    font-size: var(--font-size-4xl);
-    cursor: pointer;
-    padding: 0;
-    width: var(--spacing-3xl);
-    height: var(--spacing-3xl);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: color 0.2s, transform 0.2s;
-
-    &:hover {
-      color: var(--color-secondary);
-      transform: scale(1.1);
-    }
+    @include close-button();
   }
 }
 
 .capacity-section {
   padding: var(--spacing-l) var(--spacing-2xl);
-  border-bottom: 1px solid var(--color-surface-border);
+  border-bottom: var(--border-light);
 
   .capacity-label {
     display: flex;
@@ -95,7 +67,7 @@
     background: var(--color-bg-primary);
     border-radius: var(--radius-xs);
     overflow: hidden;
-    border: 1px solid var(--color-surface-border);
+    border: var(--border-width-thin) solid var(--color-surface-border);
 
     .capacity-fill {
       height: 100%;
@@ -119,15 +91,14 @@
 // Bank Actions
 .bank-actions {
   padding: var(--spacing-m) var(--spacing-2xl);
-  border-bottom: 1px solid var(--color-surface-border);
+  border-bottom: var(--border-light);
   background: rgba(0, 0, 0, 0.2);
   display: flex;
   gap: var(--spacing-m);
 }
 
 .bank-content {
-  display: flex;
-  gap: var(--spacing-l);
+  @include flex-grid(var(--spacing-l));
   padding: var(--spacing-l) var(--spacing-2xl);
   flex: 1;
   overflow: hidden;
@@ -142,7 +113,7 @@
   background: rgba(0, 0, 0, 0.2);
   border-radius: var(--radius-l);
   padding: var(--spacing-l);
-  border: 1px solid var(--color-surface-border);
+  border: var(--border-width-thin) solid var(--color-surface-border);
 
   .section-header {
     display: flex;
@@ -172,17 +143,7 @@
 
     .category-filter,
     .search-input {
-      background: var(--color-bg-primary);
-      border: 1px solid var(--color-surface-border);
-      border-radius: var(--radius-xs);
-      padding: var(--spacing-xs) var(--spacing-m);
-      color: var(--color-text-primary);
-      font-size: var(--font-size-s);
-
-      &:focus {
-        outline: none;
-        border-color: var(--color-accent-blue);
-      }
+      @include input-field();
     }
 
     .category-filter {
@@ -203,10 +164,10 @@
       flex: 1;
       padding: var(--spacing-xs) var(--spacing-s);
       background: var(--color-bg-primary);
-      border: 1px solid var(--color-surface-border);
+      border: var(--border-width-thin) solid var(--color-surface-border);
       border-radius: var(--radius-xs);
       color: var(--color-text-secondary);
-      font-size: var(--font-size-xs);
+      font-size: var(--font-size-s);
       font-weight: 500;
       cursor: pointer;
       transition: all var(--transition-fast) ease;
@@ -233,11 +194,10 @@
   }
 
   .items-grid {
-    display: flex;
-    flex-flow: row wrap;
+    @include flex-grid(var(--spacing-s), row wrap);
+    @include custom-scrollbar();
     flex: 1;
     align-content: flex-start;
-    gap: var(--spacing-s);
     overflow-y: auto;
     padding: var(--spacing-s);
     background: rgba(0, 0, 0, 0.1);
@@ -281,14 +241,12 @@
     }
 
     .empty-state {
+      @include empty-state();
       grid-column: 1 / -1;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: var(--spacing-3xl);
-      color: var(--color-text-secondary);
-      text-align: center;
 
       p {
         margin: var(--spacing-s) 0;
@@ -311,7 +269,7 @@
 
 .bank-footer {
   padding: var(--spacing-l) var(--spacing-2xl);
-  border-top: 1px solid var(--color-surface-border);
+  border-top: var(--border-light);
   background: rgba(0, 0, 0, 0.2);
 
   p {
@@ -341,24 +299,5 @@
   to {
     transform: translateY(0);
     opacity: 1;
-  }
-}
-
-// Scrollbar styling
-.items-grid::-webkit-scrollbar {
-  width: var(--spacing-s);
-}
-
-.items-grid::-webkit-scrollbar-track {
-  background: var(--color-bg-primary);
-  border-radius: var(--radius-xs);
-}
-
-.items-grid::-webkit-scrollbar-thumb {
-  background: var(--color-surface-border);
-  border-radius: var(--radius-xs);
-
-  &:hover {
-    background: var(--color-surface-border-light);
   }
 }
