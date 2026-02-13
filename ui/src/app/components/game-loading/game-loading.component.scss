@@ -21,15 +21,6 @@
 
 // Character Name
 .character-name {
-  opacity: 0;
-  transform: translateY(var(--spacing-xl));
-  transition: opacity var(--transition-slow) ease, transform var(--transition-slow) ease;
-
-  &.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
   h1 {
     font-size: var(--font-size-5xl);
     font-weight: var(--font-weight-bold);
@@ -43,12 +34,7 @@
 // Location Status
 .location-status {
   margin-top: var(--spacing-3xl);
-  opacity: 0;
-  transition: opacity var(--transition-normal) ease;
-
-  &.visible {
-    opacity: 1;
-  }
+  color: var(--color-text-primary);
 
   .location {
     font-size: var(--font-size-xl);
@@ -79,12 +65,6 @@
 // Stats (Health/Mana)
 .stats {
   margin-top: var(--spacing-3xl);
-  opacity: 0;
-  transition: opacity var(--transition-normal) ease;
-
-  &.visible {
-    opacity: 1;
-  }
 
   // Side by side layout for health and mana
   display: grid;
@@ -112,7 +92,7 @@
 
     .stat-bar {
       width: 100%;
-      height: var(--spacing-3xl);
+      height: var(--spacing-m);
       background: rgba(255, 255, 255, 0.1);
       border-radius: var(--radius-s);
       overflow: hidden;
@@ -170,12 +150,6 @@
 // Connection Status
 .connection-status {
   margin-top: var(--spacing-3xl);
-  opacity: 0;
-  transition: opacity var(--transition-normal) ease;
-
-  &.visible {
-    opacity: 1;
-  }
 
   .status-message {
     font-size: var(--font-size-m);
@@ -189,64 +163,85 @@
   }
 }
 
-// Animations
-.fade-in {
-  animation: fadeIn var(--transition-slow) ease forwards;
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(var(--spacing-m));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.fade-in-delay-1 {
-  animation: fadeIn var(--transition-slow) ease 0.2s forwards;
-  opacity: 0;
+// Animations - only animate when parent is visible
+.visible {
+  .fade-in {
+    opacity: 0;
+    animation: fadeIn 600ms ease forwards;
+  }
+
+  .fade-in-delay-1 {
+    opacity: 0;
+    animation: fadeIn 600ms ease 0.2s forwards;
+  }
+
+  .fade-in-delay-2 {
+    opacity: 0;
+    animation: fadeIn 600ms ease 0.4s forwards;
+  }
+
+  .fade-in-delay-3 {
+    opacity: 0;
+    animation: fadeIn 600ms ease 0.6s forwards;
+  }
+
+  .fade-in-delay-4 {
+    opacity: 0;
+    animation: fadeIn 600ms ease 0.8s forwards;
+  }
+
+  .fade-in-delay-5 {
+    opacity: 0;
+    animation: fadeIn 600ms ease 1s forwards;
+  }
+
+  .fade-in-delay-6 {
+    opacity: 0;
+    animation: fadeIn 600ms ease 1.2s forwards;
+  }
+
+  .fade-in-delay-7 {
+    opacity: 0;
+    animation: fadeIn 600ms ease 1.4s forwards;
+  }
+
+  .fade-in-delay-8 {
+    opacity: 0;
+    animation: fadeIn 600ms ease 1.6s forwards;
+  }
 }
 
-.fade-in-delay-2 {
-  animation: fadeIn var(--transition-slow) ease 0.4s forwards;
-  opacity: 0;
-}
-
-.fade-in-delay-3 {
-  animation: fadeIn var(--transition-slow) ease 0.6s forwards;
-  opacity: 0;
-}
-
-.fade-in-delay-4 {
-  animation: fadeIn var(--transition-slow) ease 0.8s forwards;
-  opacity: 0;
-}
-
-.fade-in-delay-5 {
-  animation: fadeIn var(--transition-slow) ease 1s forwards;
-  opacity: 0;
-}
-
-.fade-in-delay-6 {
-  animation: fadeIn var(--transition-slow) ease 1.2s forwards;
-  opacity: 0;
-}
-
-.fade-in-delay-7 {
-  animation: fadeIn var(--transition-slow) ease 1.4s forwards;
-  opacity: 0;
-}
-
+// Default state when not visible
+.fade-in,
+.fade-in-delay-1,
+.fade-in-delay-2,
+.fade-in-delay-3,
+.fade-in-delay-4,
+.fade-in-delay-5,
+.fade-in-delay-6,
+.fade-in-delay-7,
 .fade-in-delay-8 {
-  animation: fadeIn var(--transition-slow) ease 1.6s forwards;
   opacity: 0;
 }
 
 // Continue Button
 .continue-button-container {
   margin-top: var(--spacing-3xl);
-  opacity: 0;
-  transition: opacity var(--transition-normal) ease;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--spacing-m);
-
-  &.visible {
-    opacity: 1;
-  }
 
   // Continue button now uses .button-primary from design-tokens.scss
   .button-primary {
@@ -264,16 +259,7 @@
   }
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(var(--spacing-m));
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+
 
 @keyframes loading-dots {
   0%, 20% {
