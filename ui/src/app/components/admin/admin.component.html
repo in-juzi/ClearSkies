@@ -13,46 +13,145 @@
     <!-- Sidebar Navigation -->
     <aside class="admin-sidebar">
       <nav class="admin-nav">
-        <a
-          routerLink="/admin/dashboard"
-          routerLinkActive="active"
-          class="nav-item"
-        >
-          <span class="material-symbols-outlined">dashboard</span>
-          Dashboard
-        </a>
-        <a
-          routerLink="/admin/items"
-          routerLinkActive="active"
-          class="nav-item"
-        >
-          <span class="material-symbols-outlined">inventory_2</span>
-          Items
-        </a>
-        <a
-          routerLink="/admin/monsters"
-          routerLinkActive="active"
-          class="nav-item"
-        >
-          <span class="material-symbols-outlined">pets</span>
-          Monsters
-        </a>
-        <a
-          routerLink="/admin/locations"
-          routerLinkActive="active"
-          class="nav-item"
-        >
-          <span class="material-symbols-outlined">place</span>
-          Locations
-        </a>
-        <a
-          routerLink="/admin/design-system"
-          routerLinkActive="active"
-          class="nav-item"
-        >
-          <span class="material-symbols-outlined">palette</span>
-          Design System
-        </a>
+        <!-- Overview Section -->
+        <div class="nav-section">
+          <h3 class="nav-section-title">Overview</h3>
+          <a
+            routerLink="/admin/dashboard"
+            routerLinkActive="active"
+            class="nav-item"
+          >
+            <span class="material-symbols-outlined">dashboard</span>
+            Dashboard
+          </a>
+        </div>
+
+        <!-- Game Data Section -->
+        <div class="nav-section">
+          <h3 class="nav-section-title">Game Data</h3>
+          <a
+            routerLink="/admin/items"
+            routerLinkActive="active"
+            class="nav-item"
+          >
+            <span class="material-symbols-outlined">inventory_2</span>
+            Items
+          </a>
+          <a
+            routerLink="/admin/monsters"
+            routerLinkActive="active"
+            class="nav-item"
+          >
+            <span class="material-symbols-outlined">pets</span>
+            Monsters
+          </a>
+          <a
+            routerLink="/admin/abilities"
+            routerLinkActive="active"
+            class="nav-item"
+          >
+            <span class="material-symbols-outlined">shield</span>
+            Abilities
+          </a>
+          <a
+            routerLink="/admin/recipes"
+            routerLinkActive="active"
+            class="nav-item"
+          >
+            <span class="material-symbols-outlined">menu_book</span>
+            Recipes
+          </a>
+          <a
+            routerLink="/admin/locations"
+            routerLinkActive="active"
+            class="nav-item"
+          >
+            <span class="material-symbols-outlined">place</span>
+            Locations
+          </a>
+          <a
+            routerLink="/admin/quests"
+            routerLinkActive="active"
+            class="nav-item"
+          >
+            <span class="material-symbols-outlined">assignment</span>
+            Quests
+          </a>
+          <a
+            routerLink="/admin/vendors"
+            routerLinkActive="active"
+            class="nav-item"
+          >
+            <span class="material-symbols-outlined">storefront</span>
+            Vendors
+          </a>
+          <a
+            routerLink="/admin/activities"
+            routerLinkActive="active"
+            class="nav-item"
+          >
+            <span class="material-symbols-outlined">category</span>
+            Activities
+          </a>
+          <a
+            routerLink="/admin/drop-tables"
+            routerLinkActive="active"
+            class="nav-item"
+          >
+            <span class="material-symbols-outlined">inventory</span>
+            Drop Tables
+          </a>
+          <a
+            routerLink="/admin/facilities"
+            routerLinkActive="active"
+            class="nav-item"
+          >
+            <span class="material-symbols-outlined">store</span>
+            Facilities
+          </a>
+          <a
+            routerLink="/admin/biomes"
+            routerLinkActive="active"
+            class="nav-item"
+          >
+            <span class="material-symbols-outlined">landscape</span>
+            Biomes
+          </a>
+        </div>
+
+        <!-- Item System Section -->
+        <div class="nav-section">
+          <h3 class="nav-section-title">Item System</h3>
+          <a
+            routerLink="/admin/qualities"
+            routerLinkActive="active"
+            class="nav-item"
+          >
+            <span class="material-symbols-outlined">star</span>
+            Qualities
+          </a>
+          <a
+            routerLink="/admin/traits"
+            routerLinkActive="active"
+            class="nav-item"
+          >
+            <span class="material-symbols-outlined">auto_awesome</span>
+            Traits
+          </a>
+        </div>
+
+        <!-- Development Section -->
+        <div class="nav-section">
+          <h3 class="nav-section-title">Development</h3>
+          <a
+            routerLink="/admin/design-system"
+            routerLinkActive="active"
+            class="nav-item"
+          >
+            <span class="material-symbols-outlined">palette</span>
+            Design System
+          </a>
+        </div>
       </nav>
     </aside>
 

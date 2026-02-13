@@ -1,0 +1,187 @@
+<div class="facilities-container">
+  <!-- Facility List Sidebar -->
+  <aside class="facility-list-sidebar">
+    <div class="sidebar-header">
+      <h3>Facilities</h3>
+      <span class="facility-count">{{ filteredFacilities().length }} / {{ allFacilities.length }}</span>
+    </div>
+
+    <!-- Search -->
+    <div class="search-box">
+      <span class="material-symbols-outlined">search</span>
+      <input
+        type="text"
+        placeholder="Search facilities..."
+        [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event); applyFilters()"
+      />
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+      <div class="filter-group">
+        <label>Type</label>
+        <select
+          [ngModel]="filterType()"
+          (ngModelChange)="filterType.set($event); applyFilters()"
+        >
+          <option value="all">All Types</option>
+          <option value="crafting">Crafting</option>
+          <option value="trading">Trading</option>
+          <option value="bank">Bank</option>
+          <option value="gathering">Gathering</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Sort By</label>
+        <select
+          [ngModel]="sortBy()"
+          (ngModelChange)="sortBy.set($event); applyFilters()"
+        >
+          <option value="name">Name</option>
+          <option value="type">Type</option>
+          <option value="vendorCount">Vendor Count</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Facility List -->
+    <div class="facility-list">
+      @for (facility of filteredFacilities(); track facility.facilityId) {
+        <div
+          class="facility-list-item"
+          [class.selected]="selectedFacility()?.facilityId === facility.facilityId"
+          (click)="selectFacility(facility)"
+        >
+          <div class="facility-info">
+            <span class="facility-name">{{ facility.name }}</span>
+            <span class="facility-id">{{ facility.facilityId }}</span>
+          </div>
+          <div class="facility-stats-preview">
+            <span class="stat-badge type" [style.background-color]="getTypeColor(facility.type) + '33'" [style.color]="getTypeColor(facility.type)" [style.border-color]="getTypeColor(facility.type)">
+              {{ getTypeDisplay(facility.type) }}
+            </span>
+            @if (getVendorCount(facility) > 0) {
+              <span class="stat-badge vendor-count">{{ getVendorCount(facility) }} vendors</span>
+            }
+            @if (getCraftingSkillsCount(facility) > 0) {
+              <span class="stat-badge crafting-count">{{ getCraftingSkillsCount(facility) }} skills</span>
+            }
+          </div>
+        </div>
+      } @empty {
+        <div class="empty-state">
+          <span class="material-symbols-outlined">store</span>
+          <p>No facilities found</p>
+        </div>
+      }
+    </div>
+  </aside>
+
+  <!-- Facility Detail Panel -->
+  <main class="facility-detail-panel">
+    @if (selectedFacility(); as facility) {
+      <div class="detail-content">
+        <!-- Header -->
+        <div class="detail-header">
+          <div class="header-info">
+            <h2>{{ facility.name }}</h2>
+            <code class="facility-id-display">{{ facility.facilityId }}</code>
+          </div>
+          <div class="header-badges">
+            <span class="type-badge" [style.background-color]="getTypeColor(facility.type) + '33'" [style.color]="getTypeColor(facility.type)" [style.border-color]="getTypeColor(facility.type)">
+              {{ getTypeDisplay(facility.type) }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Basic Info Section -->
+        <section class="detail-section">
+          <h3>Basic Information</h3>
+          <div class="info-grid">
+            <div class="info-item full-width">
+              <label>Description</label>
+              <span>{{ facility.description }}</span>
+            </div>
+            <div class="info-item">
+              <label>Facility ID</label>
+              <code>{{ facility.facilityId }}</code>
+            </div>
+            <div class="info-item">
+              <label>Type</label>
+              <span class="type-badge" [style.background-color]="getTypeColor(facility.type) + '33'" [style.color]="getTypeColor(facility.type)" [style.border-color]="getTypeColor(facility.type)">
+                {{ getTypeDisplay(facility.type) }}
+              </span>
+            </div>
+            <div class="info-item">
+              <label>Icon</label>
+              <code>{{ facility.icon }}</code>
+            </div>
+          </div>
+        </section>
+
+        <!-- Vendors Section -->
+        @if (hasVendors(facility)) {
+          <section class="detail-section">
+            <h3>Vendors ({{ getVendorCount(facility) }})</h3>
+            <div class="vendors-grid">
+              @for (vendorId of facility.vendorIds; track vendorId) {
+                <div class="vendor-item">
+                  <span class="material-symbols-outlined">storefront</span>
+                  <code class="vendor-id">{{ vendorId }}</code>
+                </div>
+              }
+            </div>
+          </section>
+        }
+
+        <!-- Crafting Skills Section -->
+        @if (hasCraftingSkills(facility)) {
+          <section class="detail-section">
+            <h3>Crafting Skills ({{ getCraftingSkillsCount(facility) }})</h3>
+            <div class="crafting-skills-grid">
+              @for (skill of facility.craftingSkills; track skill) {
+                <div class="crafting-skill-item">
+                  <span class="material-symbols-outlined">construction</span>
+                  <span class="skill-name">{{ capitalizeFirst(skill) }}</span>
+                </div>
+              }
+            </div>
+          </section>
+        }
+
+        <!-- Activities Section -->
+        @if (hasActivities(facility)) {
+          <section class="detail-section">
+            <h3>Activities ({{ facility.activities.length }})</h3>
+            <div class="activities-grid">
+              @for (activityId of facility.activities; track activityId) {
+                <div class="activity-item">
+                  <span class="material-symbols-outlined">category</span>
+                  <code class="activity-id">{{ activityId }}</code>
+                </div>
+              }
+            </div>
+          </section>
+        }
+
+        <!-- Empty State for No Additional Features -->
+        @if (!hasVendors(facility) && !hasCraftingSkills(facility) && !hasActivities(facility)) {
+          <section class="detail-section">
+            <div class="empty-features">
+              <span class="material-symbols-outlined">info</span>
+              <p>This facility has no vendors, crafting skills, or activities configured.</p>
+            </div>
+          </section>
+        }
+      </div>
+    } @else {
+      <div class="empty-state-detail">
+        <span class="material-symbols-outlined">arrow_back</span>
+        <h3>No Facility Selected</h3>
+        <p>Select a facility from the list to view its details</p>
+      </div>
+    }
+  </main>
+</div>

@@ -1,0 +1,214 @@
+<div class="vendors-container">
+  <!-- Vendor List Sidebar -->
+  <aside class="vendor-list-sidebar">
+    <div class="sidebar-header">
+      <h3>Vendors</h3>
+      <span class="vendor-count">{{ filteredVendors().length }} / {{ allVendors.length }}</span>
+    </div>
+
+    <!-- Search -->
+    <div class="search-box">
+      <span class="material-symbols-outlined">search</span>
+      <input
+        type="text"
+        placeholder="Search vendors..."
+        [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event); applyFilters()"
+      />
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+      <div class="filter-group">
+        <label>Buyback</label>
+        <select
+          [ngModel]="filterBuyback()"
+          (ngModelChange)="filterBuyback.set($event); applyFilters()"
+        >
+          <option value="all">All Vendors</option>
+          <option value="accepts">Accepts Items</option>
+          <option value="no-buyback">No Buyback</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Sort By</label>
+        <select
+          [ngModel]="sortBy()"
+          (ngModelChange)="sortBy.set($event); applyFilters()"
+        >
+          <option value="name">Name</option>
+          <option value="stockCount">Stock Count</option>
+          <option value="sellMultiplier">Sell Price</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Vendor List -->
+    <div class="vendor-list">
+      @for (vendor of filteredVendors(); track vendor.vendorId) {
+        <div
+          class="vendor-list-item"
+          [class.selected]="selectedVendor()?.vendorId === vendor.vendorId"
+          (click)="selectVendor(vendor)"
+        >
+          <div class="vendor-info">
+            <span class="vendor-name">{{ vendor.name }}</span>
+            <span class="vendor-id">{{ vendor.vendorId }}</span>
+          </div>
+          <div class="vendor-stats-preview">
+            <span class="stat-badge stock">{{ vendor.stock.length }} items</span>
+            @if (vendor.buyback || vendor.acceptsAllItems) {
+              <span class="stat-badge buyback">Buyback</span>
+            }
+          </div>
+        </div>
+      } @empty {
+        <div class="empty-state">
+          <span class="material-symbols-outlined">storefront</span>
+          <p>No vendors found</p>
+        </div>
+      }
+    </div>
+  </aside>
+
+  <!-- Vendor Detail Panel -->
+  <main class="vendor-detail-panel">
+    @if (selectedVendor(); as vendor) {
+      <div class="detail-content">
+        <!-- Header -->
+        <div class="detail-header">
+          <div class="header-info">
+            <h2>{{ vendor.name }}</h2>
+            <code class="vendor-id-display">{{ vendor.vendorId }}</code>
+          </div>
+          <div class="header-badges">
+            @if (vendor.buyback || vendor.acceptsAllItems) {
+              <span class="buyback-badge">Accepts Buyback</span>
+            }
+          </div>
+        </div>
+
+        <!-- Basic Info Section -->
+        <section class="detail-section">
+          <h3>Basic Information</h3>
+          <div class="info-grid">
+            <div class="info-item full-width">
+              <label>Description</label>
+              <span>{{ vendor.description }}</span>
+            </div>
+            @if (vendor.greeting) {
+              <div class="info-item full-width">
+                <label>Greeting</label>
+                <p class="greeting-text">{{ vendor.greeting }}</p>
+              </div>
+            }
+            <div class="info-item">
+              <label>Vendor ID</label>
+              <code>{{ vendor.vendorId }}</code>
+            </div>
+            @if (vendor.iconPath) {
+              <div class="info-item">
+                <label>Icon Path</label>
+                <code>{{ vendor.iconPath }}</code>
+              </div>
+            }
+            <div class="info-item">
+              <label>Buyback Enabled</label>
+              <span [class.success]="vendor.buyback" [class.error]="!vendor.buyback">
+                {{ vendor.buyback ? 'Yes' : 'No' }}
+              </span>
+            </div>
+            <div class="info-item">
+              <label>Accepts All Items</label>
+              <span [class.success]="vendor.acceptsAllItems" [class.error]="!vendor.acceptsAllItems">
+                {{ vendor.acceptsAllItems ? 'Yes' : 'No' }}
+              </span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Pricing Section -->
+        <section class="detail-section">
+          <h3>Pricing Multipliers</h3>
+          <div class="pricing-grid">
+            <div class="pricing-card">
+              <span class="pricing-icon material-symbols-outlined">sell</span>
+              <div class="pricing-info">
+                <label>Player Sell Price</label>
+                <span class="pricing-value">{{ getSellPricePercentage(vendor) }}%</span>
+                <span class="pricing-description">What player receives when selling to this vendor</span>
+              </div>
+            </div>
+            <div class="pricing-card">
+              <span class="pricing-icon material-symbols-outlined">shopping_cart</span>
+              <div class="pricing-info">
+                <label>Player Buy Price</label>
+                <span class="pricing-value">{{ getBuyPricePercentage(vendor) }}%</span>
+                <span class="pricing-description">What player pays when buying from this vendor</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Stock Section -->
+        <section class="detail-section">
+          <h3>Stock ({{ vendor.stock.length }} items)</h3>
+          <div class="stock-grid">
+            @for (item of vendor.stock; track item.itemId) {
+              <div class="stock-item">
+                <div class="stock-header">
+                  <code class="item-id">{{ item.itemId }}</code>
+                  <span class="stock-type-badge" [style.background-color]="getStockTypeColor(item.stockType || 'infinite') + '33'" [style.color]="getStockTypeColor(item.stockType || 'infinite')" [style.border-color]="getStockTypeColor(item.stockType || 'infinite')">
+                    {{ capitalizeFirst(item.stockType || 'infinite') }}
+                  </span>
+                </div>
+                <div class="stock-details">
+                  <div class="stock-detail-item">
+                    <label>Buy Price</label>
+                    <span class="price-value">{{ item.buyPrice }} gold</span>
+                  </div>
+                  @if (item.price) {
+                    <div class="stock-detail-item">
+                      <label>Legacy Price</label>
+                      <span class="price-value legacy">{{ item.price }} gold</span>
+                    </div>
+                  }
+                  @if (item.currentStock !== undefined) {
+                    <div class="stock-detail-item">
+                      <label>Current Stock</label>
+                      <span class="quantity-value">{{ item.currentStock }}</span>
+                    </div>
+                  }
+                  @if (item.restockQuantity !== undefined) {
+                    <div class="stock-detail-item">
+                      <label>Restock Quantity</label>
+                      <span class="quantity-value">{{ item.restockQuantity }}</span>
+                    </div>
+                  }
+                  @if (item.restockInterval) {
+                    <div class="stock-detail-item">
+                      <label>Restock Interval</label>
+                      <span class="interval-value">{{ item.restockInterval }}s</span>
+                    </div>
+                  }
+                </div>
+              </div>
+            } @empty {
+              <div class="empty-stock">
+                <span class="material-symbols-outlined">inventory</span>
+                <p>No stock items defined</p>
+              </div>
+            }
+          </div>
+        </section>
+      </div>
+    } @else {
+      <div class="empty-state-detail">
+        <span class="material-symbols-outlined">arrow_back</span>
+        <h3>No Vendor Selected</h3>
+        <p>Select a vendor from the list to view its details</p>
+      </div>
+    }
+  </main>
+</div>

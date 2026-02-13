@@ -1,0 +1,186 @@
+<div class="drop-tables-container">
+  <!-- Drop Table List Sidebar -->
+  <aside class="drop-table-list-sidebar">
+    <div class="sidebar-header">
+      <h3>Drop Tables</h3>
+      <span class="table-count">{{ filteredDropTables().length }} / {{ allDropTables.length }}</span>
+    </div>
+
+    <!-- Search -->
+    <div class="search-box">
+      <span class="material-symbols-outlined">search</span>
+      <input
+        type="text"
+        placeholder="Search drop tables..."
+        [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event); applyFilters()"
+      />
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+      <div class="filter-group">
+        <label>Type</label>
+        <select
+          [ngModel]="filterType()"
+          (ngModelChange)="filterType.set($event); applyFilters()"
+        >
+          <option value="all">All Types</option>
+          <option value="combat">Combat</option>
+          <option value="gathering">Gathering</option>
+          <option value="fishing">Fishing</option>
+          <option value="woodcutting">Woodcutting</option>
+          <option value="mining">Mining</option>
+          <option value="rare">Rare</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Sort By</label>
+        <select
+          [ngModel]="sortBy()"
+          (ngModelChange)="sortBy.set($event); applyFilters()"
+        >
+          <option value="name">Name</option>
+          <option value="dropCount">Drop Count</option>
+          <option value="totalWeight">Total Weight</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Drop Table List -->
+    <div class="table-list">
+      @for (table of filteredDropTables(); track table.dropTableId) {
+        <div
+          class="table-list-item"
+          [class.selected]="selectedDropTable()?.dropTableId === table.dropTableId"
+          (click)="selectDropTable(table)"
+        >
+          <div class="table-info">
+            <span class="table-name">{{ table.name }}</span>
+            <span class="table-id">{{ table.dropTableId }}</span>
+          </div>
+          <div class="table-stats-preview">
+            <span class="stat-badge type" [style.background-color]="getTypeColor(getTypeFromId(table.dropTableId)) + '33'" [style.color]="getTypeColor(getTypeFromId(table.dropTableId))" [style.border-color]="getTypeColor(getTypeFromId(table.dropTableId))">
+              {{ getTypeFromId(table.dropTableId) }}
+            </span>
+            <span class="stat-badge drops">{{ table.drops.length }} drops</span>
+          </div>
+        </div>
+      } @empty {
+        <div class="empty-state">
+          <span class="material-symbols-outlined">inventory</span>
+          <p>No drop tables found</p>
+        </div>
+      }
+    </div>
+  </aside>
+
+  <!-- Drop Table Detail Panel -->
+  <main class="table-detail-panel">
+    @if (selectedDropTable(); as table) {
+      <div class="detail-content">
+        <!-- Header -->
+        <div class="detail-header">
+          <div class="header-info">
+            <h2>{{ table.name }}</h2>
+            <code class="table-id-display">{{ table.dropTableId }}</code>
+          </div>
+          <div class="header-badges">
+            <span class="type-badge" [style.background-color]="getTypeColor(getTypeFromId(table.dropTableId)) + '33'" [style.color]="getTypeColor(getTypeFromId(table.dropTableId))" [style.border-color]="getTypeColor(getTypeFromId(table.dropTableId))">
+              {{ getTypeFromId(table.dropTableId) }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Basic Info Section -->
+        <section class="detail-section">
+          <h3>Basic Information</h3>
+          <div class="info-grid">
+            @if (table.description) {
+              <div class="info-item full-width">
+                <label>Description</label>
+                <span>{{ table.description }}</span>
+              </div>
+            }
+            <div class="info-item">
+              <label>Drop Table ID</label>
+              <code>{{ table.dropTableId }}</code>
+            </div>
+            <div class="info-item">
+              <label>Total Drops</label>
+              <span class="stat-value">{{ table.drops.length }} entries</span>
+            </div>
+            <div class="info-item">
+              <label>Total Weight</label>
+              <span class="stat-value">{{ getTotalWeight(table) }}</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Drops Section -->
+        <section class="detail-section">
+          <h3>Drop Entries ({{ table.drops.length }})</h3>
+          <div class="drops-list">
+            @for (drop of table.drops; track $index) {
+              <div class="drop-item">
+                <!-- Item Drop -->
+                @if (!isNestedDropTable(drop)) {
+                  <div class="drop-header">
+                    <div class="drop-main-info">
+                      <code class="item-id">{{ drop.itemId }}</code>
+                      <span class="drop-probability">{{ getDropProbability(table, drop.weight).toFixed(1) }}%</span>
+                    </div>
+                    <span class="drop-weight">Weight: {{ drop.weight }}</span>
+                  </div>
+                  <div class="drop-details">
+                    <div class="drop-detail-item">
+                      <label>Quantity Range</label>
+                      <span class="quantity-range">{{ getQuantityRange(drop).min }} - {{ getQuantityRange(drop).max }}</span>
+                    </div>
+                    @if (drop.qualityBonus) {
+                      <div class="drop-detail-item full-width">
+                        <label>Quality Bonuses</label>
+                        <div class="quality-bonuses">
+                          @for (quality of Object.keys(drop.qualityBonus); track quality) {
+                            <span class="quality-tag">
+                              {{ capitalizeFirst(quality) }}: +{{ getQualityBonusValue(drop, quality) * 100 }}%
+                            </span>
+                          }
+                        </div>
+                      </div>
+                    }
+                  </div>
+                }
+
+                <!-- Nested Drop Table -->
+                @if (isNestedDropTable(drop)) {
+                  <div class="drop-header nested">
+                    <div class="drop-main-info">
+                      <span class="material-symbols-outlined">link</span>
+                      <code class="nested-table-id">{{ drop.dropTableId }}</code>
+                      <span class="drop-probability">{{ getDropProbability(table, drop.weight).toFixed(1) }}%</span>
+                    </div>
+                    <span class="drop-weight">Weight: {{ drop.weight }}</span>
+                  </div>
+                  @if (drop.comment) {
+                    <div class="drop-comment">
+                      <span class="material-symbols-outlined">info</span>
+                      <p>{{ drop.comment }}</p>
+                    </div>
+                  }
+                }
+              </div>
+            }
+          </div>
+        </section>
+      </div>
+    } @else {
+      <div class="empty-state-detail">
+        <span class="material-symbols-outlined">arrow_back</span>
+        <h3>No Drop Table Selected</h3>
+        <p>Select a drop table from the list to view its details</p>
+      </div>
+    }
+  </main>
+</div>

@@ -1,0 +1,170 @@
+<div class="qualities-container">
+  <!-- Quality List Sidebar -->
+  <aside class="quality-list-sidebar">
+    <div class="sidebar-header">
+      <h3>Item Qualities</h3>
+      <span class="quality-count">{{ filteredQualities().length }} / {{ allQualities.length }}</span>
+    </div>
+
+    <!-- Search -->
+    <div class="search-box">
+      <span class="material-symbols-outlined">search</span>
+      <input
+        type="text"
+        placeholder="Search qualities..."
+        [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event); applyFilters()"
+      />
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+      <div class="filter-group">
+        <label>Category</label>
+        <select
+          [ngModel]="filterCategory()"
+          (ngModelChange)="filterCategory.set($event); applyFilters()"
+        >
+          <option value="all">All Categories</option>
+          <option value="resource">Resource</option>
+          <option value="crafted">Crafted</option>
+          <option value="equipment">Equipment</option>
+          <option value="consumable">Consumable</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Sort By</label>
+        <select
+          [ngModel]="sortBy()"
+          (ngModelChange)="sortBy.set($event); applyFilters()"
+        >
+          <option value="name">Name</option>
+          <option value="maxLevel">Max Level</option>
+          <option value="qualityId">Quality ID</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Quality List -->
+    <div class="quality-list">
+      @for (quality of filteredQualities(); track quality.qualityId) {
+        <div
+          class="quality-list-item"
+          [class.selected]="selectedQuality()?.qualityId === quality.qualityId"
+          (click)="selectQuality(quality)"
+        >
+          <div class="quality-info">
+            <div class="quality-header">
+              <span class="quality-name">{{ quality.name }}</span>
+              <span class="quality-shorthand">{{ quality.shorthand }}</span>
+            </div>
+            <span class="quality-id">{{ quality.qualityId }}</span>
+          </div>
+          <div class="quality-stats-preview">
+            <span class="stat-badge level">Max Level {{ quality.maxLevel }}</span>
+            <span class="stat-badge categories">{{ quality.applicableCategories.length }} categories</span>
+          </div>
+        </div>
+      } @empty {
+        <div class="empty-state">
+          <span class="material-symbols-outlined">star</span>
+          <p>No qualities found</p>
+        </div>
+      }
+    </div>
+  </aside>
+
+  <!-- Quality Detail Panel -->
+  <main class="quality-detail-panel">
+    @if (selectedQuality(); as quality) {
+      <div class="detail-content">
+        <!-- Header -->
+        <div class="detail-header">
+          <div class="header-info">
+            <div class="title-row">
+              <h2>{{ quality.name }}</h2>
+              <span class="shorthand-badge">{{ quality.shorthand }}</span>
+            </div>
+            <code class="quality-id-display">{{ quality.qualityId }}</code>
+          </div>
+        </div>
+
+        <!-- Basic Info Section -->
+        <section class="detail-section">
+          <h3>Basic Information</h3>
+          <div class="info-grid">
+            <div class="info-item full-width">
+              <label>Description</label>
+              <span>{{ quality.description }}</span>
+            </div>
+            <div class="info-item">
+              <label>Quality ID</label>
+              <code>{{ quality.qualityId }}</code>
+            </div>
+            <div class="info-item">
+              <label>Shorthand</label>
+              <span class="shorthand-value">{{ quality.shorthand }}</span>
+            </div>
+            <div class="info-item">
+              <label>Value Type</label>
+              <span>{{ capitalizeFirst(quality.valueType) }}</span>
+            </div>
+            <div class="info-item">
+              <label>Max Level</label>
+              <span class="level-value">{{ quality.maxLevel }}</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Applicable Categories Section -->
+        <section class="detail-section">
+          <h3>Applicable Categories ({{ quality.applicableCategories.length }})</h3>
+          <div class="categories-grid">
+            @for (category of quality.applicableCategories; track category) {
+              <div class="category-badge">
+                {{ capitalizeFirst(category) }}
+              </div>
+            }
+          </div>
+        </section>
+
+        <!-- Quality Levels Section -->
+        <section class="detail-section">
+          <h3>Quality Levels (1-{{ quality.maxLevel }})</h3>
+          <div class="levels-list">
+            @for (levelKey of getLevelKeys(quality); track levelKey) {
+              <div class="level-card">
+                <div class="level-header">
+                  <div class="level-number">Level {{ levelKey }}</div>
+                  <div class="level-name">{{ getLevelName(quality, levelKey) }}</div>
+                </div>
+                <div class="level-description">{{ getLevelDescription(quality, levelKey) }}</div>
+
+                @if (hasEffects(quality, levelKey)) {
+                  <div class="level-effects">
+                    <h4>Effects</h4>
+                    <div class="effects-grid">
+                      @for (effectKey of Object.keys(getLevelEffects(quality, levelKey)); track effectKey) {
+                        <div class="effect-item">
+                          <label>{{ capitalizeFirst(effectKey) }}</label>
+                          <span class="effect-value">{{ getEffectDisplay(effectKey, getLevelEffects(quality, levelKey)[effectKey]) }}</span>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </section>
+      </div>
+    } @else {
+      <div class="empty-state-detail">
+        <span class="material-symbols-outlined">arrow_back</span>
+        <h3>No Quality Selected</h3>
+        <p>Select a quality from the list to view its details</p>
+      </div>
+    }
+  </main>
+</div>

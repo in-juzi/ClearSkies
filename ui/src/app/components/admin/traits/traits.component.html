@@ -1,0 +1,237 @@
+<div class="traits-container">
+  <!-- Trait List Sidebar -->
+  <aside class="trait-list-sidebar">
+    <div class="sidebar-header">
+      <h3>Item Traits</h3>
+      <span class="trait-count">{{ filteredTraits().length }} / {{ allTraits.length }}</span>
+    </div>
+
+    <!-- Search -->
+    <div class="search-box">
+      <span class="material-symbols-outlined">search</span>
+      <input
+        type="text"
+        placeholder="Search traits..."
+        [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event); applyFilters()"
+      />
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+      <div class="filter-group">
+        <label>Category</label>
+        <select
+          [ngModel]="filterCategory()"
+          (ngModelChange)="filterCategory.set($event); applyFilters()"
+        >
+          <option value="all">All Categories</option>
+          <option value="resource">Resource</option>
+          <option value="equipment">Equipment</option>
+          <option value="consumable">Consumable</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Rarity</label>
+        <select
+          [ngModel]="filterRarity()"
+          (ngModelChange)="filterRarity.set($event); applyFilters()"
+        >
+          <option value="all">All Rarities</option>
+          <option value="common">Common</option>
+          <option value="uncommon">Uncommon</option>
+          <option value="rare">Rare</option>
+          <option value="epic">Epic</option>
+          <option value="legendary">Legendary</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Sort By</label>
+        <select
+          [ngModel]="sortBy()"
+          (ngModelChange)="sortBy.set($event); applyFilters()"
+        >
+          <option value="name">Name</option>
+          <option value="rarity">Rarity</option>
+          <option value="maxLevel">Max Level</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Trait List -->
+    <div class="trait-list">
+      @for (trait of filteredTraits(); track trait.traitId) {
+        <div
+          class="trait-list-item"
+          [class.selected]="selectedTrait()?.traitId === trait.traitId"
+          (click)="selectTrait(trait)"
+        >
+          <div class="trait-info">
+            <div class="trait-header">
+              <span class="trait-name">{{ trait.name }}</span>
+              <span class="trait-shorthand">{{ trait.shorthand }}</span>
+            </div>
+            <span class="trait-id">{{ trait.traitId }}</span>
+          </div>
+          <div class="trait-stats-preview">
+            <span class="stat-badge rarity" [style.background-color]="getRarityColor(trait.rarity) + '33'" [style.color]="getRarityColor(trait.rarity)" [style.border-color]="getRarityColor(trait.rarity)">
+              {{ capitalizeFirst(trait.rarity) }}
+            </span>
+            <span class="stat-badge level">Max Level {{ trait.maxLevel }}</span>
+          </div>
+        </div>
+      } @empty {
+        <div class="empty-state">
+          <span class="material-symbols-outlined">auto_awesome</span>
+          <p>No traits found</p>
+        </div>
+      }
+    </div>
+  </aside>
+
+  <!-- Trait Detail Panel -->
+  <main class="trait-detail-panel">
+    @if (selectedTrait(); as trait) {
+      <div class="detail-content">
+        <!-- Header -->
+        <div class="detail-header">
+          <div class="header-info">
+            <div class="title-row">
+              <h2>{{ trait.name }}</h2>
+              <span class="shorthand-badge">{{ trait.shorthand }}</span>
+              <span class="rarity-badge" [style.background-color]="getRarityColor(trait.rarity) + '33'" [style.color]="getRarityColor(trait.rarity)" [style.border-color]="getRarityColor(trait.rarity)">
+                {{ capitalizeFirst(trait.rarity) }}
+              </span>
+            </div>
+            <code class="trait-id-display">{{ trait.traitId }}</code>
+          </div>
+        </div>
+
+        <!-- Basic Info Section -->
+        <section class="detail-section">
+          <h3>Basic Information</h3>
+          <div class="info-grid">
+            <div class="info-item full-width">
+              <label>Description</label>
+              <span>{{ trait.description }}</span>
+            </div>
+            <div class="info-item">
+              <label>Trait ID</label>
+              <code>{{ trait.traitId }}</code>
+            </div>
+            <div class="info-item">
+              <label>Shorthand</label>
+              <span class="shorthand-value">{{ trait.shorthand }}</span>
+            </div>
+            <div class="info-item">
+              <label>Rarity</label>
+              <span class="rarity-value" [style.color]="getRarityColor(trait.rarity)">{{ capitalizeFirst(trait.rarity) }}</span>
+            </div>
+            <div class="info-item">
+              <label>Max Level</label>
+              <span class="level-value">{{ trait.maxLevel }}</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Applicable Categories Section -->
+        <section class="detail-section">
+          <h3>Applicable Categories ({{ trait.applicableCategories.length }})</h3>
+          <div class="categories-grid">
+            @for (category of trait.applicableCategories; track category) {
+              <div class="category-badge">
+                {{ capitalizeFirst(category) }}
+              </div>
+            }
+          </div>
+        </section>
+
+        <!-- Contextual Names Section -->
+        @if (hasContextualNames(trait)) {
+          <section class="detail-section">
+            <h3>Context-Aware Variations</h3>
+            <div class="contextual-info">
+              @if (trait.nameByCategory) {
+                <div class="contextual-group">
+                  <h4>Names by Category</h4>
+                  <div class="contextual-grid">
+                    @for (category of Object.keys(getContextualNames(trait)); track category) {
+                      <div class="contextual-item">
+                        <label>{{ capitalizeFirst(category) }}</label>
+                        <span>{{ getContextualNames(trait)[category] }}</span>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+              @if (trait.shorthandByCategory) {
+                <div class="contextual-group">
+                  <h4>Shorthands by Category</h4>
+                  <div class="contextual-grid">
+                    @for (category of Object.keys(getContextualShorthands(trait)); track category) {
+                      <div class="contextual-item">
+                        <label>{{ capitalizeFirst(category) }}</label>
+                        <span class="shorthand-value">{{ getContextualShorthands(trait)[category] }}</span>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+              @if (trait.descriptionByCategory) {
+                <div class="contextual-group">
+                  <h4>Descriptions by Category</h4>
+                  <div class="contextual-grid">
+                    @for (category of Object.keys(getContextualDescriptions(trait)); track category) {
+                      <div class="contextual-item full-width">
+                        <label>{{ capitalizeFirst(category) }}</label>
+                        <span>{{ getContextualDescriptions(trait)[category] }}</span>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </section>
+        }
+
+        <!-- Trait Levels Section -->
+        <section class="detail-section">
+          <h3>Trait Levels (1-{{ trait.maxLevel }})</h3>
+          <div class="levels-list">
+            @for (levelKey of getLevelKeys(trait); track levelKey) {
+              <div class="level-card">
+                <div class="level-header">
+                  <div class="level-number">Level {{ levelKey }}</div>
+                  <div class="level-name">{{ getLevelName(trait, levelKey) }}</div>
+                </div>
+                <div class="level-description">{{ getLevelDescription(trait, levelKey) }}</div>
+
+                @if (hasEffects(trait, levelKey)) {
+                  <div class="level-effects">
+                    <h4>Effects</h4>
+                    <div class="effects-grid">
+                      @for (effectKey of Object.keys(getLevelEffects(trait, levelKey)); track effectKey) {
+                        <div class="effect-item">
+                          <label>{{ capitalizeFirst(effectKey) }}</label>
+                          <span class="effect-value">{{ getEffectDisplay(effectKey, getLevelEffects(trait, levelKey)[effectKey]) }}</span>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </section>
+      </div>
+    } @else {
+      <div class="empty-state-detail">
+        <span class="material-symbols-outlined">arrow_back</span>
+        <h3>No Trait Selected</h3>
+        <p>Select a trait from the list to view its details</p>
+      </div>
+    }
+  </main>
+</div>

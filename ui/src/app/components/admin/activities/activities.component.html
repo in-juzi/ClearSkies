@@ -1,0 +1,227 @@
+<div class="activities-container">
+  <!-- Activity List Sidebar -->
+  <aside class="activity-list-sidebar">
+    <div class="sidebar-header">
+      <h3>Activities</h3>
+      <span class="activity-count">{{ filteredActivities().length }} / {{ allActivities.length }}</span>
+    </div>
+
+    <!-- Search -->
+    <div class="search-box">
+      <span class="material-symbols-outlined">search</span>
+      <input
+        type="text"
+        placeholder="Search activities..."
+        [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event); applyFilters()"
+      />
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+      <div class="filter-group">
+        <label>Type</label>
+        <select
+          [ngModel]="filterType()"
+          (ngModelChange)="filterType.set($event); applyFilters()"
+        >
+          <option value="all">All Types</option>
+          <option value="resource-gathering">Resource Gathering</option>
+          <option value="combat">Combat</option>
+          <option value="crafting">Crafting</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Sort By</label>
+        <select
+          [ngModel]="sortBy()"
+          (ngModelChange)="sortBy.set($event); applyFilters()"
+        >
+          <option value="name">Name</option>
+          <option value="type">Type</option>
+          <option value="duration">Duration</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Activity List -->
+    <div class="activity-list">
+      @for (activity of filteredActivities(); track activity.activityId) {
+        <div
+          class="activity-list-item"
+          [class.selected]="selectedActivity()?.activityId === activity.activityId"
+          (click)="selectActivity(activity)"
+        >
+          <div class="activity-info">
+            <span class="activity-name">{{ activity.name }}</span>
+            <span class="activity-id">{{ activity.activityId }}</span>
+          </div>
+          <div class="activity-stats-preview">
+            <span class="stat-badge type" [style.background-color]="getTypeColor(activity.type) + '33'" [style.color]="getTypeColor(activity.type)" [style.border-color]="getTypeColor(activity.type)">
+              {{ getTypeDisplay(activity.type) }}
+            </span>
+            @if (getActivityDuration(activity) > 0) {
+              <span class="stat-badge duration">{{ getActivityDuration(activity) }}s</span>
+            }
+          </div>
+        </div>
+      } @empty {
+        <div class="empty-state">
+          <span class="material-symbols-outlined">category</span>
+          <p>No activities found</p>
+        </div>
+      }
+    </div>
+  </aside>
+
+  <!-- Activity Detail Panel -->
+  <main class="activity-detail-panel">
+    @if (selectedActivity(); as activity) {
+      <div class="detail-content">
+        <!-- Header -->
+        <div class="detail-header">
+          <div class="header-info">
+            <h2>{{ activity.name }}</h2>
+            <code class="activity-id-display">{{ activity.activityId }}</code>
+          </div>
+          <div class="header-badges">
+            <span class="type-badge" [style.background-color]="getTypeColor(activity.type) + '33'" [style.color]="getTypeColor(activity.type)" [style.border-color]="getTypeColor(activity.type)">
+              {{ getTypeDisplay(activity.type) }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Basic Info Section -->
+        <section class="detail-section">
+          <h3>Basic Information</h3>
+          <div class="info-grid">
+            <div class="info-item full-width">
+              <label>Description</label>
+              <span>{{ activity.description }}</span>
+            </div>
+            <div class="info-item">
+              <label>Activity ID</label>
+              <code>{{ activity.activityId }}</code>
+            </div>
+            <div class="info-item">
+              <label>Type</label>
+              <span class="type-badge" [style.background-color]="getTypeColor(activity.type) + '33'" [style.color]="getTypeColor(activity.type)" [style.border-color]="getTypeColor(activity.type)">
+                {{ getTypeDisplay(activity.type) }}
+              </span>
+            </div>
+            @if (getActivityDuration(activity) > 0) {
+              <div class="info-item">
+                <label>Duration</label>
+                <span class="duration-value">{{ getActivityDuration(activity) }} seconds</span>
+              </div>
+            }
+          </div>
+        </section>
+
+        <!-- Requirements Section -->
+        @if (hasRequirements(activity)) {
+          <section class="detail-section">
+            <h3>Requirements</h3>
+            <div class="info-grid">
+              @if (activity.requirements.skills; as skills) {
+                @if (Object.keys(skills).length > 0) {
+                  <div class="info-item full-width">
+                    <label>Skill Requirements</label>
+                    <div class="requirements-list">
+                      @for (skill of Object.keys(skills); track skill) {
+                        <span class="requirement-tag">
+                          {{ capitalizeFirst(skill) }}: Level {{ skills[skill] }}
+                        </span>
+                      }
+                    </div>
+                  </div>
+                }
+              }
+              @if (activity.requirements.equipped; as equipped) {
+                @if (equipped.length > 0) {
+                  <div class="info-item full-width">
+                    <label>Equipment Required</label>
+                    <div class="requirements-list">
+                      @for (item of equipped; track $index) {
+                        <code class="requirement-tag">{{ getEquipmentDisplay(item) }}</code>
+                      }
+                    </div>
+                  </div>
+                }
+              }
+              @if (activity.requirements.inventory; as inventory) {
+                @if (inventory.length > 0) {
+                  <div class="info-item full-width">
+                    <label>Inventory Required</label>
+                    <div class="requirements-list">
+                      @for (item of inventory; track $index) {
+                        <code class="requirement-tag">{{ item.itemId }} x{{ item.quantity }}</code>
+                      }
+                    </div>
+                  </div>
+                }
+              }
+            </div>
+          </section>
+        }
+
+        <!-- Rewards Section (for resource-gathering and crafting) -->
+        @if (activity.type !== 'combat' && hasRewards(activity)) {
+          <section class="detail-section">
+            <h3>Rewards</h3>
+            <div class="rewards-grid">
+              @for (reward of getExperienceRewards(activity); track reward.skill) {
+                <div class="reward-item">
+                  <span class="reward-icon material-symbols-outlined">school</span>
+                  <div class="reward-info">
+                    <label>{{ capitalizeFirst(reward.skill) }} XP</label>
+                    <span class="reward-value">{{ reward.amount }} XP</span>
+                  </div>
+                </div>
+              }
+            </div>
+
+            @if (getDropTables(activity); as dropTables) {
+              @if (dropTables.length > 0) {
+                <div class="drop-tables-section">
+                  <h4>Drop Tables</h4>
+                  <div class="drop-tables-list">
+                    @for (tableId of dropTables; track tableId) {
+                      <code class="drop-table-tag">{{ tableId }}</code>
+                    }
+                  </div>
+                </div>
+              }
+            }
+          </section>
+        }
+
+        <!-- Combat Config Section (for combat activities) -->
+        @if (activity.type === 'combat') {
+          <section class="detail-section">
+            <h3>Combat Configuration</h3>
+            <div class="info-grid">
+              @if (getCombatMonsterId(activity); as monsterId) {
+                <div class="info-item">
+                  <label>Monster ID</label>
+                  <code>{{ monsterId }}</code>
+                </div>
+              }
+              <div class="info-item full-width">
+                <label>Experience</label>
+                <span>Awarded dynamically based on Monster.experience and equipped weapon's skillScalar</span>
+              </div>
+            </div>
+          </section>
+        }
+      </div>
+    } @else {
+      <div class="empty-state-detail">
+        <span class="material-symbols-outlined">arrow_back</span>
+        <h3>No Activity Selected</h3>
+        <p>Select an activity from the list to view its details</p>
+      </div>
+    }
+  </main>
+</div>

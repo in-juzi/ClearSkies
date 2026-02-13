@@ -1,0 +1,401 @@
+<div class="quests-container">
+  <!-- Quest List Sidebar -->
+  <aside class="quest-list-sidebar">
+    <div class="sidebar-header">
+      <h3>Quests</h3>
+      <span class="quest-count">{{ filteredQuests().length }} / {{ allQuests.length }}</span>
+    </div>
+
+    <!-- Search -->
+    <div class="search-box">
+      <span class="material-symbols-outlined">search</span>
+      <input
+        type="text"
+        placeholder="Search quests..."
+        [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event); applyFilters()"
+      />
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+      <div class="filter-group">
+        <label>Category</label>
+        <select
+          [ngModel]="filterCategory()"
+          (ngModelChange)="filterCategory.set($event); applyFilters()"
+        >
+          <option value="all">All Categories</option>
+          <option [value]="QuestCategory.TUTORIAL">Tutorial</option>
+          <option [value]="QuestCategory.SKILLS">Skills</option>
+          <option [value]="QuestCategory.EXPLORATION">Exploration</option>
+          <option [value]="QuestCategory.COMBAT">Combat</option>
+          <option [value]="QuestCategory.CRAFTING">Crafting</option>
+          <option [value]="QuestCategory.STORY">Story</option>
+          <option [value]="QuestCategory.OPTIONAL">Optional</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Type</label>
+        <select
+          [ngModel]="filterRepeatable()"
+          (ngModelChange)="filterRepeatable.set($event); applyFilters()"
+        >
+          <option value="all">All Quests</option>
+          <option value="one-time">One-Time</option>
+          <option value="repeatable">Repeatable</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Sort By</label>
+        <select
+          [ngModel]="sortBy()"
+          (ngModelChange)="sortBy.set($event); applyFilters()"
+        >
+          <option value="name">Name</option>
+          <option value="category">Category</option>
+          <option value="autoAccept">Auto-Accept</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Quest List -->
+    <div class="quest-list">
+      @for (quest of filteredQuests(); track quest.questId) {
+        <div
+          class="quest-list-item"
+          [class.selected]="selectedQuest()?.questId === quest.questId"
+          (click)="selectQuest(quest)"
+        >
+          <div class="quest-info">
+            <span class="quest-name">{{ quest.name }}</span>
+            <span class="quest-id">{{ quest.questId }}</span>
+          </div>
+          <div class="quest-stats-preview">
+            <span class="stat-badge category" [style.background-color]="getCategoryColor(quest.category) + '33'" [style.color]="getCategoryColor(quest.category)" [style.border-color]="getCategoryColor(quest.category)">
+              {{ capitalizeFirst(quest.category) }}
+            </span>
+            @if (quest.autoAccept) {
+              <span class="stat-badge auto-accept">Auto</span>
+            }
+            @if (quest.isRepeatable) {
+              <span class="stat-badge repeatable">Repeat</span>
+            }
+          </div>
+        </div>
+      } @empty {
+        <div class="empty-state">
+          <span class="material-symbols-outlined">assignment</span>
+          <p>No quests found</p>
+        </div>
+      }
+    </div>
+  </aside>
+
+  <!-- Quest Detail Panel -->
+  <main class="quest-detail-panel">
+    @if (selectedQuest(); as quest) {
+      <div class="detail-content">
+        <!-- Header -->
+        <div class="detail-header">
+          <div class="header-info">
+            <h2>{{ quest.name }}</h2>
+            <code class="quest-id-display">{{ quest.questId }}</code>
+          </div>
+          <div class="header-badges">
+            <span class="category-badge" [style.background-color]="getCategoryColor(quest.category) + '33'" [style.color]="getCategoryColor(quest.category)" [style.border-color]="getCategoryColor(quest.category)">
+              {{ capitalizeFirst(quest.category) }}
+            </span>
+            @if (quest.autoAccept) {
+              <span class="auto-accept-badge">Auto-Accept</span>
+            }
+            @if (quest.isRepeatable) {
+              <span class="repeatable-badge">Repeatable</span>
+            }
+          </div>
+        </div>
+
+        <!-- Basic Info Section -->
+        <section class="detail-section">
+          <h3>Basic Information</h3>
+          <div class="info-grid">
+            <div class="info-item full-width">
+              <label>Description</label>
+              <span>{{ quest.description }}</span>
+            </div>
+            <div class="info-item">
+              <label>Quest ID</label>
+              <span>{{ quest.questId }}</span>
+            </div>
+            <div class="info-item">
+              <label>Category</label>
+              <span class="category-badge" [style.background-color]="getCategoryColor(quest.category) + '33'" [style.color]="getCategoryColor(quest.category)" [style.border-color]="getCategoryColor(quest.category)">
+                {{ capitalizeFirst(quest.category) }}
+              </span>
+            </div>
+            <div class="info-item">
+              <label>Auto-Accept</label>
+              <span [class.success]="quest.autoAccept" [class.error]="!quest.autoAccept">
+                {{ quest.autoAccept ? 'Yes' : 'No' }}
+              </span>
+            </div>
+            <div class="info-item">
+              <label>Repeatable</label>
+              <span [class.success]="quest.isRepeatable" [class.error]="!quest.isRepeatable">
+                {{ quest.isRepeatable ? 'Yes' : 'No' }}
+              </span>
+            </div>
+            @if (quest.resetInterval) {
+              <div class="info-item">
+                <label>Reset Interval</label>
+                <span>{{ capitalizeFirst(quest.resetInterval) }}</span>
+              </div>
+            }
+          </div>
+        </section>
+
+        <!-- Quest Giver Section -->
+        <section class="detail-section">
+          <h3>Quest Giver</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>NPC ID</label>
+              <code>{{ quest.questGiver.npcId }}</code>
+            </div>
+            <div class="info-item">
+              <label>Location ID</label>
+              <code>{{ quest.questGiver.locationId }}</code>
+            </div>
+            <div class="info-item">
+              <label>Facility ID</label>
+              <code>{{ quest.questGiver.facilityId }}</code>
+            </div>
+          </div>
+        </section>
+
+        <!-- Objectives Section -->
+        <section class="detail-section">
+          <h3>Objectives ({{ quest.objectives.length }})</h3>
+          <div class="objectives-list">
+            @for (objective of quest.objectives; track objective.objectiveId) {
+              <div class="objective-item">
+                <span class="objective-icon material-symbols-outlined">
+                  {{ getObjectiveTypeIcon(objective.type) }}
+                </span>
+                <div class="objective-info">
+                  <div class="objective-header">
+                    <span class="objective-type">{{ capitalizeFirst(objective.type) }}</span>
+                    <span class="objective-quantity">{{ objective.quantity }}x</span>
+                  </div>
+                  <span class="objective-description">{{ objective.description }}</span>
+                  <div class="objective-details">
+                    @if (objective.activityId) {
+                      <code class="detail-tag">Activity: {{ objective.activityId }}</code>
+                    }
+                    @if (objective.itemId) {
+                      <code class="detail-tag">Item: {{ objective.itemId }}</code>
+                    }
+                    @if (objective.monsterId) {
+                      <code class="detail-tag">Monster: {{ objective.monsterId }}</code>
+                    }
+                    @if (objective.locationId) {
+                      <code class="detail-tag">Location: {{ objective.locationId }}</code>
+                    }
+                    @if (objective.facilityId) {
+                      <code class="detail-tag">Facility: {{ objective.facilityId }}</code>
+                    }
+                    @if (objective.recipeId) {
+                      <code class="detail-tag">Recipe: {{ objective.recipeId }}</code>
+                    }
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </section>
+
+        <!-- Requirements Section -->
+        @if (hasRequirements(quest)) {
+          <section class="detail-section">
+            <h3>Requirements</h3>
+            <div class="info-grid">
+              @if (quest.requirements.level) {
+                <div class="info-item">
+                  <label>Minimum Level</label>
+                  <span class="stat-value">Level {{ quest.requirements.level }}</span>
+                </div>
+              }
+              @if (quest.requirements.skills; as skills) {
+                @if (Object.keys(skills).length > 0) {
+                  <div class="info-item full-width">
+                    <label>Required Skills</label>
+                    <div class="requirements-list">
+                      @for (skill of Object.keys(skills); track skill) {
+                        <span class="requirement-tag">
+                          {{ capitalizeFirst(skill) }}: Level {{ skills[skill] }}
+                        </span>
+                      }
+                    </div>
+                  </div>
+                }
+              }
+              @if (quest.requirements.quests; as quests) {
+                @if (quests.length > 0) {
+                  <div class="info-item full-width">
+                    <label>Required Quests</label>
+                    <div class="requirements-list">
+                      @for (questId of quests; track questId) {
+                        <code class="requirement-tag">{{ questId }}</code>
+                      }
+                    </div>
+                  </div>
+                }
+              }
+              @if (quest.requirements.items; as items) {
+                @if (items.length > 0) {
+                  <div class="info-item full-width">
+                    <label>Required Items</label>
+                    <div class="requirements-list">
+                      @for (itemId of items; track itemId) {
+                        <code class="requirement-tag">{{ itemId }}</code>
+                      }
+                    </div>
+                  </div>
+                }
+              }
+              @if (quest.requirements.locations; as locations) {
+                @if (locations.length > 0) {
+                  <div class="info-item full-width">
+                    <label>Required Locations</label>
+                    <div class="requirements-list">
+                      @for (locationId of locations; track locationId) {
+                        <code class="requirement-tag">{{ locationId }}</code>
+                      }
+                    </div>
+                  </div>
+                }
+              }
+            </div>
+          </section>
+        }
+
+        <!-- Rewards Section -->
+        @if (hasRewards(quest)) {
+          <section class="detail-section">
+            <h3>Rewards</h3>
+            <div class="rewards-grid">
+              @if (quest.rewards.gold) {
+                <div class="reward-item">
+                  <span class="reward-icon material-symbols-outlined">payments</span>
+                  <div class="reward-info">
+                    <label>Gold</label>
+                    <span class="reward-value">{{ quest.rewards.gold }} gold</span>
+                  </div>
+                </div>
+              }
+              @if (quest.rewards.experience; as xp) {
+                @for (reward of getExperienceRewards(quest); track reward.skill) {
+                  <div class="reward-item">
+                    <span class="reward-icon material-symbols-outlined">school</span>
+                    <div class="reward-info">
+                      <label>{{ capitalizeFirst(reward.skill) }} XP</label>
+                      <span class="reward-value">{{ reward.amount }} XP</span>
+                    </div>
+                  </div>
+                }
+              }
+              @if (quest.rewards.items; as items) {
+                @for (item of items; track item.itemId) {
+                  <div class="reward-item">
+                    <span class="reward-icon material-symbols-outlined">inventory</span>
+                    <div class="reward-info">
+                      <label>{{ item.itemId }}</label>
+                      <span class="reward-value">x{{ item.quantity }}</span>
+                    </div>
+                  </div>
+                }
+              }
+            </div>
+
+            @if (quest.rewards.unlocks) {
+              <div class="unlocks-section">
+                <h4>Unlocks</h4>
+                <div class="info-grid">
+                  @if (quest.rewards.unlocks.quests; as quests) {
+                    @if (quests.length > 0) {
+                      <div class="info-item full-width">
+                        <label>Unlocked Quests</label>
+                        <div class="unlocks-list">
+                          @for (questId of quests; track questId) {
+                            <code class="unlock-tag">{{ questId }}</code>
+                          }
+                        </div>
+                      </div>
+                    }
+                  }
+                  @if (quest.rewards.unlocks.recipes; as recipes) {
+                    @if (recipes.length > 0) {
+                      <div class="info-item full-width">
+                        <label>Unlocked Recipes</label>
+                        <div class="unlocks-list">
+                          @for (recipeId of recipes; track recipeId) {
+                            <code class="unlock-tag">{{ recipeId }}</code>
+                          }
+                        </div>
+                      </div>
+                    }
+                  }
+                  @if (quest.rewards.unlocks.locations; as locations) {
+                    @if (locations.length > 0) {
+                      <div class="info-item full-width">
+                        <label>Unlocked Locations</label>
+                        <div class="unlocks-list">
+                          @for (locationId of locations; track locationId) {
+                            <code class="unlock-tag">{{ locationId }}</code>
+                          }
+                        </div>
+                      </div>
+                    }
+                  }
+                </div>
+              </div>
+            }
+          </section>
+        }
+
+        <!-- Dialogue Section -->
+        <section class="detail-section">
+          <h3>Dialogue</h3>
+          <div class="dialogue-grid">
+            <div class="dialogue-item">
+              <label>Offer</label>
+              <p class="dialogue-text">{{ quest.dialogue.offer }}</p>
+            </div>
+            <div class="dialogue-item">
+              <label>Progress</label>
+              <p class="dialogue-text">{{ quest.dialogue.progress }}</p>
+            </div>
+            <div class="dialogue-item">
+              <label>Complete</label>
+              <p class="dialogue-text">{{ quest.dialogue.complete }}</p>
+            </div>
+            @if (quest.dialogue.decline) {
+              <div class="dialogue-item">
+                <label>Decline</label>
+                <p class="dialogue-text">{{ quest.dialogue.decline }}</p>
+              </div>
+            }
+          </div>
+        </section>
+      </div>
+    } @else {
+      <div class="empty-state-detail">
+        <span class="material-symbols-outlined">arrow_back</span>
+        <h3>No Quest Selected</h3>
+        <p>Select a quest from the list to view its details</p>
+      </div>
+    }
+  </main>
+</div>

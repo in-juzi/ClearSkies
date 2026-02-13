@@ -1,0 +1,292 @@
+<div class="abilities-container">
+  <!-- Ability List Sidebar -->
+  <aside class="ability-list-sidebar">
+    <div class="sidebar-header">
+      <h3>Abilities</h3>
+      <span class="ability-count">{{ filteredAbilities().length }} / {{ allAbilities.length }}</span>
+    </div>
+
+    <!-- Search -->
+    <div class="search-box">
+      <span class="material-symbols-outlined">search</span>
+      <input
+        type="text"
+        placeholder="Search abilities..."
+        [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event); applyFilters()"
+      />
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+      <div class="filter-group">
+        <label>Type</label>
+        <select
+          [ngModel]="filterType()"
+          (ngModelChange)="filterType.set($event); applyFilters()"
+        >
+          <option value="all">All Types</option>
+          <option value="attack">Attack</option>
+          <option value="buff">Buff</option>
+          <option value="debuff">Debuff</option>
+          <option value="heal">Heal</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Sort By</label>
+        <select
+          [ngModel]="sortBy()"
+          (ngModelChange)="sortBy.set($event); applyFilters()"
+        >
+          <option value="name">Name</option>
+          <option value="manaCost">Mana Cost</option>
+          <option value="cooldown">Cooldown</option>
+          <option value="power">Power</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Ability List -->
+    <div class="ability-list">
+      @for (ability of filteredAbilities(); track ability.abilityId) {
+        <div
+          class="ability-list-item"
+          [class.selected]="selectedAbility()?.abilityId === ability.abilityId"
+          (click)="selectAbility(ability)"
+        >
+          <div class="ability-info">
+            <span class="ability-name">{{ ability.name }}</span>
+            <span class="ability-id">{{ ability.abilityId }}</span>
+          </div>
+          <div class="ability-stats-preview">
+            <span class="stat-badge type" [style.background-color]="getTypeColor(ability.type) + '33'" [style.color]="getTypeColor(ability.type)" [style.border-color]="getTypeColor(ability.type)">
+              {{ ability.type }}
+            </span>
+            <span class="stat-badge mana">{{ ability.manaCost }} MP</span>
+            <span class="stat-badge cooldown">{{ ability.cooldown }}T CD</span>
+          </div>
+        </div>
+      } @empty {
+        <div class="empty-state">
+          <span class="material-symbols-outlined">shield</span>
+          <p>No abilities found</p>
+        </div>
+      }
+    </div>
+  </aside>
+
+  <!-- Ability Detail Panel -->
+  <main class="ability-detail-panel">
+    @if (selectedAbility(); as ability) {
+      <div class="detail-content">
+        <!-- Header -->
+        <div class="detail-header">
+          <div class="header-info">
+            <h2>{{ ability.name }}</h2>
+            <code class="ability-id-display">{{ ability.abilityId }}</code>
+          </div>
+        </div>
+
+        <!-- Basic Info Section -->
+        <section class="detail-section">
+          <h3>Basic Information</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Name</label>
+              <span>{{ ability.name }}</span>
+            </div>
+            <div class="info-item">
+              <label>Ability ID</label>
+              <span>{{ ability.abilityId }}</span>
+            </div>
+            <div class="info-item">
+              <label>Type</label>
+              <span class="type-badge" [style.background-color]="getTypeColor(ability.type) + '33'" [style.color]="getTypeColor(ability.type)" [style.border-color]="getTypeColor(ability.type)">
+                {{ capitalizeFirst(ability.type) }}
+              </span>
+            </div>
+            <div class="info-item">
+              <label>Target Type</label>
+              <span>{{ getTargetTypeLabel(ability.targetType) }}</span>
+            </div>
+            <div class="info-item full-width">
+              <label>Description</label>
+              <span>{{ ability.description }}</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Cost & Cooldown Section -->
+        <section class="detail-section">
+          <h3>Cost & Cooldown</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Mana Cost</label>
+              <span class="stat-value">{{ ability.manaCost }} MP</span>
+            </div>
+            <div class="info-item">
+              <label>Cooldown</label>
+              <span class="stat-value">{{ ability.cooldown }} Turns</span>
+            </div>
+            <div class="info-item">
+              <label>Power Multiplier</label>
+              <span class="stat-value">{{ ability.powerMultiplier }}x</span>
+            </div>
+            @if (ability.xpOnUse) {
+              <div class="info-item">
+                <label>XP on Use</label>
+                <span class="stat-value">{{ ability.xpOnUse }} XP</span>
+              </div>
+            }
+          </div>
+        </section>
+
+        <!-- Requirements Section -->
+        <section class="detail-section">
+          <h3>Requirements</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Minimum Skill Level</label>
+              <span class="stat-value">Level {{ ability.requirements.minSkillLevel }}</span>
+            </div>
+            <div class="info-item">
+              <label>Weapon Types</label>
+              <span>{{ getWeaponTypes(ability) }}</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Effects Section -->
+        <section class="detail-section">
+          <h3>Effects</h3>
+
+          @if (hasDamageEffects(ability)) {
+            <div class="effect-subsection">
+              <h4>Damage</h4>
+              <div class="info-grid">
+                <div class="info-item">
+                  <label>Damage Type</label>
+                  <span>{{ getDamageTypeLabel(ability.effects.damage?.type) }}</span>
+                </div>
+                <div class="info-item">
+                  <label>Damage Multiplier</label>
+                  <span class="stat-value">{{ ability.effects.damage?.multiplier }}x</span>
+                </div>
+              </div>
+            </div>
+          }
+
+          @if (hasHealEffects(ability)) {
+            <div class="effect-subsection">
+              <h4>Healing</h4>
+              <div class="info-grid">
+                <div class="info-item">
+                  <label>Heal Multiplier</label>
+                  <span class="stat-value">{{ ability.effects.heal?.multiplier }}x</span>
+                </div>
+              </div>
+            </div>
+          }
+
+          @if (ability.effects.critChanceBonus) {
+            <div class="effect-subsection">
+              <h4>Critical Bonus</h4>
+              <div class="info-grid">
+                <div class="info-item">
+                  <label>Crit Chance Bonus</label>
+                  <span class="stat-value">+{{ (ability.effects.critChanceBonus * 100).toFixed(1) }}%</span>
+                </div>
+              </div>
+            </div>
+          }
+
+          @if (hasBuffEffects(ability)) {
+            <div class="effect-subsection">
+              <h4>Buff/Debuff Application</h4>
+              <div class="buff-details">
+                <div class="info-grid">
+                  <div class="info-item">
+                    <label>Buff Name</label>
+                    <span>{{ ability.effects.applyBuff?.name }}</span>
+                  </div>
+                  <div class="info-item">
+                    <label>Target</label>
+                    <span>{{ capitalizeFirst(ability.effects.applyBuff?.target || '') }}</span>
+                  </div>
+                  <div class="info-item">
+                    <label>Duration</label>
+                    <span class="stat-value">{{ ability.effects.applyBuff?.duration }} Turns</span>
+                  </div>
+                  <div class="info-item full-width">
+                    <label>Description</label>
+                    <span>{{ ability.effects.applyBuff?.description }}</span>
+                  </div>
+                </div>
+
+                @if (ability.effects.applyBuff?.damageOverTime) {
+                  <div class="buff-stat">
+                    <label>Damage Over Time:</label>
+                    <span class="stat-value">{{ ability.effects.applyBuff?.damageOverTime }} per turn</span>
+                  </div>
+                }
+                @if (ability.effects.applyBuff?.healOverTime) {
+                  <div class="buff-stat">
+                    <label>Heal Over Time:</label>
+                    <span class="stat-value">{{ ability.effects.applyBuff?.healOverTime }} per turn</span>
+                  </div>
+                }
+                @if (ability.effects.applyBuff?.manaRegen) {
+                  <div class="buff-stat">
+                    <label>Mana Regen:</label>
+                    <span class="stat-value">{{ ability.effects.applyBuff?.manaRegen }} per turn</span>
+                  </div>
+                }
+                @if (ability.effects.applyBuff?.manaDrain) {
+                  <div class="buff-stat">
+                    <label>Mana Drain:</label>
+                    <span class="stat-value">{{ ability.effects.applyBuff?.manaDrain }} per turn</span>
+                  </div>
+                }
+
+                @if (getStatModifiers(ability).length > 0) {
+                  <div class="stat-modifiers">
+                    <h5>Stat Modifiers</h5>
+                    @for (modifier of getStatModifiers(ability); track $index) {
+                      <div class="modifier-item">
+                        <span class="modifier-stat">{{ capitalizeFirst(modifier.stat) }}</span>
+                        <span class="modifier-type">{{ capitalizeFirst(modifier.type) }}</span>
+                        <span class="modifier-value">{{ modifier.value > 0 ? '+' : '' }}{{ modifier.value }}</span>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </section>
+
+        <!-- Icon Section -->
+        <section class="detail-section">
+          <h3>Icon Configuration</h3>
+          <div class="info-grid">
+            <div class="info-item full-width">
+              <label>Icon Path</label>
+              <code>{{ ability.icon.path }}</code>
+            </div>
+            <div class="info-item">
+              <label>Material</label>
+              <span>{{ ability.icon.material }}</span>
+            </div>
+          </div>
+        </section>
+      </div>
+    } @else {
+      <div class="empty-state-detail">
+        <span class="material-symbols-outlined">arrow_back</span>
+        <h3>No Ability Selected</h3>
+        <p>Select an ability from the list to view its details</p>
+      </div>
+    }
+  </main>
+</div>

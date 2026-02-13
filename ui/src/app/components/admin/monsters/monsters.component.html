@@ -114,6 +114,18 @@
               <span class="stat-value">{{ getHealth(monster) }} HP</span>
             </div>
             <div class="info-item">
+              <label>Mana</label>
+              <span class="stat-value">{{ monster.stats.mana.max }} MP</span>
+            </div>
+            <div class="info-item">
+              <label>Armor</label>
+              <span class="stat-value">{{ getArmor(monster) }}</span>
+            </div>
+            <div class="info-item">
+              <label>Evasion</label>
+              <span class="stat-value">{{ getEvasion(monster) }}</span>
+            </div>
+            <div class="info-item">
               <label>Damage Roll</label>
               <span class="stat-value">{{ getDamageRoll(monster) }}</span>
             </div>
@@ -121,6 +133,50 @@
               <label>Average Damage</label>
               <span class="stat-value">{{ getAverageDamage(monster).toFixed(1) }}</span>
             </div>
+            <div class="info-item">
+              <label>Critical Chance</label>
+              <span class="stat-value">{{ (getCritChance(monster) * 100).toFixed(1) }}%</span>
+            </div>
+            <div class="info-item">
+              <label>Attack Speed</label>
+              <span class="stat-value">{{ getAttackSpeed(monster).toFixed(1) }}s</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Attributes Section -->
+        <section class="detail-section">
+          <h3>Attributes</h3>
+          <div class="attributes-grid">
+            @for (attr of getAttributes(monster); track attr.name) {
+              <div class="attribute-card">
+                <div class="attribute-header">
+                  <img class="attribute-icon" [src]="getAttributeIcon(attr.name)" [alt]="attr.name">
+                  <div class="attribute-title">
+                    <h4>{{ capitalizeFirst(attr.name) }}</h4>
+                    <span class="attribute-level">Lv {{ attr.attribute.level }}</span>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </section>
+
+        <!-- Skills Section -->
+        <section class="detail-section">
+          <h3>Skills</h3>
+          <div class="skills-grid">
+            @for (skill of getSkills(monster); track skill.name) {
+              <div class="skill-card">
+                <div class="skill-header">
+                  <img class="skill-icon" [src]="getSkillIcon(skill.name)" [alt]="getSkillDisplayName(skill.name)" loading="lazy">
+                  <div class="skill-title">
+                    <h4 class="skill-name">{{ getSkillDisplayName(skill.name) }}</h4>
+                    <span class="skill-level">Lv {{ skill.skill.level }}</span>
+                  </div>
+                </div>
+              </div>
+            }
           </div>
         </section>
 

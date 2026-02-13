@@ -1,0 +1,153 @@
+<div class="biomes-container">
+  <!-- Biome List Sidebar -->
+  <aside class="biome-list-sidebar">
+    <div class="sidebar-header">
+      <h3>Biomes</h3>
+      <span class="biome-count">{{ filteredBiomes().length }} / {{ allBiomes.length }}</span>
+    </div>
+
+    <!-- Search -->
+    <div class="search-box">
+      <span class="material-symbols-outlined">search</span>
+      <input
+        type="text"
+        placeholder="Search biomes..."
+        [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event); applyFilters()"
+      />
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+      <div class="filter-group">
+        <label>Sort By</label>
+        <select
+          [ngModel]="sortBy()"
+          (ngModelChange)="sortBy.set($event); applyFilters()"
+        >
+          <option value="name">Name</option>
+          <option value="biomeId">Biome ID</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Biome List -->
+    <div class="biome-list">
+      @for (biome of filteredBiomes(); track biome.biomeId) {
+        <div
+          class="biome-list-item"
+          [class.selected]="selectedBiome()?.biomeId === biome.biomeId"
+          (click)="selectBiome(biome)"
+        >
+          <div
+            class="biome-theme-preview"
+            [style.background]="getThemePreview(biome)"
+          ></div>
+          <div class="biome-info">
+            <span class="biome-name">{{ biome.name }}</span>
+            <span class="biome-id">{{ biome.biomeId }}</span>
+          </div>
+        </div>
+      } @empty {
+        <div class="empty-state">
+          <span class="material-symbols-outlined">landscape</span>
+          <p>No biomes found</p>
+        </div>
+      }
+    </div>
+  </aside>
+
+  <!-- Biome Detail Panel -->
+  <main class="biome-detail-panel">
+    @if (selectedBiome(); as biome) {
+      <div class="detail-content">
+        <!-- Header -->
+        <div class="detail-header">
+          <div class="header-info">
+            <h2>{{ biome.name }}</h2>
+            <code class="biome-id-display">{{ biome.biomeId }}</code>
+          </div>
+          <div
+            class="theme-preview-large"
+            [style.background]="getThemePreview(biome)"
+          ></div>
+        </div>
+
+        <!-- Basic Info Section -->
+        <section class="detail-section">
+          <h3>Basic Information</h3>
+          <div class="info-grid">
+            <div class="info-item full-width">
+              <label>Description</label>
+              <span>{{ biome.description }}</span>
+            </div>
+            <div class="info-item">
+              <label>Biome ID</label>
+              <code>{{ biome.biomeId }}</code>
+            </div>
+          </div>
+        </section>
+
+        <!-- Theme Section -->
+        @if (hasTheme(biome)) {
+          <section class="detail-section">
+            <h3>Visual Theme</h3>
+            <div class="theme-details">
+              <div class="theme-colors-grid">
+                <div class="color-item">
+                  <label>Primary Color</label>
+                  <div class="color-display">
+                    <div
+                      class="color-swatch"
+                      [style.background-color]="getPrimaryColor(biome)"
+                    ></div>
+                    <code>{{ getPrimaryColor(biome) }}</code>
+                  </div>
+                </div>
+                <div class="color-item">
+                  <label>Secondary Color</label>
+                  <div class="color-display">
+                    <div
+                      class="color-swatch"
+                      [style.background-color]="getSecondaryColor(biome)"
+                    ></div>
+                    <code>{{ getSecondaryColor(biome) }}</code>
+                  </div>
+                </div>
+                <div class="color-item">
+                  <label>Accent Color</label>
+                  <div class="color-display">
+                    <div
+                      class="color-swatch"
+                      [style.background-color]="getAccentColor(biome)"
+                    ></div>
+                    <code>{{ getAccentColor(biome) }}</code>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Theme Preview -->
+              <div class="theme-preview-section">
+                <label>Gradient Preview</label>
+                <div
+                  class="gradient-preview"
+                  [style.background]="getThemePreview(biome)"
+                >
+                  <span class="preview-text" [style.color]="getAccentColor(biome)">
+                    {{ biome.name }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </section>
+        }
+      </div>
+    } @else {
+      <div class="empty-state-detail">
+        <span class="material-symbols-outlined">arrow_back</span>
+        <h3>No Biome Selected</h3>
+        <p>Select a biome from the list to view its details</p>
+      </div>
+    }
+  </main>
+</div>

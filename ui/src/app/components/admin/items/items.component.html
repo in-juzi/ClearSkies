@@ -77,6 +77,13 @@
           [class.selected]="selectedItem()?.itemId === item.itemId"
           (click)="selectItem(item)"
         >
+          @if (item.icon) {
+            <app-icon
+              [path]="item.icon.path"
+              [material]="item.icon.material"
+              [size]="32"
+            ></app-icon>
+          }
           <div class="item-info">
             <span class="item-name">{{ item.name }}</span>
             <span class="item-id">{{ item.itemId }}</span>
@@ -101,6 +108,13 @@
       <div class="detail-content">
         <!-- Header -->
         <div class="detail-header">
+          @if (item.icon) {
+            <app-icon
+              [path]="item.icon.path"
+              [material]="item.icon.material"
+              [size]="48"
+            ></app-icon>
+          }
           <div class="header-info">
             <h2>{{ item.name }}</h2>
             <code class="item-id-display">{{ item.itemId }}</code>

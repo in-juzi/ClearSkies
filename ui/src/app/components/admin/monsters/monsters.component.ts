@@ -1,8 +1,9 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Monster } from '@shared/types';
+import { Monster, SkillName, AttributeName } from '@shared/types';
 import { MonsterRegistry } from '@be/data/monsters/MonsterRegistry';
+import { SKILL_DISPLAY_NAMES, SKILL_ICONS, ATTRIBUTE_ICONS } from '../../../constants/game-data.constants';
 
 @Component({
   selector: 'app-monsters',
@@ -27,6 +28,11 @@ export class MonstersComponent {
 
   // Edit mode (disabled for now)
   editMode = signal(false);
+
+  // Constants for display
+  skillIcons = SKILL_ICONS;
+  skillNames = SKILL_DISPLAY_NAMES;
+  attributeIcons = ATTRIBUTE_ICONS;
 
   constructor() {
     this.loadMonsters();
@@ -76,8 +82,8 @@ export class MonstersComponent {
   }
 
   getAverageDamage(monster: Monster): number {
-    const damageRoll = (monster.stats as any).damageRoll;
-    if (!damageRoll) return 0;
+    const damageRoll = this.getDamageRoll(monster);
+    if (!damageRoll || damageRoll === '0d0') return 0;
 
     const parts = damageRoll.split('d');
     if (parts.length === 2) {
@@ -102,15 +108,65 @@ export class MonstersComponent {
   }
 
   getHealth(monster: Monster): number {
-    return (monster.stats as any).health || 0;
+    return monster.stats.health.max || 0;
   }
 
   getDamageRoll(monster: Monster): string {
-    return (monster.stats as any).damageRoll || '0d0';
+    return monster.equipment.weapon?.damageRoll || monster.equipment.natural?.damageRoll || '0d0';
   }
 
   getAbilities(monster: Monster): string[] {
     return (monster as any).abilities || [];
+  }
+
+  getSkills(monster: Monster): { name: SkillName; skill: { level: number; experience: number } }[] {
+    if (!monster.skills) return [];
+    return Object.entries(monster.skills).map(([name, skill]) => ({
+      name: name as SkillName,
+      skill
+    }));
+  }
+
+  getAttributes(monster: Monster): { name: AttributeName; attribute: { level: number; experience: number } }[] {
+    if (!monster.attributes) return [];
+    return Object.entries(monster.attributes).map(([name, attr]) => ({
+      name: name as AttributeName,
+      attribute: attr
+    }));
+  }
+
+  getSkillIcon(skillName: SkillName): string {
+    return this.skillIcons[skillName as keyof typeof this.skillIcons] || 'assets/icons/ui/ui_question.svg';
+  }
+
+  getSkillDisplayName(skillName: SkillName): string {
+    return this.skillNames[skillName as keyof typeof this.skillNames] || this.capitalizeFirst(skillName);
+  }
+
+  getAttributeIcon(attributeName: AttributeName): string {
+    return this.attributeIcons[attributeName];
+  }
+
+  capitalizeFirst(str: string): string {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
+  getArmor(monster: Monster): number {
+    return monster.combatStats.armor || 0;
+  }
+
+  getEvasion(monster: Monster): number {
+    return monster.combatStats.evasion || 0;
+  }
+
+  getCritChance(monster: Monster): number {
+    const weapon = monster.equipment.weapon || monster.equipment.natural;
+    return weapon?.critChance || 0;
+  }
+
+  getAttackSpeed(monster: Monster): number {
+    const weapon = monster.equipment.weapon || monster.equipment.natural;
+    return weapon?.attackSpeed || 0;
   }
 
   // Stub methods for future editing functionality
