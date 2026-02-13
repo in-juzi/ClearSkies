@@ -38,16 +38,14 @@
 
       .section-title {
         color: var(--color-secondary);
-        font-size: var(--font-size-2xl);
         font-weight: var(--font-weight-semibold);
-        margin: 0;
-        text-transform: uppercase;
         letter-spacing: var(--letter-spacing-wide);
+        margin: 0;
         flex: 1;
       }
 
       .section-count {
-        background: var(--color-primary);
+        background: var(--color-bg-tertiary);
         color: var(--color-text-primary);
         padding: var(--spacing-xs) var(--spacing-m);
         border-radius: var(--radius-full);

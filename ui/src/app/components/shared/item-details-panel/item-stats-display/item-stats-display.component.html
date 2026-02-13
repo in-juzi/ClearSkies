@@ -30,7 +30,7 @@
       @if (properties['skillScalar']) {
         <div class="detail-row">
           <span class="label">Skill:</span>
-          <span class="text-purple-400">{{ properties['skillScalar'] }}</span>
+          <span class="text-purple-400">{{ getSkillDisplayName(properties['skillScalar']) }}</span>
         </div>
       }
       @if (properties['requiredLevel'] !== undefined) {

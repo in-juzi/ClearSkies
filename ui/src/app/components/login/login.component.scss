@@ -8,7 +8,7 @@
 }
 
 .login-card {
-  background: var(--color-text-primary);
+  background: var(--color-surface-elevated);
   padding: var(--spacing-4xl);
   border-radius: var(--radius-l);
   box-shadow: var(--shadow-xl);
@@ -17,14 +17,14 @@
 
   h1 {
     font-size: var(--font-size-4xl);
-    color: var(--color-bg-primary);
+    color: var(--color-text-primary);
     margin-bottom: var(--spacing-m);
     text-align: center;
   }
 
   h2 {
     font-size: var(--font-size-xl);
-    color: var(--color-text-disabled);
+    color: var(--color-text-secondary);
     margin-bottom: var(--spacing-3xl);
     text-align: center;
     font-weight: var(--font-weight-regular);
@@ -48,7 +48,7 @@
   label {
     display: block;
     margin-bottom: var(--spacing-s);
-    color: var(--color-bg-primary);
+    color: var(--color-text-primary);
     font-weight: var(--font-weight-medium);
   }
 
@@ -104,7 +104,7 @@ button {
 .register-link {
   margin-top: var(--spacing-xl);
   text-align: center;
-  color: var(--color-text-disabled);
+  color: var(--color-text-secondary);
 
   a {
     color: var(--color-text-accent-secondary);

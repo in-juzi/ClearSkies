@@ -85,7 +85,7 @@
       <div class="purchase-header">
         <h3>Purchase a Plot of Land</h3>
         @if (currentLocation()) {
-          <p>Location: <strong>{{ currentLocation() }}</strong></p>
+          <p>Location: <strong>{{ currentLocation()?.name }}</strong></p>
         } @else {
           <p class="warning">You must be at a location to purchase a plot</p>
         }

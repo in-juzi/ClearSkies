@@ -1,5 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { SKILL_DISPLAY_NAMES } from '../../../../constants/game-data.constants';
+import { SkillName } from '../../../../models/user.model';
 
 // Combat stats interface
 export interface CombatStats {
@@ -42,4 +44,11 @@ export class ItemStatsDisplayComponent {
   @Input() scaledHealthRestore: number = 0;
   @Input() scaledManaRestore: number = 0;
   @Input() hasPotencyQuality: boolean = false;
+
+  /**
+   * Get human-readable skill name from skill ID
+   */
+  getSkillDisplayName(skillId: string): string {
+    return SKILL_DISPLAY_NAMES[skillId as SkillName] || skillId;
+  }
 }
