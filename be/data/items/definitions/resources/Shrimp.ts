@@ -1,16 +1,16 @@
 /**
- * Shrimp - Small shellfish caught in shallow waters
+ * Raw Shrimp - Small shellfish caught in shallow waters
  * Tier: 1
  */
 
-import { ConsumableItem } from '@shared/types';
+import { ResourceItem } from '@shared/types';
 import { CATEGORY, RARITY, TIER, MATERIAL, SKILL_SOURCE, SUBCATEGORIES } from '../../../constants/item-constants';
 
-export const Shrimp: ConsumableItem = {
+export const Shrimp: ResourceItem = {
   "itemId": "shrimp",
-  "name": "Shrimp",
-  "description": "Small shellfish caught in shallow waters",
-  "category": CATEGORY.CONSUMABLE,
+  "name": "Raw Shrimp",
+  "description": "Small raw shellfish caught in shallow waters",
+  "category": CATEGORY.RESOURCE,
   "subcategories": SUBCATEGORIES.FISH_SHELLFISH,
   "baseValue": 8,
   "rarity": RARITY.COMMON,

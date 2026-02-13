@@ -1,16 +1,16 @@
 /**
- * Salmon - A prized salmon, rich in flavor
+ * Raw Salmon - A prized salmon, rich in flavor
  * Tier: 2
  */
 
-import { ConsumableItem } from '@shared/types';
+import { ResourceItem } from '@shared/types';
 import { CATEGORY, RARITY, TIER, MATERIAL, SKILL_SOURCE, SUBCATEGORIES } from '../../../constants/item-constants';
 
-export const Salmon: ConsumableItem = {
+export const Salmon: ResourceItem = {
   "itemId": "salmon",
-  "name": "Salmon",
-  "description": "A prized salmon, rich in flavor",
-  "category": CATEGORY.CONSUMABLE,
+  "name": "Raw Salmon",
+  "description": "A prized raw salmon, rich in flavor",
+  "category": CATEGORY.RESOURCE,
   "subcategories": SUBCATEGORIES.FISH_FRESHWATER,
   "baseValue": 35,
   "rarity": RARITY.UNCOMMON,
