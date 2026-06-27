@@ -21,7 +21,7 @@ ClearSkies is a medieval fantasy browser-based game:
 **Make migration:** `be/migrations/NNN-description.js` (see Database Migrations below)
 **Deploy to production:** `cd ui && npm run deploy` — builds + uploads to S3 with CloudFront invalidation
 
-> **IMPORTANT — NEVER start backend/frontend servers.** They are always running during development. Only rebuild with `npm run build` if code changes require it. If a restart is needed, ask the user first.
+> **Dev shells**: Claude maintains the dev servers — backend `cd be && npm run dev` and frontend `cd ui && npm run start` (`ng serve`). Run them as **background tasks** so logs are readable across turns, and start/restart them as needed (e.g. after dependency installs or backend code changes) without asking. Check whether one is already running before starting a duplicate.
 
 > **Content creation**: Before adding monsters/locations/activities/drop tables, read [project/docs/019-content-creation-pitfalls.md](project/docs/019-content-creation-pitfalls.md).
 
@@ -29,7 +29,7 @@ ClearSkies is a medieval fantasy browser-based game:
 
 ### Code Changes
 - Backend model/schema change → create migration in `be/migrations/`
-- New dependency → ask the user to restart servers
+- New dependency → restart the affected dev shell (Claude-managed background task)
 - Use Angular **signals** for state management
 - Game components live under `ui/src/app/components/game/`
 - Use the Edit tool first; fall back to bash only if it fails twice; batch related changes
