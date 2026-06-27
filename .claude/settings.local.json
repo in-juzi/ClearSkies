@@ -28,6 +28,8 @@
       "Bash(echo:*)",
       "Bash(ls:*)",
       "Bash(wc:*)",
+      "Bash(date:*)",
+      "Bash(git add:*)",
       "Bash(npm run dev:*)",
       "Bash(npm run start:*)",
       "Bash(npm start:*)",
