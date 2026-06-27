@@ -28,3 +28,5 @@ npm-debug.log*
 # OS
 .DS_Store
 Thumbs.db
+# Session journals (local-only, safe to delete after resume)
+journals/
