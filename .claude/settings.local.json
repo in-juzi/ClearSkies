@@ -20,7 +20,18 @@
       "Bash(npm run update:activity-xp:*)",
       "Bash(npm run survey:activity-xp:*)",
       "Bash(sed:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(npm run type-check:*)",
+      "Bash(npm run generate:*)",
+      "Bash(npm run progression:*)",
+      "Bash(npm run test:items:*)",
+      "Bash(echo:*)",
+      "Bash(ls:*)",
+      "Bash(wc:*)",
+      "Bash(npm run dev:*)",
+      "Bash(npm run start:*)",
+      "Bash(npm start:*)",
+      "Bash(npx ng serve:*)"
     ],
     "deny": [],
     "ask": []
