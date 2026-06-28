@@ -6,12 +6,12 @@ import { InventoryService } from '../../../services/inventory.service';
 import { AuthService } from '../../../services/auth.service';
 import { SkillsService } from '../../../services/skills.service';
 import { ChatService } from '../../../services/chat.service';
-import { Recipe, ItemInstance, RecipeIngredient } from '@shared/types';
+import { Recipe, ItemInstance } from '@shared/types';
 import { ActivityLogEntry } from '../../shared/activity-log/activity-log.component';
 import { RecipeListComponent } from './recipe-list/recipe-list.component';
 import { CraftingProgressComponent } from './crafting-progress/crafting-progress.component';
 import { IngredientSelectorComponent } from './ingredient-selector/ingredient-selector.component';
-import { calculateItemScore } from '../../../utils/item-sort.utils';
+import { CraftingSelectionService } from '../../../services/crafting-selection.service';
 
 // Extended item instance with crafting-specific properties (uses any for flexibility with ItemDetails)
 type CraftingItemInstance = ItemInstance | any;
@@ -153,7 +153,8 @@ export class CraftingComponent implements OnInit {
     private inventoryService: InventoryService,
     private authService: AuthService,
     private skillsService: SkillsService,
-    private chatService: ChatService
+    private chatService: ChatService,
+    private craftingSelection: CraftingSelectionService
   ) {
     // Setup auto-restart watcher in constructor (injection context)
     effect(() => {
@@ -258,15 +259,19 @@ export class CraftingComponent implements OnInit {
             // Already set restarting flag above to prevent flicker
 
             // Try to reuse the same ingredient instances if possible
-            const reused = this.reuseIngredientSelection(recipe);
+            const reused = this.craftingSelection.reuseIngredientSelection(
+              recipe, this.playerInventory() || [], this.selectedIngredients()
+            );
 
-            if (!reused) {
+            if (reused) {
+              this.selectedIngredients.set(reused);
+            } else {
               // Can't reuse, try auto-selecting new instances
               this.autoSelectBestQuality(recipe);
             }
 
             // Check if we have enough selected
-            if (this.hasSelectedEnough(recipe)) {
+            if (this.craftingSelection.hasSelectedEnough(recipe, this.selectedIngredients())) {
               // Restart immediately now that inventory is confirmed updated
               this.restartCrafting(recipe);
             } else {
@@ -412,7 +417,7 @@ export class CraftingComponent implements OnInit {
     }
 
     // Check if we have selected specific ingredients
-    const hasSelection = this.hasSelectedEnough(recipe);
+    const hasSelection = this.craftingSelection.hasSelectedEnough(recipe, this.selectedIngredients());
     if (!hasSelection) {
       this.showMessage('Please select ingredients to craft with', 'error');
       return;
@@ -474,208 +479,23 @@ export class CraftingComponent implements OnInit {
   }
 
   /**
-   * Get lookupKey for an ingredient (itemId or subcategory)
-   */
-  getIngredientLookupKey(ingredient: RecipeIngredient): string {
-    return ingredient.itemId || ingredient.subcategory || '';
-  }
-
-  /**
-   * Get available instances for an ingredient (supports subcategory)
-   */
-  getAvailableInstancesByIngredient(ingredient: RecipeIngredient): CraftingItemInstance[] {
-    const inventory = this.playerInventory();
-    if (!inventory) return [];
-
-    let items: CraftingItemInstance[];
-    if (ingredient.subcategory) {
-      // Filter by subcategory
-      items = inventory.filter(item =>
-        !item.equipped && item.definition?.subcategories?.includes(ingredient.subcategory!)
-      );
-    } else {
-      // Filter by specific itemId
-      items = inventory.filter(item =>
-        item.itemId === ingredient.itemId && !item.equipped
-      );
-    }
-
-    // Sort by quality score (higher quality first)
-    return items.sort((a, b) => {
-      const aQuality = this.getQualityScore(a);
-      const bQuality = this.getQualityScore(b);
-      return bQuality - aQuality;
-    });
-  }
-
-  /**
-   * Calculate quality score for sorting
-   */
-  getQualityScore(item: CraftingItemInstance): number {
-    // Use centralized utility function for consistent scoring
-    return calculateItemScore(item, 10); // trait weight = 10 for crafting (prioritize traits)
-  }
-
-  /**
    * Toggle instance selection
    */
   toggleInstanceSelection(lookupKey: string, instanceId: string, maxQuantity: number, required: number): void {
-    const selected = new Map(this.selectedIngredients());
-    const instanceIds = selected.get(lookupKey) || [];
-
-    // Count how many of this instance are already selected
-    const currentCount = instanceIds.filter(id => id === instanceId).length;
-
-    // Count total selected for this lookupKey
-    const totalSelected = instanceIds.length;
-
-    // Left click adds, right-click or shift-click would remove
-    // For now, we cycle: 0 -> 1 -> 2 -> ... -> maxQuantity -> 0
-    if (currentCount >= maxQuantity || (currentCount > 0 && totalSelected >= required)) {
-      // At max for this instance OR at required total, remove all of this instance
-      const filtered = instanceIds.filter(id => id !== instanceId);
-      selected.set(lookupKey, filtered);
-    } else {
-      // Add one more instance
-      if (totalSelected < required) {
-        // Room available, just add
-        instanceIds.push(instanceId);
-        selected.set(lookupKey, instanceIds);
-      } else {
-        // At capacity but can replace oldest different instance
-        // Find the first instance that's not this one
-        const indexToReplace = instanceIds.findIndex(id => id !== instanceId);
-        if (indexToReplace > -1) {
-          instanceIds.splice(indexToReplace, 1);
-          instanceIds.push(instanceId);
-          selected.set(lookupKey, instanceIds);
-        } else {
-          // All selected are this instance already at max, cycle back to 0
-          selected.set(lookupKey, []);
-        }
-      }
-    }
-
-    this.selectedIngredients.set(selected);
+    this.selectedIngredients.set(
+      this.craftingSelection.toggleInstanceSelection(
+        this.selectedIngredients(), lookupKey, instanceId, maxQuantity, required
+      )
+    );
   }
 
   /**
-   * Get total selected count for an ingredient by lookupKey
-   */
-  getTotalSelectedByLookupKey(lookupKey: string): number {
-    const selected = this.selectedIngredients();
-    const instanceIds = selected.get(lookupKey) || [];
-    return instanceIds.length;
-  }
-
-  /**
-   * Check if we have selected enough ingredients
-   */
-  hasSelectedEnough(recipe: Recipe): boolean {
-    for (const ingredient of recipe.ingredients) {
-      const lookupKey = this.getIngredientLookupKey(ingredient);
-      const selected = this.getTotalSelectedByLookupKey(lookupKey);
-      if (selected < ingredient.quantity) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  /**
-   * Try to reuse the same ingredient instances from the previous selection
-   * Returns true if successful, false if we need to reselect
-   */
-  reuseIngredientSelection(recipe: Recipe): boolean {
-    const currentSelection = this.selectedIngredients();
-    if (currentSelection.size === 0) {
-      return false; // No previous selection to reuse
-    }
-
-    const inventory = this.playerInventory();
-    if (!inventory) return false;
-
-    const newSelection = new Map<string, string[]>();
-
-    // Try to reuse the same instances for each ingredient
-    for (const ingredient of recipe.ingredients) {
-      const lookupKey = this.getIngredientLookupKey(ingredient);
-      const previousInstanceIds = currentSelection.get(lookupKey) || [];
-      const instanceIds: string[] = [];
-      let remaining = ingredient.quantity;
-
-      // Count how many times each instance was used previously
-      const instanceCounts: { [instanceId: string]: number } = {};
-      for (const instanceId of previousInstanceIds) {
-        instanceCounts[instanceId] = (instanceCounts[instanceId] || 0) + 1;
-      }
-
-      // Try to reuse the same instances in the same order
-      for (const [instanceId, prevCount] of Object.entries(instanceCounts)) {
-        if (remaining <= 0) break;
-
-        // Find this instance in current inventory
-        const item = inventory.find(i => i.instanceId === instanceId && !i.equipped);
-        if (item) {
-          // Validate it matches the ingredient requirement
-          if (ingredient.subcategory) {
-            if (!item.definition?.subcategories?.includes(ingredient.subcategory)) {
-              continue; // Skip items that don't match subcategory
-            }
-          } else {
-            if (item.itemId !== ingredient.itemId) {
-              continue; // Skip items with different itemId
-            }
-          }
-
-          // Use as many as we need and as many as are available
-          const available = Math.min(item.quantity, remaining, prevCount);
-          for (let i = 0; i < available; i++) {
-            instanceIds.push(instanceId);
-          }
-          remaining -= available;
-        }
-      }
-
-      // If we couldn't fulfill the requirement with the same instances, fail
-      if (remaining > 0) {
-        return false;
-      }
-
-      newSelection.set(lookupKey, instanceIds);
-    }
-
-    // Successfully reused all instances
-    this.selectedIngredients.set(newSelection);
-    return true;
-  }
-
-  /**
-   * Auto-select best quality instances
+   * Auto-select best quality instances for the recipe
    */
   autoSelectBestQuality(recipe: Recipe): void {
-    const selected = new Map<string, string[]>();
-
-    for (const ingredient of recipe.ingredients) {
-      const lookupKey = this.getIngredientLookupKey(ingredient);
-      const instances = this.getAvailableInstancesByIngredient(ingredient);
-      const instanceIds: string[] = [];
-
-      let remaining = ingredient.quantity;
-      for (const instance of instances) {
-        if (remaining <= 0) break;
-
-        const available = Math.min(instance.quantity, remaining);
-        for (let i = 0; i < available; i++) {
-          instanceIds.push(instance.instanceId);
-        }
-        remaining -= available;
-      }
-
-      selected.set(lookupKey, instanceIds);
-    }
-
-    this.selectedIngredients.set(selected);
+    this.selectedIngredients.set(
+      this.craftingSelection.autoSelectBestQuality(recipe, this.playerInventory() || [])
+    );
   }
 
   /**
