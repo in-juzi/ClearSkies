@@ -28,9 +28,9 @@ Most of this plan shipped after Nov 17 without the checkboxes being updated. Ver
 |---|---|---|
 | 1 — Dead code & naming | ✅ Done | `bank.service.ts` deleted; components renamed |
 | 2.1 — `any` types | ✅ Done | (as marked) |
-| 2.2 — console.logs | 🔧 ~Done | Only **12 left** (housing.service ×6, admin components ×6), not 93 |
+| 2.2 — console.logs | ✅ Done | **0 left** (2026-06-28: admin stubs → TODO comments, housing.service debug logs removed); `console.error` retained |
 | 3.1 — CraftingComponent | 🔧 Partial | Sub-components **created** (`recipe-list`, `ingredient-selector`, `crafting-progress`) but main still **929 lines** → move business logic to `CraftingService` |
-| 3.2 — InventoryComponent | 🔧 Partial | Sub-components **created** (`inventory-list-view`, `-grouped-view`, `-header`, `-stats`); main **574 lines** (just over target) |
+| 3.2 — InventoryComponent | 🔧 Partial | Sub-components **created** (`inventory-list-view`, `-grouped-view`, `-header`, `-stats`); main trimmed to **530 lines** (2026-06-28: filter/group delegated to `ItemFilterService`). Last ~30 lines need action handlers (equip/use/drop) moved to `InventoryService` |
 | 3.3 — ItemDetailsPanel | ✅ Done | **246 lines** (was 883) |
 | 3.4 — Combat / Chat | ✅ Done | Combat **472 lines**; Chat decomposed (header/input/messages) |
 | 4 — Signals migration | ✅ Done | Sampled components use `input()` API (item-mini, location-facility-list) |
@@ -40,8 +40,8 @@ Most of this plan shipped after Nov 17 without the checkboxes being updated. Ver
 
 ### Genuinely remaining work
 1. **Slim CraftingComponent** (929 → <500) by moving business logic to `CraftingService` (sub-components already extracted).
-2. **Slim InventoryComponent** (574 → <500) — minor.
-3. **Remove ~12 console.logs** (housing.service ×6, admin locations/monsters/items ×2 each).
+2. **Slim InventoryComponent** (530 → <500) — needs the equip/unequip/use/drop action handlers moved into `InventoryService` (deeper than a quick win; pair with #5).
+3. ~~Remove console.logs~~ — ✅ done 2026-06-28 (0 remaining).
 4. **world-map requirement checking** (Phase 5.3) — an actual feature gap, not just cleanup.
 5. Verify/finish Phase 5.2 (business logic → services) and 5.4 `inject()` standardization.
 

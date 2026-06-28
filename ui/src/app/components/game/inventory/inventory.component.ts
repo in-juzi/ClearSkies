@@ -7,6 +7,7 @@ import { VendorService } from '../../../services/vendor.service';
 import { ChatService } from '../../../services/chat.service';
 import { AuthService } from '../../../services/auth.service';
 import { ConfirmDialogService } from '../../../services/confirm-dialog.service';
+import { ItemFilterService } from '../../../services/item-filter.service';
 import { ItemDetails } from '../../../models/inventory.model';
 import { ItemDetailsPanelComponent } from '../../shared/item-details-panel/item-details-panel.component';
 import { isEquipmentItem, isConsumableItem } from '@shared/types';
@@ -24,6 +25,7 @@ import { InventoryStatsComponent } from './inventory-stats/inventory-stats.compo
 })
 export class InventoryComponent implements OnInit {
   private confirmDialog = inject(ConfirmDialogService);
+  private itemFilter = inject(ItemFilterService);
   private equipmentService = inject(EquipmentService);
   private chatService = inject(ChatService);
   private authService = inject(AuthService);
@@ -82,34 +84,17 @@ export class InventoryComponent implements OnInit {
 
   loadInventory(): void {
     this.inventoryService.getInventory().subscribe({
-      next: (response) => {
-      },
-      error: (error) => {
-        console.error('Error loading inventory:', error);
-      }
+      error: (error) => console.error('Error loading inventory:', error)
     });
   }
 
   getFilteredInventory(): ItemDetails[] {
-    let items: ItemDetails[];
+    // Category filtering keeps the service's sorted ordering; search is delegated to ItemFilterService
+    const items = this.selectedCategory === 'all'
+      ? this.inventoryService.getSortedInventory()
+      : this.inventoryService.getSortedItemsByCategory(this.selectedCategory);
 
-    // Filter by category
-    if (this.selectedCategory === 'all') {
-      items = this.inventoryService.getSortedInventory();
-    } else {
-      items = this.inventoryService.getSortedItemsByCategory(this.selectedCategory);
-    }
-
-    // Filter by search query
-    if (this.searchQuery.trim()) {
-      const query = this.searchQuery.toLowerCase();
-      items = items.filter(item =>
-        item.definition?.name.toLowerCase().includes(query) ||
-        item.itemId.toLowerCase().includes(query)
-      );
-    }
-
-    return items;
+    return this.itemFilter.filterBySearch(items, this.searchQuery);
   }
 
   /**
@@ -123,32 +108,7 @@ export class InventoryComponent implements OnInit {
    * Get grouped inventory items organized by item definition
    */
   getGroupedInventory(): ItemGroup[] {
-    const filteredItems = this.getFilteredInventory();
-    const groups = new Map<string, ItemGroup>();
-
-    // Group items by itemId
-    for (const item of filteredItems) {
-      const itemId = item.itemId;
-
-      if (!groups.has(itemId)) {
-        groups.set(itemId, {
-          itemId: itemId,
-          definition: item.definition,
-          instances: [],
-          totalQuantity: 0,
-          isExpanded: true // Default to expanded
-        });
-      }
-
-      const group = groups.get(itemId)!;
-      group.instances.push(item);
-      group.totalQuantity += item.quantity;
-    }
-
-    // Convert map to array and sort by item name
-    return Array.from(groups.values()).sort((a, b) =>
-      a.definition.name.localeCompare(b.definition.name)
-    );
+    return this.itemFilter.groupByItemId(this.getFilteredInventory());
   }
 
   /**
@@ -329,11 +289,7 @@ export class InventoryComponent implements OnInit {
   // Dev helper: Add test item with random qualities
   addTestItem(itemId: string): void {
     this.inventoryService.addRandomItem(itemId, 1).subscribe({
-      next: (response) => {
-      },
-      error: (error) => {
-        console.error('Error adding test item:', error);
-      }
+      error: (error) => console.error('Error adding test item:', error)
     });
   }
 
