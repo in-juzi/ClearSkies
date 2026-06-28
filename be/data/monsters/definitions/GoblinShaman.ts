@@ -8,6 +8,7 @@ import { Monster } from '@shared/types';
 export const GoblinShaman: Monster = {
   "monsterId": "goblin_shaman",
   "name": "Goblin Shaman",
+  "families": ["goblinoid", "caster"],
   "description": "A mystical goblin adorned with bone fetishes and painted symbols. These cunning spellcasters wield dark magic learned from ancient spirits, making them formidable foes despite their frail appearance.",
   "level": 8,
   "stats": {

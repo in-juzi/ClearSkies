@@ -26,11 +26,26 @@ export type StatModifierType = 'flat' | 'percentage';
 /**
  * Monster definition
  */
+/**
+ * Monster family / archetype. A monster belongs to one OR MORE families.
+ * Used by the effect system's TARGET_FAMILY condition (e.g. "+30% vs undead")
+ * and by the essence/enchanting system (see project/ideas/enchanting.md).
+ */
+export type MonsterFamily =
+  | 'goblinoid'
+  | 'beast'
+  | 'humanoid'
+  | 'caster'
+  | 'undead'
+  | 'aberrant';
+
 export interface Monster {
   monsterId: string;
   name: string;
   description: string;
   level: number;
+  /** One or more families/archetypes this monster belongs to */
+  families: MonsterFamily[];
   stats: {
     health: Stats;
     mana: Stats;

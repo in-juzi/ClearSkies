@@ -8,6 +8,7 @@ import { Monster } from '@shared/types';
 export const BanditThug: Monster = {
   "monsterId": "bandit_thug",
   "name": "Bandit Thug",
+  "families": ["humanoid"],
   "description": "A rough-looking brigand wielding a rusty blade. These outlaws prey on travelers along the roads, seeking easy coin through violence and intimidation.",
   "level": 5,
   "stats": {

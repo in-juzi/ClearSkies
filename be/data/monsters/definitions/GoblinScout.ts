@@ -8,6 +8,7 @@ import { Monster } from '@shared/types';
 export const GoblinScout: Monster = {
   "monsterId": "goblin_scout",
   "name": "Goblin Scout",
+  "families": ["goblinoid"],
   "description": "A nimble goblin archer that prefers to strike from afar with crude arrows. Scouts are the eyes and ears of goblin tribes, quick to flee but deadly at range.",
   "level": 5,
   "stats": {

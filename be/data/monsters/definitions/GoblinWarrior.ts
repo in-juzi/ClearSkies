@@ -8,6 +8,7 @@ import { Monster } from '@shared/types';
 export const GoblinWarrior: Monster = {
   "monsterId": "goblin_warrior",
   "name": "Goblin Warrior",
+  "families": ["goblinoid"],
   "description": "A small but fierce goblin clad in crude metal armor. What these creatures lack in size, they make up for in ferocity and cunning, fighting with reckless abandon.",
   "level": 7,
   "stats": {

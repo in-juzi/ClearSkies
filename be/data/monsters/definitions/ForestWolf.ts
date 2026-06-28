@@ -8,6 +8,7 @@ import { Monster } from '@shared/types';
 export const ForestWolf: Monster = {
   "monsterId": "forest_wolf",
   "name": "Forest Wolf",
+  "families": ["beast"],
   "description": "A lean gray wolf that prowls the forest paths. Its keen eyes and sharp fangs make it a dangerous opponent for inexperienced travelers.",
   "level": 3,
   "stats": {
