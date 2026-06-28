@@ -171,11 +171,11 @@ export class MonstersComponent {
 
   // Stub methods for future editing functionality
   toggleEditMode(): void {
-    console.log('Edit mode not yet implemented');
+    // TODO: Implement edit mode
   }
 
   saveChanges(): void {
-    console.log('Save functionality not yet implemented');
+    // TODO: Implement save functionality
   }
 
   cancelEdit(): void {

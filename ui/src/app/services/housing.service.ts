@@ -49,30 +49,19 @@ export class HousingService {
       auth: { token }
     });
 
-    this.socket.on('connect', () => {
-      console.log('Housing socket connected');
-    });
-
-    this.socket.on('disconnect', () => {
-      console.log('Housing socket disconnected');
-    });
-
     // Listen for real-time project updates
     this.socket.on('construction:projectCreated', (data) => {
-      console.log('New construction project created:', data.project);
       // Add to location projects if we're viewing that location
       const current = this.locationProjects();
       this.locationProjects.set([...current, data.project]);
     });
 
     this.socket.on('construction:projectProgress', (data) => {
-      console.log('Construction progress update:', data);
       // Update project in location projects list
       this.updateProjectProgress(data.projectId, data.completedActions);
     });
 
     this.socket.on('construction:projectCompleted', (data) => {
-      console.log('Construction project completed:', data);
       // Remove from active projects
       this.removeFromActiveProjects(data.projectId);
       // If this was our project, add property to list
@@ -82,7 +71,6 @@ export class HousingService {
     });
 
     this.socket.on('construction:projectAbandoned', (data) => {
-      console.log('Construction project abandoned:', data.projectId);
       this.removeFromActiveProjects(data.projectId);
     });
   }

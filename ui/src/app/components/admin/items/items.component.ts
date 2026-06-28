@@ -119,12 +119,10 @@ export class ItemsComponent {
   // Stub methods for future editing functionality
   toggleEditMode(): void {
     // TODO: Implement edit mode
-    console.log('Edit mode not yet implemented');
   }
 
   saveChanges(): void {
     // TODO: Implement save functionality
-    console.log('Save functionality not yet implemented');
   }
 
   cancelEdit(): void {
