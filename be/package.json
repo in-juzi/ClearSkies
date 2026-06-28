@@ -7,6 +7,7 @@
     "start": "node dist/be/index.js",
     "dev": "npm run build && node dist/be/index.js",
     "dev:watch": "nodemon --watch . --ext ts,js,json --ignore dist --exec \"npm run build && node dist/be/index.js\"",
+    "dev:watch:fast": "nodemon --watch . --ext ts,json --ignore dist --ignore node_modules --exec \"ts-node --transpile-only -r tsconfig-paths/register index.ts\"",
     "test": "echo \"Error: no test specified\" && exit 1",
     "migrate": "node utils/migrate.js up",
     "migrate:down": "node utils/migrate.js down",
