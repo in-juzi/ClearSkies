@@ -155,26 +155,17 @@ Rename 5 components to follow `.component.*` naming convention:
 - 8+ `any` types
 - Mixed concerns: UI logic, business logic, and data transformation
 
-**Decomposition Plan:**
-- [ ] Create `RecipeListComponent`
-  - Recipe display and filtering
-  - Extract recipe filtering logic
+**Decomposition Plan:** ✅ COMPLETE (2026-06-28) — CraftingComponent 929 → 497 lines
+- [x] Create `RecipeListComponent` — done
+- [x] Create `IngredientSelectorComponent` — done
+- [x] Create `CraftingProgressComponent` — done
+- [x] Move business logic out of the component
+  - Ingredient-selection logic → new `CraftingSelectionService` (auto-select, reuse, toggle, has-enough, availability/scoring, active-ingredient grouping)
+  - Recipe lock/unlock-hint logic → `RecipeService`
+  - Recipe validation (`canCraft`) already lived in `RecipeService`
+  - Activity-log entry building deduped into a single helper
 
-- [ ] Create `IngredientSelectorComponent`
-  - Ingredient selection UI
-  - Instance selection logic
-
-- [ ] Create `CraftingProgressComponent`
-  - Active crafting display
-  - Progress bar and completion handling
-
-- [ ] Move business logic to `CraftingService`
-  - Recipe validation
-  - Ingredient checking
-  - Crafting calculations
-
-**Estimated Time:** 6-8 hours
-**Risk:** Medium (complex state management, extensive testing required)
+**Actual outcome:** main component is now a thin coordinator (497 lines); pure logic is in services. Verified in-game (incl. auto-restart).
 
 ### 3.2 Refactor InventoryComponent (HIGH - 847 lines)
 
@@ -301,7 +292,7 @@ Rename 5 components to follow `.component.*` naming convention:
 
 ### 5.2 Move Business Logic to Services
 
-- [ ] **CraftingComponent** - Move recipe validation to CraftingService
+- [x] **CraftingComponent** - business logic moved to `CraftingSelectionService` + `RecipeService` (2026-06-28)
 - [ ] **InventoryComponent** - Move item scoring algorithm to InventoryService
 - [ ] **VendorComponent** - Move price calculation to VendorService
 - [ ] **CombatComponent** - Move damage calculations to CombatService
