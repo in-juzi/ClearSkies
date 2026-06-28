@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { DynamicNode, Edge, EdgeChange, NodeChange, Vflow, VflowComponent } from 'ngx-vflow';
 import { LocationService } from '../../../services/location.service';
 import { QuestService } from '../../../services/quest.service';
+import { AuthService } from '../../../services/auth.service';
+import { NotificationService } from '../../../services/notification.service';
 import type { NavigationLink, NavigationRequirements } from '@shared/types';
 import type { Location } from '../../../models/location.model';
 import type { ActiveQuest } from '@shared/types';
@@ -26,6 +28,8 @@ interface TravelEdgeData {
 export class WorldMapComponent implements OnInit {
   private locationService = inject(LocationService);
   private questService = inject(QuestService);
+  private authService = inject(AuthService);
+  private notificationService = inject(NotificationService);
 
   @Input() mode: 'minimap' | 'fullscreen' = 'fullscreen';
   @Output() travelRequested = new EventEmitter<string>();
@@ -43,6 +47,9 @@ export class WorldMapComponent implements OnInit {
 
   // Signal for active quests (populated from service)
   activeQuests = signal<ActiveQuest[]>([]);
+
+  // Completed quest IDs, used for navigation requirement checks
+  completedQuestIds = signal<string[]>([]);
 
   // Computed: Transform locations to ngx-vflow nodes
   nodes = computed<any[]>(() => {
@@ -171,20 +178,23 @@ export class WorldMapComponent implements OnInit {
     this.questService.activeQuests$.subscribe(quests => {
       this.activeQuests.set(quests);
     });
+
+    // Load completed quests for navigation requirement checks
+    this.questService.getCompletedQuests().subscribe({
+      next: response => this.completedQuestIds.set(response.quests.map(q => q.questId)),
+      error: err => console.error('Failed to load completed quests:', err)
+    });
   }
 
   /**
-   * Check if navigation requirements are met
+   * Check if the player meets a link's navigation requirements
    */
   private checkRequirements(link: NavigationLink): boolean {
-    // TODO: Implement actual requirement checking
-    // For now, just return true if no requirements
-    if (!link.requirements) return true;
-
-    // Check if requirements object is empty
-    const hasRequirements = Object.keys(link.requirements).length > 0;
-
-    return !hasRequirements; // Simplified for now
+    return this.locationService.meetsNavigationRequirements(
+      link,
+      this.authService.currentPlayer(),
+      this.completedQuestIds()
+    ).met;
   }
 
   /**
@@ -283,7 +293,20 @@ export class WorldMapComponent implements OnInit {
           if (edge.data.available) {
             this.travelRequested.emit(targetLocationId);
           } else {
-            // TODO: Show requirements error
+            // Explain why travel isn't available
+            const { failures } = this.locationService.meetsNavigationRequirements(
+              edge.data.link,
+              this.authService.currentPlayer(),
+              this.completedQuestIds()
+            );
+            if (failures.length > 0) {
+              this.notificationService.warning('Cannot travel yet', failures.join(' • '));
+            } else {
+              this.notificationService.warning(
+                'Cannot travel',
+                'You can only travel to locations connected to your current location.'
+              );
+            }
           }
         }
       }

@@ -9,7 +9,7 @@ import {
   ActivityRewards,
   LocationState
 } from '../models/location.model';
-import { DropTable } from '@shared/types';
+import { DropTable, NavigationLink } from '@shared/types';
 import { SkillsService } from './skills.service';
 import { AttributesService } from './attributes.service';
 import { InventoryService } from './inventory.service';
@@ -497,6 +497,69 @@ export class LocationService {
     return this.http.get<{ dropTable: DropTable & { enrichedDrops: any[] } }>(
       `${this.apiUrl}/drop-tables/${dropTableId}`
     );
+  }
+
+  /**
+   * Check whether the player meets a navigation link's travel requirements.
+   * Mirrors the backend `meetsNavigationRequirements` and follows the
+   * NavigationRequirements contract (skills, attributes, completedQuests, items).
+   * Item quantities are checked against the live inventory.
+   *
+   * @returns `met` plus a list of human-readable `failures` for display.
+   */
+  meetsNavigationRequirements(
+    link: NavigationLink,
+    player: any,
+    completedQuestIds: string[] = []
+  ): { met: boolean; failures: string[] } {
+    const req = link?.requirements;
+    if (!req || Object.keys(req).length === 0) {
+      return { met: true, failures: [] };
+    }
+
+    const failures: string[] = [];
+
+    // Skill level requirements
+    if (req.skills) {
+      for (const [skill, level] of Object.entries(req.skills)) {
+        if ((player?.skills?.[skill]?.level ?? 0) < (level as number)) {
+          failures.push(`Requires ${skill} level ${level}`);
+        }
+      }
+    }
+
+    // Attribute level requirements
+    if (req.attributes) {
+      for (const [attr, level] of Object.entries(req.attributes)) {
+        if ((player?.attributes?.[attr]?.level ?? 0) < (level as number)) {
+          failures.push(`Requires ${attr} level ${level}`);
+        }
+      }
+    }
+
+    // Completed-quest requirements
+    if (req.completedQuests) {
+      for (const questId of req.completedQuests) {
+        if (!completedQuestIds.includes(questId)) {
+          failures.push(`Requires completing quest: ${questId}`);
+        }
+      }
+    }
+
+    // Item requirements (checked against the live inventory)
+    if (req.items) {
+      const inventory = this.inventoryService.inventory();
+      for (const { itemId, quantity } of req.items) {
+        const owned = inventory
+          .filter(item => item.itemId === itemId)
+          .reduce((sum, item) => sum + (item.quantity ?? 0), 0);
+        if (owned < quantity) {
+          failures.push(`Requires ${quantity}x ${itemId}`);
+        }
+      }
+    }
+
+    return { met: failures.length === 0, failures };
   }
 
   /**
