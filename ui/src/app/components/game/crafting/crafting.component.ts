@@ -6,15 +6,12 @@ import { InventoryService } from '../../../services/inventory.service';
 import { AuthService } from '../../../services/auth.service';
 import { SkillsService } from '../../../services/skills.service';
 import { ChatService } from '../../../services/chat.service';
-import { Recipe, ItemInstance } from '@shared/types';
+import { Recipe } from '@shared/types';
 import { ActivityLogEntry } from '../../shared/activity-log/activity-log.component';
 import { RecipeListComponent } from './recipe-list/recipe-list.component';
 import { CraftingProgressComponent } from './crafting-progress/crafting-progress.component';
 import { IngredientSelectorComponent } from './ingredient-selector/ingredient-selector.component';
 import { CraftingSelectionService } from '../../../services/crafting-selection.service';
-
-// Extended item instance with crafting-specific properties (uses any for flexibility with ItemDetails)
-type CraftingItemInstance = ItemInstance | any;
 
 @Component({
   selector: 'app-crafting',
@@ -105,47 +102,13 @@ export class CraftingComponent implements OnInit {
   selectedRecipeOutputItems = signal<any[]>([]);
 
 
-  // Get selected ingredient items for display
-  activeIngredientItems = computed(() => {
-    const activeCrafting = this.craftingService.activeCrafting();
-    if (!activeCrafting || !activeCrafting.selectedIngredients) return [];
-
-    const items: CraftingItemInstance[] = [];
-    // Explicitly read from inventoryService to ensure reactivity
-    const inventory = this.inventoryService.inventory();
-    if (!inventory) return [];
-
-    // Group ingredients by itemId
-    const ingredientGroups: { [itemId: string]: { itemId: string; instances: CraftingItemInstance[] } } = {};
-
-    for (const [itemId, instanceIds] of Object.entries(activeCrafting.selectedIngredients)) {
-      if (!ingredientGroups[itemId]) {
-        ingredientGroups[itemId] = { itemId, instances: [] };
-      }
-
-      // Count instances
-      const instanceCounts: { [instanceId: string]: number } = {};
-      for (const instanceId of instanceIds) {
-        instanceCounts[instanceId] = (instanceCounts[instanceId] || 0) + 1;
-      }
-
-      // Find instances in inventory (they may have been consumed)
-      for (const [instanceId, count] of Object.entries(instanceCounts)) {
-        const item = inventory.find(i => i.instanceId === instanceId);
-        if (item) {
-          // Show current quantity in inventory as "remaining"
-          // This represents what's available right now, before this craft consumes it
-          ingredientGroups[itemId].instances.push({
-            ...item,
-            usedQuantity: count,
-            remainingQuantity: item.quantity
-          });
-        }
-      }
-    }
-
-    return Object.values(ingredientGroups);
-  });
+  // Get selected ingredient items for display (reads signals here for reactivity, transform in service)
+  activeIngredientItems = computed(() =>
+    this.craftingSelection.buildActiveIngredientItems(
+      this.craftingService.activeCrafting(),
+      this.inventoryService.inventory()
+    )
+  );
 
   constructor(
     public recipeService: RecipeService,
@@ -184,67 +147,13 @@ export class CraftingComponent implements OnInit {
         outputs.forEach(output => {
           this.inventoryService.getItemDefinition(output.itemId).subscribe({
             next: (itemDef) => {
-              const newEntry: ActivityLogEntry = {
-                timestamp: new Date(),
-                activityName: lastResult.recipe.name,
-                activityType: 'crafting',
-                rewards: {
-                  items: [{
-                    itemId: output.itemId,
-                    name: output.name || itemDef.name, // Use output name or definition name
-                    quantity: output.quantity,
-                    qualities: output.qualities,
-                    traits: output.traits,
-                    definition: itemDef // Include full definition for icon
-                  }],
-                  experience: [{
-                    skill: lastResult.experience.skill,
-                    xp: lastResult.experience.xp,
-                    leveledUp: lastResult.experience.skillResult?.leveledUp,
-                    newLevel: lastResult.experience.skillResult?.newLevel
-                  }],
-                  attributes: lastResult.experience.attributeResult ? [{
-                    attribute: lastResult.experience.attributeResult.attribute,
-                    xp: Math.floor(lastResult.experience.xp * 0.5), // 50% of skill XP goes to attribute
-                    leveledUp: lastResult.experience.attributeResult.leveledUp,
-                    newLevel: lastResult.experience.attributeResult.newLevel
-                  }] : []
-                }
-              };
-
               // Create new array instead of mutating to ensure Angular change detection
-              this.craftingLog = [newEntry, ...this.craftingLog].slice(0, 10);
+              this.craftingLog = [this.buildCraftingLogEntry(lastResult, output, itemDef), ...this.craftingLog].slice(0, 10);
             },
             error: (error) => {
               console.warn('Could not load item definition for log:', error);
               // Add entry without definition as fallback
-              const newEntry: ActivityLogEntry = {
-                timestamp: new Date(),
-                activityName: lastResult.recipe.name,
-                activityType: 'crafting',
-                rewards: {
-                  items: [{
-                    itemId: output.itemId,
-                    name: output.name,
-                    quantity: output.quantity,
-                    qualities: output.qualities,
-                    traits: output.traits
-                  }],
-                  experience: [{
-                    skill: lastResult.experience.skill,
-                    xp: lastResult.experience.xp,
-                    leveledUp: lastResult.experience.skillResult?.leveledUp,
-                    newLevel: lastResult.experience.skillResult?.newLevel
-                  }],
-                  attributes: lastResult.experience.attributeResult ? [{
-                    attribute: lastResult.experience.attributeResult.attribute,
-                    xp: Math.floor(lastResult.experience.xp * 0.5), // 50% of skill XP goes to attribute
-                    leveledUp: lastResult.experience.attributeResult.leveledUp,
-                    newLevel: lastResult.experience.attributeResult.newLevel
-                  }] : []
-                }
-              };
-              this.craftingLog = [newEntry, ...this.craftingLog].slice(0, 10);
+              this.craftingLog = [this.buildCraftingLogEntry(lastResult, output), ...this.craftingLog].slice(0, 10);
             }
           });
         });
@@ -346,8 +255,8 @@ export class CraftingComponent implements OnInit {
    */
   selectRecipe(recipe: Recipe): void {
     // Don't allow selecting locked recipes
-    if (this.isRecipeLocked(recipe)) {
-      this.showMessage('This recipe is locked: ' + this.getUnlockHint(recipe), 'info');
+    if (this.recipeService.isRecipeLocked(recipe, this.authService.currentPlayer())) {
+      this.showMessage('This recipe is locked: ' + this.recipeService.getUnlockHint(recipe), 'info');
       return;
     }
 
@@ -513,6 +422,44 @@ export class CraftingComponent implements OnInit {
   }
 
   /**
+   * Build an activity-log entry for a completed craft output.
+   * Includes the full item definition (for icon/name) when available.
+   */
+  private buildCraftingLogEntry(lastResult: any, output: any, itemDef?: any): ActivityLogEntry {
+    const item: any = {
+      itemId: output.itemId,
+      name: itemDef ? (output.name || itemDef.name) : output.name,
+      quantity: output.quantity,
+      qualities: output.qualities,
+      traits: output.traits
+    };
+    if (itemDef) {
+      item.definition = itemDef; // Include full definition for icon
+    }
+
+    return {
+      timestamp: new Date(),
+      activityName: lastResult.recipe.name,
+      activityType: 'crafting',
+      rewards: {
+        items: [item],
+        experience: [{
+          skill: lastResult.experience.skill,
+          xp: lastResult.experience.xp,
+          leveledUp: lastResult.experience.skillResult?.leveledUp,
+          newLevel: lastResult.experience.skillResult?.newLevel
+        }],
+        attributes: lastResult.experience.attributeResult ? [{
+          attribute: lastResult.experience.attributeResult.attribute,
+          xp: Math.floor(lastResult.experience.xp * 0.5), // 50% of skill XP goes to attribute
+          leveledUp: lastResult.experience.attributeResult.leveledUp,
+          newLevel: lastResult.experience.attributeResult.newLevel
+        }] : []
+      }
+    };
+  }
+
+  /**
    * Show message to user via chat
    */
   private showMessage(text: string, type: 'success' | 'error' | 'info'): void {
@@ -547,50 +494,4 @@ export class CraftingComponent implements OnInit {
     return this.searchQuery() !== '' || this.showCraftableOnly() || this.sortBy() !== 'level';
   }
 
-  /**
-   * Check if a recipe is locked
-   */
-  isRecipeLocked(recipe: Recipe): boolean {
-    // If no unlock conditions, it's unlocked by default
-    if (!recipe.unlockConditions) return false;
-
-    // If discoveredByDefault is explicitly false, check if player has unlocked it
-    if (recipe.unlockConditions.discoveredByDefault === false) {
-      const player = this.authService.currentPlayer();
-      if (!player || !player.unlockedRecipes) return true;
-      return !player.unlockedRecipes.includes(recipe.recipeId);
-    }
-
-    // Otherwise it's unlocked by default
-    return false;
-  }
-
-  /**
-   * Get unlock hint for a locked recipe
-   */
-  getUnlockHint(recipe: Recipe): string {
-    if (!recipe.unlockConditions) return '';
-
-    const hints: string[] = [];
-
-    if (recipe.unlockConditions.requiredRecipes && recipe.unlockConditions.requiredRecipes.length > 0) {
-      const requiredNames = recipe.unlockConditions.requiredRecipes
-        .map(recipeId => {
-          const req = this.recipeService.getRecipe(recipeId);
-          return req ? req.name : recipeId;
-        })
-        .join(', ');
-      hints.push(`Craft: ${requiredNames}`);
-    }
-
-    if (recipe.unlockConditions.requiredItems && recipe.unlockConditions.requiredItems.length > 0) {
-      hints.push(`Requires: ${recipe.unlockConditions.requiredItems.join(', ')}`);
-    }
-
-    if (recipe.unlockConditions.questRequired) {
-      hints.push(`Complete quest: ${recipe.unlockConditions.questRequired}`);
-    }
-
-    return hints.length > 0 ? hints.join(' | ') : 'Unlock through progression';
-  }
 }

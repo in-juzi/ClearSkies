@@ -98,4 +98,50 @@ export class RecipeService {
       message: 'Requirements met'
     };
   }
+
+  /**
+   * Check if a recipe is locked for the given player
+   */
+  isRecipeLocked(recipe: Recipe, player: any): boolean {
+    // If no unlock conditions, it's unlocked by default
+    if (!recipe.unlockConditions) return false;
+
+    // If discoveredByDefault is explicitly false, check if player has unlocked it
+    if (recipe.unlockConditions.discoveredByDefault === false) {
+      if (!player || !player.unlockedRecipes) return true;
+      return !player.unlockedRecipes.includes(recipe.recipeId);
+    }
+
+    // Otherwise it's unlocked by default
+    return false;
+  }
+
+  /**
+   * Get an unlock hint describing how to unlock a locked recipe
+   */
+  getUnlockHint(recipe: Recipe): string {
+    if (!recipe.unlockConditions) return '';
+
+    const hints: string[] = [];
+
+    if (recipe.unlockConditions.requiredRecipes && recipe.unlockConditions.requiredRecipes.length > 0) {
+      const requiredNames = recipe.unlockConditions.requiredRecipes
+        .map(recipeId => {
+          const req = this.getRecipe(recipeId);
+          return req ? req.name : recipeId;
+        })
+        .join(', ');
+      hints.push(`Craft: ${requiredNames}`);
+    }
+
+    if (recipe.unlockConditions.requiredItems && recipe.unlockConditions.requiredItems.length > 0) {
+      hints.push(`Requires: ${recipe.unlockConditions.requiredItems.join(', ')}`);
+    }
+
+    if (recipe.unlockConditions.questRequired) {
+      hints.push(`Complete quest: ${recipe.unlockConditions.questRequired}`);
+    }
+
+    return hints.length > 0 ? hints.join(' | ') : 'Unlock through progression';
+  }
 }

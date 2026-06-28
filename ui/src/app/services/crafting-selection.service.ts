@@ -168,6 +168,44 @@ export class CraftingSelectionService {
   }
 
   /**
+   * Build display groups for the ingredients used by an active craft.
+   * Groups instances by itemId with their used/remaining quantities for the progress UI.
+   */
+  buildActiveIngredientItems(activeCrafting: any, inventory: CraftingItemInstance[] | null): any[] {
+    if (!activeCrafting || !activeCrafting.selectedIngredients) return [];
+    if (!inventory) return [];
+
+    // Group ingredients by itemId
+    const ingredientGroups: { [itemId: string]: { itemId: string; instances: CraftingItemInstance[] } } = {};
+
+    for (const [itemId, instanceIds] of Object.entries(activeCrafting.selectedIngredients) as [string, string[]][]) {
+      if (!ingredientGroups[itemId]) {
+        ingredientGroups[itemId] = { itemId, instances: [] };
+      }
+
+      // Count instances
+      const instanceCounts: { [instanceId: string]: number } = {};
+      for (const instanceId of instanceIds) {
+        instanceCounts[instanceId] = (instanceCounts[instanceId] || 0) + 1;
+      }
+
+      // Find instances in inventory (they may have been consumed); show current quantity as "remaining"
+      for (const [instanceId, count] of Object.entries(instanceCounts)) {
+        const item = inventory.find(i => i.instanceId === instanceId);
+        if (item) {
+          ingredientGroups[itemId].instances.push({
+            ...item,
+            usedQuantity: count,
+            remainingQuantity: item.quantity
+          });
+        }
+      }
+    }
+
+    return Object.values(ingredientGroups);
+  }
+
+  /**
    * Toggle an instance in the selection, cycling 0 -> 1 -> ... -> maxQuantity -> 0
    * while respecting the ingredient's required total. Returns a new selection map.
    */
