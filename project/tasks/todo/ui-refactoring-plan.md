@@ -1,8 +1,8 @@
 # UI Refactoring Plan
 
-**Created:** 2025-11-17
 **Status:** In Progress
 **Priority:** High
+**Created:** 2025-11-17
 
 ## Overview
 
@@ -17,6 +17,35 @@ Comprehensive refactoring of the Angular UI to improve code quality, remove dead
 - **Naming violations:** 5 components
 - **Type safety issues:** 40+ `any` occurrences
 - **Debug code:** 93 console.log statements
+
+---
+
+## ⚡ Status Update (2026-06-27) — re-audited against current code
+
+Most of this plan shipped after Nov 17 without the checkboxes being updated. Verified current state:
+
+| Phase | Status | Evidence |
+|---|---|---|
+| 1 — Dead code & naming | ✅ Done | `bank.service.ts` deleted; components renamed |
+| 2.1 — `any` types | ✅ Done | (as marked) |
+| 2.2 — console.logs | 🔧 ~Done | Only **12 left** (housing.service ×6, admin components ×6), not 93 |
+| 3.1 — CraftingComponent | 🔧 Partial | Sub-components **created** (`recipe-list`, `ingredient-selector`, `crafting-progress`) but main still **929 lines** → move business logic to `CraftingService` |
+| 3.2 — InventoryComponent | 🔧 Partial | Sub-components **created** (`inventory-list-view`, `-grouped-view`, `-header`, `-stats`); main **574 lines** (just over target) |
+| 3.3 — ItemDetailsPanel | ✅ Done | **246 lines** (was 883) |
+| 3.4 — Combat / Chat | ✅ Done | Combat **472 lines**; Chat decomposed (header/input/messages) |
+| 4 — Signals migration | ✅ Done | Sampled components use `input()` API (item-mini, location-facility-list) |
+| 5.1 — Extract duplicate logic | ✅ Done | `rarity-class.pipe.ts`, `item-filter.service.ts`, `item-sort.utils.ts` exist |
+| 5.3 — world-map TODOs | ⬜ Not done | TODOs still at `world-map.component.ts:180,286` (requirement checking) |
+| 5.4 — Component suffix naming | ✅ Done | No bare `Equipment`/`Skills` classes remain |
+
+### Genuinely remaining work
+1. **Slim CraftingComponent** (929 → <500) by moving business logic to `CraftingService` (sub-components already extracted).
+2. **Slim InventoryComponent** (574 → <500) — minor.
+3. **Remove ~12 console.logs** (housing.service ×6, admin locations/monsters/items ×2 each).
+4. **world-map requirement checking** (Phase 5.3) — an actual feature gap, not just cleanup.
+5. Verify/finish Phase 5.2 (business logic → services) and 5.4 `inject()` standardization.
+
+> Original phase detail below is retained for reference; trust the table above for current status.
 
 ---
 

@@ -1,6 +1,24 @@
 # Implement Alchemy System
 
-**Created**: 2025-11-09
+**Status:** Complete
+**Priority:** Medium
+**Created:** 2025-11-09
+**Completed:** 2026-06-27 (shipped via unified crafting system)
+
+## Completion Note (2026-06-27)
+
+Alchemy shipped, but via the **unified RecipeRegistry / crafting system** — NOT the standalone architecture proposed below (no separate `be/data/alchemy/`, `alchemyController`, `alchemy.js` route, or migration `007`). The original file's file-structure and API sections are obsolete; what actually exists:
+
+- **Skill**: `alchemy` is a registered skill on `Player.ts` (gains XP, has a main attribute).
+- **Recipes**: 11 alchemy recipes as TS modules in `be/data/recipes/alchemy/` (HealthPotion, ManaPotion, HealthElixir/Tincture, ManaTincture, PowerElixir, VigorDraught, FuryBrew, WardingTonic, FloralRejuvenationDraught, Glassblowing).
+- **Crafting**: handled by the shared crafting controller/service (`POST /api/crafting/...`, `GET /api/crafting/recipes/:skill`) — ingredient consumption, quality calculation from ingredient instances, skill-level gating, XP award.
+- **Discovery**: `Player.unlockedRecipes: string[]` + `recipeService.checkRecipeUnlocks()` + recipe `unlockConditions` ("Recipe not yet discovered" guard).
+- **UI**: craftable through the existing crafting component (no dedicated alchemy component needed).
+
+**Not built** (lives elsewhere / future): the alchemy mixing **minigame** (see `implement-alchemy-mixing-minigame.md`), plus "Future Enhancements" like alchemy apparatus, transmutation, brewing time, batch crafting — capture as fresh tasks if wanted.
+
+---
+
 
 ## Overview
 

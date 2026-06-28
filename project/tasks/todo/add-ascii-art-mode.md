@@ -1,6 +1,8 @@
 # Add ASCII Art Mode
 
-**Date Created**: 2025-11-09
+**Status:** Not Started
+**Priority:** Low
+**Created:** 2025-11-09
 
 ## Description
 
@@ -44,14 +46,11 @@ This feature would provide an alternative visual style for the game, potentially
 
 ## Related Files
 
-- [ui/src/app/components/game/equipment/equipment.ts](../../ui/src/app/components/game/equipment/equipment.ts)
-- [ui/src/app/components/game/skills/skills.ts](../../ui/src/app/components/game/skills/skills.ts)
-- [ui/src/app/components/game/attributes/attributes.ts](../../ui/src/app/components/game/attributes/attributes.ts)
+- [ui/src/app/components/game/equipment/equipment.component.ts](../../ui/src/app/components/game/equipment/equipment.component.ts)
+- [ui/src/app/components/game/skills/skills.component.ts](../../ui/src/app/components/game/skills/skills.component.ts)
+- [ui/src/app/components/game/attributes/attributes.component.ts](../../ui/src/app/components/game/attributes/attributes.component.ts)
+- The shared [icon.component.ts](../../ui/src/app/components/shared/icon/icon.component.ts) (central SVG icon renderer — likely the main integration point for a mode toggle)
 - All SVG icon files in [ui/src/assets/icons/](../../ui/src/assets/icons/)
-
-## Priority
-
-**Low** - Enhancement feature, not critical to core gameplay
 
 ## Notes
 

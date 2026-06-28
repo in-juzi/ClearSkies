@@ -1,18 +1,31 @@
 # Implement Alchemy Mixing Minigame
 
-**Date Created**: 2025-11-09
+**Status:** Not Started
+**Priority:** Low
+**Created:** 2025-11-09
+**Plan refreshed:** 2026-06-27 (aligned to shipped alchemy/crafting system)
+
+## Current State (2026-06-27)
+
+The alchemy *system* already shipped via the unified crafting/RecipeRegistry (see `tasks/complete/implement-alchemy-system.md`):
+- `alchemy` is its own registered skill on `Player.ts` (with XP + main attribute).
+- 11 alchemy recipes exist as TS modules in `be/data/recipes/alchemy/`.
+- Crafting is currently **passive/timed** — the controller sets `endTime = now + recipe.duration` and resolves later; there is **no interactive minigame layer**.
+
+So this task is specifically about adding an **active, skill-expression minigame** on top of the existing crafting flow — replacing/augmenting the passive timer for alchemy first. It is the first concrete step toward the broader active-crafting vision in `project/ideas/crafting.md`.
 
 ## Overview
 
-Implement an alchemy potion brewing minigame as the first skill minigame in ClearSkies. This minigame will allow players to combine herbs from the herbalism system into potions with quality-based outcomes.
+Implement an alchemy potion brewing minigame as the first skill minigame in ClearSkies. It hooks into the existing alchemy crafting flow, letting players actively influence quality-based outcomes instead of waiting on a timer.
 
 ## Why This Minigame First?
 
-- Leverages existing quality/trait system (levels 1-5, 1-3)
-- Uses herbalism skill and 6 existing herbs
-- Works with current inventory system
+- Leverages existing quality/trait system (qualities 1-5, traits 1-3)
+- Builds on the **already-implemented `alchemy` skill** and its 11 recipes (no new system needed — just an interactive layer)
+- Works with current inventory + crafting controller
 - Simple but engaging mechanics
 - Clear progression path from basic to advanced potions
+- Establishes the active-crafting pattern that can later extend to smithing/cooking
 
 ## Core Mechanics
 
@@ -47,11 +60,13 @@ Success Chance: 87%
 ## Implementation Plan
 
 ### Session 1: Recipe System + Basic UI
-- [ ] Create potion item definitions (health_potion, mana_potion, etc.)
-- [ ] Create alchemy recipe system (JSON-based like items/locations)
-- [ ] Design recipe schema (ingredients, requirements, base success rate)
-- [ ] Create basic alchemy UI component
-- [ ] Add alchemy activity type to location system
+- [x] ~~Create potion item definitions (health_potion, mana_potion, etc.)~~ — DONE (potion/draught/elixir/tincture items exist)
+- [x] ~~Create alchemy recipe system~~ — DONE (unified RecipeRegistry; 11 alchemy recipes as TS modules in `be/data/recipes/alchemy/`)
+- [x] ~~Design recipe schema (ingredients, requirements)~~ — DONE (`Recipe` type in `@shared/types`; note: outcome uses quality calc, not a stored "base success rate")
+- [ ] Create basic alchemy minigame UI component (hooks into existing crafting flow)
+- [x] ~~Add alchemy activity/crafting entry point~~ — DONE (craftable via crafting controller + UI)
+
+> Remaining Session 1 work is now just the minigame UI shell — the data/recipe/skill foundation already exists.
 
 ### Session 2: Minigame Mechanics
 - [ ] Implement heat gauge component with optimal zone

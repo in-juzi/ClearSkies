@@ -1,6 +1,23 @@
 # Implement Chat
 
-**Created**: 2025-11-09
+**Status:** Complete
+**Priority:** Medium
+**Created:** 2025-11-09
+**Completed:** 2026-06-27 (global-chat MVP shipped)
+
+## Completion Note (2026-06-27)
+
+Global-chat MVP is fully implemented and working:
+- **Backend** `be/sockets/chatHandler.ts` — Socket.io with JWT auth middleware, rate limiting (5 msg / 10s), message validation (≤500 chars), events `chat:sendMessage` / `chat:getHistory` / `chat:getOnlineCount`.
+- **Model** `be/models/ChatMessage.ts` — persistence with 7-day TTL auto-expiry index (channel enum hardcoded to `'global'`).
+- **Frontend** `ui/src/app/components/game/chat/` — signals-based, collapsible window, in-chat command system (`/help`, `/online`, `/clear`, `/additem`, `/listitems`) with autocomplete + keyboard nav, decomposed into `chat-header` / `chat-input` / `chat-messages` sub-components.
+
+**Deferred** (originally listed as "Potential Features", not built — capture as a fresh task if/when wanted):
+- Additional channels: Local/proximity, Party, Whispers/DMs, Trade (model enum would need expanding beyond `'global'`).
+- Profanity filter, mute/block, user mentions (`@username`), click-player-name quick actions.
+
+---
+
 
 ## Description
 
