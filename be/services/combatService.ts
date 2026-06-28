@@ -10,8 +10,10 @@ import {
   StatModifier,
   BuffableStat,
   ModifierType,
-  EffectContext
+  EffectContext,
+  MonsterFamily
 } from '@shared/types';
+import { FAMILY_ESSENCE } from '@shared/constants/essence-constants';
 import { MonsterRegistry } from '../data/monsters/MonsterRegistry';
 import { AbilityRegistry } from '../data/abilities/AbilityRegistry';
 import { COMBAT_FORMULAS } from '../data/constants/combat-constants';
@@ -1071,8 +1073,20 @@ class CombatService {
         Math.random() * (monsterDef.goldDrop.max - monsterDef.goldDrop.min + 1) + monsterDef.goldDrop.min
       );
 
-      // Roll loot from drop tables
+      // Roll loot from drop tables (weighted/probabilistic)
       const droppedItems = dropTableService.rollMultipleDropTables(monsterDef.lootTables);
+
+      // Guaranteed essence drops derived from the monster's families. Lore: a
+      // monster's mana is conserved and crystallizes on defeat. Granted
+      // separately from the weighted loot so essences ALWAYS drop - one per
+      // mapped family (a multi-family monster yields one of each). See
+      // project/ideas/enchanting.md.
+      const essenceDrops = (monsterDef.families || [])
+        .map((family: MonsterFamily) => FAMILY_ESSENCE[family])
+        .filter((itemId): itemId is string => Boolean(itemId))
+        .map((itemId: string) => ({ itemId, quantity: 1, qualities: {}, traits: [] }));
+
+      const allDrops = [...droppedItems, ...essenceDrops];
 
       // Get active combat skill for XP
       const activeCombatSkill = player.getActiveCombatSkill();
@@ -1082,7 +1096,7 @@ class CombatService {
         player,
         {
           experience: { [activeCombatSkill]: monsterDef.experience },
-          items: droppedItems,
+          items: allDrops,
           gold: goldAmount
         },
         {
