@@ -4,6 +4,44 @@
 
 > **Engine basis**: This is NOT a new system. A socketable is just an item that carries effect-system *applicators* (context + modifier + condition), injected into a host item. The data-driven effect evaluator already aggregates applicators from every equipped item via `(base + flat) * (1 + percentage) * multiplier`. The architecture explicitly anticipates this ("Future: Check affixes"). See project/docs/047 and 048.
 
+## Locked decisions (2026-06-28)
+
+The design conversation locked these. Build the foundation slice against them.
+
+- **Enchanting is its own skill**, `mainAttribute: 'wisdom'`. Rationale: it's *magical crafting*, and wisdom is the magic attribute with **no** production skill today (the production skills only key off strength/endurance/will — wisdom and dexterity have none). A new wisdom skill fills that gap; folding into will-based `alchemy` would deepen the imbalance. See [the domain thesis](#enchantings-domain-what-it-is-and-isnt).
+- **Socket count is rarity-gated and *derived*** (common 0, uncommon 1, rare 2, epic 3, legendary 4) via a single `getSocketCount(instance, def)` helper. Contents are stored as a **sparse list of filled sockets** on the item instance, so capacity and contents are decoupled — the count rule stays swappable (rarity→quality, or a later "add socket" craft via an additive `addedSockets` field) with no destructive migration.
+- **Socket replacement is removable-for-a-cost** (an extraction action consuming a separate *solvent* reagent; the sigil pops back out intact). This is the agile spine: it's the superset of free (cost 0) and destructive (cost = the gem), tunable to anywhere on that spectrum via one data value, and the direction of future change (loosening the cost) stays player-friendly. Long-term gem demand comes from **tiering/progression churn**, not from punishing swaps. *Build note:* the v1 slice only sockets into **empty** sockets; extraction is the immediate fast-follow.
+- **Socketables are called *Sigils*** (proposed; "Rune" is the alt). A sigil is a gem-vessel with a monster's essence bound in. Distinct word from its inputs ("gem"/"essence"/"crystal" all already name ingredients). itemId `sigil_<family>`, file `Sigil<Family>.ts`, new `SUBCATEGORY.SOCKETABLE = 'socketable'` as the functional tag the socket system keys on. Final display-name style (flat "Goblinoid Sigil" vs flavor "Sigil of Greed") still open.
+- **Two orthogonal inputs: essence = the effect, gem = the magnitude.** The essence (monster family) decides *what* the sigil does; the gem-vessel's capacity (clarity/tier — see [story.md](story.md) "Gems, vessels, and binding") decides *how strong*. Keeps it to ~4 recipes (one per essence, gem matched by `subcategory: gemstone`), and the magnitude scales off a value that already exists, solving the tiering TODO for free.
+
+## Enchanting's domain: what it *is* and isn't
+
+> **Enchanting is the manipulation of crystallized mana. Full stop. It never shapes inert material — it only works the magic that material can hold.**
+
+The risk this thesis guards against: "enchanting" silently absorbing jewelcrafting/goldsmithing and becoming a muddy "gem skill" that overlaps smithing. The fix is a hard boundary — enchanting owns the **mana**, never the **rock or metal**. That turns a naming collision into a clean supply chain:
+
+| Skill | Owns | Example |
+|---|---|---|
+| **Mining** (str) | pulling raw gems / ore from the earth | rough Ruby, iron ore |
+| **Jewelcrafting** (dex) | shaping inert material into fine vessels | cut gem, the gold ring/amulet base — see [jewelcrafting.md](jewelcrafting.md) |
+| **Smithing** (end) | shaping material into weapons/armor/tools (brute force, hammer & forge) | sword, plate |
+| **Enchanting** (wis) | everything done to **mana/essence** | bind essence into the vessel, charge the ring |
+
+**The keep-it-clean test** for any future craft: *does its core action manipulate mana/essence? → enchanting. Does it shape an inert material into a form? → smithing/jewelcrafting/mining.* (Cut the gem? Jewelcrafting. Forge the ring? Jewelcrafting. Bind the goblin's greed into that ring? Enchanting.)
+
+### Expansion roadmap — every enchanting craft is a verb applied to mana
+
+Not one of these shapes material; that's what keeps the skill coherent.
+
+- **Bind** — essence + vessel → sigil *(v1)*
+- **Socket** — install a sigil's mana into gear *(v1)*
+- **Extract** — a solvent loosens the binding to recover a sigil *(removal fast-follow)*
+- **Refine / concentrate** — combine lesser essences into a greater one *(tiering)*
+- **Transmute** — convert one family's essence into another at a loss *(economy lever / pity for unwanted drops)*
+- **Imbue / inscribe** — apply a mana effect to an item *without* a socket — the bridge to the deterministic-craft path of [affixes.md](affixes.md)
+- **Disenchant** — break a magical item back down into essence / mana-dust *(sink + source)*
+- **Charge** — mana-infused consumables: wards, runestones, throwables, scrolls
+
 ## The core loop
 
 Every monster killed drops a crystallized essence in addition to its normal loot. Essences are deliberately **versatile** so there is always demand:
@@ -76,6 +114,11 @@ Sockets/essences are the **deterministic, player-chosen** path to power. Affixes
 - [ ] **`DAMAGE_TYPE` condition** — needed for the undead "avoid projectiles" effect; no such `ConditionType` exists yet.
 - [ ] **Undead / aberrant essences** — add the items + `FAMILY_ESSENCE` entries when monsters of those families exist.
 - [ ] **Tiered essences** — the `sheen` quality slot is reserved but unused; scale essence quality off monster level / player perception so high-end demand never saturates (the economy lever below).
-- [ ] **Socket model on items** — how many sockets, gated by item rarity/quality? Ties into the power-budget question in [affixes.md](affixes.md).
-- [ ] **Enchanting / socketing recipes** — THE NEXT BIG PIECE. How an essence + gem becomes a socketable, and how socketing injects its applicators/triggers into the host item. Its own skill or part of an existing crafting skill? How does it use the integrity/quality crafting model in [crafting.md](crafting.md)?
+- [x] **Socket model on items** — DECIDED: **rarity-gated, derived** (common 0 → legendary 4) via `getSocketCount`; contents stored as a sparse filled-socket list on the instance so the count rule stays swappable. See Locked decisions.
+- [x] **Own skill vs. existing** — DECIDED: its own **`enchanting`** skill, `mainAttribute: 'wisdom'`. See Locked decisions + domain thesis.
+- [x] **Socketable naming** — DECIDED (proposed): **Sigil**, `SUBCATEGORY.SOCKETABLE`, `sigil_<family>`. Display-name style still open.
+- [x] **Essence + gem → what each contributes** — DECIDED: essence = effect, gem-vessel capacity = magnitude. See Locked decisions + [story.md](story.md) gem lore.
+- [ ] **Socket replacement / extraction** — policy locked (removable-for-cost via a *solvent* reagent), but the solvent item + extraction action are unbuilt. v1 sockets into empty only.
+- [ ] **Enchanting / socketing recipes — THE NEXT BUILD.** How socketing injects a sigil's applicators/triggers into the host item instance (extend the `effectEvaluator` walk to read `item.sockets[].socketableItemId` → sigil def's `socketEffect`), the `socketEffect: { applicators?, triggers? }` field on socketable defs, the bind recipe (1 essence + 1 gemstone → 1 sigil, skill `enchanting`), and `getSocketCount`. How does it use the integrity/quality crafting model in [crafting.md](crafting.md)?
+- [ ] **Jewelcrafting feeder skill** — planned DEX fine-crafting skill that produces the cut-gem / ring / amulet *vessels* enchanting binds into (also creates rings/amulets, which currently can't be crafted, and fills the dexterity production gap). See [jewelcrafting.md](jewelcrafting.md). v1 enchanting can use raw mined gems as vessels until this exists.
 - [ ] **Content Generator** — new monsters need a `families` array (build enforces it); essences need a `FAMILY_ESSENCE` entry. Worth a note in `project/docs/005-content-generator-agent.md`.
