@@ -481,113 +481,6 @@ export class CraftingComponent implements OnInit {
   }
 
   /**
-   * Get display label for an ingredient
-   */
-  getIngredientLabel(ingredient: RecipeIngredient): string {
-    if (ingredient.subcategory) {
-      // Capitalize first letter for display
-      return ingredient.subcategory.charAt(0).toUpperCase() + ingredient.subcategory.slice(1);
-    }
-    // For specific itemId, look up the item definition to get the display name
-    if (ingredient.itemId) {
-      const itemDef = this.inventoryService.getItemDefinitionSync(ingredient.itemId);
-      return itemDef?.name || ingredient.itemId;
-    }
-    return 'Unknown';
-  }
-
-  /**
-   * Get ingredient availability display
-   */
-  getIngredientDisplay(itemId: string, required: number): string {
-    const inventory = this.playerInventory();
-    if (!inventory) return `0/${required}`;
-
-    const available = inventory
-      .filter(item => item.itemId === itemId)
-      .reduce((sum, item) => sum + item.quantity, 0);
-
-    return `${available}/${required}`;
-  }
-
-  /**
-   * Get ingredient availability display (supports subcategory)
-   */
-  getIngredientDisplayByLookupKey(lookupKey: string, ingredient: RecipeIngredient, required: number): string {
-    const inventory = this.playerInventory();
-    if (!inventory) return `0/${required}`;
-
-    let available = 0;
-    if (ingredient.subcategory) {
-      // Count items matching subcategory
-      available = inventory
-        .filter(item => !item.equipped && item.definition?.subcategories?.includes(ingredient.subcategory!))
-        .reduce((sum, item) => sum + item.quantity, 0);
-    } else {
-      // Count specific itemId
-      available = inventory
-        .filter(item => item.itemId === lookupKey)
-        .reduce((sum, item) => sum + item.quantity, 0);
-    }
-
-    return `${available}/${required}`;
-  }
-
-  /**
-   * Check if player has enough of an ingredient
-   */
-  hasEnoughIngredient(itemId: string, required: number): boolean {
-    const inventory = this.playerInventory();
-    if (!inventory) return false;
-
-    const available = inventory
-      .filter(item => item.itemId === itemId)
-      .reduce((sum, item) => sum + item.quantity, 0);
-
-    return available >= required;
-  }
-
-  /**
-   * Check if player has enough of an ingredient (supports subcategory)
-   */
-  hasEnoughIngredientByLookupKey(lookupKey: string, ingredient: RecipeIngredient, required: number): boolean {
-    const inventory = this.playerInventory();
-    if (!inventory) return false;
-
-    let available = 0;
-    if (ingredient.subcategory) {
-      // Count items matching subcategory
-      available = inventory
-        .filter(item => !item.equipped && item.definition?.subcategories?.includes(ingredient.subcategory!))
-        .reduce((sum, item) => sum + item.quantity, 0);
-    } else {
-      // Count specific itemId
-      available = inventory
-        .filter(item => item.itemId === lookupKey)
-        .reduce((sum, item) => sum + item.quantity, 0);
-    }
-
-    return available >= required;
-  }
-
-  /**
-   * Get available instances of an ingredient
-   */
-  getAvailableInstances(itemId: string): CraftingItemInstance[] {
-    const inventory = this.playerInventory();
-    if (!inventory) return [];
-
-    return inventory
-      .filter(item => item.itemId === itemId && !item.equipped)
-      .sort((a, b) => {
-        // Sort by quality score (higher quality first)
-        const aQuality = this.getQualityScore(a);
-        const bQuality = this.getQualityScore(b);
-        return bQuality - aQuality;
-      });
-  }
-
-  /**
    * Get available instances for an ingredient (supports subcategory)
    */
   getAvailableInstancesByIngredient(ingredient: RecipeIngredient): CraftingItemInstance[] {
@@ -621,18 +514,6 @@ export class CraftingComponent implements OnInit {
   getQualityScore(item: CraftingItemInstance): number {
     // Use centralized utility function for consistent scoring
     return calculateItemScore(item, 10); // trait weight = 10 for crafting (prioritize traits)
-  }
-
-  /**
-   * Get selected quantity for an instance
-   */
-  getSelectedQuantity(instanceId: string): number {
-    const selected = this.selectedIngredients();
-    for (const [_, instanceIds] of selected.entries()) {
-      const count = instanceIds.filter(id => id === instanceId).length;
-      if (count > 0) return count;
-    }
-    return 0;
   }
 
   /**
@@ -676,15 +557,6 @@ export class CraftingComponent implements OnInit {
     }
 
     this.selectedIngredients.set(selected);
-  }
-
-  /**
-   * Get total selected count for an ingredient
-   */
-  getTotalSelected(itemId: string): number {
-    const selected = this.selectedIngredients();
-    const instanceIds = selected.get(itemId) || [];
-    return instanceIds.length;
   }
 
   /**
@@ -814,35 +686,10 @@ export class CraftingComponent implements OnInit {
   }
 
   /**
-   * Create item object for display with custom quantity
-   */
-  createItemForDisplay(instance: CraftingItemInstance, usedQuantity: number): CraftingItemInstance {
-    return {
-      ...instance,
-      quantity: usedQuantity
-    };
-  }
-
-  /**
    * Get recipe outputs as array (handles both old and new schema)
    */
   getRecipeOutputs(recipe: Recipe) {
     return recipe.outputs || (recipe.output ? [recipe.output] : []);
-  }
-
-  /**
-   * Format time remaining
-   */
-  formatTime(seconds: number): string {
-    if (seconds <= 0) return '0s';
-
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-
-    if (mins > 0) {
-      return `${mins}m ${secs}s`;
-    }
-    return `${secs}s`;
   }
 
   /**
