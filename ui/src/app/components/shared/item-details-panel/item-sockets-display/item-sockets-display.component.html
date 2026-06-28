@@ -1,0 +1,77 @@
+@if (hasSockets) {
+  <div class="detail-section sockets-section">
+    <div class="section-title">Sockets ({{ (item.sockets?.length ?? 0) }}/{{ capacity }})</div>
+
+    <div class="socket-pips">
+      @for (slot of slots; track slot.index) {
+        @if (slot.filled) {
+          <!-- Filled socket: click to extract the bound sigil -->
+          <button type="button"
+                  class="socket-pip filled"
+                  [class.active]="extractOpenIndex === slot.index"
+                  [title]="filledTooltip(slot.sigil)"
+                  (click)="toggleExtract(slot.index)">
+            @if (slot.sigil?.icon) {
+              <app-icon [icon]="slot.sigil!.icon" [size]="28"></app-icon>
+            } @else {
+              <span class="socket-glyph">◆</span>
+            }
+          </button>
+        } @else {
+          <!-- Empty socket: click to open the sigil picker -->
+          <button type="button"
+                  class="socket-pip empty"
+                  [class.active]="pickerOpenIndex === slot.index"
+                  (click)="togglePicker(slot.index)"
+                  title="Insert a sigil">
+            <span class="socket-glyph">+</span>
+          </button>
+        }
+      }
+    </div>
+
+    @if (pickerOpenIndex !== null) {
+      <div class="socket-picker">
+        @if (availableSocketables.length > 0) {
+          <div class="picker-label">Choose a sigil</div>
+          <div class="picker-list">
+            @for (sigil of availableSocketables; track sigil.instanceId) {
+              <button type="button" class="picker-item" (click)="selectSocketable(sigil)">
+                @if (sigil.definition.icon) {
+                  <app-icon [icon]="sigil.definition.icon" [size]="24"></app-icon>
+                }
+                <span class="picker-item-text">
+                  <span class="picker-item-name">{{ sigil.definition.name }}</span>
+                  @if (effectSummary(sigil.definition)) {
+                    <span class="picker-item-effect">{{ effectSummary(sigil.definition) }}</span>
+                  }
+                </span>
+                @if (sigil.quantity > 1) {
+                  <span class="picker-item-qty">×{{ sigil.quantity }}</span>
+                }
+              </button>
+            }
+          </div>
+        } @else {
+          <div class="picker-empty">No sigils in inventory. Bind essences into sigils with the Enchanting skill.</div>
+        }
+      </div>
+    }
+
+    @if (extractOpenIndex !== null) {
+      <div class="socket-picker extract-panel">
+        <div class="picker-label">Extract sigil</div>
+        <p class="extract-note">
+          Recovers the sigil intact. Costs {{ extractionCost.quantity }} {{ reagentName }}
+          <span class="extract-owned">(you have {{ reagentOwned }}).</span>
+        </p>
+        <button type="button"
+                class="extract-confirm"
+                [disabled]="!canAffordExtraction"
+                (click)="confirmExtract(extractOpenIndex)">
+          {{ canAffordExtraction ? 'Extract' : 'Need ' + reagentName }}
+        </button>
+      </div>
+    }
+  </div>
+}

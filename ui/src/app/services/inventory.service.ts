@@ -281,6 +281,26 @@ export class InventoryService {
   }
 
   /**
+   * Socket a socketable (e.g. a sigil) into an empty socket on a host item.
+   * Mirrors equip: POST then refresh inventory so socket pips/effects update.
+   */
+  socketItem(hostInstanceId: string, socketableInstanceId: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/socket`, { hostInstanceId, socketableInstanceId }).pipe(
+      tap(() => this.getInventory().subscribe())
+    );
+  }
+
+  /**
+   * Extract a socketed sigil from a host item (consumes a solvent reagent).
+   * Returns the sigil to inventory; refresh so pips/effects/stacks update.
+   */
+  extractSocket(hostInstanceId: string, socketIndex: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/extract-socket`, { hostInstanceId, socketIndex }).pipe(
+      tap(() => this.getInventory().subscribe())
+    );
+  }
+
+  /**
    * Use a consumable item
    */
   useItem(instanceId: string): Observable<any> {

@@ -6,12 +6,14 @@ import { ItemDetailHeaderComponent } from './item-detail-header/item-detail-head
 import { ItemBasicInfoComponent } from './item-basic-info/item-basic-info.component';
 import { ItemStatsDisplayComponent, CombatStats } from './item-stats-display/item-stats-display.component';
 import { ItemModifiersDisplayComponent } from './item-modifiers-display/item-modifiers-display.component';
+import { ItemSocketsDisplayComponent } from './item-sockets-display/item-sockets-display.component';
+import { ItemSocketEffectDisplayComponent } from './item-socket-effect-display/item-socket-effect-display.component';
 import { ItemActionsComponent } from './item-actions/item-actions.component';
 
 @Component({
   selector: 'app-item-details-panel',
   standalone: true,
-  imports: [CommonModule, ItemDetailHeaderComponent, ItemBasicInfoComponent, ItemStatsDisplayComponent, ItemModifiersDisplayComponent, ItemActionsComponent],
+  imports: [CommonModule, ItemDetailHeaderComponent, ItemBasicInfoComponent, ItemStatsDisplayComponent, ItemModifiersDisplayComponent, ItemSocketsDisplayComponent, ItemSocketEffectDisplayComponent, ItemActionsComponent],
   templateUrl: './item-details-panel.component.html',
   styleUrls: ['./item-details-panel.component.scss']
 })
@@ -25,6 +27,8 @@ export class ItemDetailsPanelComponent implements OnChanges {
   @Output() useItem = new EventEmitter<string>();
   @Output() removeItem = new EventEmitter<{ instanceId: string; quantity: number }>();
   @Output() removeAllItems = new EventEmitter<string>();
+  @Output() socketItem = new EventEmitter<{ hostInstanceId: string; socketableInstanceId: string }>();
+  @Output() extractSocketItem = new EventEmitter<{ hostInstanceId: string; socketIndex: number }>();
 
   dropQuantity: number = 1;
   isUsingItem: boolean = false;
@@ -141,6 +145,14 @@ export class ItemDetailsPanelComponent implements OnChanges {
     if (this.item) {
       this.removeAllItems.emit(this.item.instanceId);
     }
+  }
+
+  onSocket(event: { hostInstanceId: string; socketableInstanceId: string }): void {
+    this.socketItem.emit(event);
+  }
+
+  onExtract(event: { hostInstanceId: string; socketIndex: number }): void {
+    this.extractSocketItem.emit(event);
   }
 
   updateDropQuantity(value: number): void {

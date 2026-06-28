@@ -428,6 +428,48 @@ export class InventoryComponent implements OnInit {
   }
 
   /**
+   * Socket a sigil into an empty socket on a host equipment item.
+   */
+  socketItem(event: { hostInstanceId: string; socketableInstanceId: string }): void {
+    this.inventoryService.socketItem(event.hostInstanceId, event.socketableInstanceId).subscribe({
+      next: () => {
+        // Equipped host's combat profile may have changed — refresh equipment display.
+        this.equipmentService.loadEquippedItems().subscribe();
+        // Wait for inventory to reload, then refresh the selected (host) item.
+        setTimeout(() => {
+          const updatedItem = this.inventoryService.inventory().find(i => i.instanceId === event.hostInstanceId);
+          if (updatedItem && this.selectedItem?.instanceId === event.hostInstanceId) {
+            this.selectedItem = updatedItem;
+          }
+        }, 100);
+      },
+      error: (error: Error) => {
+        console.error('Error socketing item:', error);
+      }
+    });
+  }
+
+  /**
+   * Extract a sigil from a socket on a host equipment item.
+   */
+  extractSocket(event: { hostInstanceId: string; socketIndex: number }): void {
+    this.inventoryService.extractSocket(event.hostInstanceId, event.socketIndex).subscribe({
+      next: () => {
+        this.equipmentService.loadEquippedItems().subscribe();
+        setTimeout(() => {
+          const updatedItem = this.inventoryService.inventory().find(i => i.instanceId === event.hostInstanceId);
+          if (updatedItem && this.selectedItem?.instanceId === event.hostInstanceId) {
+            this.selectedItem = updatedItem;
+          }
+        }, 100);
+      },
+      error: (error: Error) => {
+        console.error('Error extracting sigil:', error);
+      }
+    });
+  }
+
+  /**
    * Use a consumable item
    */
   useItem(instanceId: string): void {

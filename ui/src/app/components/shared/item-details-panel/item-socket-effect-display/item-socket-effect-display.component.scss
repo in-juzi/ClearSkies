@@ -1,0 +1,39 @@
+/* Item Socket Effect Display Component */
+.detail-section {
+  margin-bottom: var(--spacing-2xl);
+}
+
+.section-title {
+  color: var(--color-accent-purple);
+  font-size: var(--font-size-l);
+  margin-bottom: var(--spacing-m);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+.effect-lines {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.effect-line {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-s);
+  padding: var(--spacing-s);
+  background: rgba(168, 85, 247, 0.1);
+  border-radius: var(--radius-xs);
+  border-left: var(--spacing-xs) solid var(--color-accent-purple);
+}
+
+.effect-glyph {
+  color: var(--color-accent-purple);
+  line-height: 1.4;
+}
+
+.effect-text {
+  font-size: var(--font-size-s);
+  color: var(--color-text-tertiary);
+  line-height: 1.4;
+}

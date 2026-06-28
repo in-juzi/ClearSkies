@@ -193,6 +193,47 @@ export class EquipmentComponent {
   }
 
   /**
+   * Socket a sigil into an empty socket on the selected (equipped) host item.
+   */
+  socketItem(event: { hostInstanceId: string; socketableInstanceId: string }): void {
+    this.inventoryService.socketItem(event.hostInstanceId, event.socketableInstanceId).subscribe({
+      next: () => {
+        // Refresh equipped items so the host's sockets/stats update in place.
+        this.equipmentService.loadEquippedItems().subscribe(() => {
+          const updated = Object.values(this.equipmentService.equippedItems())
+            .find(i => i?.instanceId === event.hostInstanceId);
+          if (updated && this.selectedItem?.instanceId === event.hostInstanceId) {
+            this.selectedItem = updated;
+          }
+        });
+      },
+      error: (error: Error) => {
+        console.error('Error socketing item:', error);
+      }
+    });
+  }
+
+  /**
+   * Extract a sigil from a socket on the selected (equipped) host item.
+   */
+  extractSocket(event: { hostInstanceId: string; socketIndex: number }): void {
+    this.inventoryService.extractSocket(event.hostInstanceId, event.socketIndex).subscribe({
+      next: () => {
+        this.equipmentService.loadEquippedItems().subscribe(() => {
+          const updated = Object.values(this.equipmentService.equippedItems())
+            .find(i => i?.instanceId === event.hostInstanceId);
+          if (updated && this.selectedItem?.instanceId === event.hostInstanceId) {
+            this.selectedItem = updated;
+          }
+        });
+      },
+      error: (error: Error) => {
+        console.error('Error extracting sigil:', error);
+      }
+    });
+  }
+
+  /**
    * Handle remove item action from details panel
    * (Cannot drop equipped items)
    */

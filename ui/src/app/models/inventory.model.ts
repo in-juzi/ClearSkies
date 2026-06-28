@@ -1,5 +1,8 @@
 // Import Item and IconConfig from shared types (replaces ItemDefinition and ItemIcon)
-import { Item, IconConfig } from '@shared/types';
+import { Item, IconConfig, ItemSocket } from '@shared/types';
+
+// Re-export so UI components can import socket types from the inventory model
+export type { ItemSocket };
 
 // ItemIcon alias for semantic clarity in inventory/icon contexts
 export type ItemIcon = IconConfig;
@@ -58,6 +61,7 @@ export interface ItemInstance {
   traits: { [traitId: string]: number }; // Map of traitId -> level (integer)
   equipped?: boolean;
   acquiredAt: Date;
+  sockets?: ItemSocket[]; // Filled sockets (sparse); absent/empty = nothing socketed
 }
 
 export interface ItemDetails extends ItemInstance {

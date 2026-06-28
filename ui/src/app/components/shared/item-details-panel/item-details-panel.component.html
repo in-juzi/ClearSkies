@@ -45,6 +45,18 @@
         [qualityDetails]="item.qualityDetails"
         [traitDetails]="item.traitDetails">
       </app-item-modifiers-display>
+
+      <!-- Sockets Display (host-centric socketing) -->
+      <app-item-sockets-display
+        [item]="item"
+        (socket)="onSocket($event)"
+        (extract)="onExtract($event)">
+      </app-item-sockets-display>
+
+      <!-- Socket Effect Display (what a sigil does when socketed) -->
+      <app-item-socket-effect-display
+        [socketEffect]="item.definition.socketEffect">
+      </app-item-socket-effect-display>
     </div>
 
     <!-- Actions (Decomposed Component) -->

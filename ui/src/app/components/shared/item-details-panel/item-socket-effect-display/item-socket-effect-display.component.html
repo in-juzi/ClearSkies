@@ -1,0 +1,13 @@
+@if (hasEffect) {
+  <div class="detail-section socket-effect-section">
+    <div class="section-title">When Socketed</div>
+    <div class="effect-lines">
+      @for (line of lines; track line) {
+        <div class="effect-line">
+          <span class="effect-glyph">◆</span>
+          <span class="effect-text">{{ line }}</span>
+        </div>
+      }
+    </div>
+  </div>
+}
