@@ -5,7 +5,7 @@
  */
 import { IPlayer, InventoryItem } from '../models/Player';
 import itemService from './itemService';
-import { getSocketCount } from '@shared/constants/socket-constants';
+import { getSocketCount, SOCKET_EXTRACTION_COST } from '@shared/constants/socket-constants';
 
 class PlayerInventoryService {
   /**
@@ -308,6 +308,56 @@ class PlayerInventoryService {
     this.removeItem(player, socketableInstanceId, 1);
 
     return { host, socketableItemId: socketableDef.itemId };
+  }
+
+  /**
+   * Extract a socketed sigil from a host item (removable-for-a-cost).
+   *
+   * Consumes one extraction reagent (SOCKET_EXTRACTION_COST), pops the sigil
+   * out of the given socket index, and returns it to the inventory as a fresh
+   * instance — the sigil keeps its essence and can be reseated elsewhere.
+   *
+   * Returns the mutated host and the recovered sigil. Caller is responsible for
+   * player.save() and effectEvaluator.invalidateCache (mirrors socketItem).
+   */
+  extractSocket(
+    player: IPlayer,
+    hostInstanceId: string,
+    socketIndex: number
+  ): { host: InventoryItem; extractedItemId: string } {
+    const host = this.getItem(player, hostInstanceId);
+    if (!host) {
+      throw new Error('Host item not found in inventory');
+    }
+
+    if (!host.sockets || !host.sockets[socketIndex]) {
+      throw new Error('No socketed sigil at that position');
+    }
+
+    // Pay the extraction cost (a solvent reagent) before mutating the host.
+    const { itemId: reagentId, quantity: reagentQty } = SOCKET_EXTRACTION_COST;
+    const reagentStacks = this.getItemsByItemId(player, reagentId);
+    const reagentOwned = reagentStacks.reduce((total, item) => total + item.quantity, 0);
+    if (reagentOwned < reagentQty) {
+      const reagentDef = itemService.getItemDefinition(reagentId);
+      throw new Error(`Extraction requires ${reagentQty} ${reagentDef?.name ?? reagentId}`);
+    }
+    let remaining = reagentQty;
+    for (const stack of reagentStacks) {
+      if (remaining <= 0) break;
+      const toRemove = Math.min(remaining, stack.quantity);
+      this.removeItem(player, stack.instanceId, toRemove);
+      remaining -= toRemove;
+    }
+
+    // Pop the sigil out (sparse list — splice keeps remaining sockets contiguous).
+    const [removed] = host.sockets.splice(socketIndex, 1);
+
+    // Return the sigil to inventory as a fresh instance.
+    const recovered = itemService.createItemInstance(removed.socketableItemId, 1, {}, {}, 'admin');
+    this.addItem(player, recovered);
+
+    return { host, extractedItemId: removed.socketableItemId };
   }
 
   /**

@@ -689,6 +689,45 @@ export const socketItem = async (req: Request<{}, {}, { hostInstanceId?: string;
 };
 
 /**
+ * Extract a socketed sigil from a host item (removable-for-a-cost).
+ * Body: { hostInstanceId, socketIndex }
+ */
+export const extractSocket = async (req: Request<{}, {}, { hostInstanceId?: string; socketIndex?: number }>, res: Response): Promise<void> => {
+  try {
+    const { hostInstanceId, socketIndex } = req.body;
+
+    if (!hostInstanceId || socketIndex === undefined || socketIndex === null) {
+      res.status(400).json({ message: 'hostInstanceId and socketIndex are required' });
+      return;
+    }
+
+    const player = await Player.findOne({ userId: req.user._id });
+    if (!player) {
+      res.status(404).json({ message: 'Player not found' });
+      return;
+    }
+
+    const result = playerInventoryService.extractSocket(player, hostInstanceId, socketIndex);
+    await player.save();
+
+    // Removing a socketed effect changes the host's combat profile — drop the cache.
+    effectEvaluator.invalidateCache(player._id.toString());
+
+    const plainItem = convertMapsToObjects(result.host);
+    const itemDetails = itemService.getItemDetails(plainItem);
+
+    res.json({
+      message: 'Sigil extracted successfully',
+      extractedItemId: result.extractedItemId,
+      item: itemDetails
+    });
+  } catch (error) {
+    console.error('Extract socket error:', error);
+    res.status(400).json({ message: (error as Error).message });
+  }
+};
+
+/**
  * Unequip an item from a slot
  * Body: { slotName }
  */

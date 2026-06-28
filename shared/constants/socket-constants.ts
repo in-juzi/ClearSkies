@@ -28,3 +28,14 @@ export const SOCKET_COUNT_BY_RARITY: Record<Rarity, number> = {
 export function getSocketCount(rarity: Rarity): number {
   return SOCKET_COUNT_BY_RARITY[rarity] ?? 0;
 }
+
+/**
+ * The cost to extract a socketed sigil (removable-for-a-cost). The sigil pops
+ * back out intact; this reagent is consumed. Kept as a single data value — the
+ * agile spine between free removal (quantity 0) and destructive — so the cost
+ * model can be retuned here without touching the extraction logic.
+ */
+export const SOCKET_EXTRACTION_COST = {
+  itemId: 'sigil_solvent',
+  quantity: 1,
+} as const;

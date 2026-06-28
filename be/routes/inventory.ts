@@ -40,6 +40,9 @@ router.post('/equipment/unequip', inventoryController.unequipItem);
 // Socket a socketable (sigil) into a host item's empty socket
 router.post('/socket', inventoryController.socketItem);
 
+// Extract a socketed sigil from a host item (consumes a solvent reagent)
+router.post('/extract-socket', inventoryController.extractSocket);
+
 // Consumable item routes
 router.post('/use', inventoryController.useItem);
 
