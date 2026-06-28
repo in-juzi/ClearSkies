@@ -17,6 +17,7 @@ interface RegistryConfig {
   idField: string;
   registryClassName: string;
   flatStructure?: boolean; // If true, doesn't have a definitions subdirectory
+  singular?: string; // Human singular noun for doc comments (defaults to typeName); set when typeName isn't prose-friendly (e.g. 'BiomeDefinition' -> 'biome')
 }
 
 const REGISTRY_CONFIGS: Record<string, RegistryConfig> = {
@@ -25,7 +26,7 @@ const REGISTRY_CONFIGS: Record<string, RegistryConfig> = {
     definitionsDir: 'data/monsters/definitions',
     outputFile: 'data/monsters/MonsterRegistry.ts',
     typeName: 'Monster',
-    typeImportPath: '../../types/combat',
+    typeImportPath: '@shared/types',
     idField: 'monsterId',
     registryClassName: 'MonsterRegistry'
   },
@@ -34,7 +35,7 @@ const REGISTRY_CONFIGS: Record<string, RegistryConfig> = {
     definitionsDir: 'data/abilities/definitions',
     outputFile: 'data/abilities/AbilityRegistry.ts',
     typeName: 'Ability',
-    typeImportPath: '../../types/combat',
+    typeImportPath: '@shared/types',
     idField: 'abilityId',
     registryClassName: 'AbilityRegistry'
   },
@@ -43,7 +44,7 @@ const REGISTRY_CONFIGS: Record<string, RegistryConfig> = {
     definitionsDir: 'data/recipes',
     outputFile: 'data/recipes/RecipeRegistry.ts',
     typeName: 'Recipe',
-    typeImportPath: '../../types/crafting',
+    typeImportPath: '@shared/types',
     idField: 'recipeId',
     registryClassName: 'RecipeRegistry',
     flatStructure: true  // Recipes are organized in subdirectories (cooking, smithing), not definitions/
@@ -53,7 +54,7 @@ const REGISTRY_CONFIGS: Record<string, RegistryConfig> = {
     definitionsDir: 'data/vendors',
     outputFile: 'data/vendors/VendorRegistry.ts',
     typeName: 'Vendor',
-    typeImportPath: '../../types/crafting',
+    typeImportPath: '@shared/types',
     idField: 'vendorId',
     registryClassName: 'VendorRegistry',
     flatStructure: true  // Vendors don't have a definitions subdirectory
@@ -63,7 +64,7 @@ const REGISTRY_CONFIGS: Record<string, RegistryConfig> = {
     definitionsDir: 'data/locations/definitions',
     outputFile: 'data/locations/LocationRegistry.ts',
     typeName: 'Location',
-    typeImportPath: '../../types/locations',
+    typeImportPath: '@shared/types',
     idField: 'locationId',
     registryClassName: 'LocationRegistry'
   },
@@ -72,7 +73,7 @@ const REGISTRY_CONFIGS: Record<string, RegistryConfig> = {
     definitionsDir: 'data/locations/activities',
     outputFile: 'data/locations/ActivityRegistry.ts',
     typeName: 'ActivityUnion',
-    typeImportPath: '../../types/locations',
+    typeImportPath: '@shared/types',
     idField: 'activityId',
     registryClassName: 'ActivityRegistry',
     flatStructure: true
@@ -82,7 +83,7 @@ const REGISTRY_CONFIGS: Record<string, RegistryConfig> = {
     definitionsDir: 'data/locations/facilities',
     outputFile: 'data/locations/FacilityRegistry.ts',
     typeName: 'Facility',
-    typeImportPath: '../../types/locations',
+    typeImportPath: '@shared/types',
     idField: 'facilityId',
     registryClassName: 'FacilityRegistry',
     flatStructure: true
@@ -91,18 +92,19 @@ const REGISTRY_CONFIGS: Record<string, RegistryConfig> = {
     name: 'Biomes',
     definitionsDir: 'data/locations/biomes',
     outputFile: 'data/locations/BiomeRegistry.ts',
-    typeName: 'Biome',
-    typeImportPath: '../../types/locations',
+    typeName: 'BiomeDefinition',
+    typeImportPath: '@shared/types',
     idField: 'biomeId',
     registryClassName: 'BiomeRegistry',
-    flatStructure: true
+    flatStructure: true,
+    singular: 'biome'
   },
   dropTables: {
     name: 'DropTables',
     definitionsDir: 'data/locations/drop-tables',
     outputFile: 'data/locations/DropTableRegistry.ts',
     typeName: 'DropTable',
-    typeImportPath: '../../types/locations',
+    typeImportPath: '@shared/types',
     idField: 'dropTableId',
     registryClassName: 'DropTableRegistry',
     flatStructure: true
@@ -112,7 +114,7 @@ const REGISTRY_CONFIGS: Record<string, RegistryConfig> = {
 /**
  * Find all TypeScript files recursively
  */
-function findTsFiles(dir: string, baseDir: string, flatStructure: boolean = false): Array<{ className: string; relativePath: string; subdirectory?: string }> {
+function findTsFiles(dir: string, baseDir: string, outputDir: string): Array<{ className: string; relativePath: string; subdirectory?: string }> {
   const results: Array<{ className: string; relativePath: string; subdirectory?: string }> = [];
 
   if (!fs.existsSync(dir)) {
@@ -126,7 +128,7 @@ function findTsFiles(dir: string, baseDir: string, flatStructure: boolean = fals
 
     if (entry.isDirectory()) {
       // Recursively find files in subdirectories
-      const subResults = findTsFiles(fullPath, baseDir, flatStructure);
+      const subResults = findTsFiles(fullPath, baseDir, outputDir);
       const subdirName = path.relative(baseDir, path.dirname(fullPath + '/dummy')).split(path.sep)[0];
 
       subResults.forEach(result => {
@@ -143,8 +145,14 @@ function findTsFiles(dir: string, baseDir: string, flatStructure: boolean = fals
         continue;
       }
 
-      const pathPrefix = flatStructure ? './' : './definitions/';
-      const relativePath = pathPrefix + path.relative(baseDir, fullPath).replace(/\\/g, '/').replace('.ts', '');
+      // The import path must be relative to the REGISTRY (output) file's
+      // directory — not the definitions dir. They differ for flat registries
+      // whose output sits above the definitions (e.g. ActivityRegistry lives in
+      // data/locations/ but its definitions are in data/locations/activities/).
+      let relativePath = path.relative(outputDir, fullPath).replace(/\\/g, '/').replace(/\.ts$/, '');
+      if (!relativePath.startsWith('.')) {
+        relativePath = './' + relativePath;
+      }
 
       results.push({ className, relativePath });
     }
@@ -158,6 +166,8 @@ function findTsFiles(dir: string, baseDir: string, flatStructure: boolean = fals
  */
 function generateRegistry(config: RegistryConfig, files: Array<{ className: string; relativePath: string; subdirectory?: string }>): string {
   const lines: string[] = [];
+  // Human singular noun for doc comments; falls back to the type name.
+  const singular = (config.singular || config.typeName).toLowerCase();
 
   // Header
   lines.push('/**');
@@ -209,14 +219,14 @@ function generateRegistry(config: RegistryConfig, files: Array<{ className: stri
   lines.push('  ]);');
   lines.push('');
   lines.push('  /**');
-  lines.push(`   * Get a ${config.typeName.toLowerCase()} by ID`);
+  lines.push(`   * Get a ${singular} by ID`);
   lines.push('   */');
   lines.push(`  static get(id: string): ${config.typeName} | undefined {`);
   lines.push('    return this.items.get(id);');
   lines.push('  }');
   lines.push('');
   lines.push('  /**');
-  lines.push(`   * Check if a ${config.typeName.toLowerCase()} exists`);
+  lines.push(`   * Check if a ${singular} exists`);
   lines.push('   */');
   lines.push('  static has(id: string): boolean {');
   lines.push('    return this.items.has(id);');
@@ -230,7 +240,7 @@ function generateRegistry(config: RegistryConfig, files: Array<{ className: stri
   lines.push('  }');
   lines.push('');
   lines.push('  /**');
-  lines.push(`   * Get all ${config.typeName.toLowerCase()} IDs`);
+  lines.push(`   * Get all ${singular} IDs`);
   lines.push('   */');
   lines.push('  static getAllIds(): string[] {');
   lines.push('    return Array.from(this.items.keys());');
@@ -264,10 +274,10 @@ function main() {
       console.log(`📦 Generating ${config.registryClassName}...`);
 
       const definitionsPath = path.join(__dirname, '..', config.definitionsDir);
-      const files = findTsFiles(definitionsPath, definitionsPath, config.flatStructure || false);
+      const outputPath = path.join(__dirname, '..', config.outputFile);
+      const files = findTsFiles(definitionsPath, definitionsPath, path.dirname(outputPath));
 
       const registryContent = generateRegistry(config, files);
-      const outputPath = path.join(__dirname, '..', config.outputFile);
 
       fs.writeFileSync(outputPath, registryContent, 'utf8');
 
@@ -280,10 +290,10 @@ function main() {
     console.log(`📦 Generating ${config.registryClassName}...`);
 
     const definitionsPath = path.join(__dirname, '..', config.definitionsDir);
-    const files = findTsFiles(definitionsPath, definitionsPath, config.flatStructure || false);
+    const outputPath = path.join(__dirname, '..', config.outputFile);
+    const files = findTsFiles(definitionsPath, definitionsPath, path.dirname(outputPath));
 
     const registryContent = generateRegistry(config, files);
-    const outputPath = path.join(__dirname, '..', config.outputFile);
 
     fs.writeFileSync(outputPath, registryContent, 'utf8');
 
