@@ -35,15 +35,17 @@ Most of this plan shipped after Nov 17 without the checkboxes being updated. Ver
 | 3.4 — Combat / Chat | ✅ Done | Combat **472 lines**; Chat decomposed (header/input/messages) |
 | 4 — Signals migration | ✅ Done | Sampled components use `input()` API (item-mini, location-facility-list) |
 | 5.1 — Extract duplicate logic | ✅ Done | `rarity-class.pipe.ts`, `item-filter.service.ts`, `item-sort.utils.ts` exist |
-| 5.3 — world-map TODOs | ⬜ Not done | TODOs still at `world-map.component.ts:180,286` (requirement checking) |
+| 5.3 — world-map TODOs | ✅ Done | 2026-06-28: `checkRequirements` now evaluates requirements via `LocationService.meetsNavigationRequirements`; unavailable-edge clicks show a reason. ⚠️ see backend note below |
 | 5.4 — Component suffix naming | ✅ Done | No bare `Equipment`/`Skills` classes remain |
 
 ### Genuinely remaining work
 1. ~~Slim CraftingComponent~~ — ✅ done 2026-06-28 (929 → 497; logic moved to `CraftingSelectionService` + `RecipeService`).
 2. **Slim InventoryComponent** (530 → <500) — needs the equip/unequip/use/drop action handlers moved into `InventoryService` (deeper than a quick win; pair with #5).
 3. ~~Remove console.logs~~ — ✅ done 2026-06-28 (0 remaining).
-4. **world-map requirement checking** (Phase 5.3) — an actual feature gap, not just cleanup.
+4. ~~world-map requirement checking~~ — ✅ done 2026-06-28 (logic in `LocationService`, user-facing error on blocked travel).
 5. Verify/finish Phase 5.2 (business logic → services) and 5.4 `inject()` standardization.
+
+> ⚠️ **Backend follow-up (out of scope here):** the frontend now checks navigation requirements per the `NavigationRequirements` type (skills, attributes, completedQuests, items-as-`{itemId,quantity}`), but `be/services/locationService.ts` `meetsNavigationRequirements` only checks `attributes` + `items` and treats `items` as a `string[]` — inconsistent with the shared type. No location data uses nav requirements yet, so nothing breaks today, but reconcile backend ↔ type before adding any. 
 
 > Original phase detail below is retained for reference; trust the table above for current status.
 
