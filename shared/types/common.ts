@@ -30,6 +30,7 @@ export type SkillName =
   | 'cooking'
   | 'alchemy'    // NEW: Potion/reagent crafting
   | 'construction' // NEW: Building and crafting structures
+  | 'enchanting' // NEW: Binding crystallized mana (essences) into socketables (sigils)
   | 'oneHanded'
   | 'dualWield'
   | 'twoHanded'
@@ -92,6 +93,18 @@ export type QualityMap = Record<string, number>;
 export type TraitMap = Record<string, number>;
 
 /**
+ * A single filled socket on an item instance.
+ * Sockets are stored as a SPARSE list: only filled sockets appear here, and the
+ * item's socket CAPACITY is derived separately (see getSocketCount in
+ * socket-constants). This decouples capacity from contents so the count rule
+ * (currently rarity-gated) can change without a contents migration.
+ */
+export interface ItemSocket {
+  /** The socketable item (e.g. a sigil) bound into this socket. */
+  socketableItemId: string;
+}
+
+/**
  * Item instance (in player inventory)
  */
 export interface ItemInstance {
@@ -101,6 +114,8 @@ export interface ItemInstance {
   qualities: QualityMap;
   traits: TraitMap;
   equipped: boolean;
+  /** Filled sockets (sparse). Absent/empty = nothing socketed. */
+  sockets?: ItemSocket[];
 }
 
 /**

@@ -152,6 +152,7 @@ class EffectEvaluatorService {
       };
       this.evaluateItemTraits(item, itemContext, result);
       this.evaluateItemQualities(item, itemContext, result);
+      this.evaluateItemSockets(item, itemContext, result);
     }
 
     // 2. Evaluate equipped item affixes (future)
@@ -189,9 +190,10 @@ class EffectEvaluatorService {
       skippedEffects: [],
     };
 
-    // Evaluate this item's traits and qualities only
+    // Evaluate this item's traits, qualities, and socketed effects only
     this.evaluateItemTraits(item, context, result);
     this.evaluateItemQualities(item, context, result);
+    this.evaluateItemSockets(item, context, result);
 
     return result;
   }
@@ -256,11 +258,42 @@ class EffectEvaluatorService {
   }
 
   /**
+   * Evaluate the passive applicators injected by an item's filled sockets.
+   *
+   * A socketable (e.g. a sigil) carries its effect on its OWN item definition
+   * (def.socketEffect), not on the host. So we read each filled socket's
+   * socketableItemId, look up that definition, and evaluate its applicators as
+   * if they belonged to the host item. Triggered effects from sockets are
+   * collected separately in collectTriggers().
+   */
+  private evaluateItemSockets(
+    item: any,
+    context: EffectEvaluationContext,
+    result: EffectEvaluationResult
+  ): void {
+    if (!Array.isArray(item.sockets)) return;
+
+    for (const socket of item.sockets) {
+      const socketableItemId = socket?.socketableItemId;
+      if (!socketableItemId) continue;
+
+      const socketableDef = itemService.getItemDefinition(socketableItemId);
+      const applicators = socketableDef?.socketEffect?.applicators;
+      if (!Array.isArray(applicators)) continue;
+
+      for (const applicator of applicators) {
+        // Sockets have no level; pass 0 for the level slot.
+        this.evaluateApplicator(applicator, 'socket', socketableItemId, 0, context, result);
+      }
+    }
+  }
+
+  /**
    * Evaluate a single effect applicator
    */
   private evaluateApplicator(
     applicator: EffectApplicator,
-    sourceType: 'trait' | 'quality' | 'affix',
+    sourceType: 'trait' | 'quality' | 'affix' | 'socket',
     sourceId: string,
     level: number,
     context: EffectEvaluationContext,
@@ -549,9 +582,40 @@ class EffectEvaluatorService {
       };
       this.collectItemTriggers(item, 'trait', context, triggerType, matches);
       this.collectItemTriggers(item, 'quality', context, triggerType, matches);
+      this.collectItemSocketTriggers(item, context, triggerType, matches);
     }
 
     return matches;
+  }
+
+  /**
+   * Helper: collect matching triggers from an item's filled sockets.
+   * Like collectItemTriggers but reads each socketable's own definition
+   * (def.socketEffect.triggers) instead of the host's trait/quality maps.
+   */
+  private collectItemSocketTriggers(
+    item: any,
+    context: EffectEvaluationContext,
+    triggerType: TriggerType,
+    matches: TriggeredEffectMatch[]
+  ): void {
+    if (!Array.isArray(item.sockets)) return;
+
+    for (const socket of item.sockets) {
+      const socketableItemId = socket?.socketableItemId;
+      if (!socketableItemId) continue;
+
+      const socketableDef = itemService.getItemDefinition(socketableItemId);
+      const triggers = socketableDef?.socketEffect?.triggers;
+      if (!Array.isArray(triggers)) continue;
+
+      for (const effect of triggers) {
+        if (effect.trigger !== triggerType) continue;
+        if (!this.isConditionMet(effect.condition, context)) continue;
+        // Sockets have no level; pass 0 for the level slot.
+        matches.push({ sourceType: 'socket', sourceId: socketableItemId, level: 0, effect });
+      }
+    }
   }
 
   /**

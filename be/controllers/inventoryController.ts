@@ -219,6 +219,7 @@ export const getInventory = async (req: Request, res: Response): Promise<void> =
         quantity: plainItem.quantity,
         qualities: plainItem.qualities,
         traits: plainItem.traits,
+        sockets: plainItem.sockets,
         equipped: plainItem.equipped || false,
         acquiredAt: plainItem.acquiredAt
       };
@@ -644,6 +645,45 @@ export const equipItem = async (req: Request<{}, {}, EquipItemRequest>, res: Res
     });
   } catch (error) {
     console.error('Equip item error:', error);
+    res.status(400).json({ message: (error as Error).message });
+  }
+};
+
+/**
+ * Socket a socketable (e.g. a sigil) into an empty socket on a host item.
+ * Body: { hostInstanceId, socketableInstanceId }
+ */
+export const socketItem = async (req: Request<{}, {}, { hostInstanceId?: string; socketableInstanceId?: string }>, res: Response): Promise<void> => {
+  try {
+    const { hostInstanceId, socketableInstanceId } = req.body;
+
+    if (!hostInstanceId || !socketableInstanceId) {
+      res.status(400).json({ message: 'hostInstanceId and socketableInstanceId are required' });
+      return;
+    }
+
+    const player = await Player.findOne({ userId: req.user._id });
+    if (!player) {
+      res.status(404).json({ message: 'Player not found' });
+      return;
+    }
+
+    const result = playerInventoryService.socketItem(player, hostInstanceId, socketableInstanceId);
+    await player.save();
+
+    // Socketed effects change the host's combat profile — drop the effect cache.
+    effectEvaluator.invalidateCache(player._id.toString());
+
+    const plainItem = convertMapsToObjects(result.host);
+    const itemDetails = itemService.getItemDetails(plainItem);
+
+    res.json({
+      message: 'Item socketed successfully',
+      socketableItemId: result.socketableItemId,
+      item: itemDetails
+    });
+  } catch (error) {
+    console.error('Socket item error:', error);
     res.status(400).json({ message: (error as Error).message });
   }
 };

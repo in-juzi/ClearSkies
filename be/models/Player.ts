@@ -28,6 +28,8 @@ export interface InventoryItem {
   quantity: number;
   qualities: Map<string, number>;
   traits: Map<string, number>;
+  /** Filled sockets (sparse). Absent = nothing socketed. See socket-constants getSocketCount for capacity. */
+  sockets?: { socketableItemId: string }[];
   equipped: boolean;
   acquiredAt: Date;
 }
@@ -241,6 +243,10 @@ const playerSchema = new Schema<IPlayer>({
       of: Number,
       default: {}
     },
+    sockets: {
+      type: [{ socketableItemId: { type: String, required: true }, _id: false }],
+      default: undefined
+    },
     equipped: { type: Boolean, default: false },
     acquiredAt: { type: Date, default: Date.now }
   }],
@@ -267,6 +273,10 @@ const playerSchema = new Schema<IPlayer>({
         type: Map,
         of: Number,
         default: {}
+      },
+      sockets: {
+        type: [{ socketableItemId: { type: String, required: true }, _id: false }],
+        default: undefined
       },
       depositedAt: { type: Date, default: Date.now }
     }]
@@ -445,6 +455,11 @@ const playerSchema = new Schema<IPlayer>({
       level: { type: Number, default: 1, min: 1 },
       experience: { type: Number, default: 0, min: 0 },
       mainAttribute: { type: String, default: 'strength' }
+    },
+    enchanting: {
+      level: { type: Number, default: 1, min: 1 },
+      experience: { type: Number, default: 0, min: 0 },
+      mainAttribute: { type: String, default: 'wisdom' }
     },
     oneHanded: {
       level: { type: Number, default: 1, min: 1 },
@@ -665,7 +680,7 @@ playerSchema.methods.addSkillExperience = async function(
 }> {
   const { getXPForLevel } = require('@shared/constants/attribute-constants');
   const validSkills: SkillName[] = [
-    'woodcutting', 'mining', 'fishing', 'gathering', 'smithing', 'cooking', 'alchemy', 'construction',
+    'woodcutting', 'mining', 'fishing', 'gathering', 'smithing', 'cooking', 'alchemy', 'construction', 'enchanting',
     'oneHanded', 'dualWield', 'twoHanded', 'ranged', 'casting', 'protection'
   ];
 
@@ -874,6 +889,7 @@ playerSchema.methods.getContainerItems = function(this: IPlayer, containerId: st
       quantity: plainItem.quantity,
       qualities: plainItem.qualities,
       traits: plainItem.traits,
+      sockets: plainItem.sockets,
       equipped: plainItem.equipped || false,
       acquiredAt: plainItem.acquiredAt
     };

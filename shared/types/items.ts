@@ -11,6 +11,23 @@ import {
   QualityMap,
   TraitMap
 } from './common';
+import { EffectApplicator, TriggeredEffect } from './effect-system';
+
+// ===== SOCKETABLE EFFECTS =====
+
+/**
+ * The effect a socketable item (e.g. a sigil) injects into its host when slotted.
+ * Mirrors ModifierLevelEffects' two channels: passive applicators and event-driven
+ * triggers. The effectEvaluator reads these off the socketable's item definition
+ * when walking a host item's filled sockets — so a socketable is "just another
+ * applicator/trigger carrier", the same as a trait or quality.
+ */
+export interface SocketEffect {
+  /** Passive modifier applicators (e.g. +crit chance). */
+  applicators?: EffectApplicator[];
+  /** Event-driven triggered effects (e.g. steal gold on hit). */
+  triggers?: TriggeredEffect[];
+}
 
 // ===== BASE ITEM INTERFACE =====
 
@@ -33,6 +50,8 @@ export interface Item {
   allowedTraits: readonly string[];
   slot?: EquipmentSlot | string; // Optional for compatibility (only EquipmentItem requires it)
   output?: any; // Deprecated field for legacy Recipe compatibility
+  /** For socketable items (sigils): the effect injected into the host when slotted. */
+  socketEffect?: SocketEffect;
 }
 
 /**

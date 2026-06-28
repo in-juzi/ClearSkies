@@ -5,6 +5,7 @@
  */
 import { IPlayer, InventoryItem } from '../models/Player';
 import itemService from './itemService';
+import { getSocketCount } from '@shared/constants/socket-constants';
 
 class PlayerInventoryService {
   /**
@@ -252,6 +253,61 @@ class PlayerInventoryService {
   isSlotAvailable(player: IPlayer, slotName: string): boolean {
     const instanceId = player.equipmentSlots.get(slotName);
     return !instanceId;
+  }
+
+  /**
+   * Socket a socketable (e.g. a sigil) into an empty socket on a host item.
+   *
+   * v1: fills an EMPTY socket only — replacement/extraction is a separate
+   * (removable-for-cost) action, not yet built. Capacity is derived from the
+   * host's rarity via getSocketCount; contents are the sparse host.sockets list.
+   * Consumes one socketable from the inventory stack.
+   *
+   * Returns the mutated host item. Caller is responsible for player.save() and
+   * effectEvaluator.invalidateCache (mirrors equipItem).
+   */
+  socketItem(
+    player: IPlayer,
+    hostInstanceId: string,
+    socketableInstanceId: string
+  ): { host: InventoryItem; socketableItemId: string } {
+    const host = this.getItem(player, hostInstanceId);
+    if (!host) {
+      throw new Error('Host item not found in inventory');
+    }
+
+    const hostDef = itemService.getItemDefinition(host.itemId);
+    if (!hostDef || hostDef.category !== 'equipment') {
+      throw new Error('Only equipment can be socketed');
+    }
+
+    // Capacity is derived from rarity; contents are the sparse list.
+    const capacity = getSocketCount(hostDef.rarity);
+    if (capacity <= 0) {
+      throw new Error('This item has no sockets');
+    }
+    if (!host.sockets) {
+      host.sockets = [];
+    }
+    if (host.sockets.length >= capacity) {
+      throw new Error('All sockets on this item are already filled');
+    }
+
+    const socketable = this.getItem(player, socketableInstanceId);
+    if (!socketable) {
+      throw new Error('Socketable item not found in inventory');
+    }
+
+    const socketableDef = itemService.getItemDefinition(socketable.itemId);
+    if (!socketableDef?.socketEffect) {
+      throw new Error('That item is not a socketable');
+    }
+
+    // Bind it in, then consume one from the stack.
+    host.sockets.push({ socketableItemId: socketableDef.itemId });
+    this.removeItem(player, socketableInstanceId, 1);
+
+    return { host, socketableItemId: socketableDef.itemId };
   }
 
   /**

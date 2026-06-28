@@ -91,6 +91,7 @@ export interface PlayerSkills {
   cooking: Skill;
   alchemy: Skill;    // NEW: Potion/reagent crafting
   construction: Skill; // NEW: Building and crafting structures
+  enchanting: Skill; // NEW: Binding essences into sigils
   // Combat skills
   oneHanded: Skill;
   dualWield: Skill;
@@ -124,6 +125,7 @@ export interface SkillsResponse {
       cooking: SkillWithProgress;
       alchemy: SkillWithProgress;    // NEW
       construction: SkillWithProgress; // NEW: Building and crafting structures
+      enchanting: SkillWithProgress; // NEW: Binding essences into sigils
       // Combat skills
       oneHanded: SkillWithProgress;
       dualWield: SkillWithProgress;
@@ -159,7 +161,7 @@ export interface SkillExperienceResponse {
   };
 }
 
-export type SkillName = 'woodcutting' | 'mining' | 'fishing' | 'gathering' | 'smithing' | 'cooking' | 'alchemy' | 'construction' | 'oneHanded' | 'dualWield' | 'twoHanded' | 'ranged' | 'casting' | 'protection';
+export type SkillName = 'woodcutting' | 'mining' | 'fishing' | 'gathering' | 'smithing' | 'cooking' | 'alchemy' | 'construction' | 'enchanting' | 'oneHanded' | 'dualWield' | 'twoHanded' | 'ranged' | 'casting' | 'protection';
 export type AttributeName = 'strength' | 'endurance' | 'wisdom' | 'perception' | 'dexterity' | 'will' | 'charisma'; // 'magic' renamed to 'wisdom'
 
 export interface Location {

@@ -271,6 +271,7 @@ export const SUBCATEGORY = {
   CRYSTAL: 'crystal',
   JEWELRY: 'jewelry',
   ENCHANTING: 'enchanting',
+  SOCKETABLE: 'socketable', // Finished enchanting output (sigils) — distinct from its inputs
   SALVAGE: 'salvage',
   CLOTH: 'cloth',
 } as const;
@@ -342,6 +343,7 @@ export const SKILL_SOURCE = {
   SMITHING: 'smithing',
   COOKING: 'cooking',
   CONSTRUCTION: 'construction',  // NEW: Housing/building skill
+  ENCHANTING: 'enchanting',  // NEW: Binding essences into sigils
   COMBAT: 'combat',
   ONE_HANDED: 'oneHanded',
   DUAL_WIELD: 'dualWield',

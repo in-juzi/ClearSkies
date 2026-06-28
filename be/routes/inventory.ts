@@ -37,6 +37,9 @@ router.get('/equipment/stats', inventoryController.getEquipmentStats);
 router.post('/equipment/equip', inventoryController.equipItem);
 router.post('/equipment/unequip', inventoryController.unequipItem);
 
+// Socket a socketable (sigil) into a host item's empty socket
+router.post('/socket', inventoryController.socketItem);
+
 // Consumable item routes
 router.post('/use', inventoryController.useItem);
 

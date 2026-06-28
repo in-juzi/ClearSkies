@@ -17,6 +17,7 @@ export const ALL_SKILLS: readonly SkillName[] = [
   'cooking',
   'alchemy',
   'construction',
+  'enchanting',
   'oneHanded',
   'dualWield',
   'twoHanded',
@@ -50,6 +51,7 @@ export const SKILL_DISPLAY_NAMES: Record<SkillName, string> = {
   cooking: 'Cooking',
   alchemy: 'Alchemy',
   construction: 'Construction',
+  enchanting: 'Enchanting',
   oneHanded: 'One-Handed',
   dualWield: 'Dual Wield',
   twoHanded: 'Two-Handed',
@@ -70,6 +72,7 @@ export const SKILL_ICONS: Record<SkillName, string> = {
   cooking: 'assets/icons/skills/skill_cooking.svg',
   alchemy: 'assets/icons/skills/skill_alchemy.svg',
   construction: 'assets/icons/skills/skill_construction.svg',
+  enchanting: 'assets/icons/skills/skill_piety.svg', // placeholder — no dedicated enchanting icon yet
   oneHanded: 'assets/icons/abilities/ability_quick_slash.svg',
   dualWield: 'assets/icons/abilities/ability_slash_2.svg',
   twoHanded: 'assets/icons/abilities/ability_hammer_smash.svg',

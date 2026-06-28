@@ -359,7 +359,7 @@ export interface EffectEvaluationResult {
  * Effect that was successfully applied
  */
 export interface AppliedEffect {
-  sourceType: 'trait' | 'quality' | 'affix' | 'buff';
+  sourceType: 'trait' | 'quality' | 'affix' | 'buff' | 'socket';
   sourceId: string;
   level?: number;
   applicator: EffectApplicator;
@@ -370,7 +370,7 @@ export interface AppliedEffect {
  * Effect that was skipped
  */
 export interface SkippedEffect {
-  sourceType: 'trait' | 'quality' | 'affix' | 'buff';
+  sourceType: 'trait' | 'quality' | 'affix' | 'buff' | 'socket';
   sourceId: string;
   level?: number;
   applicator: EffectApplicator;
@@ -473,7 +473,7 @@ export interface TriggerEvent {
  * chance roll). Produced by effectEvaluator.collectTriggers().
  */
 export interface TriggeredEffectMatch {
-  sourceType: 'trait' | 'quality' | 'affix';
+  sourceType: 'trait' | 'quality' | 'affix' | 'socket';
   sourceId: string;
   level: number;
   effect: TriggeredEffect;
@@ -485,7 +485,7 @@ export interface TriggeredEffectMatch {
 export interface TriggerOutcome {
   triggered: boolean;
   action: TriggerActionType;
-  sourceType?: 'trait' | 'quality' | 'affix';
+  sourceType?: 'trait' | 'quality' | 'affix' | 'socket';
   sourceId?: string;
   level?: number;
   message?: string;
