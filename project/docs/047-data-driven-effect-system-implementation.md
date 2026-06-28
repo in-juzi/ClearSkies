@@ -274,7 +274,7 @@ The effect system is designed to support your planned affix system:
       modifierType: ModifierType.PERCENTAGE,
       value: 0.50,  // +50% damage
       condition: {
-        type: ConditionType.TARGET_TYPE,
+        type: ConditionType.TARGET_FAMILY,
         value: ["beast", "wild_animal"]
       }
     }

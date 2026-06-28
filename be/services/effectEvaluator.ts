@@ -15,6 +15,8 @@ import {
   ModifierType,
   AppliedEffect,
   SkippedEffect,
+  TriggerType,
+  TriggeredEffectMatch,
 } from '@shared/types/effect-system';
 import { TraitRegistry } from '../data/items/traits/TraitRegistry';
 import { QualityRegistry } from '../data/items/qualities/QualityRegistry';
@@ -368,12 +370,13 @@ class EffectEvaluatorService {
         return this.isItemRequiredForActivity(runtime.currentItem, runtime.activity);
 
       // Target restrictions
-      case ConditionType.TARGET_TYPE:
-        if (!runtime.target?.type) return false;
-        if (Array.isArray(condition.value)) {
-          return condition.value.includes(runtime.target.type);
-        }
-        return runtime.target.type === condition.value;
+      case ConditionType.TARGET_FAMILY: {
+        // A monster has one OR MORE families; match if any falls in the allowed list.
+        const families = runtime.target?.families;
+        if (!Array.isArray(families) || families.length === 0) return false;
+        const allowed = Array.isArray(condition.value) ? condition.value : [condition.value];
+        return families.some((family: string) => allowed.includes(family));
+      }
 
       case ConditionType.TARGET_BELOW_HP_PERCENT:
         return (runtime.targetHpPercent !== undefined && runtime.targetHpPercent < condition.value);
@@ -515,6 +518,72 @@ class EffectEvaluatorService {
   private describeCondition(condition: EffectCondition | undefined): string {
     if (!condition) return 'always';
     return `${condition.type}: ${JSON.stringify(condition.value)}`;
+  }
+
+  // ===== TRIGGERED EFFECTS =====
+
+  /**
+   * Collect all triggered effects on an entity's equipped items that match a
+   * given trigger type AND whose condition is currently met.
+   *
+   * This is the read-only half of the trigger system: it does NOT roll the
+   * chance gate or execute actions (that's triggerService's job). It mirrors
+   * the applicator-collection walk so triggers ride the same trait/quality
+   * sources as passive modifiers. Entity-agnostic: works for players or monsters.
+   */
+  collectTriggers(
+    entity: any,
+    triggerType: TriggerType,
+    runtimeContext?: EffectEvaluationContext['runtime']
+  ): TriggeredEffectMatch[] {
+    const matches: TriggeredEffectMatch[] = [];
+
+    const equippedItems = this.getEquippedItems(entity);
+    for (const item of equippedItems) {
+      const context: EffectEvaluationContext = {
+        entity,
+        // effectContext is unused for trigger condition checks (conditions read
+        // runtime + entity), but the interface requires a value.
+        effectContext: EffectContext.COMBAT_DAMAGE,
+        runtime: { ...(runtimeContext || {}), currentItem: item },
+      };
+      this.collectItemTriggers(item, 'trait', context, triggerType, matches);
+      this.collectItemTriggers(item, 'quality', context, triggerType, matches);
+    }
+
+    return matches;
+  }
+
+  /**
+   * Helper: collect matching triggers from a single source (traits or qualities)
+   * on one item.
+   */
+  private collectItemTriggers(
+    item: any,
+    sourceType: 'trait' | 'quality',
+    context: EffectEvaluationContext,
+    triggerType: TriggerType,
+    matches: TriggeredEffectMatch[]
+  ): void {
+    const sourceMap = sourceType === 'trait' ? item.traits : item.qualities;
+    if (!sourceMap?.entries) return;
+
+    for (const [sourceId, level] of sourceMap.entries()) {
+      const def = sourceType === 'trait'
+        ? TraitRegistry.get(sourceId)
+        : QualityRegistry.get(sourceId);
+      if (!def) continue;
+
+      const levelData = def.levels?.[level.toString()];
+      const triggers = (levelData?.effects as any)?.triggers;
+      if (!Array.isArray(triggers)) continue;
+
+      for (const effect of triggers) {
+        if (effect.trigger !== triggerType) continue;
+        if (!this.isConditionMet(effect.condition, context)) continue;
+        matches.push({ sourceType, sourceId, level, effect });
+      }
+    }
   }
 
   // ===== LEGACY EFFECT SUPPORT =====

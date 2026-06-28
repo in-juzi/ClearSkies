@@ -5,10 +5,23 @@ import locationService from '../services/locationService';
 import itemService from '../services/itemService';
 import playerInventoryService from '../services/playerInventoryService';
 import playerCombatService from '../services/playerCombatService';
+import triggerService from '../services/triggerService';
+import { TriggerType, TriggerOutcome } from '@shared/types/effect-system';
 
 // Track combat turn timers per user (separate for player and monster)
 const playerTurnTimers = new Map<string, NodeJS.Timeout>();
 const monsterTurnTimers = new Map<string, NodeJS.Timeout>();
+
+/**
+ * Helper: append any fired trigger outcomes to the combat log.
+ */
+function logTriggerOutcomes(player: any, outcomes: TriggerOutcome[]): void {
+  for (const outcome of outcomes) {
+    if (outcome.message) {
+      playerCombatService.addCombatLog(player, outcome.message, 'system');
+    }
+  }
+}
 
 /**
  * Helper: Save player with version conflict handling
@@ -634,6 +647,30 @@ async function performPlayerTurn(userId: string, io: Server): Promise<void> {
       playerCombatService.addCombatLog(player,`You deal ${attackResult.damage} damage with ${attackResult.weaponName}.`, 'damage', attackResult.damage, 'monster');
     }
 
+    // Fire offensive triggers (on-hit, on-crit) from the player's gear.
+    // These may further reduce the monster's HP (e.g. DEAL_DAMAGE), which is
+    // captured by the monsterInstance re-sync and defeat check below.
+    if (!attackResult.isDodge) {
+      logTriggerOutcomes(player, await triggerService.fire({
+        type: TriggerType.ON_HIT,
+        source: player,
+        target: monsterInstance,
+        player,
+        damageDealt: attackResult.damage,
+        isCrit: attackResult.isCrit,
+      }));
+      if (attackResult.isCrit) {
+        logTriggerOutcomes(player, await triggerService.fire({
+          type: TriggerType.ON_CRIT,
+          source: player,
+          target: monsterInstance,
+          player,
+          damageDealt: attackResult.damage,
+          isCrit: true,
+        }));
+      }
+    }
+
     // Process buff/debuff tick effects (DoT, HoT, durations)
     // Only decrement player buffs on player turn
     const buffTickResults = await combatService.processBuffTick(player, monsterInstance, 'player');
@@ -666,6 +703,16 @@ async function performPlayerTurn(userId: string, io: Server): Promise<void> {
 
     // Check if monster defeated
     if (monsterInstance.stats.health.current <= 0) {
+      // Fire on-kill triggers from the player's gear before awarding rewards.
+      logTriggerOutcomes(player, await triggerService.fire({
+        type: TriggerType.ON_KILL,
+        source: player,
+        target: monsterInstance,
+        player,
+        damageDealt: attackResult.damage,
+        isCrit: attackResult.isCrit,
+      }));
+
       playerCombatService.addCombatLog(player,`You defeated ${monsterInstance.name}!`, 'system');
       await savePlayerSafely(player);
 
@@ -720,6 +767,22 @@ async function performMonsterTurn(userId: string, io: Server): Promise<void> {
       playerCombatService.addCombatLog(player,`${monsterInstance.name} CRITICALLY HITS you for ${attackResult.damage} damage!`, 'crit', attackResult.damage, 'player');
     } else {
       playerCombatService.addCombatLog(player,`${monsterInstance.name} deals ${attackResult.damage} damage.`, 'damage', attackResult.damage, 'player');
+    }
+
+    // Fire defensive triggers from the PLAYER's gear (on-being-hit). The player
+    // is the source here since it's their equipped items that react. Skipped if
+    // the blow was dodged or the player has already been defeated.
+    // NOTE: ON_BLOCK is not wired yet — combat has no block mechanic distinct
+    // from dodge/evasion. Hook it here once one exists.
+    if (!attackResult.isDodge && !playerDefeated) {
+      logTriggerOutcomes(player, await triggerService.fire({
+        type: TriggerType.ON_BEING_HIT,
+        source: player,
+        target: monsterInstance,
+        player,
+        damageDealt: attackResult.damage,
+        isCrit: attackResult.isCrit,
+      }));
     }
 
     // Process buff/debuff tick effects (DoT, HoT, durations)

@@ -130,7 +130,7 @@ applicators: [
     modifierType: ModifierType.PERCENTAGE,
     value: 0.30,
     condition: {
-      type: ConditionType.TARGET_TYPE,
+      type: ConditionType.TARGET_FAMILY,
       value: ["beast", "wild_animal"]  // Array for multiple types
     },
     description: "+30% damage vs beasts"
@@ -315,7 +315,7 @@ condition: {
 ```typescript
 // Specific monster type
 condition: {
-  type: ConditionType.TARGET_TYPE,
+  type: ConditionType.TARGET_FAMILY,
   value: ["beast", "undead"]
 }
 

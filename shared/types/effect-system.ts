@@ -78,7 +78,7 @@ export enum ConditionType {
   ITEM_REQUIRED_FOR_ACTIVITY = 'item.required.for.activity', // Item is required for current activity
 
   // Enemy targeting
-  TARGET_TYPE = 'target.type',           // Specific monster type (beast, undead, etc.)
+  TARGET_FAMILY = 'target.family',       // Monster family/archetype (beast, undead, goblinoid, ...); matches if any of the target's families is allowed
   TARGET_BELOW_HP_PERCENT = 'target.below.hp.percent',
 
   // Equipment state
@@ -111,7 +111,7 @@ export type ConditionValue<T extends ConditionType> =
   T extends ConditionType.HP_BELOW_PERCENT ? number :
   T extends ConditionType.HP_ABOVE_PERCENT ? number :
   T extends ConditionType.ACTIVITY_TYPE ? string | string[] :
-  T extends ConditionType.TARGET_TYPE ? string | string[] :
+  T extends ConditionType.TARGET_FAMILY ? string | string[] :
   T extends ConditionType.EQUIPPED_SLOT ? string :
   T extends ConditionType.SKILL_LEVEL_ABOVE ? { skill: string; level: number } :
   any;
@@ -377,6 +377,121 @@ export interface SkippedEffect {
   reason: string; // Why it was skipped
 }
 
+// ===== TRIGGERED EFFECTS =====
+//
+// A SECOND CHANNEL alongside EffectApplicator. Where applicators are passive,
+// queried, and return a number, triggered effects are event-driven, probabilistic,
+// and side-effecting: "when a hit lands, roll a chance, and if it fires, do something."
+// They power on-hit/on-crit/on-kill/on-being-hit/on-block effects (e.g. essence
+// socketables like "chance to steal gold on hit").
+//
+// See project/ideas/triggered-effects.md for the design rationale.
+
+/**
+ * Combat events that a triggered effect can hook into.
+ */
+export enum TriggerType {
+  ON_HIT = 'trigger.onHit',           // After a landed attack resolves (attacker's gear)
+  ON_CRIT = 'trigger.onCrit',         // When an attack crits (attacker's gear)
+  ON_KILL = 'trigger.onKill',         // When an attack defeats the target (attacker's gear)
+  ON_BEING_HIT = 'trigger.onBeingHit', // When the wearer is struck (victim's gear)
+  ON_BLOCK = 'trigger.onBlock',       // When the wearer blocks/dodges (victim's gear)
+}
+
+/**
+ * Whether a trigger fires from the attacker's gear (offensive) or the
+ * victim's gear (defensive). The combat loop uses this to know whose equipped
+ * items to scan. If an effect needs to react to both sides, declare two triggers.
+ */
+export const TRIGGER_PERSPECTIVE: Record<TriggerType, 'offensive' | 'defensive'> = {
+  [TriggerType.ON_HIT]: 'offensive',
+  [TriggerType.ON_CRIT]: 'offensive',
+  [TriggerType.ON_KILL]: 'offensive',
+  [TriggerType.ON_BEING_HIT]: 'defensive',
+  [TriggerType.ON_BLOCK]: 'defensive',
+};
+
+/**
+ * What a triggered effect actually DOES when it fires. Unlike modifier
+ * applicators (which return numbers), these mutate game state. Each type is
+ * dispatched to a handler in triggerService.
+ */
+export enum TriggerActionType {
+  STEAL_GOLD = 'action.stealGold',     // Transfer gold to the wearer (e.g. goblin essence)
+  DEAL_DAMAGE = 'action.dealDamage',   // Immediate bonus damage to the target
+  APPLY_DOT = 'action.applyDot',       // Apply damage-over-time to the target
+  HEAL = 'action.heal',                // Restore HP to the wearer
+  APPLY_BUFF = 'action.applyBuff',     // Apply a buff to the wearer
+  APPLY_DEBUFF = 'action.applyDebuff', // Apply a debuff to the target
+}
+
+/**
+ * The side-effecting action a trigger performs.
+ */
+export interface TriggerAction {
+  type: TriggerActionType;
+  /** Primary magnitude (gold amount, damage, heal, etc.) */
+  value: number;
+  /** Action-specific extras (dotTicks, dotInterval, buffId, damageType, ...) */
+  params?: Record<string, any>;
+}
+
+/**
+ * A triggered effect declared on a trait/quality/affix/socket level.
+ * Reuses EffectCondition for gating (e.g. only vs undead).
+ */
+export interface TriggeredEffect {
+  /** Which combat event fires this */
+  trigger: TriggerType;
+  /** Probability gate, 0-1 (flat for now; stat-scaling is a future enhancement) */
+  chance: number;
+  /** Optional gate, reusing the existing condition system verbatim */
+  condition?: EffectCondition;
+  /** What happens when it fires */
+  action: TriggerAction;
+  /** Optional description for tooltips/logging */
+  description?: string;
+}
+
+/**
+ * Runtime payload emitted into triggerService.fire() at a combat hook point.
+ * `source` is the entity whose equipped items provide the triggers; `target`
+ * is the opponent. `player` is always the persisted player document (for
+ * combat log, gold, and buff plumbing) regardless of perspective.
+ */
+export interface TriggerEvent {
+  type: TriggerType;
+  source: any;
+  target: any;
+  player: any;
+  damageDealt?: number;
+  isCrit?: boolean;
+}
+
+/**
+ * A matched triggered effect (after collection + condition check, before the
+ * chance roll). Produced by effectEvaluator.collectTriggers().
+ */
+export interface TriggeredEffectMatch {
+  sourceType: 'trait' | 'quality' | 'affix';
+  sourceId: string;
+  level: number;
+  effect: TriggeredEffect;
+}
+
+/**
+ * Result of a fired trigger action, surfaced to the combat log.
+ */
+export interface TriggerOutcome {
+  triggered: boolean;
+  action: TriggerActionType;
+  sourceType?: 'trait' | 'quality' | 'affix';
+  sourceId?: string;
+  level?: number;
+  message?: string;
+  data?: Record<string, any>;
+}
+
 // ===== MODIFIER DEFINITION INTEGRATION =====
 
 /**
@@ -386,6 +501,9 @@ export interface SkippedEffect {
 export interface ModifierLevelEffects {
   /** All effect applicators for this modifier level */
   applicators: EffectApplicator[];
+
+  /** Event-driven triggered effects for this modifier level (on-hit, etc.) */
+  triggers?: TriggeredEffect[];
 
   /** Legacy vendor price modifier (for backward compatibility during migration) */
   vendorPrice?: {
