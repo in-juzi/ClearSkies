@@ -344,6 +344,7 @@ export const SKILL_SOURCE = {
   COOKING: 'cooking',
   CONSTRUCTION: 'construction',  // NEW: Housing/building skill
   ENCHANTING: 'enchanting',  // NEW: Binding essences into sigils
+  JEWELCRAFTING: 'jewelcrafting',  // NEW: Cutting gems / crafting jewelry bases (the vessels)
   COMBAT: 'combat',
   ONE_HANDED: 'oneHanded',
   DUAL_WIELD: 'dualWield',

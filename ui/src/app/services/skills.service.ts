@@ -23,6 +23,7 @@ export class SkillsService {
     alchemy: SkillWithProgress;
     construction: SkillWithProgress;
     enchanting: SkillWithProgress;
+    jewelcrafting: SkillWithProgress;
     oneHanded: SkillWithProgress;
     dualWield: SkillWithProgress;
     twoHanded: SkillWithProgress;

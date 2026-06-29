@@ -461,6 +461,11 @@ const playerSchema = new Schema<IPlayer>({
       experience: { type: Number, default: 0, min: 0 },
       mainAttribute: { type: String, default: 'wisdom' }
     },
+    jewelcrafting: {
+      level: { type: Number, default: 1, min: 1 },
+      experience: { type: Number, default: 0, min: 0 },
+      mainAttribute: { type: String, default: 'dexterity' }
+    },
     oneHanded: {
       level: { type: Number, default: 1, min: 1 },
       experience: { type: Number, default: 0, min: 0 },
@@ -680,7 +685,7 @@ playerSchema.methods.addSkillExperience = async function(
 }> {
   const { getXPForLevel } = require('@shared/constants/attribute-constants');
   const validSkills: SkillName[] = [
-    'woodcutting', 'mining', 'fishing', 'gathering', 'smithing', 'cooking', 'alchemy', 'construction', 'enchanting',
+    'woodcutting', 'mining', 'fishing', 'gathering', 'smithing', 'cooking', 'alchemy', 'construction', 'enchanting', 'jewelcrafting',
     'oneHanded', 'dualWield', 'twoHanded', 'ranged', 'casting', 'protection'
   ];
 

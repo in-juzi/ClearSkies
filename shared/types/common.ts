@@ -31,6 +31,7 @@ export type SkillName =
   | 'alchemy'    // NEW: Potion/reagent crafting
   | 'construction' // NEW: Building and crafting structures
   | 'enchanting' // NEW: Binding crystallized mana (essences) into socketables (sigils)
+  | 'jewelcrafting' // NEW: Fine material craft (DEX) — cut gems + jewelry bases (the vessels)
   | 'oneHanded'
   | 'dualWield'
   | 'twoHanded'
