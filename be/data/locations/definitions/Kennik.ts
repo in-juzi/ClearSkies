@@ -18,7 +18,9 @@ export const Kennik: Location = {
     "kennik-kitchen",
     "kennik-forge",
     "kennik-sawmill",
-    "village-apothecary"
+    "village-apothecary",
+    "kennik-jewelers-bench",
+    "kennik-enchanters-table"
   ],
   "navigationLinks": [
     {
