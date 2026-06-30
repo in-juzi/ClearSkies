@@ -30,3 +30,7 @@ npm-debug.log*
 Thumbs.db
 # Session journals (local-only, safe to delete after resume)
 journals/
+
+# Claude Code personal/machine-local config (settings.json stays tracked & shared)
+.claude/settings.local.json
+.claude/hooks/
