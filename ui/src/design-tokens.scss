@@ -618,6 +618,22 @@
    --scrollbar-thumb: var(--color-border-moderate);
    --scrollbar-thumb-hover: var(--color-moon-yellow);
    --scrollbar-width: 8px;
+
+   /* Admin compatibility aliases
+      The admin/* component SCSS references these legacy token names, which were
+      never defined here — so the admin UI rendered those properties unset.
+      Alias each to its intended scale token. */
+   --font-size-xs: var(--font-size-2xs);
+   --font-size-sm: var(--font-size-s);
+   --font-size-lg: var(--font-size-l);
+   --radius-sm: var(--radius-s);
+   --radius-md: var(--radius-m);
+   --radius-pill: var(--radius-full);
+   --color-accent-moon: var(--color-moon-yellow);
+   --color-accent-twilight: var(--color-night-blue-light);
+   --color-border-primary: var(--color-surface-border);
+   --border-primary: var(--border-default);
+   --shadow-elevation-2: var(--shadow-m);
 }
 
 /* ========================================
