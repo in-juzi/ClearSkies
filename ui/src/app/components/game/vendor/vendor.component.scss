@@ -131,12 +131,14 @@
   .v {
     font-family: var(--font-monospace);
     font-size: var(--font-size-base);
+    line-height: 1;
     font-weight: var(--font-weight-bold);
     color: var(--color-gold);
   }
 
   .l {
     font-size: var(--font-size-2xs);
+    line-height: 1;
     text-transform: uppercase;
     letter-spacing: var(--letter-spacing-wide);
     color: var(--color-text-muted);
@@ -456,15 +458,21 @@
   .n {
     width: 42px;
     height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    padding: 0;
+    text-align: center;
+    background: transparent;
+    color: var(--color-text-primary);
     font-family: var(--font-monospace);
     font-size: var(--font-size-base);
     font-weight: var(--font-weight-bold);
-    color: var(--color-text-primary);
+    border: none;
     border-left: var(--border-width-thin) solid var(--color-border-moderate);
     border-right: var(--border-width-thin) solid var(--color-border-moderate);
+    outline: none;
+
+    &:focus {
+      background: var(--color-bg-hover);
+    }
   }
 }
 
@@ -562,6 +570,7 @@
 
   .ml {
     font-size: var(--font-size-2xs);
+    line-height: 1;
     text-transform: uppercase;
     letter-spacing: var(--letter-spacing-wide);
     color: var(--color-text-muted);
@@ -570,6 +579,7 @@
   .mv {
     font-family: var(--font-monospace);
     font-size: var(--font-size-m);
+    line-height: 1;
     font-weight: var(--font-weight-bold);
     color: var(--color-text-primary);
 

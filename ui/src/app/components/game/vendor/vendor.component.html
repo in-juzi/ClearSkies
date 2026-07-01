@@ -114,7 +114,8 @@
                 <div class="ctl">
                   <div class="step">
                     <button (click)="decQty()" aria-label="Decrease quantity">−</button>
-                    <div class="n">{{ stepQty() }}</div>
+                    <input class="n" type="text" inputmode="numeric" aria-label="Quantity"
+                           [value]="stepQty()" (input)="onQtyInput($event)" (blur)="onQtyBlur($event)" />
                     <button (click)="incQty()" aria-label="Increase quantity">+</button>
                   </div>
                   <div class="quick">
@@ -193,7 +194,8 @@
                 <div class="ctl">
                   <div class="step">
                     <button (click)="decQty()" aria-label="Decrease quantity">−</button>
-                    <div class="n">{{ stepQty() }}</div>
+                    <input class="n" type="text" inputmode="numeric" aria-label="Quantity"
+                           [value]="stepQty()" (input)="onQtyInput($event)" (blur)="onQtyBlur($event)" />
                     <button (click)="incQty()" aria-label="Increase quantity">+</button>
                   </div>
                   <div class="quick">

@@ -219,6 +219,34 @@ export class VendorComponent {
   maxQty(): void { this.clampStep(this.stepCap()); }
 
   /**
+   * Directly-typed quantity: keep digits only and clamp to [1, cap] live.
+   * An empty field is allowed mid-edit and finalized on blur.
+   */
+  onQtyInput(event: Event): void {
+    const el = event.target as HTMLInputElement;
+    const digits = el.value.replace(/[^0-9]/g, '');
+    if (digits === '') return;
+    const cap = this.stepCap();
+    let n = parseInt(digits, 10);
+    if (n < 1) n = 1;
+    if (n > cap) n = cap;
+    this.stepQty.set(n);
+    // Sync the field when we stripped/clamped what was typed.
+    const clamped = String(n);
+    if (el.value !== clamped) el.value = clamped;
+  }
+
+  /**
+   * On blur, guarantee the field holds a valid quantity (fall back to 1).
+   */
+  onQtyBlur(event: Event): void {
+    const el = event.target as HTMLInputElement;
+    const n = parseInt(el.value, 10);
+    if (isNaN(n) || n < 1) this.stepQty.set(1);
+    el.value = String(this.stepQty());
+  }
+
+  /**
    * Confirm a buy from the open stepper.
    */
   confirmBuy(item: VendorStockItem): void {
@@ -226,7 +254,7 @@ export class VendorComponent {
     if (this.stepTotal() > this.playerGold()) return;
     this.hint.set(`Bought ${qty} × ${item.itemDefinition?.name ?? 'item'}`);
     this.buyItem(item.itemId, qty);
-    this.expandedBuyId.set(null);
+    // Keep the row expanded so the player can buy again; reset the quantity.
     this.stepQty.set(1);
   }
 
@@ -237,7 +265,7 @@ export class VendorComponent {
     const qty = this.stepQty();
     this.hint.set(`Sold ${qty} × ${item.definition?.name ?? 'item'}`);
     this.sellItem(item.instanceId, qty);
-    this.expandedSellId.set(null);
+    // Keep the row expanded (if any stack remains); reset the quantity.
     this.stepQty.set(1);
   }
 
