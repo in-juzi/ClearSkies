@@ -21,8 +21,20 @@
     (itemClick)="onItemClick($event.event, $event.item)"
     (itemRightClick)="onItemRightClick($event.event, $event.item)"
     (itemDragStart)="onItemDragStart($event.event, $event.item)"
-    (itemDragEnd)="onItemDragEnd($event)">
+    (itemDragEnd)="onItemDragEnd($event)"
+    (itemHover)="onItemHover($event)">
   </app-inventory-density-view>
+
+  <!-- Hover Preview: read-only, anchored beside the rail; hidden while the
+       full click-opened panel is up -->
+  @if (hoveredItem() && !selectedItem) {
+    <app-item-details-panel
+      [item]="hoveredItem()"
+      [preview]="true"
+      [showActions]="false"
+      [showDropControls]="false">
+    </app-item-details-panel>
+  }
 
   <!-- Item Details Panel (Shared Component) -->
   @if (selectedItem) {

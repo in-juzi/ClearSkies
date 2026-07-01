@@ -21,6 +21,7 @@ export class ItemDetailsPanelComponent implements OnChanges {
   @Input() item: ItemDetails | null = null;
   @Input() showActions: boolean = true; // Show equip/use/drop buttons
   @Input() showDropControls: boolean = true; // Show quantity slider for dropping
+  @Input() preview: boolean = false; // Read-only anchored hover preview (no drag, non-interactive)
   @Output() close = new EventEmitter<void>();
   @Output() equipItem = new EventEmitter<string>();
   @Output() unequipItem = new EventEmitter<string>();
@@ -227,6 +228,7 @@ export class ItemDetailsPanelComponent implements OnChanges {
    * Start dragging the panel
    */
   onDragStart(event: MouseEvent): void {
+    if (this.preview) return; // Preview is a transient, non-draggable glance
     this.isDragging = true;
     this.hasDragged = true; // Mark that the panel has been dragged
     const panel = (event.target as HTMLElement).closest('.item-details-panel') as HTMLElement;

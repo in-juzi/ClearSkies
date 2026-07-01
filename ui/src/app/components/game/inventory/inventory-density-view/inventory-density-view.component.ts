@@ -36,6 +36,8 @@ export class InventoryDensityViewComponent {
 
   @Output() itemClick = new EventEmitter<{ event: MouseEvent; item: ItemDetails }>();
   @Output() itemRightClick = new EventEmitter<{ event: MouseEvent; item: ItemDetails }>();
+  /** Emits the hovered item on mouseenter, null on mouseleave (drives the hover preview). */
+  @Output() itemHover = new EventEmitter<ItemDetails | null>();
   @Output() itemDragStart = new EventEmitter<{ event: DragEvent; item: ItemDetails }>();
   @Output() itemDragEnd = new EventEmitter<DragEvent>();
 

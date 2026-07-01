@@ -1,4 +1,6 @@
-import { Component, OnInit, HostListener, inject, signal, effect } from '@angular/core';
+import { Component, OnInit, HostListener, inject, signal, effect, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InventoryService } from '../../../services/inventory.service';
@@ -31,6 +33,11 @@ export class InventoryComponent implements OnInit {
   public vendorService = inject(VendorService); // Public for template access
 
   selectedItem: ItemDetails | null = null;
+  // Read-only hover preview: the item currently hovered (debounced), shown in an
+  // anchored, non-interactive details panel. Distinct from selectedItem (click).
+  hoveredItem = signal<ItemDetails | null>(null);
+  private hoverSubject = new Subject<ItemDetails | null>();
+  private destroyRef = inject(DestroyRef);
   selectedCategory: string = 'all';
   searchQuery: string = ''; // Search filter
   isAltKeyHeld: boolean = false; // Track Alt key state for visual feedback
@@ -61,7 +68,20 @@ export class InventoryComponent implements OnInit {
 
   constructor(
     public inventoryService: InventoryService
-  ) {}
+  ) {
+    // Debounce hover so sweeping the cursor down the list doesn't thrash the
+    // preview (or fire a combat-stats request per row); ignore repeats of the
+    // same instance.
+    this.hoverSubject.pipe(
+      debounceTime(150),
+      distinctUntilChanged((a, b) => a?.instanceId === b?.instanceId),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(item => this.hoveredItem.set(item));
+  }
+
+  onItemHover(item: ItemDetails | null): void {
+    this.hoverSubject.next(item);
+  }
 
   @HostListener('window:keydown', ['$event'])
   handleKeyDown(event: KeyboardEvent): void {

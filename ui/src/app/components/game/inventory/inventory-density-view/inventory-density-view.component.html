@@ -18,6 +18,8 @@
           (contextmenu)="onItemRightClick($event, item)"
           (dragstart)="onItemDragStart($event, item)"
           (dragend)="onItemDragEnd($event)"
+          (mouseenter)="itemHover.emit(item)"
+          (mouseleave)="itemHover.emit(null)"
           [title]="getItemTooltip(item)"
         >
           @if (item.definition.icon) {
@@ -55,6 +57,8 @@
               (contextmenu)="onItemRightClick($event, item)"
               (dragstart)="onItemDragStart($event, item)"
               (dragend)="onItemDragEnd($event)"
+              (mouseenter)="itemHover.emit(item)"
+              (mouseleave)="itemHover.emit(null)"
               [title]="getItemTooltip(item)"
             >
               <div class="ico">
@@ -84,6 +88,8 @@
               (contextmenu)="onItemRightClick($event, item)"
               (dragstart)="onItemDragStart($event, item)"
               (dragend)="onItemDragEnd($event)"
+              (mouseenter)="itemHover.emit(item)"
+              (mouseleave)="itemHover.emit(null)"
               [title]="getItemTooltip(item)"
             >
               <div class="ico">

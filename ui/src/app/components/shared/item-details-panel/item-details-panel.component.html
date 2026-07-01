@@ -1,5 +1,6 @@
 @if (item) {
   <div class="item-details-panel"
+       [class.preview]="preview"
        [style.--rarity]="rarityColor"
        [ngStyle]="getPanelStyle()"
        (mousemove)="onDrag($event)"
