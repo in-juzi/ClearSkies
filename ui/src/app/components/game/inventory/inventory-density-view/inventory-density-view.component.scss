@@ -28,7 +28,7 @@
   align-items: center;
   gap: var(--spacing-s);
   padding: var(--spacing-xs) var(--spacing-2xs) var(--spacing-2xs);
-  margin-bottom: var(--spacing-xs);
+  margin: var(--spacing-s) 0;
   position: sticky;
   top: calc(-1 * var(--spacing-s));
   background: linear-gradient(to bottom, var(--color-bg-secondary) 72%, transparent);
