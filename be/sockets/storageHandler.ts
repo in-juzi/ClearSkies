@@ -196,6 +196,66 @@ export default function storageHandler(io: Server): void {
     });
 
     /**
+     * Bulk withdraw items from storage container
+     * Event: storage:bulkWithdraw
+     * Payload: { containerId: string, items: [{ instanceId: string, quantity?: number | null }] }
+     */
+    socket.on('storage:bulkWithdraw', async (data: { containerId: string; items: Array<{ instanceId: string; quantity?: number | null }> }) => {
+      try {
+        const { containerId, items } = data;
+
+        const player = await Player.findOne({ userId });
+        if (!player) {
+          socket.emit('storage:error', { message: 'Player not found' });
+          return;
+        }
+
+        const results: any[] = [];
+        const errors: any[] = [];
+
+        // Process each withdrawal
+        for (const item of items) {
+          try {
+            const result = await storageService.processWithdraw(player, containerId, item.instanceId, item.quantity ?? null);
+            results.push(result);
+          } catch (error: any) {
+            errors.push({
+              instanceId: item.instanceId,
+              error: error.message
+            });
+          }
+        }
+
+        // Get updated container info
+        const containerInfo = storageService.getContainerInfo(player, containerId);
+
+        // Emit success
+        socket.emit('storage:bulkWithdrawn', {
+          containerId,
+          withdrawn: results,
+          errors,
+          container: containerInfo
+        });
+
+        // Emit update to other players viewing the same container
+        if (results.length > 0) {
+          socket.to(`storage:${containerId}`).emit('storage:bulkUpdate', {
+            containerId,
+            userId,
+            action: 'withdraw',
+            count: results.length
+          });
+        }
+      } catch (error: any) {
+        console.error('Error bulk withdrawing items:', error);
+        socket.emit('storage:error', {
+          message: 'Failed to bulk withdraw items',
+          error: error.message
+        });
+      }
+    });
+
+    /**
      * Join storage container room (for real-time updates)
      * Event: storage:join
      * Payload: { containerId: string }

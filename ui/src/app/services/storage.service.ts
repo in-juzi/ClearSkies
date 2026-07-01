@@ -31,6 +31,13 @@ export interface StorageBulkDepositedEvent {
   container: StorageContainerInfo;
 }
 
+export interface StorageBulkWithdrawnEvent {
+  containerId: string;
+  withdrawn: any[];
+  errors: any[];
+  container: StorageContainerInfo;
+}
+
 export interface StorageItemAddedEvent {
   containerId: string;
   userId: string;
@@ -145,6 +152,22 @@ export class StorageService {
       }
     });
 
+    // Bulk withdraw success
+    socket.on('storage:bulkWithdrawn', (data: StorageBulkWithdrawnEvent) => {
+      // Enrich minimal instances with definitions
+      const enrichedItems = this.itemDataService.enrichItemInstances(data.container.items);
+
+      this.containerItems.set(enrichedItems);
+      this.containerUsedSlots.set(data.container.usedSlots);
+      this.containerAvailableSlots.set(data.container.capacity - data.container.usedSlots);
+      this.isLoading.set(false);
+
+      // Log any errors
+      if (data.errors.length > 0) {
+        console.warn('Bulk withdraw had errors:', data.errors);
+      }
+    });
+
     // Real-time updates from other users (for guild storage)
     socket.on('storage:itemAdded', (data: StorageItemAddedEvent) => {
       // Only update if we're viewing the same container
@@ -241,6 +264,21 @@ export class StorageService {
     this.isLoading.set(true);
     this.error.set(null);
     socket.emit('storage:bulkDeposit', {
+      containerId,
+      items
+    });
+  }
+
+  /**
+   * Bulk withdraw multiple items from storage container
+   */
+  bulkWithdraw(containerId: string, items: Array<{ instanceId: string; quantity?: number | null }>): void {
+    const socket = this.socketService.getSocket();
+    if (!socket) return;
+
+    this.isLoading.set(true);
+    this.error.set(null);
+    socket.emit('storage:bulkWithdraw', {
       containerId,
       items
     });
