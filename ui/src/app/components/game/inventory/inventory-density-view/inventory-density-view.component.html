@@ -86,7 +86,6 @@
               (dragend)="onItemDragEnd($event)"
               [title]="getItemTooltip(item)"
             >
-              <span class="dot" [style.background]="rarityColor(item)"></span>
               <div class="ico">
                 @if (item.definition.icon) {
                   <app-icon [icon]="item.definition.icon" [size]="18"></app-icon>

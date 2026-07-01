@@ -145,7 +145,7 @@
 
   .row {
     display: grid;
-    grid-template-columns: 8px 20px 1fr auto auto;
+    grid-template-columns: 20px 1fr auto auto;
     gap: var(--spacing-s);
     align-items: center;
     padding: var(--spacing-2xs) var(--spacing-s);
@@ -156,8 +156,6 @@
     &:nth-child(even) { background: rgba(15, 23, 41, 0.55); }
     &:hover { background: var(--color-bg-tertiary); }
   }
-
-  .dot { width: 8px; height: 8px; border-radius: 50%; justify-self: center; }
 
   .ico {
     width: 20px;
