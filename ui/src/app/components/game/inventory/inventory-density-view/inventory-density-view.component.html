@@ -18,7 +18,7 @@
           (contextmenu)="onItemRightClick($event, item)"
           (dragstart)="onItemDragStart($event, item)"
           (dragend)="onItemDragEnd($event)"
-          (mouseenter)="itemHover.emit(item)"
+          (mouseenter)="onItemHover($event, item)"
           (mouseleave)="itemHover.emit(null)"
           [title]="getItemTooltip(item)"
         >
@@ -57,7 +57,7 @@
               (contextmenu)="onItemRightClick($event, item)"
               (dragstart)="onItemDragStart($event, item)"
               (dragend)="onItemDragEnd($event)"
-              (mouseenter)="itemHover.emit(item)"
+              (mouseenter)="onItemHover($event, item)"
               (mouseleave)="itemHover.emit(null)"
               [title]="getItemTooltip(item)"
             >
@@ -88,7 +88,7 @@
               (contextmenu)="onItemRightClick($event, item)"
               (dragstart)="onItemDragStart($event, item)"
               (dragend)="onItemDragEnd($event)"
-              (mouseenter)="itemHover.emit(item)"
+              (mouseenter)="onItemHover($event, item)"
               (mouseleave)="itemHover.emit(null)"
               [title]="getItemTooltip(item)"
             >

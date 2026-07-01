@@ -2,10 +2,12 @@
      (mousedown)="onDragStart($event)"
      [style.cursor]="isDragging ? 'grabbing' : 'grab'">
 
-  <button class="close"
-          aria-label="Close"
-          (click)="onClose()"
-          (mousedown)="$event.stopPropagation()">×</button>
+  @if (showClose) {
+    <button class="close"
+            aria-label="Close"
+            (click)="onClose()"
+            (mousedown)="$event.stopPropagation()">×</button>
+  }
 
   @if (icon) {
     <div class="icon">

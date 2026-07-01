@@ -1,5 +1,6 @@
 @if (item) {
   <div class="item-details-panel"
+       #panelRoot
        [class.preview]="preview"
        [style.--rarity]="rarityColor"
        [ngStyle]="getPanelStyle()"
@@ -18,6 +19,7 @@
       [requiredLevel]="item.definition.properties['requiredLevel'] ?? null"
       [quantity]="item.quantity"
       [isDragging]="isDragging"
+      [showClose]="!preview"
       (close)="onClose()"
       (dragStart)="onDragStart($event)">
     </app-item-detail-header>

@@ -19,6 +19,7 @@ export class ItemDetailHeaderComponent {
   @Input() slot: string = '';
   @Input() requiredLevel: number | null = null;
   @Input() quantity: number = 1;
+  @Input() showClose: boolean = true; // Hidden in read-only preview mode
 
   @Output() close = new EventEmitter<void>();
   @Output() dragStart = new EventEmitter<MouseEvent>();

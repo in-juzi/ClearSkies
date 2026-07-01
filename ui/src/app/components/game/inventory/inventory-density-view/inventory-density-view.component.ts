@@ -36,8 +36,8 @@ export class InventoryDensityViewComponent {
 
   @Output() itemClick = new EventEmitter<{ event: MouseEvent; item: ItemDetails }>();
   @Output() itemRightClick = new EventEmitter<{ event: MouseEvent; item: ItemDetails }>();
-  /** Emits the hovered item on mouseenter, null on mouseleave (drives the hover preview). */
-  @Output() itemHover = new EventEmitter<ItemDetails | null>();
+  /** Emits the hovered item + its viewport Y on mouseenter, null on mouseleave (drives the hover preview). */
+  @Output() itemHover = new EventEmitter<{ item: ItemDetails; anchorTop: number } | null>();
   @Output() itemDragStart = new EventEmitter<{ event: DragEvent; item: ItemDetails }>();
   @Output() itemDragEnd = new EventEmitter<DragEvent>();
 
@@ -116,5 +116,10 @@ export class InventoryDensityViewComponent {
 
   onItemDragEnd(event: DragEvent): void {
     this.itemDragEnd.emit(event);
+  }
+
+  onItemHover(event: MouseEvent, item: ItemDetails): void {
+    const anchorTop = (event.currentTarget as HTMLElement).getBoundingClientRect().top;
+    this.itemHover.emit({ item, anchorTop });
   }
 }

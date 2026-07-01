@@ -33,10 +33,12 @@ export class InventoryComponent implements OnInit {
   public vendorService = inject(VendorService); // Public for template access
 
   selectedItem: ItemDetails | null = null;
-  // Read-only hover preview: the item currently hovered (debounced), shown in an
-  // anchored, non-interactive details panel. Distinct from selectedItem (click).
+  // Read-only hover preview: the item currently hovered (debounced) plus its
+  // viewport Y, shown in an anchored, non-interactive details panel that tracks
+  // the item. Distinct from selectedItem (click).
   hoveredItem = signal<ItemDetails | null>(null);
-  private hoverSubject = new Subject<ItemDetails | null>();
+  hoverAnchorTop = signal<number | null>(null);
+  private hoverSubject = new Subject<{ item: ItemDetails; anchorTop: number } | null>();
   private destroyRef = inject(DestroyRef);
   selectedCategory: string = 'all';
   searchQuery: string = ''; // Search filter
@@ -74,13 +76,16 @@ export class InventoryComponent implements OnInit {
     // same instance.
     this.hoverSubject.pipe(
       debounceTime(150),
-      distinctUntilChanged((a, b) => a?.instanceId === b?.instanceId),
+      distinctUntilChanged((a, b) => a?.item.instanceId === b?.item.instanceId),
       takeUntilDestroyed(this.destroyRef)
-    ).subscribe(item => this.hoveredItem.set(item));
+    ).subscribe(payload => {
+      this.hoveredItem.set(payload?.item ?? null);
+      this.hoverAnchorTop.set(payload?.anchorTop ?? null);
+    });
   }
 
-  onItemHover(item: ItemDetails | null): void {
-    this.hoverSubject.next(item);
+  onItemHover(payload: { item: ItemDetails; anchorTop: number } | null): void {
+    this.hoverSubject.next(payload);
   }
 
   @HostListener('window:keydown', ['$event'])

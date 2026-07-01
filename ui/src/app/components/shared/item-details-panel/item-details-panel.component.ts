@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ItemDetails } from '../../../models/inventory.model';
 import { InventoryService } from '../../../services/inventory.service';
@@ -22,6 +22,15 @@ export class ItemDetailsPanelComponent implements OnChanges {
   @Input() showActions: boolean = true; // Show equip/use/drop buttons
   @Input() showDropControls: boolean = true; // Show quantity slider for dropping
   @Input() preview: boolean = false; // Read-only anchored hover preview (no drag, non-interactive)
+  @Input() anchorTop: number | null = null; // Viewport Y of the hovered item; preview aligns to it
+
+  @ViewChild('panelRoot') panelRoot?: ElementRef<HTMLElement>;
+
+  /** Clamped top (px) for the preview, tracked to the hovered item and kept on-screen. */
+  previewTop: number | null = null;
+
+  /** Combat stats are immutable per instance — cache across hovers/clicks to avoid refetching. */
+  private static combatStatsCache = new Map<string, CombatStats>();
   @Output() close = new EventEmitter<void>();
   @Output() equipItem = new EventEmitter<string>();
   @Output() unequipItem = new EventEmitter<string>();
@@ -102,19 +111,52 @@ export class ItemDetailsPanelComponent implements OnChanges {
         this.currentY = 0;
       }
     }
+
+    // Re-anchor the preview whenever the item or its screen position changes.
+    if (this.preview && (changes['item'] || changes['anchorTop'])) {
+      this.schedulePreviewPosition();
+    }
+  }
+
+  /**
+   * Position the preview so its top tracks the hovered item, clamped so the
+   * card never runs off the top or bottom of the viewport. Measured after
+   * layout because the card height varies by item (stats, traits, etc.).
+   */
+  private schedulePreviewPosition(): void {
+    requestAnimationFrame(() => {
+      const el = this.panelRoot?.nativeElement;
+      if (!el || !this.preview || this.anchorTop == null) {
+        this.previewTop = null;
+        return;
+      }
+      const gap = 16; // matches --spacing-l
+      const maxTop = window.innerHeight - el.offsetHeight - gap;
+      this.previewTop = Math.max(gap, Math.min(this.anchorTop, maxTop));
+    });
   }
 
   /**
    * Load combat stats from backend API
    */
   loadCombatStats(instanceId: string): void {
+    const cached = ItemDetailsPanelComponent.combatStatsCache.get(instanceId);
+    if (cached) {
+      this.combatStats = cached;
+      this.loadingCombatStats = false;
+      return;
+    }
+
     this.loadingCombatStats = true;
     this.inventoryService.getItemCombatStats(instanceId).subscribe({
       next: (response: { success: boolean; stats?: CombatStats }) => {
-        if (response.success) {
-          this.combatStats = response.stats || null;
+        if (response.success && response.stats) {
+          this.combatStats = response.stats;
+          ItemDetailsPanelComponent.combatStatsCache.set(instanceId, response.stats);
         }
         this.loadingCombatStats = false;
+        // Stats add height; re-clamp the preview now that it's rendered.
+        if (this.preview) this.schedulePreviewPosition();
       },
       error: (error) => {
         console.error('Error loading combat stats:', error);
@@ -164,10 +206,14 @@ export class ItemDetailsPanelComponent implements OnChanges {
   }
 
   onSocket(event: { hostInstanceId: string; socketableInstanceId: string }): void {
+    // Socketing changes the host's combat stats while keeping its instanceId.
+    ItemDetailsPanelComponent.combatStatsCache.delete(event.hostInstanceId);
     this.socketItem.emit(event);
   }
 
   onExtract(event: { hostInstanceId: string; socketIndex: number }): void {
+    // Extracting changes the host's combat stats while keeping its instanceId.
+    ItemDetailsPanelComponent.combatStatsCache.delete(event.hostInstanceId);
     this.extractSocketItem.emit(event);
   }
 
@@ -263,6 +309,9 @@ export class ItemDetailsPanelComponent implements OnChanges {
    * Get the transform style for the panel position
    */
   getPanelStyle(): { transform?: string; left?: string; top?: string } {
+    if (this.preview) {
+      return this.previewTop != null ? { top: `${this.previewTop}px` } : {};
+    }
     if (this.hasDragged) {
       return {
         transform: 'none',
