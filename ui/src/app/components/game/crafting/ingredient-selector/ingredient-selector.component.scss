@@ -1,293 +1,269 @@
-// Styles extracted from crafting.component.scss - recipe details section
+// Crafting v2 — compact two-column layout (sticky recipe summary + dense reagent rows)
 
-.recipe-details {
+// compact inline text-link action (replaces the big per-group buttons)
+.link-action {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0;
+  font-size: var(--font-size-s);
+  color: var(--color-text-muted);
+  transition: color var(--transition-fast);
+
+  &:hover { color: var(--color-text-primary); }
+  &.accent:hover { color: var(--color-starlight); }
+}
+
+.craft-screen {
   flex: 1;
   overflow-y: auto;
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: var(--spacing-l);
+  align-items: start;
+  max-width: 980px;
+  margin: 0 auto;
+  width: 100%;
+}
 
-  // Back button now uses .button-quaternary from design-tokens.scss
-  .button-quaternary {
-    margin-bottom: var(--spacing-l);
+// ===== topbar (spans both columns) =====
+.topbar {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-m);
+
+  .back { font-size: var(--font-size-s); }
+
+  .crumb {
+    font-family: var(--font-display);
+    color: var(--color-text-primary);
+    font-size: var(--font-size-l);
+    letter-spacing: var(--letter-spacing-wide);
+
+    .muted {
+      color: var(--color-text-muted);
+      font-weight: var(--font-weight-normal);
+    }
+  }
+}
+
+// ===== left rail: recipe summary + output + craft, sticky =====
+.summary {
+  position: sticky;
+  top: var(--spacing-xl);
+  background: var(--gradient-card);
+  border: var(--border-default);
+  border-radius: var(--radius-card);
+  padding: var(--spacing-l);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-m);
+
+  h2 {
+    margin: 0;
+    color: var(--color-secondary);
+    font-size: var(--font-size-xl);
   }
 
-  .recipe-header-detail {
-    margin-bottom: var(--spacing-l);
-
-    h2 {
-      margin: 0 0 var(--spacing-s) 0;
-      color: var(--color-secondary);
-    }
-
-    .recipe-meta {
-      display: flex;
-      gap: var(--spacing-l);
-      color: var(--color-text-secondary);
-      font-size: var(--font-size-s);
-    }
-  }
-
-  .recipe-description-detail {
-    color: var(--color-text-secondary);
-    font-style: italic;
-    line-height: var(--line-height-relaxed);
-    margin-top: var(--spacing-xs);
+  .recipe-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs) var(--spacing-m);
+    color: var(--color-text-muted);
     font-size: var(--font-size-s);
 
-    // When standalone (not inside output-item-display)
-    &:not(.output-details .recipe-description-detail) {
-      padding: var(--spacing-m);
-      background: var(--color-bg-overlay);
-      border-radius: var(--radius-s);
-      margin-bottom: var(--spacing-l);
-    }
-  }
-
-  .ingredients-section,
-  .output-section {
-    margin-bottom: var(--spacing-l);
-
-    h3 {
-      margin: 0 0 var(--spacing-m) 0;
-      color: var(--color-text-accent-secondary);
-    }
-  }
-
-  .ingredient-group {
-    padding: var(--spacing-l);
-    background: var(--color-bg-elevated);
-    border-radius: var(--radius-card);
-    border: var(--border-default);
-    margin-bottom: var(--spacing-m);
-
-    &:last-child {
-      margin-bottom: 0;
-    }
-
-    .ingredient-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: var(--spacing-m);
-      padding-bottom: var(--spacing-m);
-      border-bottom: var(--border-light);
-
-      .ingredient-name {
-        font-size: var(--font-size-l);
-        font-weight: var(--font-weight-medium);
-        color: var(--color-text-primary);
-        text-transform: capitalize;
-      }
-
-      .ingredient-selection-count {
-        color: var(--color-text-secondary);
-        font-size: var(--font-size-m);
-      }
-    }
-
-    .ingredient-actions {
-      display: flex;
-      gap: var(--spacing-s);
-      margin-bottom: var(--spacing-m);
-
-      // Action buttons now use standardized button classes from design-tokens.scss
-      button {
-        flex: 1;
-      }
-    }
-
-    .instance-list {
-      display: flex;
-      flex-direction: column;
-      gap: var(--spacing-s);
-
-      .instance-card {
-        padding: var(--spacing-m);
-        background: var(--color-bg-base);
-        border: var(--border-width-medium) solid var(--color-surface-border);
-        border-radius: var(--radius-s);
-        cursor: pointer;
-        transition: all var(--transition-fast);
-
-        &:hover {
-          border-color: var(--color-text-accent-secondary);
-          transform: translateX(var(--spacing-xs));
-        }
-
-        &.selected {
-          border-color: var(--color-text-accent-secondary);
-          background: rgba(138, 43, 226, 0.1);
-        }
-
-        &.fully-selected {
-          border-color: var(--color-secondary);
-          background: rgba(255, 215, 0, 0.1);
-        }
-
-        .instance-info {
-          display: flex;
-          align-items: center;
-          gap: var(--spacing-m);
-          margin-bottom: var(--spacing-s);
-
-          .instance-item-name {
-            font-weight: var(--font-weight-medium);
-            color: var(--color-secondary);
-            font-size: var(--font-size-m);
-            flex-shrink: 0;
-          }
-
-          .instance-quantity {
-            font-weight: var(--font-weight-bold);
-            color: var(--color-text-primary);
-            font-size: var(--font-size-l);
-          }
-
-          .quality-badge {
-            padding: var(--spacing-xs) var(--spacing-s);
-            border-radius: var(--radius-s);
-            font-size: var(--font-size-s);
-            font-weight: var(--font-weight-medium);
-
-            &.common {
-              background: rgba(128, 128, 128, 0.3);
-              color: #aaa;
-            }
-
-            &.uncommon {
-              background: rgba(76, 175, 80, 0.3);
-              color: var(--color-quality-4);
-            }
-
-            &.rare {
-              background: rgba(33, 150, 243, 0.3);
-              color: var(--color-quality-3);
-            }
-
-            &.epic {
-              background: rgba(156, 39, 176, 0.3);
-              color: var(--color-quality-5);
-            }
-
-            &.legendary {
-              background: rgba(255, 152, 0, 0.3);
-              color: #ff9800;
-            }
-          }
-        }
-
-        .selection-indicator {
-          color: var(--color-text-accent-secondary);
-          font-weight: var(--font-weight-medium);
-          font-size: var(--font-size-s);
-        }
-      }
-
-      .no-instances {
-        padding: var(--spacing-l);
-        text-align: center;
-        color: var(--color-text-muted);
-        font-style: italic;
-      }
-    }
-  }
-
-  .output-item {
-    display: flex;
-    justify-content: space-between;
-    padding: var(--spacing-m);
-    background: var(--gradient-card);
-    border-radius: var(--radius-s);
-    margin-bottom: var(--spacing-s);
-
-    .output-name {
-      font-weight: var(--font-weight-medium);
-      color: var(--color-secondary);
-    }
-
-    .output-quantity {
+    b {
       color: var(--color-text-secondary);
+      font-weight: var(--font-weight-medium);
     }
   }
 
-  .output-item-display {
+  .output-strip {
     display: flex;
     align-items: center;
-    gap: var(--spacing-m);
-    padding: var(--spacing-m);
-    background: var(--gradient-card);
+    gap: var(--spacing-s);
+    padding: var(--spacing-s) var(--spacing-m);
+    background: var(--color-bg-base);
+    border: var(--border-subtle);
     border-radius: var(--radius-s);
-    margin-bottom: var(--spacing-m);
 
-    .output-icon-inline {
-      flex-shrink: 0;
+    .o-icon { flex-shrink: 0; }
+    .o-text { min-width: 0; }
+
+    .o-label {
+      font-size: var(--font-size-2xs);
+      text-transform: uppercase;
+      letter-spacing: var(--letter-spacing-wider);
+      color: var(--color-text-muted);
     }
 
-    .output-details {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: var(--spacing-xs);
+    .o-name {
+      font-weight: var(--font-weight-medium);
+      color: var(--color-secondary);
+      font-size: var(--font-size-base);
     }
 
-    .output-name-display {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-m);
-
-      .output-name {
-        font-weight: var(--font-weight-medium);
-        color: var(--color-secondary);
-        font-size: var(--font-size-l);
-      }
-
-      .output-quantity {
-        color: var(--color-gold);
-        font-weight: var(--font-weight-medium);
-      }
+    .o-qty {
+      color: var(--color-gold);
+      font-weight: var(--font-weight-medium);
+      margin-left: auto;
     }
   }
 
-  .quality-note {
+  .desc {
     font-size: var(--font-size-s);
     color: var(--color-text-muted);
     font-style: italic;
+    line-height: var(--line-height-snug);
   }
 
-  .craft-actions {
-    margin-top: var(--spacing-xl);
-    margin-bottom: var(--spacing-xl);
+  .button-primary { width: 100%; }
 
-    // Craft button now uses .button-primary from design-tokens.scss
-    .button-primary {
-      width: 100%;
-      font-size: var(--font-size-l);
+  .cannot-craft-message {
+    text-align: center;
+    padding: var(--spacing-s) var(--spacing-m);
+    background: rgba(244, 67, 54, 0.2);
+    border: var(--border-width-medium) solid var(--color-error);
+    color: var(--color-error);
+    border-radius: var(--radius-s);
+    font-weight: var(--font-weight-medium);
+    font-size: var(--font-size-s);
+  }
+
+  .craft-hint {
+    font-size: var(--font-size-2xs);
+    color: var(--color-text-muted);
+    text-align: center;
+
+    &.ready { color: var(--color-success); }
+  }
+}
+
+// ===== right column: ingredients =====
+.ingredients-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-s);
+}
+
+.col-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+
+  h3 {
+    margin: 0;
+    color: var(--color-text-accent-secondary);
+    font-size: var(--font-size-l);
+  }
+}
+
+.ingredient-group {
+  background: var(--color-bg-elevated);
+  border-radius: var(--radius-m);
+  border: var(--border-subtle);
+  overflow: hidden;
+}
+
+.ingredient-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-s);
+  padding: var(--spacing-s) var(--spacing-m);
+  background: var(--color-overlay-light);
+
+  .ingredient-name {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-primary);
+    text-transform: capitalize;
+  }
+
+  .count {
+    font-size: var(--font-size-s);
+    color: var(--color-text-muted);
+
+    &.done { color: var(--color-success); }
+  }
+
+  .grp-actions {
+    margin-left: auto;
+    display: flex;
+    gap: var(--spacing-m);
+  }
+}
+
+.instance-list {
+  display: flex;
+  flex-direction: column;
+
+  .instance-row {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-s);
+    padding: var(--spacing-xs) var(--spacing-m);
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    border-top: var(--border-subtle);
+    transition: background var(--transition-fast);
+
+    &:first-child { border-top: none; }
+    &:hover { background: var(--color-bg-hover); }
+
+    &.selected {
+      border-left-color: var(--color-starlight);
+      background: rgba(199, 210, 254, 0.07);
     }
 
-    .cannot-craft-message {
-      text-align: center;
-      padding: var(--spacing-l);
-      background: rgba(244, 67, 54, 0.2);
-      border: var(--border-width-medium) solid var(--color-error);
-      color: var(--color-error);
-      border-radius: var(--radius-s);
+    &.fully-selected {
+      border-left-color: var(--color-secondary);
+      background: rgba(244, 233, 155, 0.07);
+    }
+
+    .i-name {
       font-weight: var(--font-weight-medium);
+      color: var(--color-secondary);
+      font-size: var(--font-size-m);
+      min-width: 84px;
     }
+
+    .i-qty {
+      font-weight: var(--font-weight-bold);
+      color: var(--color-text-tertiary);
+      font-size: var(--font-size-s);
+      min-width: 24px;
+    }
+
+    .i-sel {
+      margin-left: auto;
+      font-size: var(--font-size-s);
+      color: var(--color-text-muted);
+      white-space: nowrap;
+      min-width: 64px;
+      text-align: right;
+    }
+
+    &.selected .i-sel,
+    &.fully-selected .i-sel { color: var(--color-text-primary); }
+  }
+
+  .no-instances {
+    padding: var(--spacing-m);
+    text-align: center;
+    color: var(--color-text-muted);
+    font-style: italic;
+    font-size: var(--font-size-s);
   }
 }
 
 // Scrollbar styling
-.recipe-details::-webkit-scrollbar {
-  width: var(--spacing-s);
-}
-
-.recipe-details::-webkit-scrollbar-track {
-  background: var(--color-bg-elevated);
-}
-
-.recipe-details::-webkit-scrollbar-thumb {
+.craft-screen::-webkit-scrollbar { width: var(--spacing-s); }
+.craft-screen::-webkit-scrollbar-track { background: var(--color-bg-elevated); }
+.craft-screen::-webkit-scrollbar-thumb {
   background: var(--color-surface-border);
   border-radius: var(--radius-s);
 
-  &:hover {
-    background: var(--color-surface-border-light);
-  }
+  &:hover { background: var(--color-surface-border-light); }
 }

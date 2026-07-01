@@ -1,100 +1,86 @@
-<div class="recipe-details">
-  <button class="button-quaternary" (click)="back()">
-    ← Back to Recipes
-  </button>
+@if (recipe) {
+  <div class="craft-screen">
 
-  @if (recipe) {
-    <div class="recipe-header-detail">
+    <div class="topbar">
+      <button class="button-quaternary back" (click)="back()">← Recipes</button>
+      <span class="crumb">{{ skill | titlecase }} <span class="muted">/</span> {{ recipe.name }}</span>
+    </div>
+
+    <!-- LEFT: sticky recipe + output summary + craft -->
+    <aside class="summary">
       <h2>{{ recipe.name }}</h2>
       <div class="recipe-meta">
-        <span class="level-req">Requires {{ skill | titlecase }} Level {{ recipe.requiredLevel }}</span>
-        <span class="duration">Duration: {{ recipe.duration }}s</span>
-        <span class="xp-reward">+{{ recipe.experience }} XP</span>
+        <span><b>Lvl {{ recipe.requiredLevel }}</b> {{ skill | titlecase }}</span>
+        <span><b>{{ recipe.duration }}s</b> craft</span>
+        <span><b>+{{ recipe.experience }}</b> XP</span>
       </div>
-    </div>
 
-    <!-- Output Section -->
-    <div class="output-section">
-      <h3>Creates</h3>
       @for (outputItem of outputItems; track outputItem.itemId) {
-        <div class="output-item-display">
+        <div class="output-strip">
           @if (outputItem.definition?.icon) {
-            <app-icon
-              [icon]="outputItem.definition.icon"
-              [size]="32"
-              class="output-icon-inline">
-            </app-icon>
+            <app-icon [icon]="outputItem.definition.icon" [size]="24" class="o-icon"></app-icon>
           }
-          <div class="output-details">
-            <div class="output-name-display">
-              <span class="output-name">{{ outputItem.name }}</span>
-              <span class="output-quantity">x{{ outputItem.quantity }}</span>
-            </div>
-            <div class="recipe-description-detail">
-              {{ recipe.description }}
-            </div>
-            @if (outputItem.qualityModifier === 'inherit') {
-              <div class="quality-note">
-                Quality inherited from ingredients + {{ skill }} level bonus
-              </div>
-            }
+          <div class="o-text">
+            <div class="o-label">Creates</div>
+            <div class="o-name">{{ outputItem.name }}</div>
           </div>
+          <span class="o-qty">x{{ outputItem.quantity }}</span>
         </div>
       }
-    </div>
 
-    <div class="craft-actions">
+      @if (recipe.description) {
+        <div class="desc">{{ recipe.description }}</div>
+      }
+
       @if (canCraft) {
-        <button class="button-primary" (click)="startCrafting()">
-          Start Crafting
-        </button>
+        <button class="button-primary" (click)="startCrafting()">Start Crafting</button>
       } @else {
-        <div class="cannot-craft-message">
-          {{ canCraftMessage }}
-        </div>
+        <div class="cannot-craft-message">{{ canCraftMessage }}</div>
       }
-    </div>
 
-    <div class="ingredients-section">
-      <h3>Required Ingredients</h3>
+      <div class="craft-hint" [class.ready]="totalSelected() >= totalRequired()">
+        {{ totalSelected() }} / {{ totalRequired() }} reagents selected
+      </div>
+    </aside>
+
+    <!-- RIGHT: ingredient selection -->
+    <div class="ingredients-col">
+      <div class="col-head">
+        <h3>Select Reagents</h3>
+        <button class="link-action accent all-action" (click)="autoSelectBestQuality()">
+          Auto-select all best
+        </button>
+      </div>
 
       @for (ingredient of recipe.ingredients; track getIngredientLookupKey(ingredient)) {
         <div class="ingredient-group">
           <div class="ingredient-header">
             <span class="ingredient-name">{{ getIngredientLabel(ingredient) }}</span>
-            <span class="ingredient-selection-count">
-              Selected: {{ getTotalSelectedByLookupKey(getIngredientLookupKey(ingredient)) }} / {{ ingredient.quantity }}
+            <span class="count" [class.done]="isIngredientComplete(ingredient)">
+              @if (isIngredientComplete(ingredient)) { ✓ }{{ getTotalSelectedByLookupKey(getIngredientLookupKey(ingredient)) }} / {{ ingredient.quantity }}
             </span>
-          </div>
-
-          <div class="ingredient-actions">
-            <button class="button-tertiary"
-                    (click)="autoSelectBestQuality()">
-              Auto-select Best
-            </button>
-            <button class="button-quaternary"
-                    (click)="clearSelection()">
-              Clear Selection
-            </button>
+            <span class="grp-actions">
+              <button class="link-action accent" (click)="autoSelectBestQuality()">Auto</button>
+              <button class="link-action" (click)="clearSelection()">Clear</button>
+            </span>
           </div>
 
           <div class="instance-list">
             @for (instance of getAvailableInstancesByIngredient(ingredient); track instance.instanceId) {
-              <div class="instance-card"
+              <div class="instance-row"
                    (click)="toggleInstanceSelection(getIngredientLookupKey(ingredient), instance.instanceId, instance.quantity, ingredient.quantity)"
                    [class.selected]="getSelectedQuantity(instance.instanceId) > 0"
                    [class.fully-selected]="getSelectedQuantity(instance.instanceId) === instance.quantity">
-                <div class="instance-info">
-                  <span class="instance-item-name">{{ instance.definition?.name || instance.itemId }}</span>
-                  <span class="instance-quantity">x{{ instance.quantity }}</span>
-                  <app-item-modifiers [item]="instance" displayMode="badge-name" size="normal"></app-item-modifiers>
-                </div>
-
-                @if (getSelectedQuantity(instance.instanceId) > 0) {
-                  <div class="selection-indicator">
-                    ✓ {{ getSelectedQuantity(instance.instanceId) }} selected
-                  </div>
-                }
+                <span class="i-name">{{ instance.definition?.name || instance.itemId }}</span>
+                <span class="i-qty">x{{ instance.quantity }}</span>
+                <app-item-modifiers [item]="instance" displayMode="badge-name" size="mini"></app-item-modifiers>
+                <span class="i-sel">
+                  @if (getSelectedQuantity(instance.instanceId) > 0) {
+                    ✓ {{ getSelectedQuantity(instance.instanceId) }} used
+                  } @else {
+                    —
+                  }
+                </span>
               </div>
             }
 
@@ -107,5 +93,6 @@
         </div>
       }
     </div>
-  }
-</div>
+
+  </div>
+}

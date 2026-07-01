@@ -61,6 +61,24 @@ export class IngredientSelectorComponent {
     }, 0);
   }
 
+  /** True once this ingredient slot has enough instances selected. */
+  isIngredientComplete(ingredient: RecipeIngredient): boolean {
+    return this.getTotalSelectedByLookupKey(this.getIngredientLookupKey(ingredient)) >= ingredient.quantity;
+  }
+
+  /** Total reagents the recipe requires (sum of ingredient quantities). */
+  totalRequired(): number {
+    return (this.recipe?.ingredients || []).reduce((sum, i) => sum + i.quantity, 0);
+  }
+
+  /** Total reagents currently selected, clamped per-ingredient so overselection doesn't inflate the count. */
+  totalSelected(): number {
+    return (this.recipe?.ingredients || []).reduce(
+      (sum, i) => sum + Math.min(this.getTotalSelectedByLookupKey(this.getIngredientLookupKey(i)), i.quantity),
+      0
+    );
+  }
+
   getSelectedQuantity(instanceId: string): number {
     let count = 0;
     for (const [_, instanceIds] of this.selectedIngredients().entries()) {
