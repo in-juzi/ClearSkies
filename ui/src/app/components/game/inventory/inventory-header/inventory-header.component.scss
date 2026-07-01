@@ -26,19 +26,19 @@
 
 // View toggle buttons now use .button-tertiary from design-tokens.scss
 .button-tertiary {
-  padding: var(--spacing-xs) var(--spacing-m);
+  padding: var(--spacing-xs) var(--spacing-s);
   border-right: var(--border-light);
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: var(--spacing-4xl);
+  min-width: var(--spacing-3xl);
 
   &:last-child {
     border-right: none;
   }
 
-  .material-icons {
-    font-size: var(--spacing-xl);
+  .material-symbols-outlined {
+    font-size: var(--font-size-xl);
   }
 
   &.active {
