@@ -12,6 +12,33 @@
   background: var(--color-bg-primary);
 }
 
+/* Inline coin glyph — sized to its context's text, gold by default.
+   vertical-align keeps it centered against adjacent numerals. */
+.coin-ic {
+  width: 1em;
+  height: 1em;
+  flex: none;
+  vertical-align: middle;
+  color: var(--color-gold);
+
+  path {
+    fill: currentColor;
+  }
+
+  path:first-child {
+    fill: none;
+  }
+}
+
+/* Coin tint follows its context: moon-yellow in totals, red when unaffordable */
+.tv .coin-ic {
+  color: var(--color-moon-yellow);
+}
+
+.price.no .coin-ic {
+  color: var(--color-error);
+}
+
 /* ============ HEADER — one line ============ */
 .vh {
   display: flex;
@@ -101,11 +128,6 @@
   background: var(--color-overlay-medium);
   border: var(--border-width-thin) solid var(--color-border-moderate);
 
-  .coin {
-    font-size: var(--font-size-m);
-    line-height: 1;
-  }
-
   .v {
     font-family: var(--font-monospace);
     font-size: var(--font-size-base);
@@ -161,16 +183,6 @@
     &.active {
       background: var(--color-bg-hover);
       color: var(--color-moon-yellow);
-    }
-
-    .ct {
-      font-family: var(--font-monospace);
-      font-size: var(--font-size-2xs);
-      color: var(--color-text-muted);
-    }
-
-    &.active .ct {
-      color: var(--color-moon-yellow-dark);
     }
   }
 }
@@ -585,7 +597,7 @@
     border-radius: var(--radius-m);
 
     &::after {
-      content: '💰 Drop here to sell';
+      content: 'Drop here to sell';
       position: absolute;
       top: 50%;
       left: 50%;

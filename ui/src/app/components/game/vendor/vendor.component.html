@@ -1,6 +1,20 @@
 @if (vendor(); as currentVendor) {
   <div class="vendor">
 
+    <!-- Reusable coin glyph (inherits currentColor from its context) -->
+    <ng-template #coin>
+      <svg class="coin-ic" viewBox="0 0 512 512" aria-hidden="true">
+        <path d="M0 0h512v512H0z" />
+        <path d="M322.248 85.684L61.432 224.717 20.287 334.657 27.52 338.507 181.193 420.307 489.688 256.092 451.936 156.189 322.248 85.683Z" />
+        <path d="M441.283 180.871L466.393 247.321 363.833 301.915 430.39 186.64 441.283 180.87Z" />
+        <path d="M351.707 228.288L284.957 343.9 243.287 366.082 315.482 247.462 351.707 228.287Z" />
+        <path d="M72.38 248.78L100.59 263.713 46.578 317.725 72.38 248.78Z" />
+        <path d="M283.207 264.547L211.19 382.87 211.45 383.03 194.242 392.19 200.037 308.572 283.207 264.547Z" />
+        <path d="M117.873 272.859L134.836 281.839 74.391 342.284 57.461 333.272 117.874 272.858Z" />
+        <path d="M181.42 306.9L175.246 395.97 121.146 367.172 181.42 306.9Z" />
+      </svg>
+    </ng-template>
+
     <!-- ============ HEADER (one line) ============ -->
     <div class="vh">
       <button class="back" (click)="closeVendor()" title="Back to facility" aria-label="Back to facility">←</button>
@@ -12,7 +26,7 @@
         }
       </div>
       <div class="purse">
-        <span class="coin">💰</span>
+        <ng-container [ngTemplateOutlet]="coin"></ng-container>
         <span class="v">{{ playerGold() | number }}</span>
         <span class="l">gold</span>
       </div>
@@ -22,10 +36,10 @@
     <div class="tb">
       <div class="seg">
         <button [class.active]="activeTab() === 'buy'" (click)="setTab('buy')">
-          Buy <span class="ct">{{ buyCount() }}</span>
+          Buy
         </button>
         <button [class.active]="activeTab() === 'sell'" (click)="setTab('sell')">
-          Sell <span class="ct">{{ sellCount() }}</span>
+          Sell
         </button>
       </div>
       <div class="search">
@@ -80,7 +94,7 @@
                   }
                 </div>
                 <div class="right">
-                  <span class="price" [class.no]="!canAfford(s)">💰 {{ s.buyPrice | number }}</span>
+                  <span class="price" [class.no]="!canAfford(s)"><ng-container [ngTemplateOutlet]="coin"></ng-container>{{ s.buyPrice | number }}</span>
                   @if (s.stockType === 'infinite') {
                     <span class="stk">∞ stock</span>
                   } @else if (getStockRemaining(s) !== null) {
@@ -110,7 +124,7 @@
                   </div>
                   <div class="tot">
                     <div class="tl">Total</div>
-                    <div class="tv">💰 {{ stepTotal() | number }}</div>
+                    <div class="tv"><ng-container [ngTemplateOutlet]="coin"></ng-container>{{ stepTotal() | number }}</div>
                   </div>
                   <button class="cta" [disabled]="!canAffordStep()" (click)="confirmBuy(s)">
                     Buy {{ stepQty() }}
@@ -167,7 +181,7 @@
                   <app-item-modifiers [item]="item" displayMode="badge-level" size="normal"></app-item-modifiers>
                 </div>
                 <div class="right">
-                  <span class="price">💰 {{ calculateSellPrice(item) | number }}</span>
+                  <span class="price"><ng-container [ngTemplateOutlet]="coin"></ng-container>{{ calculateSellPrice(item) | number }}</span>
                   <span class="stk">50% value</span>
                 </div>
                 <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -189,7 +203,7 @@
                   </div>
                   <div class="tot">
                     <div class="tl">You receive</div>
-                    <div class="tv">💰 {{ stepTotal() | number }}</div>
+                    <div class="tv"><ng-container [ngTemplateOutlet]="coin"></ng-container>{{ stepTotal() | number }}</div>
                   </div>
                   <button class="cta sell" (click)="confirmSell(item)">
                     Sell {{ stepQty() }}

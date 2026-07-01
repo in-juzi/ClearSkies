@@ -47,8 +47,7 @@ export class VendorComponent {
   inventory = this.inventoryService.inventory;
   playerGold = computed(() => this.inventoryService.gold());
 
-  // Segmented control counts (totals, unaffected by search)
-  buyCount = computed(() => this.vendor()?.stock.length ?? 0);
+  // Count of sellable items (drives the sell pane's empty state)
   sellCount = computed(() => this.inventory().filter(i => !i.equipped).length);
 
   // Filtered + sorted panes
