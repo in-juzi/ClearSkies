@@ -1,159 +1,219 @@
 @if (vendor(); as currentVendor) {
-  <div class="vendor-container">
-    <!-- Back Button -->
-    <button (click)="closeVendor()" class="button-quaternary">← Back to Facility</button>
+  <div class="vendor">
 
-    <!-- Header -->
-    <div class="vendor-header">
-      <h2>{{ currentVendor.name }}</h2>
-      <p class="vendor-greeting">{{ currentVendor.greeting }}</p>
-      <p class="vendor-description">{{ currentVendor.description }}</p>
-      <div class="player-gold">
-        <span class="gold-icon">💰</span>
-        <span class="gold-amount">{{ playerGold() }} gold</span>
+    <!-- ============ HEADER (one line) ============ -->
+    <div class="vh">
+      <button class="back" (click)="closeVendor()" title="Back to facility" aria-label="Back to facility">←</button>
+      <div class="av">{{ currentVendor.name.charAt(0) }}</div>
+      <div class="who">
+        <div class="nm">{{ currentVendor.name }}</div>
+        @if (currentVendor.greeting) {
+          <div class="gr">"{{ currentVendor.greeting }}"</div>
+        }
+      </div>
+      <div class="purse">
+        <span class="coin">💰</span>
+        <span class="v">{{ playerGold() | number }}</span>
+        <span class="l">gold</span>
       </div>
     </div>
 
-    <!-- Tabs -->
-    <div class="tabs">
-      <button
-        class="tab"
-        [class.active]="activeTab() === 'buy'"
-        (click)="setTab('buy')">
-        Buy
-      </button>
-      <button
-        class="tab"
-        [class.active]="activeTab() === 'sell'"
-        (click)="setTab('sell')">
-        Sell
+    <!-- ============ TOOLBAR ============ -->
+    <div class="tb">
+      <div class="seg">
+        <button [class.active]="activeTab() === 'buy'" (click)="setTab('buy')">
+          Buy <span class="ct">{{ buyCount() }}</span>
+        </button>
+        <button [class.active]="activeTab() === 'sell'" (click)="setTab('sell')">
+          Sell <span class="ct">{{ sellCount() }}</span>
+        </button>
+      </div>
+      <div class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" />
+        </svg>
+        <input
+          type="text"
+          [placeholder]="activeTab() === 'buy' ? 'Search stock…' : 'Search items…'"
+          [value]="searchText()"
+          (input)="onSearch($event)" />
+      </div>
+      <button class="sortbtn" (click)="cycleSort()" title="Change sort order">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 6h12M3 12h9M3 18h6" />
+        </svg>
+        {{ sortLabel() }}
       </button>
     </div>
 
-    <!-- Buy Tab Content -->
+    <!-- ============ BUY PANE ============ -->
     @if (activeTab() === 'buy') {
-      <div class="tab-content buy-tab">
-        @if (currentVendor.stock.length === 0) {
-          <p class="empty-message">This vendor has no items for sale.</p>
+      <div class="list">
+        @if (filteredBuyStock().length === 0) {
+          <p class="empty">
+            @if (currentVendor.stock.length === 0) {
+              This vendor has no items for sale.
+            } @else {
+              No items match your search.
+            }
+          </p>
         } @else {
-          <div class="stock-list">
-            @for (stockItem of currentVendor.stock; track stockItem.itemId) {
-              <div class="stock-item" [class.selected]="selectedBuyItem()?.itemId === stockItem.itemId">
-                <div class="item-info" (click)="selectBuyItem(stockItem)">
-                  @if (stockItem.itemDefinition) {
-                    <div class="item-icon">
-                      @if (stockItem.itemDefinition.icon) {
-                        <app-icon
-                          [path]="stockItem.itemDefinition.icon.path"
-                          [material]="stockItem.itemDefinition.icon.material"
-                          [size]="48">
-                        </app-icon>
-                      }
-                    </div>
-                    <div class="item-details">
-                      <h4 class="item-name" [ngClass]="stockItem.itemDefinition.rarity | rarityName">
-                        {{ stockItem.itemDefinition.name }}
-                      </h4>
-                      <p class="item-description">{{ stockItem.itemDefinition.description }}</p>
-                      <div class="item-meta">
-                        <span class="price">💰 {{ stockItem.buyPrice }} gold</span>
-                        <span class="stock-type">{{ stockItem.stockType === 'infinite' ? '∞' : 'Limited' }}</span>
-                      </div>
-                    </div>
+          @for (s of filteredBuyStock(); track s.itemId) {
+            <div class="row"
+                 [ngClass]="'rc-' + (s.itemDefinition?.rarity || 'common')"
+                 [class.sel]="expandedBuyId() === s.itemId"
+                 [class.poor]="!canAfford(s)">
+              <div class="rmain" (click)="toggleBuy(s)">
+                <div class="ic">
+                  @if (s.itemDefinition?.icon; as icon) {
+                    <app-icon [path]="icon.path" [material]="icon.material" [size]="30"></app-icon>
                   }
                 </div>
-                <div class="item-actions">
-                  <button class="button-secondary" (click)="buyItem(stockItem.itemId, 1)">
-                    Buy 1
-                  </button>
-                  <button class="button-secondary" (click)="buyItem(stockItem.itemId, 5)">
-                    Buy 5
-                  </button>
-                  <button class="button-secondary" (click)="buyItem(stockItem.itemId, 10)">
-                    Buy 10
+                <div class="info">
+                  <div class="line1">
+                    <span class="nm" [ngClass]="'r-' + (s.itemDefinition?.rarity || 'common')">
+                      {{ s.itemDefinition?.name }}
+                    </span>
+                  </div>
+                  @if (s.itemDefinition?.description) {
+                    <div class="desc">{{ s.itemDefinition?.description }}</div>
+                  }
+                </div>
+                <div class="right">
+                  <span class="price" [class.no]="!canAfford(s)">💰 {{ s.buyPrice | number }}</span>
+                  @if (s.stockType === 'infinite') {
+                    <span class="stk">∞ stock</span>
+                  } @else if (getStockRemaining(s) !== null) {
+                    <span class="stk lim">{{ getStockRemaining(s) }} left</span>
+                  } @else {
+                    <span class="stk lim">Limited</span>
+                  }
+                </div>
+                @if (canAfford(s)) {
+                  <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                }
+              </div>
+
+              @if (expandedBuyId() === s.itemId) {
+                <div class="ctl">
+                  <div class="step">
+                    <button (click)="decQty()" aria-label="Decrease quantity">−</button>
+                    <div class="n">{{ stepQty() }}</div>
+                    <button (click)="incQty()" aria-label="Increase quantity">+</button>
+                  </div>
+                  <div class="quick">
+                    <button (click)="setQty(5)">+5</button>
+                    <button (click)="setQty(10)">+10</button>
+                    <button (click)="maxQty()">Max</button>
+                  </div>
+                  <div class="tot">
+                    <div class="tl">Total</div>
+                    <div class="tv">💰 {{ stepTotal() | number }}</div>
+                  </div>
+                  <button class="cta" [disabled]="!canAffordStep()" (click)="confirmBuy(s)">
+                    Buy {{ stepQty() }}
                   </button>
                 </div>
-              </div>
-            }
-          </div>
+              }
+            </div>
+          }
         }
       </div>
     }
 
-    <!-- Sell Tab Content -->
+    <!-- ============ SELL PANE (also a drop target) ============ -->
     @if (activeTab() === 'sell') {
-      <div class="tab-content sell-tab drop-zone"
+      <div class="list sell-list"
            (dragover)="onDragOver($event)"
            (drop)="onDrop($event)"
            (dragleave)="onDragLeave($event)"
            [class.drag-over]="isDragOver()">
-        @if (getSortedSellableItems().length === 0) {
-          <p class="empty-message drop-hint"
+        @if (filteredSellItems().length === 0) {
+          <p class="empty drop-hint"
              (dragover)="onDragOver($event)"
              (drop)="onDrop($event)">
-            You have no items to sell. Drag items from your inventory here to sell them.
+            @if (sellCount() === 0) {
+              You have no items to sell. Drag items from your inventory here to sell them.
+            } @else {
+              No items match your search.
+            }
           </p>
         } @else {
-          <div class="inventory-list"
-               (dragover)="onDragOver($event)"
-               (drop)="onDrop($event)">
-            @for (item of getSortedSellableItems(); track item.instanceId) {
-              <div class="inventory-item"
-                   (dragover)="onDragOver($event)"
-                   (drop)="onDrop($event)">
-                <div class="item-info">
-                  <div class="item-icon">
-                    @if (item.definition.icon) {
-                      <app-icon
-                        [path]="item.definition.icon.path"
-                        [material]="item.definition.icon.material"
-                        [size]="48">
-                      </app-icon>
-                    } @else {
-                      <span class="item-tier">T{{ item.definition.properties.tier }}</span>
+          @for (item of filteredSellItems(); track item.instanceId) {
+            <div class="row"
+                 [ngClass]="'rc-' + (item.definition.rarity || 'common')"
+                 [class.sel]="expandedSellId() === item.instanceId"
+                 (dragover)="onDragOver($event)"
+                 (drop)="onDrop($event)">
+              <div class="rmain" (click)="toggleSell(item)">
+                <div class="ic">
+                  @if (item.definition.icon; as icon) {
+                    <app-icon [path]="icon.path" [material]="icon.material" [size]="30"></app-icon>
+                  } @else {
+                    <span class="tier">T{{ item.definition.properties.tier }}</span>
+                  }
+                </div>
+                <div class="info">
+                  <div class="line1">
+                    <span class="nm" [ngClass]="'r-' + (item.definition.rarity || 'common')">
+                      {{ item.definition.name }}
+                    </span>
+                    @if (item.quantity > 1) {
+                      <span class="qty">×{{ item.quantity }}</span>
                     }
                   </div>
-                  <div class="item-details">
-                    <div class="item-header">
-                      <h4 class="item-name" [ngClass]="item.definition.rarity | rarityName">
-                        {{ item.definition.name }}
-                      </h4>
-                      @if (item.quantity > 1) {
-                        <span class="item-quantity">x{{ item.quantity }}</span>
-                      }
-                    </div>
-
-                    <!-- Quality/Trait badges -->
-                    <app-item-modifiers [item]="item" displayMode="badge-level" size="normal"></app-item-modifiers>
-
-                    <p class="sell-price">💰 {{ calculateSellPrice(item) }}g each (50% of value)</p>
-                  </div>
+                  <app-item-modifiers [item]="item" displayMode="badge-level" size="normal"></app-item-modifiers>
                 </div>
-                <div class="item-actions">
-                  <button class="button-secondary" (click)="sellItem(item.instanceId, 1)">
-                    Sell 1
-                  </button>
-                  @if (item.quantity >= 5) {
-                    <button class="button-secondary" (click)="sellItem(item.instanceId, 5)">
-                      Sell 5
-                    </button>
-                  }
-                  @if (item.quantity >= 10) {
-                    <button class="button-secondary" (click)="sellItem(item.instanceId, 10)">
-                      Sell 10
-                    </button>
-                  }
-                  @if (item.quantity > 1) {
-                    <button class="button-secondary" (click)="sellItem(item.instanceId, item.quantity)">
-                      Sell All ({{ item.quantity }})
-                    </button>
-                  }
+                <div class="right">
+                  <span class="price">💰 {{ calculateSellPrice(item) | number }}</span>
+                  <span class="stk">50% value</span>
                 </div>
+                <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
               </div>
-            }
-          </div>
+
+              @if (expandedSellId() === item.instanceId) {
+                <div class="ctl">
+                  <div class="step">
+                    <button (click)="decQty()" aria-label="Decrease quantity">−</button>
+                    <div class="n">{{ stepQty() }}</div>
+                    <button (click)="incQty()" aria-label="Increase quantity">+</button>
+                  </div>
+                  <div class="quick">
+                    <button (click)="setQty(5)">+5</button>
+                    <button (click)="setQty(10)">+10</button>
+                    <button (click)="maxQty()">Max</button>
+                  </div>
+                  <div class="tot">
+                    <div class="tl">You receive</div>
+                    <div class="tv">💰 {{ stepTotal() | number }}</div>
+                  </div>
+                  <button class="cta sell" (click)="confirmSell(item)">
+                    Sell {{ stepQty() }}
+                  </button>
+                </div>
+              }
+            </div>
+          }
         }
       </div>
     }
+
+    <!-- ============ FOOTER ============ -->
+    <div class="ft">
+      <div class="m">
+        <span class="ml">Gold</span>
+        <span class="mv gold">{{ playerGold() | number }}</span>
+      </div>
+      <div class="m">
+        <span class="ml">Bag</span>
+        <span class="mv">{{ inventoryService.currentWeight() | number:'1.0-0' }} / {{ inventoryService.carryingCapacity() | number:'1.0-0' }} kg</span>
+      </div>
+      <span class="hint">{{ hint() }}</span>
+    </div>
+
   </div>
 }

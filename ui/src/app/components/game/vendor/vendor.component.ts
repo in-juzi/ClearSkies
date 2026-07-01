@@ -5,15 +5,17 @@ import { InventoryService } from '../../../services/inventory.service';
 import { AuthService } from '../../../services/auth.service';
 import { ChatService } from '../../../services/chat.service';
 import { VendorStockItem } from '../../../models/vendor.model';
+import { ItemDetails } from '../../../models/inventory.model';
 import { ItemModifiersComponent } from '../../shared/item-modifiers/item-modifiers.component';
 import { IconComponent } from '../../shared/icon/icon.component';
 import { ItemInstance } from '@shared/types';
-import { RarityNamePipe } from '../../../pipes/rarity-name.pipe';
+
+type SortMode = 'price-asc' | 'price-desc' | 'name';
 
 @Component({
   selector: 'app-vendor',
   standalone: true,
-  imports: [CommonModule, ItemModifiersComponent, IconComponent, RarityNamePipe],
+  imports: [CommonModule, ItemModifiersComponent, IconComponent],
   templateUrl: './vendor.component.html',
   styleUrl: './vendor.component.scss'
 })
@@ -26,26 +28,222 @@ export class VendorComponent {
   // Expose Object for template use
   Object = Object;
 
-  // Signals
+  // Signals — existing
   activeTab = signal<'buy' | 'sell'>('buy');
   selectedBuyItem = signal<VendorStockItem | null>(null);
   buyQuantity = signal<number>(1);
   isDragOver = signal<boolean>(false);
 
-  // Computed signals
+  // Signals — v2 additions
+  searchText = signal<string>('');
+  sortMode = signal<SortMode>('price-asc');
+  expandedBuyId = signal<string | null>(null);   // vendor stock itemId
+  expandedSellId = signal<string | null>(null);  // inventory instanceId
+  stepQty = signal<number>(1);                    // quantity for the open row's stepper
+  hint = signal<string>('Select an item to buy');
+
+  // Computed signals — data sources
   vendor = this.vendorService.currentVendor;
   inventory = this.inventoryService.inventory;
   playerGold = computed(() => this.inventoryService.gold());
 
+  // Segmented control counts (totals, unaffected by search)
+  buyCount = computed(() => this.vendor()?.stock.length ?? 0);
+  sellCount = computed(() => this.inventory().filter(i => !i.equipped).length);
+
+  // Filtered + sorted panes
+  filteredBuyStock = computed<VendorStockItem[]>(() => {
+    const v = this.vendor();
+    if (!v) return [];
+    const q = this.searchText().trim().toLowerCase();
+    const mode = this.sortMode();
+    let list = [...v.stock];
+    if (q) {
+      list = list.filter(s => (s.itemDefinition?.name ?? '').toLowerCase().includes(q));
+    }
+    return list.sort((a, b) => {
+      if (mode === 'name') {
+        return (a.itemDefinition?.name ?? '').localeCompare(b.itemDefinition?.name ?? '');
+      }
+      return mode === 'price-desc' ? b.buyPrice - a.buyPrice : a.buyPrice - b.buyPrice;
+    });
+  });
+
+  filteredSellItems = computed<ItemDetails[]>(() => {
+    const q = this.searchText().trim().toLowerCase();
+    const mode = this.sortMode();
+    let list = this.getSortedSellableItems();
+    if (q) {
+      list = list.filter(i => (i.definition?.name ?? '').toLowerCase().includes(q));
+    }
+    return [...list].sort((a, b) => {
+      if (mode === 'name') {
+        return (a.definition?.name ?? '').localeCompare(b.definition?.name ?? '');
+      }
+      const pa = this.calculateSellPrice(a);
+      const pb = this.calculateSellPrice(b);
+      return mode === 'price-desc' ? pb - pa : pa - pb;
+    });
+  });
+
+  sortLabel = computed(() => {
+    switch (this.sortMode()) {
+      case 'name': return 'Name';
+      case 'price-desc': return 'Price ↓';
+      default: return 'Price ↑';
+    }
+  });
+
+  // The currently-open row for whichever pane is active
+  private expandedBuyItem = computed<VendorStockItem | null>(() => {
+    const id = this.expandedBuyId();
+    if (!id) return null;
+    return this.vendor()?.stock.find(s => s.itemId === id) ?? null;
+  });
+
+  private expandedSellItem = computed<ItemDetails | null>(() => {
+    const id = this.expandedSellId();
+    if (!id) return null;
+    return this.inventory().find(i => i.instanceId === id) ?? null;
+  });
+
+  // Stepper-derived values for the active pane's open row
+  stepUnit = computed<number>(() => {
+    if (this.activeTab() === 'buy') return this.expandedBuyItem()?.buyPrice ?? 0;
+    const s = this.expandedSellItem();
+    return s ? this.calculateSellPrice(s) : 0;
+  });
+
+  stepCap = computed<number>(() => {
+    if (this.activeTab() === 'buy') {
+      const b = this.expandedBuyItem();
+      return b ? this.getBuyCap(b) : 1;
+    }
+    const s = this.expandedSellItem();
+    return s ? s.quantity : 1;
+  });
+
+  stepTotal = computed<number>(() => this.stepUnit() * this.stepQty());
+  canAffordStep = computed<boolean>(() => this.activeTab() === 'sell' || this.stepTotal() <= this.playerGold());
+
   /**
-   * Switch between buy and sell tabs
+   * Switch between buy and sell tabs. Resets any open accordion + stepper.
    */
   setTab(tab: 'buy' | 'sell'): void {
     this.activeTab.set(tab);
+    this.expandedBuyId.set(null);
+    this.expandedSellId.set(null);
+    this.stepQty.set(1);
+    this.hint.set(tab === 'buy' ? 'Select an item to buy' : 'Select an item to sell');
   }
 
   /**
-   * Select an item to buy
+   * Cycle the sort mode: Price ascending → Price descending → Name.
+   */
+  cycleSort(): void {
+    const order: SortMode[] = ['price-asc', 'price-desc', 'name'];
+    const next = order[(order.indexOf(this.sortMode()) + 1) % order.length];
+    this.sortMode.set(next);
+  }
+
+  /**
+   * Update the client-side search filter.
+   */
+  onSearch(event: Event): void {
+    this.searchText.set((event.target as HTMLInputElement).value);
+  }
+
+  /**
+   * Remaining stock for a limited item, or null when unknown.
+   */
+  getStockRemaining(item: VendorStockItem): number | null {
+    if (typeof item.currentStock === 'number') return item.currentStock;
+    if (typeof item.stock === 'number') return item.stock;
+    return null;
+  }
+
+  /**
+   * Max quantity a player can buy in one go (limited stock cap, else 99).
+   */
+  private getBuyCap(item: VendorStockItem): number {
+    if (item.stockType === 'limited') {
+      const rem = this.getStockRemaining(item);
+      return rem && rem > 0 ? rem : 1;
+    }
+    return 99;
+  }
+
+  /**
+   * Whether the player can afford at least one of this item.
+   */
+  canAfford(item: VendorStockItem): boolean {
+    return item.buyPrice <= this.playerGold();
+  }
+
+  /**
+   * Toggle the buy accordion for a stock row. Unaffordable rows don't expand.
+   */
+  toggleBuy(item: VendorStockItem): void {
+    if (!this.canAfford(item)) return;
+    if (this.expandedBuyId() === item.itemId) {
+      this.expandedBuyId.set(null);
+      return;
+    }
+    this.expandedBuyId.set(item.itemId);
+    this.stepQty.set(1);
+  }
+
+  /**
+   * Toggle the sell accordion for an inventory row.
+   */
+  toggleSell(item: ItemDetails): void {
+    if (this.expandedSellId() === item.instanceId) {
+      this.expandedSellId.set(null);
+      return;
+    }
+    this.expandedSellId.set(item.instanceId);
+    this.stepQty.set(1);
+  }
+
+  // ---- Stepper controls (operate on the active pane's open row) ----
+
+  private clampStep(q: number): void {
+    const cap = this.stepCap();
+    if (q < 1) q = 1;
+    if (q > cap) q = cap;
+    this.stepQty.set(q);
+  }
+
+  incQty(): void { this.clampStep(this.stepQty() + 1); }
+  decQty(): void { this.clampStep(this.stepQty() - 1); }
+  setQty(n: number): void { this.clampStep(n); }
+  maxQty(): void { this.clampStep(this.stepCap()); }
+
+  /**
+   * Confirm a buy from the open stepper.
+   */
+  confirmBuy(item: VendorStockItem): void {
+    const qty = this.stepQty();
+    if (this.stepTotal() > this.playerGold()) return;
+    this.hint.set(`Bought ${qty} × ${item.itemDefinition?.name ?? 'item'}`);
+    this.buyItem(item.itemId, qty);
+    this.expandedBuyId.set(null);
+    this.stepQty.set(1);
+  }
+
+  /**
+   * Confirm a sell from the open stepper.
+   */
+  confirmSell(item: ItemDetails): void {
+    const qty = this.stepQty();
+    this.hint.set(`Sold ${qty} × ${item.definition?.name ?? 'item'}`);
+    this.sellItem(item.instanceId, qty);
+    this.expandedSellId.set(null);
+    this.stepQty.set(1);
+  }
+
+  /**
+   * Select an item to buy (retained for compatibility)
    */
   selectBuyItem(item: VendorStockItem): void {
     this.selectedBuyItem.set(item);
@@ -130,7 +328,6 @@ export class VendorComponent {
       createdAt: new Date()
     });
   }
-
 
   /**
    * Get sellable items sorted by quality+trait score (descending)
