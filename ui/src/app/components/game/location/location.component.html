@@ -7,9 +7,6 @@
       <div class="location-header" [style.background-color]="currentLocation()?.biome?.theme?.primaryColor">
         <h1>{{ currentLocation()?.name }}</h1>
         <p class="location-description">{{ currentLocation()?.description }}</p>
-        <span class="biome-badge" [style.background-color]="currentLocation()?.biome?.theme?.accentColor">
-          {{ currentLocation()?.biome?.name }}
-        </span>
       </div>
 
       <!-- Traveling State -->
