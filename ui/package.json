@@ -10,6 +10,9 @@
     "build:dev": "ng build --configuration development",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+    "e2e": "playwright test",
+    "e2e:headed": "playwright test --headed",
+    "e2e:report": "playwright show-report e2e/.report",
     "deploy": "npm run build:cloudflare && cd dist/ui/browser && aws s3 sync . s3://clearskies.juzi.dev --delete",
     "deploy:invalidate": "npm run deploy && aws cloudfront create-invalidation --distribution-id YOUR_DISTRIBUTION_ID --paths \"/*\""
   },
@@ -43,6 +46,7 @@
     "@angular/build": "^20.3.9",
     "@angular/cli": "^20.3.9",
     "@angular/compiler-cli": "^20.3.0",
+    "@playwright/test": "^1.61.1",
     "@types/jasmine": "~5.1.0",
     "jasmine-core": "~5.9.0",
     "karma": "~6.4.0",
