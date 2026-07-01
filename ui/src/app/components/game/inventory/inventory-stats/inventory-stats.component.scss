@@ -1,109 +1,93 @@
-// Styles extracted from inventory.component.scss - stats section
+// Inventory footer — compact weight meter + gold (Inventory Panel v2 design)
 
-.inventory-stats-container {
+.inventory-footer {
   margin-top: auto;
-  padding-top: var(--spacing-l);
-  border-top: var(--border-width-medium) solid var(--color-surface-border);
   flex-shrink: 0;
-}
-
-.inventory-stats {
   display: flex;
-  justify-content: space-between;
-  gap: var(--spacing-s);
-  font-size: var(--font-size-m);
-}
-
-.stat-item {
-  display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  flex: 1;
-  min-width: 0;
-  padding: var(--spacing-s) var(--spacing-xs);
-  background: var(--color-bg-elevated);
-  border: var(--border-light);
-  border-radius: var(--radius-button);
-  transition: all var(--transition-fast);
+  gap: var(--spacing-l);
+  padding: var(--spacing-m) var(--spacing-l);
+  border-top: var(--border-width-thin) solid var(--color-border-moderate);
+  background: rgba(0, 0, 0, 0.2);
+}
 
-  &:hover {
-    background: var(--color-bg-tertiary);
-    border-color: var(--color-surface-border);
-    transform: translateY(calc(-1 * var(--border-width-thin)));
+.wt {
+  flex: 0 0 50%;
+  min-width: 0;
+
+  .wlab {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-xs);
+    font-size: var(--font-size-s);
+    color: var(--color-text-muted);
+
+    .lbl {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--spacing-2xs);
+
+      .material-symbols-outlined { font-size: var(--font-size-l); }
+    }
+
+    b {
+      color: var(--color-text-secondary);
+      font-weight: var(--font-weight-semibold);
+      white-space: nowrap;
+
+      &.weight-warning { color: var(--color-warning); }
+      &.weight-critical {
+        color: var(--color-error);
+        animation: pulse-warning 2s ease-in-out infinite;
+      }
+    }
+  }
+
+  .bar {
+    height: var(--spacing-xs);
+    background: var(--color-bg-primary);
+    border-radius: var(--radius-xs);
+    overflow: hidden;
+    border: var(--border-width-thin) solid var(--color-surface-border);
+
+    > span {
+      display: block;
+      height: 100%;
+      transition: width 0.3s ease-in-out;
+
+      &.weight-normal { background: linear-gradient(90deg, var(--color-success-dark), var(--color-success)); }
+      &.weight-warning { background: linear-gradient(90deg, var(--color-warning-dark), var(--color-warning)); }
+      &.weight-critical { background: linear-gradient(90deg, var(--color-error-dark), var(--color-error)); }
+    }
   }
 }
 
-.stat-icon {
-  font-size: var(--font-size-xl);
-  line-height: var(--line-height-none);
-  margin-bottom: var(--spacing-xs);
-}
-
-.stat-content {
-  display: flex;
-  flex-direction: column;
+.stat.gold {
+  position: relative;
+  margin-left: auto;
+  display: inline-flex;
   align-items: center;
-  gap: var(--spacing-2xs);
-  min-width: 0;
-  width: 100%;
-}
-
-.stat-label {
-  font-size: var(--font-size-s);
-  color: var(--color-text-label);
-  text-transform: uppercase;
-  letter-spacing: var(--letter-spacing-wide);
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-base);
   font-weight: var(--font-weight-semibold);
+  color: var(--color-moon-yellow);
   white-space: nowrap;
-}
-
-.stat-value {
-  font-size: var(--font-size-s);
-  color: var(--color-text-tertiary);
-  font-weight: var(--font-weight-semibold);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
-
-  /* Weight capacity color coding */
-  &.weight-normal {
-    color: var(--color-green-400);
-  }
-
-  &.weight-warning {
-    color: var(--color-yellow-400);
-  }
-
-  &.weight-critical {
-    color: var(--color-red-400);
-    animation: pulse-warning 2s ease-in-out infinite;
-  }
 }
 
 @keyframes pulse-warning {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.7;
-  }
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
 }
 
-/* Floating Gold Notifications */
-.gold-stat-item {
-  position: relative;
-}
-
+/* Floating Gold Notifications (anchored above the gold stat) */
 .floating-gold-container {
   position: absolute;
-  top: calc(-1 * var(--spacing-s));
+  bottom: 100%;
   left: 50%;
   transform: translateX(-50%);
   pointer-events: none;
-  z-index: 100;
-  width: 100%;
+  z-index: var(--z-notification);
   display: flex;
   justify-content: center;
 }
@@ -112,7 +96,7 @@
   position: absolute;
   font-size: var(--font-size-2xl);
   font-weight: bold;
-  font-family: monospace;
+  font-family: var(--font-monospace);
   color: var(--color-secondary-dark);
   opacity: 0;
   animation: floatUpGold 1s ease-out forwards;
