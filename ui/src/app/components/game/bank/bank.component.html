@@ -137,6 +137,8 @@
                     (dragstart)="onBankItemDragStart($event, item)"
                     (dblclick)="onBankItemDoubleClick($event, item)"
                     (contextmenu)="onBankItemRightClick($event, item)"
+                    (mouseenter)="onItemHover($event, item)"
+                    (mouseleave)="onItemHover(null, null)"
                     title="Double-click or right-click to withdraw (hold Shift for partial), or drag to inventory"
                   >
                     @if (item.definition.icon) {
@@ -160,6 +162,8 @@
                     (dragstart)="onBankItemDragStart($event, item)"
                     (dblclick)="onBankItemDoubleClick($event, item)"
                     (contextmenu)="onBankItemRightClick($event, item)"
+                    (mouseenter)="onItemHover($event, item)"
+                    (mouseleave)="onItemHover(null, null)"
                     title="Double-click or right-click to withdraw (hold Shift for partial), or drag to inventory"
                   >
                     @if (item.definition.icon) {
@@ -233,6 +237,8 @@
                     (dragstart)="onInventoryItemDragStart($event, item)"
                     (dblclick)="onInventoryItemDoubleClick($event, item)"
                     (contextmenu)="onInventoryItemRightClick($event, item)"
+                    (mouseenter)="onItemHover($event, item)"
+                    (mouseleave)="onItemHover(null, null)"
                     title="Double-click or right-click to deposit (hold Shift for partial), or drag to bank"
                   >
                     @if (item.definition.icon) {
@@ -258,6 +264,8 @@
                     (dragstart)="onInventoryItemDragStart($event, item)"
                     (dblclick)="onInventoryItemDoubleClick($event, item)"
                     (contextmenu)="onInventoryItemRightClick($event, item)"
+                    (mouseenter)="onItemHover($event, item)"
+                    (mouseleave)="onItemHover(null, null)"
                     title="Double-click or right-click to deposit (hold Shift for partial), or drag to bank"
                   >
                     @if (item.definition.icon) {
@@ -281,6 +289,17 @@
         </div>
 
       </div>
+
+      <!-- Hover Preview: read-only, anchored beside the hovered item -->
+      @if (hoveredItem()) {
+        <app-item-details-panel
+          [item]="hoveredItem()"
+          [preview]="true"
+          [anchorRect]="hoverAnchorRect()"
+          [showActions]="false"
+          [showDropControls]="false">
+        </app-item-details-panel>
+      }
 
       <!-- Footer -->
       <div class="bank-footer">

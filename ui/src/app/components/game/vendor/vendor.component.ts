@@ -1,4 +1,6 @@
-import { Component, signal, computed, inject } from '@angular/core';
+import { Component, signal, computed, inject, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { VendorService } from '../../../services/vendor.service';
 import { InventoryService } from '../../../services/inventory.service';
@@ -8,6 +10,7 @@ import { VendorStockItem } from '../../../models/vendor.model';
 import { ItemDetails } from '../../../models/inventory.model';
 import { ItemModifiersComponent } from '../../shared/item-modifiers/item-modifiers.component';
 import { IconComponent } from '../../shared/icon/icon.component';
+import { ItemDetailsPanelComponent } from '../../shared/item-details-panel/item-details-panel.component';
 import { ItemInstance } from '@shared/types';
 
 type SortMode = 'price-asc' | 'price-desc' | 'name';
@@ -15,7 +18,7 @@ type SortMode = 'price-asc' | 'price-desc' | 'name';
 @Component({
   selector: 'app-vendor',
   standalone: true,
-  imports: [CommonModule, ItemModifiersComponent, IconComponent],
+  imports: [CommonModule, ItemModifiersComponent, IconComponent, ItemDetailsPanelComponent],
   templateUrl: './vendor.component.html',
   styleUrl: './vendor.component.scss'
 })
@@ -24,9 +27,36 @@ export class VendorComponent {
   inventoryService = inject(InventoryService);
   authService = inject(AuthService);
   chatService = inject(ChatService);
+  private destroyRef = inject(DestroyRef);
 
   // Expose Object for template use
   Object = Object;
+
+  // Read-only hover preview (shared item-details panel) for sellable items,
+  // anchored beside the hovered row. Debounced to avoid thrash.
+  hoveredItem = signal<ItemDetails | null>(null);
+  hoverAnchorRect = signal<DOMRect | null>(null);
+  private hoverSubject = new Subject<{ item: ItemDetails; anchorRect: DOMRect } | null>();
+
+  constructor() {
+    this.hoverSubject.pipe(
+      debounceTime(150),
+      distinctUntilChanged((a, b) => a?.item.instanceId === b?.item.instanceId),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(payload => {
+      this.hoveredItem.set(payload?.item ?? null);
+      this.hoverAnchorRect.set(payload?.anchorRect ?? null);
+    });
+  }
+
+  onItemHover(event: MouseEvent | null, item: ItemDetails | null): void {
+    if (!event || !item) {
+      this.hoverSubject.next(null);
+      return;
+    }
+    const anchorRect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+    this.hoverSubject.next({ item, anchorRect });
+  }
 
   // Signals — existing
   activeTab = signal<'buy' | 'sell'>('buy');

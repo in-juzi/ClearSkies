@@ -1,4 +1,6 @@
-import { Component, OnInit, OnDestroy, inject, computed, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, computed, signal, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { StorageService } from '../../../services/storage.service';
@@ -8,12 +10,13 @@ import { QuantityDialogService } from '../../../services/quantity-dialog.service
 import { ItemDetails } from '../../../models/inventory.model';
 import { ItemModifiersComponent } from '../../shared/item-modifiers/item-modifiers.component';
 import { IconComponent } from '../../shared/icon/icon.component';
+import { ItemDetailsPanelComponent } from '../../shared/item-details-panel/item-details-panel.component';
 import { sortByName, sortByWeight, sortByQuantity } from '../../../utils/item-sort.utils';
 
 @Component({
   selector: 'app-bank',
   standalone: true,
-  imports: [CommonModule, FormsModule, ItemModifiersComponent, IconComponent],
+  imports: [CommonModule, FormsModule, ItemModifiersComponent, IconComponent, ItemDetailsPanelComponent],
   templateUrl: './bank.component.html',
   styleUrl: './bank.component.scss'
 })
@@ -22,6 +25,13 @@ export class BankComponent implements OnInit, OnDestroy {
   public inventoryService = inject(InventoryService);
   private itemFilterService = inject(ItemFilterService);
   private quantityDialogService = inject(QuantityDialogService);
+  private destroyRef = inject(DestroyRef);
+
+  // Read-only hover preview (shared item-details panel), anchored beside the
+  // hovered item. Debounced so sweeping the grids doesn't thrash it.
+  hoveredItem = signal<ItemDetails | null>(null);
+  hoverAnchorRect = signal<DOMRect | null>(null);
+  private hoverSubject = new Subject<{ item: ItemDetails; anchorRect: DOMRect } | null>();
 
   // Bank container ID (could be made dynamic for multi-container support)
   private readonly BANK_CONTAINER_ID = 'bank';
@@ -133,6 +143,24 @@ export class BankComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // Items are loaded when bank is opened via storageService.openStorage()
+
+    this.hoverSubject.pipe(
+      debounceTime(150),
+      distinctUntilChanged((a, b) => a?.item.instanceId === b?.item.instanceId),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(payload => {
+      this.hoveredItem.set(payload?.item ?? null);
+      this.hoverAnchorRect.set(payload?.anchorRect ?? null);
+    });
+  }
+
+  onItemHover(event: MouseEvent | null, item: ItemDetails | null): void {
+    if (!event || !item) {
+      this.hoverSubject.next(null);
+      return;
+    }
+    const anchorRect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+    this.hoverSubject.next({ item, anchorRect });
   }
 
   ngOnDestroy(): void {

@@ -22,12 +22,12 @@ export class ItemDetailsPanelComponent implements OnChanges {
   @Input() showActions: boolean = true; // Show equip/use/drop buttons
   @Input() showDropControls: boolean = true; // Show quantity slider for dropping
   @Input() preview: boolean = false; // Read-only anchored hover preview (no drag, non-interactive)
-  @Input() anchorTop: number | null = null; // Viewport Y of the hovered item; preview aligns to it
+  @Input() anchorRect: DOMRect | null = null; // Viewport rect of the hovered item; preview anchors beside it
 
   @ViewChild('panelRoot') panelRoot?: ElementRef<HTMLElement>;
 
-  /** Clamped top (px) for the preview, tracked to the hovered item and kept on-screen. */
-  previewTop: number | null = null;
+  /** Computed viewport position for the preview: beside the hovered item, clamped on-screen. */
+  previewPos: { left: number; top: number } | null = null;
 
   /** Combat stats are immutable per instance — cache across hovers/clicks to avoid refetching. */
   private static combatStatsCache = new Map<string, CombatStats>();
@@ -99,7 +99,8 @@ export class ItemDetailsPanelComponent implements OnChanges {
         this.combatStats = null;
         const isWeapon = this.item.definition.subcategories?.includes('weapon');
         const isArmor = this.item.definition.subcategories?.includes('armor');
-        if (this.item.definition.category === 'equipment' && (isWeapon || isArmor)) {
+        // Requires a real item instance (e.g. not vendor stock previews).
+        if (this.item.instanceId && this.item.definition.category === 'equipment' && (isWeapon || isArmor)) {
           this.loadCombatStats(this.item.instanceId);
         }
       } else {
@@ -113,26 +114,42 @@ export class ItemDetailsPanelComponent implements OnChanges {
     }
 
     // Re-anchor the preview whenever the item or its screen position changes.
-    if (this.preview && (changes['item'] || changes['anchorTop'])) {
+    if (this.preview && (changes['item'] || changes['anchorRect'])) {
       this.schedulePreviewPosition();
     }
   }
 
   /**
-   * Position the preview so its top tracks the hovered item, clamped so the
-   * card never runs off the top or bottom of the viewport. Measured after
-   * layout because the card height varies by item (stats, traits, etc.).
+   * Position the preview beside the hovered item: to its right by default,
+   * flipped to its left if that would overflow, with its top tracking the item
+   * and clamped so the card stays fully on-screen. Measured after layout since
+   * the card size varies by item (stats, traits, etc.).
    */
   private schedulePreviewPosition(): void {
     requestAnimationFrame(() => {
       const el = this.panelRoot?.nativeElement;
-      if (!el || !this.preview || this.anchorTop == null) {
-        this.previewTop = null;
+      const rect = this.anchorRect;
+      if (!el || !this.preview || !rect) {
+        this.previewPos = null;
         return;
       }
-      const gap = 16; // matches --spacing-l
-      const maxTop = window.innerHeight - el.offsetHeight - gap;
-      this.previewTop = Math.max(gap, Math.min(this.anchorTop, maxTop));
+      const gap = 8; // matches --spacing-s
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const w = el.offsetWidth;
+      const h = el.offsetHeight;
+
+      // Horizontal: prefer the right of the item; flip left if it won't fit.
+      let left = rect.right + gap;
+      if (left + w > vw - gap) {
+        left = rect.left - w - gap;
+      }
+      left = Math.max(gap, Math.min(left, vw - w - gap));
+
+      // Vertical: align to the item's top, clamped into the viewport.
+      const top = Math.max(gap, Math.min(rect.top, vh - h - gap));
+
+      this.previewPos = { left, top };
     });
   }
 
@@ -310,7 +327,9 @@ export class ItemDetailsPanelComponent implements OnChanges {
    */
   getPanelStyle(): { transform?: string; left?: string; top?: string } {
     if (this.preview) {
-      return this.previewTop != null ? { top: `${this.previewTop}px` } : {};
+      return this.previewPos != null
+        ? { left: `${this.previewPos.left}px`, top: `${this.previewPos.top}px` }
+        : {};
     }
     if (this.hasDragged) {
       return {

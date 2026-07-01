@@ -161,7 +161,9 @@
                  [ngClass]="'rc-' + (item.definition.rarity || 'common')"
                  [class.sel]="expandedSellId() === item.instanceId"
                  (dragover)="onDragOver($event)"
-                 (drop)="onDrop($event)">
+                 (drop)="onDrop($event)"
+                 (mouseenter)="onItemHover($event, item)"
+                 (mouseleave)="onItemHover(null, null)">
               <div class="rmain" (click)="toggleSell(item)">
                 <div class="ic">
                   @if (item.definition.icon; as icon) {
@@ -216,6 +218,17 @@
           }
         }
       </div>
+    }
+
+    <!-- Hover Preview: read-only, anchored beside the hovered sell item -->
+    @if (hoveredItem()) {
+      <app-item-details-panel
+        [item]="hoveredItem()"
+        [preview]="true"
+        [anchorRect]="hoverAnchorRect()"
+        [showActions]="false"
+        [showDropControls]="false">
+      </app-item-details-panel>
     }
 
     <!-- ============ FOOTER ============ -->

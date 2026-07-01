@@ -37,8 +37,8 @@ export class InventoryComponent implements OnInit {
   // viewport Y, shown in an anchored, non-interactive details panel that tracks
   // the item. Distinct from selectedItem (click).
   hoveredItem = signal<ItemDetails | null>(null);
-  hoverAnchorTop = signal<number | null>(null);
-  private hoverSubject = new Subject<{ item: ItemDetails; anchorTop: number } | null>();
+  hoverAnchorRect = signal<DOMRect | null>(null);
+  private hoverSubject = new Subject<{ item: ItemDetails; anchorRect: DOMRect } | null>();
   private destroyRef = inject(DestroyRef);
   selectedCategory: string = 'all';
   searchQuery: string = ''; // Search filter
@@ -80,11 +80,11 @@ export class InventoryComponent implements OnInit {
       takeUntilDestroyed(this.destroyRef)
     ).subscribe(payload => {
       this.hoveredItem.set(payload?.item ?? null);
-      this.hoverAnchorTop.set(payload?.anchorTop ?? null);
+      this.hoverAnchorRect.set(payload?.anchorRect ?? null);
     });
   }
 
-  onItemHover(payload: { item: ItemDetails; anchorTop: number } | null): void {
+  onItemHover(payload: { item: ItemDetails; anchorRect: DOMRect } | null): void {
     this.hoverSubject.next(payload);
   }
 

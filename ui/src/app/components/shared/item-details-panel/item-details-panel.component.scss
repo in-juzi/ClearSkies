@@ -19,15 +19,16 @@
   flex-direction: column;
 }
 
-/* Read-only hover preview: anchored beside the inventory rail, non-interactive.
-   Renders the same card, just repositioned and passive (no drag, no clicks). */
+/* Read-only hover preview: anchored beside the hovered item, non-interactive.
+   Renders the same card, just repositioned (via inline left/top) and passive
+   (no drag, no clicks). The top/left here are only a pre-measure fallback. */
 .item-details-panel.preview {
   top: var(--spacing-l);
-  left: calc(var(--sidebar-width-left) + var(--spacing-s));
+  left: var(--spacing-l);
   transform: none;
   width: var(--container-s);
   max-height: calc(100vh - var(--spacing-3xl));
-  z-index: var(--z-raised);
+  z-index: var(--z-modal);
   pointer-events: none;
 }
 
