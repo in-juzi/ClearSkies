@@ -1,14 +1,19 @@
 /* Item Socket Effect Display Component */
+:host {
+  display: block;
+}
+
 .detail-section {
-  margin-bottom: var(--spacing-2xl);
+  margin: 0 var(--spacing-l) var(--spacing-l);
 }
 
 .section-title {
-  color: var(--color-accent-purple);
-  font-size: var(--font-size-l);
-  margin-bottom: var(--spacing-m);
+  color: var(--color-moon-yellow-dark);
+  font-size: var(--font-size-2xs);
+  margin-bottom: var(--spacing-s);
   text-transform: uppercase;
-  letter-spacing: var(--letter-spacing-wide);
+  letter-spacing: var(--letter-spacing-wider);
+  font-weight: var(--font-weight-bold);
 }
 
 .effect-lines {

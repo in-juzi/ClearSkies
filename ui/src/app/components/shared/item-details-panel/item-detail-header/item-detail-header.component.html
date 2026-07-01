@@ -1,8 +1,27 @@
-<div class="details-header"
+<div class="hdr"
      (mousedown)="onDragStart($event)"
      [style.cursor]="isDragging ? 'grabbing' : 'grab'">
-  <h3 [class]="rarity | rarityColor">
-    {{ itemName }}
-  </h3>
-  <button (click)="onClose()" class="button-quaternary">✕</button>
+
+  <button class="close"
+          aria-label="Close"
+          (click)="onClose()"
+          (mousedown)="$event.stopPropagation()">×</button>
+
+  @if (icon) {
+    <div class="icon">
+      <app-icon [icon]="icon" [size]="40" [alt]="itemName"></app-icon>
+    </div>
+  }
+
+  <div class="titles">
+    <h3>{{ itemName }}</h3>
+    <div class="crumb-row">
+      <span class="crumb">{{ breadcrumb }}</span>
+      @if (showReqTag) {
+        <span class="hdr-tag req">Req. <b>Lv {{ requiredLevel }}</b></span>
+      } @else if (showQtyTag) {
+        <span class="hdr-tag">Qty <b>×{{ quantity }}</b></span>
+      }
+    </div>
+  </div>
 </div>

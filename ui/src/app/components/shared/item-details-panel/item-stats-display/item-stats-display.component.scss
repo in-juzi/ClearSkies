@@ -1,30 +1,98 @@
-/* Item Stats Display Component */
-.detail-section {
-  margin-bottom: var(--spacing-2xl);
+/* Item Stats Display Component (v2 combat grid + affix list) */
+:host {
+  display: block;
 }
 
-.section-title {
-  color: var(--color-secondary-dark);
-  font-size: var(--font-size-l);
-  margin-bottom: var(--spacing-m);
-  text-transform: uppercase;
-  letter-spacing: var(--letter-spacing-wide);
+/* Weapon: 4-cell combat grid */
+.combat {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr 1fr 1fr;
+  gap: var(--spacing-2xs);
+  margin: 0 var(--spacing-l) var(--spacing-l);
+  background: var(--color-border-subtle);
+  border: var(--border-width-thin) solid var(--color-border-subtle);
+  border-radius: var(--radius-m);
+  overflow: hidden;
 }
 
-.detail-row {
-  display: flex;
-  justify-content: space-between;
-  padding: var(--spacing-s) 0;
-  border-bottom: var(--border-width-thin) solid var(--color-bg-elevated);
-}
-
-.detail-row .label {
-  color: var(--color-text-label);
-  font-weight: var(--font-weight-semibold);
-}
-
-.weapon-stats-grid {
+.stat {
+  background: var(--color-surface-sunken);
+  padding: var(--spacing-s) var(--spacing-m);
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
   gap: var(--spacing-xs);
+  min-width: 0;
+}
+
+.stat .k {
+  font-size: var(--font-size-2xs);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.stat .v {
+  font-size: var(--font-size-l);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-secondary);
+  line-height: 1.05;
+}
+
+.stat .v small {
+  font-size: var(--font-size-s);
+  color: var(--color-moon-yellow);
+  font-weight: var(--font-weight-bold);
+}
+
+.stat.hero {
+  background: color-mix(in srgb, var(--color-moon-yellow) 12%, var(--color-surface-sunken));
+}
+
+.stat.hero .k {
+  color: var(--color-moon-yellow-dark);
+}
+
+.stat.hero .v {
+  font-size: var(--font-size-2xl);
+  color: var(--color-moon-yellow);
+}
+
+/* Armor / consumable: affix list */
+.afflist {
+  margin: 0 var(--spacing-l) var(--spacing-l);
+  padding: var(--spacing-m);
+  background: var(--color-surface-sunken);
+  border: var(--border-width-thin) solid var(--color-border-subtle);
+  border-radius: var(--radius-m);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.aff {
+  font-size: var(--font-size-base);
+  color: var(--color-text-label);
+  line-height: var(--line-height-snug);
+}
+
+.aff .av {
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.aff.heal .av {
+  color: var(--color-health);
+}
+
+.aff.mana .av {
+  color: var(--color-mana);
+}
+
+.aff.penalty .av {
+  color: var(--color-error-light);
 }

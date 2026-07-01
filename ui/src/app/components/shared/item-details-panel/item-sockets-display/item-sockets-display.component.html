@@ -1,6 +1,6 @@
 @if (hasSockets) {
   <div class="detail-section sockets-section">
-    <div class="section-title">Sockets ({{ (item.sockets?.length ?? 0) }}/{{ capacity }})</div>
+    <div class="sec">Sockets · {{ (item.sockets?.length ?? 0) }} / {{ capacity }}</div>
 
     <div class="socket-pips">
       @for (slot of slots; track slot.index) {

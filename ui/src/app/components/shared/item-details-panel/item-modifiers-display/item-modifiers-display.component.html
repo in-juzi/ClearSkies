@@ -1,96 +1,71 @@
-<!-- Qualities -->
-@if (getQualityKeys(qualityDetails).length > 0) {
-  <div class="detail-section">
-    <h4 class="section-title">Qualities</h4>
-    <div class="quality-list">
-      @for (qualityId of getQualityKeys(qualityDetails); track qualityId) {
-        <div class="quality-item">
-          <div class="quality-header">
-            <span class="quality-name">{{ qualityDetails[qualityId].name }}</span>
-            <span [class]="inventoryService.getQualityColor(qualityDetails[qualityId].level)" class="quality-level-badge">
-              Level {{ qualityDetails[qualityId].level }}
-            </span>
-          </div>
-          <div class="quality-level-name" [class]="inventoryService.getQualityColor(qualityDetails[qualityId].level)">
-            {{ qualityDetails[qualityId].levelData.name }}
-          </div>
-          <p class="quality-description">{{ qualityDetails[qualityId].levelData.description }}</p>
-
-          <!-- Effects -->
-          @if (qualityDetails[qualityId].levelData.effects) {
-            <div class="effects-section">
-              <div class="effect-label">Effects:</div>
-              <div class="effects-grid">
-                @for (effect of getQualityKeys(qualityDetails[qualityId].levelData.effects); track effect) {
-                  <div class="effect-item">
-                    <span class="effect-type">{{ formatEffectType(effect) }}:</span>
-                    <span class="effect-value">{{ formatEffectValue(qualityDetails[qualityId].levelData.effects[effect]) }}</span>
-                  </div>
+<!-- Qualities (collapsed single lines; click to expand) -->
+@if (qualityKeys.length > 0) {
+  <div class="sec">{{ qualityKeys.length === 1 ? 'Quality' : 'Qualities' }} · {{ qualityKeys.length }}</div>
+  <div class="mods">
+    @for (id of qualityKeys; track id) {
+      <div class="mod"
+           [class.open]="isOpen('q:' + id)"
+           [style.--acc]="'var(--color-success)'"
+           role="button"
+           tabindex="0"
+           [attr.aria-expanded]="isOpen('q:' + id)"
+           (click)="toggle('q:' + id)"
+           (keydown)="onKey($event, 'q:' + id)">
+        <div class="mod-top">
+          <span class="nm">{{ qualityDetails[id].name }}<small class="meta">{{ qualityDetails[id].levelData.name }} · Lv {{ qualityDetails[id].level }}</small></span>
+          <span class="fx-line">{{ effectSummary(qualityDetails[id].levelData.effects) }}</span>
+          <span class="badge">Tier {{ qualityDetails[id].level }}</span>
+          <span class="chev">›</span>
+        </div>
+        <div class="mod-more">
+          <div class="mod-more-pad">
+            <p class="ds">{{ qualityDetails[id].levelData.description }}</p>
+            @if (getEffectChips(qualityDetails[id].levelData.effects).length > 0) {
+              <div class="fx">
+                @for (chip of getEffectChips(qualityDetails[id].levelData.effects); track chip) {
+                  <span class="chip">▸ {{ chip }}</span>
                 }
               </div>
-            </div>
-          }
+            }
+          </div>
         </div>
-      }
-    </div>
+      </div>
+    }
   </div>
 }
 
-<!-- Traits -->
-@if (getQualityKeys(traitDetails).length > 0) {
-  <div class="detail-section">
-    <h4 class="section-title">Traits</h4>
-    <div class="trait-list">
-      @for (traitId of getQualityKeys(traitDetails); track traitId) {
-        <div class="trait-item" [class]="'trait-rarity-' + traitDetails[traitId].rarity">
-          <div class="trait-header">
-            <span [class]="traitDetails[traitId].rarity | rarityColor" class="trait-name">
-              {{ traitDetails[traitId].name }}
-            </span>
-            <div class="trait-badges">
-              <span class="trait-rarity-badge" [class]="traitDetails[traitId].rarity | rarityColor">
-                {{ traitDetails[traitId].rarity }}
-              </span>
-              <span [class]="inventoryService.getTraitLevelColor(traitDetails[traitId].level)" class="trait-level-badge">
-                Level {{ traitDetails[traitId].level }}
-              </span>
-            </div>
-          </div>
-          <div class="trait-level-name" [class]="traitDetails[traitId].rarity | rarityColor">
-            {{ traitDetails[traitId].levelData.name }}
-          </div>
-          <p class="trait-description">{{ traitDetails[traitId].levelData.description }}</p>
-
-          <!-- Effects -->
-          @if (traitDetails[traitId].levelData.effects) {
-            <div class="effects-section">
-              <div class="effect-label">Effects:</div>
-              <div class="effects-grid">
-                <!-- Legacy effect format (vendorPrice, etc.) -->
-                @for (effect of getLegacyEffectKeys(traitDetails[traitId].levelData.effects); track effect) {
-                  <div class="effect-item">
-                    <span class="effect-type">{{ formatEffectType(effect) }}:</span>
-                    <span class="effect-value">{{ formatEffectValue(traitDetails[traitId].levelData.effects[effect]) }}</span>
-                  </div>
-                }
-                <!-- New applicators format -->
-                @if (getApplicators(traitDetails[traitId].levelData.effects).length > 0) {
-                  <div class="effect-item">
-                    <span class="effect-type">{{ getApplicatorsLabel(traitDetails[traitId].levelData.effects) }}:</span>
-                    <span class="effect-value">
-                      @for (applicator of getApplicators(traitDetails[traitId].levelData.effects); track applicator; let i = $index) {
-                        <span>
-                          {{ applicator.description }}@if (i < getApplicators(traitDetails[traitId].levelData.effects).length - 1) {<span>, </span>}
-                        </span>
-                      }
-                    </span>
-                  </div>
+<!-- Traits (collapsed single lines; click to expand) -->
+@if (traitKeys.length > 0) {
+  <div class="sec">{{ traitKeys.length === 1 ? 'Trait' : 'Traits' }} · {{ traitKeys.length }}</div>
+  <div class="mods">
+    @for (id of traitKeys; track id) {
+      <div class="mod"
+           [class.open]="isOpen('t:' + id)"
+           [style.--acc]="rarityVar(traitDetails[id].rarity)"
+           role="button"
+           tabindex="0"
+           [attr.aria-expanded]="isOpen('t:' + id)"
+           (click)="toggle('t:' + id)"
+           (keydown)="onKey($event, 't:' + id)">
+        <div class="mod-top">
+          <span class="nm">{{ traitDetails[id].name }}<small class="meta">{{ traitDetails[id].levelData.name }} · Lv {{ traitDetails[id].level }}</small></span>
+          <span class="fx-line">{{ effectSummary(traitDetails[id].levelData.effects) }}</span>
+          <span class="badge">{{ traitDetails[id].rarity }}</span>
+          <span class="chev">›</span>
+        </div>
+        <div class="mod-more">
+          <div class="mod-more-pad">
+            <p class="ds">{{ traitDetails[id].levelData.description }}</p>
+            @if (getEffectChips(traitDetails[id].levelData.effects).length > 0) {
+              <div class="fx">
+                @for (chip of getEffectChips(traitDetails[id].levelData.effects); track chip) {
+                  <span class="chip">▸ {{ chip }}</span>
                 }
               </div>
-            </div>
-          }
+            }
+          </div>
         </div>
-      }
-    </div>
+      </div>
+    }
   </div>
 }

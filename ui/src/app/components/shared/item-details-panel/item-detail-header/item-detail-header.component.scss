@@ -1,22 +1,113 @@
-/* Item Detail Header Component */
-.details-header {
+/* Item Detail Header Component (v2 ".hdr" block) */
+:host {
+  display: block;
+}
+
+.hdr {
   display: flex;
-  justify-content: space-between;
+  gap: var(--spacing-m);
   align-items: center;
-  padding: 0 var(--spacing-l);
-  background: var(--color-bg-elevated);
-  border-bottom: var(--border-light);
-  flex-shrink: 0;
-  padding: var(--spacing-s);
+  padding: var(--spacing-l) var(--spacing-2xl) var(--spacing-m) var(--spacing-l);
 }
 
-.details-header h3 {
+.hdr .icon {
+  width: 52px;
+  height: 52px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface-sunken);
+  border: var(--border-width-thin) solid
+    color-mix(in srgb, var(--rarity, var(--color-rarity-common)) 45%, var(--color-border-subtle));
+  border-radius: var(--radius-m);
+  box-shadow: inset 0 0 14px rgba(0, 0, 0, 0.45);
+}
+
+.titles {
+  flex: 1;
+  min-width: 0;
+}
+
+.hdr h3 {
   margin: 0;
-  font-size: var(--font-size-xl);
+  font-family: var(--font-display);
+  font-size: var(--font-size-2xl);
+  color: var(--rarity, var(--color-text-primary));
+  line-height: 1.05;
+  letter-spacing: var(--letter-spacing-wide);
 }
 
-// Close button now uses .button-quaternary from design-tokens.scss
-.button-quaternary {
-  font-size: var(--font-size-2xl);
-  padding: var(--spacing-s) var(--spacing-m);
+.crumb-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-s);
+  margin-top: var(--spacing-xs);
+}
+
+.crumb {
+  font-size: var(--font-size-s);
+  color: var(--color-text-muted);
+  text-transform: capitalize;
+  letter-spacing: var(--letter-spacing-wide);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hdr-tag {
+  flex: none;
+  font-size: var(--font-size-2xs);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+  font-weight: var(--font-weight-bold);
+  padding: 3px 9px;
+  border-radius: var(--radius-full);
+  background: var(--color-overlay-medium);
+  border: var(--border-width-thin) solid var(--color-border-moderate);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.hdr-tag b {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-bold);
+}
+
+.hdr-tag.req {
+  color: var(--color-moon-yellow);
+  border-color: color-mix(in srgb, var(--color-moon-yellow) 42%, var(--color-border-moderate));
+  background: color-mix(in srgb, var(--color-moon-yellow) 9%, var(--color-overlay-medium));
+}
+
+.hdr-tag.req b {
+  color: var(--color-moon-yellow-light);
+}
+
+.close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 22px;
+  line-height: 1;
+  border-radius: var(--radius-s);
+  cursor: pointer;
+  transition: color var(--duration-fast) var(--ease-out),
+    background var(--duration-fast) var(--ease-out);
+  z-index: 3;
+}
+
+.close:hover {
+  color: var(--color-text-primary);
+  background: var(--color-overlay-medium);
 }

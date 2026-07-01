@@ -35,6 +35,21 @@ export class ItemDetailsPanelComponent implements OnChanges {
   combatStats: CombatStats | null = null;
   loadingCombatStats: boolean = false;
 
+  /** Maps an item rarity to its design-token color, used for the --rarity accent. */
+  private readonly rarityColorMap: Record<string, string> = {
+    common: 'var(--color-rarity-common)',
+    uncommon: 'var(--color-rarity-uncommon)',
+    rare: 'var(--color-rarity-rare)',
+    epic: 'var(--color-rarity-epic)',
+    legendary: 'var(--color-rarity-legendary)'
+  };
+
+  /** Rarity accent color bound to the panel's `--rarity` custom property. */
+  get rarityColor(): string {
+    const rarity = this.item?.definition?.rarity ?? 'common';
+    return this.rarityColorMap[rarity] ?? this.rarityColorMap['common'];
+  }
+
   // Drag functionality
   isDragging: boolean = false;
   dragOffsetX: number = 0;

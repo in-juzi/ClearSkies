@@ -1,4 +1,4 @@
-/* Item Details Panel - Parent Container Component */
+/* Item Details Panel - Parent Container Component (v2 ".idp" card look) */
 .item-details-panel {
   position: fixed;
   top: 50%;
@@ -7,8 +7,9 @@
   width: 90%;
   max-width: var(--container-m);
   max-height: 80vh;
-  background: var(--gradient-card);
-  border: var(--border-default);
+  --rarity: var(--color-rarity-common);
+  background: var(--color-bg-secondary);
+  border: var(--border-width-thin) solid var(--color-border-moderate);
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-xl);
   z-index: var(--z-modal);
@@ -18,44 +19,24 @@
   flex-direction: column;
 }
 
+/* Rarity accent bar across the top of the card */
+.item-details-panel::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--border-width-thick);
+  background: var(--rarity);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--rarity) 65%, transparent);
+  z-index: 2;
+}
+
 .details-content {
-  padding: var(--spacing-l);
+  padding: 0;
   flex: 1;
   overflow-y: auto;
   min-height: 0;
-}
-
-/* Color utilities for rarity */
-.text-gold-400 {
-  color: var(--color-secondary-dark);
-}
-
-.text-gray-400 {
-  color: var(--color-text-label-alt);
-}
-
-.text-green-400 {
-  color: var(--color-success);
-}
-
-.text-blue-400 {
-  color: var(--color-info);
-}
-
-.text-purple-400 {
-  color: var(--color-text-accent-secondary);
-}
-
-.text-orange-400 {
-  color: var(--color-warning);
-}
-
-.text-yellow-400 {
-  color: var(--color-secondary-light);
-}
-
-.text-red-400 {
-  color: var(--color-error-light);
 }
 
 /* Scrollbar styling */

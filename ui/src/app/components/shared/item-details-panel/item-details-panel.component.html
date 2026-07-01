@@ -1,5 +1,6 @@
 @if (item) {
   <div class="item-details-panel"
+       [style.--rarity]="rarityColor"
        [ngStyle]="getPanelStyle()"
        (mousemove)="onDrag($event)"
        (mouseup)="onDragEnd()"
@@ -9,6 +10,12 @@
     <app-item-detail-header
       [itemName]="item.definition.name"
       [rarity]="item.definition.rarity"
+      [icon]="item.definition.icon"
+      [category]="item.definition.category"
+      [subcategories]="item.definition.subcategories"
+      [slot]="item.definition.slot || ''"
+      [requiredLevel]="item.definition.properties['requiredLevel'] ?? null"
+      [quantity]="item.quantity"
       [isDragging]="isDragging"
       (close)="onClose()"
       (dragStart)="onDragStart($event)">
@@ -17,13 +24,7 @@
     <div class="details-content">
       <!-- Basic Info (Decomposed Component) -->
       <app-item-basic-info
-        [icon]="item.definition.icon"
-        [itemName]="item.definition.name"
         [description]="item.definition.description"
-        [category]="item.definition.category"
-        [subcategories]="item.definition.subcategories"
-        [rarity]="item.definition.rarity"
-        [quantity]="item.quantity"
         [weight]="item.definition.properties.weight"
         [vendorPrice]="item.vendorPrice">
       </app-item-basic-info>
