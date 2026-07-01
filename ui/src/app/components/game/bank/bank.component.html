@@ -11,10 +11,7 @@
       [ngStyle]="getModalStyle()"
     >
       <!-- Header -->
-      <div
-        class="bank-header draggable-header"
-        (mousedown)="onDragStart($event)"
-      >
+      <div class="bank-header draggable-header" (mousedown)="onDragStart($event)">
         <h2>
           <app-icon [path]="'ui/ui_bank.svg'" [size]="24"></app-icon>
           {{ storageService.containerName() }}
@@ -22,121 +19,105 @@
         <button class="close-button" (click)="close()" (mousedown)="$event.stopPropagation()">×</button>
       </div>
 
-      <!-- Capacity Bar -->
-      <div class="capacity-section">
-        <div class="capacity-label">
-          <span>Storage: {{ storageService.containerUsedSlots() }} / {{ storageService.containerCapacity() }} slots</span>
-          <span class="capacity-percentage">{{ capacityPercentage().toFixed(0) }}%</span>
+      <!-- Dual Capacity Meters -->
+      <div class="capacity-row">
+        <div class="meter">
+          <div class="lab">
+            <span>Vault storage</span>
+            <b>{{ storageService.containerUsedSlots() }} / {{ storageService.containerCapacity() }} slots · {{ capacityPercentage().toFixed(0) }}%</b>
+          </div>
+          <div class="bar">
+            <span
+              [class.capacity-normal]="capacityColorClass() === 'capacity-normal'"
+              [class.capacity-warning]="capacityColorClass() === 'capacity-warning'"
+              [class.capacity-critical]="capacityColorClass() === 'capacity-critical'"
+              [style.width.%]="capacityPercentage()"
+            ></span>
+          </div>
         </div>
-        <div class="capacity-bar">
-          <div
-            class="capacity-fill"
-            [class.capacity-normal]="capacityColorClass() === 'capacity-normal'"
-            [class.capacity-warning]="capacityColorClass() === 'capacity-warning'"
-            [class.capacity-critical]="capacityColorClass() === 'capacity-critical'"
-            [style.width.%]="capacityPercentage()"
-          ></div>
+        <div class="meter">
+          <div class="lab">
+            <span>Carry weight</span>
+            <b>{{ inventoryService.currentWeight().toFixed(1) }} / {{ inventoryService.carryingCapacity().toFixed(1) }} kg · {{ weightPercentage().toFixed(0) }}%</b>
+          </div>
+          <div class="bar">
+            <span
+              [class.capacity-normal]="weightColorClass() === 'capacity-normal'"
+              [class.capacity-warning]="weightColorClass() === 'capacity-warning'"
+              [class.capacity-critical]="weightColorClass() === 'capacity-critical'"
+              [style.width.%]="weightPercentage()"
+            ></span>
+          </div>
         </div>
       </div>
 
-      <!-- Bank Actions -->
-      <div class="bank-actions">
-        <button
-          class="button-tertiary"
-          (click)="storeStacks()"
-          [disabled]="storingStacks() || storingAll()"
-          title="Deposit all stackable items that already exist in the bank"
-        >
-          <span class="action-icon">📦</span>
-          <span class="action-text">{{ storingStacks() ? 'Storing...' : 'Store Stacks' }}</span>
-        </button>
+      <!-- Actions -->
+      <div class="actions">
         <button
           class="button-primary"
           (click)="storeAll()"
-          [disabled]="storingAll() || storingStacks()"
+          [disabled]="storingAll() || storingStacks() || withdrawingAll()"
           title="Deposit all non-equipped items from your inventory"
         >
-          <span class="action-icon">💰</span>
-          <span class="action-text">{{ storingAll() ? 'Storing...' : 'Store All' }}</span>
+          {{ storingAll() ? 'Storing…' : 'Store All' }}
+        </button>
+        <button
+          class="button-tertiary"
+          (click)="storeStacks()"
+          [disabled]="storingStacks() || storingAll() || withdrawingAll()"
+          title="Deposit all stackable items that already exist in the bank"
+        >
+          {{ storingStacks() ? 'Storing…' : 'Store Stacks' }}
+        </button>
+        <button
+          class="button-tertiary"
+          (click)="withdrawAll()"
+          [disabled]="withdrawingAll() || storingAll() || storingStacks()"
+          title="Withdraw everything from the bank into your inventory"
+        >
+          {{ withdrawingAll() ? 'Withdrawing…' : 'Withdraw All' }}
         </button>
       </div>
 
-      <!-- Main Content Area -->
-      <div class="bank-content">
-        <!-- Bank Items (Left Side) -->
-        <div class="bank-items-section">
-          <div class="section-header">
-            <h3>Bank Storage</h3>
+      <!-- Main Content: two panels -->
+      <div class="content">
+
+        <!-- Bank panel -->
+        <div class="panel" [attr.data-view]="bankView()">
+          <div class="panel-head">
+            <div class="ht">
+              <h3>Bank Storage</h3>
+              <span class="sub">{{ storageService.containerUsedSlots() }} / {{ storageService.containerCapacity() }} slots</span>
+            </div>
+            <div class="viewtoggle">
+              <button [class.active]="bankView() === 'grid'" (click)="setBankView('grid')" title="Grid view">▦</button>
+              <button [class.active]="bankView() === 'list'" (click)="setBankView('list')" title="List view">☰</button>
+            </div>
           </div>
 
-          <!-- Filters -->
           <div class="filters">
             <select [ngModel]="selectedBankCategory()" (ngModelChange)="selectedBankCategory.set($event)" class="category-filter">
               @for (cat of categories; track cat.value) {
-                <option [value]="cat.value">
-                  {{ cat.label }}
-                </option>
+                <option [value]="cat.value">{{ cat.label }}</option>
               }
             </select>
-
             <input
               type="text"
               [ngModel]="bankSearchQuery()"
               (ngModelChange)="bankSearchQuery.set($event)"
-              placeholder="Search items..."
+              placeholder="Search vault…"
               class="search-input"
             />
           </div>
 
-          <!-- Sort Buttons -->
-          <div class="sort-buttons">
-            <button
-              class="button-tertiary"
-              [class.active]="bankSortType() === 'name'"
-              (click)="bankSortType.set('name')"
-              title="Sort by name (A-Z)"
-            >
-              Name
-            </button>
-            <button
-              class="button-tertiary"
-              [class.active]="bankSortType() === 'weight'"
-              (click)="bankSortType.set('weight')"
-              title="Sort by total stack weight"
-            >
-              Weight
-            </button>
-            <button
-              class="button-tertiary"
-              [class.active]="bankSortType() === 'count'"
-              (click)="bankSortType.set('count')"
-              title="Sort by stack count"
-            >
-              Count
-            </button>
+          <div class="sortrow">
+            <button class="button-tertiary" [class.active]="bankSortType() === 'name'" (click)="bankSortType.set('name')">Name</button>
+            <button class="button-tertiary" [class.active]="bankSortType() === 'weight'" (click)="bankSortType.set('weight')">Weight</button>
+            <button class="button-tertiary" [class.active]="bankSortType() === 'count'" (click)="bankSortType.set('count')">Count</button>
           </div>
 
-          <!-- Bank Items Grid -->
-          <div
-            class="items-grid bank-storage"
-            [class.empty]="!filteredBankItems().length"
-            (drop)="onBankDrop($event)"
-            (dragover)="onDragOver($event)"
-          >
-            @for (item of filteredBankItems(); track item.instanceId) {
-              <div
-                class="item-wrapper"
-                draggable="true"
-                (dragstart)="onBankItemDragStart($event, item)"
-                (dblclick)="onBankItemDoubleClick($event, item)"
-                (contextmenu)="onBankItemRightClick($event, item)"
-                title="Double-click or right-click to withdraw (hold Shift for partial), or drag to inventory"
-              >
-                <app-item-mini [item]="item"></app-item-mini>
-              </div>
-            }
-
-            <!-- Empty state -->
+          <!-- Items (drop target for deposits) -->
+          <div class="panel-body" (drop)="onBankDrop($event)" (dragover)="onDragOver($event)">
             @if (filteredBankItems().length === 0) {
               <div class="empty-state">
                 @if (storageService.containerItems().length === 0) {
@@ -146,91 +127,93 @@
                   <p>No items match filters</p>
                 }
               </div>
+            } @else if (bankView() === 'grid') {
+              <div class="view-grid">
+                @for (item of filteredBankItems(); track item.instanceId) {
+                  <div
+                    class="slot"
+                    [style.border-color]="rarityColor(item)"
+                    draggable="true"
+                    (dragstart)="onBankItemDragStart($event, item)"
+                    (dblclick)="onBankItemDoubleClick($event, item)"
+                    (contextmenu)="onBankItemRightClick($event, item)"
+                    title="Double-click or right-click to withdraw (hold Shift for partial), or drag to inventory"
+                  >
+                    @if (item.definition.icon) {
+                      <app-icon [icon]="item.definition.icon" [size]="30" class="ic"></app-icon>
+                    }
+                    @if (item.quantity > 1) { <span class="qty">{{ item.quantity }}</span> }
+                    @if (hasModifiers(item)) { <span class="dot"></span> }
+                  </div>
+                }
+                @for (empty of emptySlots(filteredBankItems().length); track $index) {
+                  <div class="slot empty"></div>
+                }
+              </div>
+            } @else {
+              <div class="view-list">
+                @for (item of filteredBankItems(); track item.instanceId) {
+                  <div
+                    class="lrow"
+                    [style.border-left-color]="rarityColor(item)"
+                    draggable="true"
+                    (dragstart)="onBankItemDragStart($event, item)"
+                    (dblclick)="onBankItemDoubleClick($event, item)"
+                    (contextmenu)="onBankItemRightClick($event, item)"
+                    title="Double-click or right-click to withdraw (hold Shift for partial), or drag to inventory"
+                  >
+                    @if (item.definition.icon) {
+                      <app-icon [icon]="item.definition.icon" [size]="24" class="ic"></app-icon>
+                    }
+                    <span class="qn">@if (item.quantity > 1) { ×{{ item.quantity }} }</span>
+                    <span class="nm" [style.color]="rarityColor(item)">{{ item.definition.name || item.itemId }}</span>
+                    <span class="right">
+                      <app-item-modifiers [item]="item" displayMode="badge-name" size="mini"></app-item-modifiers>
+                      <button class="xfb" (click)="$event.stopPropagation(); withdrawItem(item, $event.shiftKey)">← Take</button>
+                    </span>
+                  </div>
+                }
+              </div>
             }
           </div>
         </div>
 
-        <!-- Inventory Items (Right Side) -->
-        <div class="inventory-items-section">
-          <div class="section-header">
-            <h3>Your Inventory</h3>
-            <span class="weight-info">
-              {{ inventoryService.currentWeight().toFixed(1) }}kg /
-              {{ inventoryService.carryingCapacity().toFixed(1) }}kg
-            </span>
+        <!-- Inventory panel -->
+        <div class="panel" [attr.data-view]="inventoryView()">
+          <div class="panel-head">
+            <div class="ht">
+              <h3>Your Inventory</h3>
+              <span class="sub">{{ inventoryService.currentWeight().toFixed(1) }} / {{ inventoryService.carryingCapacity().toFixed(1) }} kg</span>
+            </div>
+            <div class="viewtoggle">
+              <button [class.active]="inventoryView() === 'grid'" (click)="setInventoryView('grid')" title="Grid view">▦</button>
+              <button [class.active]="inventoryView() === 'list'" (click)="setInventoryView('list')" title="List view">☰</button>
+            </div>
           </div>
 
-          <!-- Inventory Filters -->
           <div class="filters">
             <select [ngModel]="selectedInventoryCategory()" (ngModelChange)="selectedInventoryCategory.set($event)" class="category-filter">
               @for (cat of categories; track cat.value) {
-                <option [value]="cat.value">
-                  {{ cat.label }}
-                </option>
+                <option [value]="cat.value">{{ cat.label }}</option>
               }
             </select>
-
             <input
               type="text"
               [ngModel]="inventorySearchQuery()"
               (ngModelChange)="inventorySearchQuery.set($event)"
-              placeholder="Search items..."
+              placeholder="Search inventory…"
               class="search-input"
             />
           </div>
 
-          <!-- Sort Buttons -->
-          <div class="sort-buttons">
-            <button
-              class="button-tertiary"
-              [class.active]="inventorySortType() === 'name'"
-              (click)="inventorySortType.set('name')"
-              title="Sort by name (A-Z)"
-            >
-              Name
-            </button>
-            <button
-              class="button-tertiary"
-              [class.active]="inventorySortType() === 'weight'"
-              (click)="inventorySortType.set('weight')"
-              title="Sort by total stack weight"
-            >
-              Weight
-            </button>
-            <button
-              class="button-tertiary"
-              [class.active]="inventorySortType() === 'count'"
-              (click)="inventorySortType.set('count')"
-              title="Sort by stack count"
-            >
-              Count
-            </button>
+          <div class="sortrow">
+            <button class="button-tertiary" [class.active]="inventorySortType() === 'name'" (click)="inventorySortType.set('name')">Name</button>
+            <button class="button-tertiary" [class.active]="inventorySortType() === 'weight'" (click)="inventorySortType.set('weight')">Weight</button>
+            <button class="button-tertiary" [class.active]="inventorySortType() === 'count'" (click)="inventorySortType.set('count')">Count</button>
           </div>
 
-          <!-- Inventory Items Grid -->
-          <div
-            class="items-grid"
-            (drop)="onInventoryDrop($event)"
-            (dragover)="onDragOver($event)"
-          >
-            @for (item of filteredInventoryItems(); track item.instanceId) {
-              <div
-                class="item-wrapper"
-                [class.equipped]="item.equipped"
-                draggable="true"
-                (dragstart)="onInventoryItemDragStart($event, item)"
-                (dblclick)="onInventoryItemDoubleClick($event, item)"
-                (contextmenu)="onInventoryItemRightClick($event, item)"
-                title="Double-click or right-click to deposit (hold Shift for partial), or drag to bank"
-              >
-                <app-item-mini [item]="item"></app-item-mini>
-                @if (item.equipped) {
-                  <span class="equipped-badge">E</span>
-                }
-              </div>
-            }
-
-            <!-- Empty state -->
+          <!-- Items (drop target for withdrawals) -->
+          <div class="panel-body" (drop)="onInventoryDrop($event)" (dragover)="onDragOver($event)">
             @if (filteredInventoryItems().length === 0) {
               <div class="empty-state">
                 @if (inventoryService.inventory().length === 0) {
@@ -239,14 +222,69 @@
                   <p>No items match filters</p>
                 }
               </div>
+            } @else if (inventoryView() === 'grid') {
+              <div class="view-grid">
+                @for (item of filteredInventoryItems(); track item.instanceId) {
+                  <div
+                    class="slot"
+                    [class.equipped]="item.equipped"
+                    [style.border-color]="rarityColor(item)"
+                    draggable="true"
+                    (dragstart)="onInventoryItemDragStart($event, item)"
+                    (dblclick)="onInventoryItemDoubleClick($event, item)"
+                    (contextmenu)="onInventoryItemRightClick($event, item)"
+                    title="Double-click or right-click to deposit (hold Shift for partial), or drag to bank"
+                  >
+                    @if (item.definition.icon) {
+                      <app-icon [icon]="item.definition.icon" [size]="30" class="ic"></app-icon>
+                    }
+                    @if (item.quantity > 1) { <span class="qty">{{ item.quantity }}</span> }
+                    @if (hasModifiers(item)) { <span class="dot"></span> }
+                    @if (item.equipped) { <span class="eb">EQ</span> }
+                  </div>
+                }
+                @for (empty of emptySlots(filteredInventoryItems().length); track $index) {
+                  <div class="slot empty"></div>
+                }
+              </div>
+            } @else {
+              <div class="view-list">
+                @for (item of filteredInventoryItems(); track item.instanceId) {
+                  <div
+                    class="lrow"
+                    [class.equipped]="item.equipped"
+                    [style.border-left-color]="rarityColor(item)"
+                    draggable="true"
+                    (dragstart)="onInventoryItemDragStart($event, item)"
+                    (dblclick)="onInventoryItemDoubleClick($event, item)"
+                    (contextmenu)="onInventoryItemRightClick($event, item)"
+                    title="Double-click or right-click to deposit (hold Shift for partial), or drag to bank"
+                  >
+                    @if (item.definition.icon) {
+                      <app-icon [icon]="item.definition.icon" [size]="24" class="ic"></app-icon>
+                    }
+                    <span class="qn">@if (item.quantity > 1) { ×{{ item.quantity }} }</span>
+                    <span class="nm" [style.color]="rarityColor(item)">{{ item.definition.name || item.itemId }}</span>
+                    <span class="right">
+                      <app-item-modifiers [item]="item" displayMode="badge-name" size="mini"></app-item-modifiers>
+                      @if (item.equipped) {
+                        <span class="eb-pill">EQUIPPED</span>
+                      } @else {
+                        <button class="xfb" (click)="$event.stopPropagation(); depositItem(item, $event.shiftKey)">Store →</button>
+                      }
+                    </span>
+                  </div>
+                }
+              </div>
             }
           </div>
         </div>
+
       </div>
 
-      <!-- Footer Help Text -->
+      <!-- Footer -->
       <div class="bank-footer">
-        <p>💡 <strong>Tip:</strong> Drag items between bank and inventory, or double-click/right-click to transfer. Hold <strong>Shift</strong> to split stacks.</p>
+        <p>💡 <strong>Tip:</strong> Toggle each side between grid and list. Drag items between panels, or double-click / right-click to transfer. Hold <strong>Shift</strong> to split stacks.</p>
       </div>
     </div>
   </div>

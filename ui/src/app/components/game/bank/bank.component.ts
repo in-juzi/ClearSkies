@@ -6,14 +6,14 @@ import { InventoryService } from '../../../services/inventory.service';
 import { ItemFilterService } from '../../../services/item-filter.service';
 import { QuantityDialogService } from '../../../services/quantity-dialog.service';
 import { ItemDetails } from '../../../models/inventory.model';
-import { ItemMiniComponent } from '../../shared/item-mini/item-mini.component';
+import { ItemModifiersComponent } from '../../shared/item-modifiers/item-modifiers.component';
 import { IconComponent } from '../../shared/icon/icon.component';
 import { sortByName, sortByWeight, sortByQuantity } from '../../../utils/item-sort.utils';
 
 @Component({
   selector: 'app-bank',
   standalone: true,
-  imports: [CommonModule, FormsModule, ItemMiniComponent, IconComponent],
+  imports: [CommonModule, FormsModule, ItemModifiersComponent, IconComponent],
   templateUrl: './bank.component.html',
   styleUrl: './bank.component.scss'
 })
@@ -38,6 +38,11 @@ export class BankComponent implements OnInit, OnDestroy {
 
   storingStacks = signal<boolean>(false);
   storingAll = signal<boolean>(false);
+  withdrawingAll = signal<boolean>(false);
+
+  // Per-panel view mode (grid vs list), persisted to localStorage
+  bankView = signal<'grid' | 'list'>(this.loadView('bank', 'grid'));
+  inventoryView = signal<'grid' | 'list'>(this.loadView('inventory', 'list'));
 
   // Drag functionality
   isDragging: boolean = false;
@@ -107,6 +112,20 @@ export class BankComponent implements OnInit, OnDestroy {
   // Color class for capacity bar
   capacityColorClass = computed(() => {
     const percentage = this.capacityPercentage();
+    if (percentage >= 95) return 'capacity-critical';
+    if (percentage >= 80) return 'capacity-warning';
+    return 'capacity-normal';
+  });
+
+  // Carry-weight meter (inventory side)
+  weightPercentage = computed(() => {
+    const used = this.inventoryService.currentWeight();
+    const total = this.inventoryService.carryingCapacity();
+    return total > 0 ? Math.min(100, (used / total) * 100) : 0;
+  });
+
+  weightColorClass = computed(() => {
+    const percentage = this.weightPercentage();
     if (percentage >= 95) return 'capacity-critical';
     if (percentage >= 80) return 'capacity-warning';
     return 'capacity-normal';
@@ -365,6 +384,88 @@ export class BankComponent implements OnInit, OnDestroy {
         this.storingAll.set(false);
       });
     }, 500);
+  }
+
+  /**
+   * Withdraw all items from the bank back into inventory.
+   * Uses bulk withdraw via WebSocket; the server withdraws what fits and
+   * reports per-item errors (e.g. carry-weight limits) without failing the batch.
+   */
+  withdrawAll(): void {
+    if (this.withdrawingAll()) return;
+
+    this.withdrawingAll.set(true);
+
+    const bankItems = this.storageService.containerItems();
+
+    if (bankItems.length === 0) {
+      this.withdrawingAll.set(false);
+      alert('The bank is empty.');
+      return;
+    }
+
+    const itemsToWithdraw: Array<{ instanceId: string; quantity: null }> = bankItems.map(item => ({
+      instanceId: item.instanceId,
+      quantity: null
+    }));
+
+    this.storageService.bulkWithdraw(this.BANK_CONTAINER_ID, itemsToWithdraw);
+
+    // Refresh inventory after bulk withdraw (WebSocket updates the bank container)
+    setTimeout(() => {
+      this.inventoryService.getInventory().subscribe(() => {
+        this.withdrawingAll.set(false);
+      });
+    }, 500);
+  }
+
+  /**
+   * Toggle a panel's view mode and persist the choice.
+   */
+  setBankView(view: 'grid' | 'list'): void {
+    this.bankView.set(view);
+    this.saveView('bank', view);
+  }
+
+  setInventoryView(view: 'grid' | 'list'): void {
+    this.inventoryView.set(view);
+    this.saveView('inventory', view);
+  }
+
+  /** Resolve the CSS rarity color var for an item's border. */
+  rarityColor(item: any): string {
+    const rarities = ['common', 'uncommon', 'rare', 'epic', 'legendary'];
+    const rarity = item?.definition?.rarity;
+    return `var(--color-rarity-${rarities.includes(rarity) ? rarity : 'common'})`;
+  }
+
+  /** Whether an item carries any quality or trait modifiers (drives the grid mod dot). */
+  hasModifiers(item: any): boolean {
+    return !!(item?.qualities && Object.keys(item.qualities).length) ||
+           !!(item?.traits && Object.keys(item.traits).length);
+  }
+
+  /** Empty grid cells to pad the visible items out to a full rectangle (multiple of 6, min 12). */
+  emptySlots(itemCount: number): number[] {
+    const target = Math.max(12, Math.ceil(itemCount / 6) * 6);
+    return Array.from({ length: Math.max(0, target - itemCount) });
+  }
+
+  private loadView(panel: 'bank' | 'inventory', fallback: 'grid' | 'list'): 'grid' | 'list' {
+    try {
+      const saved = localStorage.getItem(`bankview-${panel}`);
+      return saved === 'grid' || saved === 'list' ? saved : fallback;
+    } catch {
+      return fallback;
+    }
+  }
+
+  private saveView(panel: 'bank' | 'inventory', view: 'grid' | 'list'): void {
+    try {
+      localStorage.setItem(`bankview-${panel}`, view);
+    } catch {
+      // localStorage unavailable — non-fatal
+    }
   }
 
   /**
