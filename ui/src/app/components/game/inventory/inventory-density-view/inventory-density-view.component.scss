@@ -34,6 +34,10 @@
   background: linear-gradient(to bottom, var(--color-bg-secondary) 72%, transparent);
   z-index: var(--z-raised);
 
+  // First group sits flush under the scroll padding so it doesn't stack an
+  // extra 8px onto the filters gap above it.
+  &:first-child { margin-top: 0; }
+
   .lbl {
     font-size: var(--font-size-2xs);
     font-weight: var(--font-weight-bold);
