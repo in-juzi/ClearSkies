@@ -7,38 +7,70 @@
   overflow: hidden;
 }
 
-.game-header {
-  background: var(--gradient-surface);
-  padding: var(--spacing-m) var(--spacing-3xl);
+// Brand strip at top of the left rail (replaces the removed top navbar).
+// Brand text is starlight; the moon logo carries the moon-yellow accent.
+.rail-brand {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  box-shadow: var(--shadow-m);
+  gap: var(--spacing-s);
+  height: 42px;
+  padding: 0 var(--spacing-s) 0 var(--spacing-m);
   flex-shrink: 0;
+  background: var(--gradient-surface);
+  border-bottom: var(--border-width-medium) solid var(--color-bg-tertiary);
 
-  .header-left {
-    display: flex;
-    align-items: center;
-
-    h1 {
-      margin: 0;
-      color: var(--color-primary);
-      font-size: var(--font-size-2xl);
-    }
+  .brand-moon {
+    width: 20px;
+    height: 20px;
+    border-radius: var(--radius-full);
+    flex: none;
+    background: radial-gradient(circle at 35% 30%,
+        var(--color-moon-yellow-light),
+        var(--color-moon-yellow) 55%,
+        var(--color-moon-yellow-dark));
+    box-shadow: var(--shadow-glow-moon);
   }
 
-  .header-right {
+  h1 {
+    margin: 0;
+    font-family: var(--font-display);
+    color: var(--color-text-primary);
+    font-size: var(--font-size-l);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: var(--letter-spacing-wide);
+  }
+
+  .brand-spacer {
+    flex: 1;
+  }
+
+  .icon-nav {
     display: flex;
-    align-items: center;
-    gap: var(--spacing-l);
+    gap: var(--spacing-2xs);
 
-    .username {
-      color: var(--color-secondary);
-      font-weight: var(--font-weight-semibold);
-      font-size: var(--font-size-m);
+    .icon-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: var(--radius-m);
+      border: var(--border-width-thin) solid transparent;
+      background: transparent;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition-fast);
+
+      .material-symbols-outlined {
+        font-size: var(--font-size-xl);
+      }
+
+      &:hover {
+        background: var(--color-bg-hover);
+        color: var(--color-text-primary);
+        border-color: var(--color-border-moderate);
+      }
     }
-
-    // Header navigation buttons now use .button-quaternary from design-tokens.scss
   }
 }
 
@@ -175,7 +207,8 @@
       }
 
       &.active {
-        color: var(--color-primary);
+        // starlight text, moon-yellow underline accent
+        color: var(--color-text-primary);
         background: var(--color-bg-secondary);
 
         &::after {
@@ -355,7 +388,8 @@
       }
 
       &.active {
-        color: var(--color-primary);
+        // starlight text, moon-yellow underline accent
+        color: var(--color-text-primary);
         background: var(--color-bg-secondary);
 
         &::after {
@@ -394,7 +428,7 @@
     border-bottom: var(--border-width-medium) solid var(--color-bg-tertiary);
 
     h3 {
-      color: var(--color-primary);
+      color: var(--color-text-primary);
       font-size: var(--font-size-2xl);
       font-weight: var(--font-weight-bold);
       text-align: center;

@@ -1,19 +1,4 @@
 <div class="game-container">
-  <header class="game-header">
-    <div class="header-left">
-      <h1>ClearSkies</h1>
-    </div>
-    <div class="header-right">
-      @if (currentUser()) {
-        <span class="username">{{ currentUser()!.username }}</span>
-        <button class="button-quaternary" (click)="openQuestJournal()">Quests</button>
-        <button class="button-quaternary" (click)="openManual()">Manual</button>
-        <button class="button-quaternary" routerLink="/admin">Admin</button>
-        <button class="button-quaternary" (click)="onLogout()">Logout</button>
-      }
-    </div>
-  </header>
-
   <!-- Manual Dialog -->
   @if (manualDialogService.isOpen()) {
     <app-manual [dialogMode]="true" />
@@ -41,6 +26,27 @@
           }
 
           @if (!leftSidebarCollapsed()) {
+            <!-- Brand strip (replaces the removed top navbar) -->
+            <div class="rail-brand">
+              <span class="brand-moon"></span>
+              <h1>ClearSkies</h1>
+              <span class="brand-spacer"></span>
+              <div class="icon-nav">
+                <button class="icon-btn" (click)="openQuestJournal()" title="Quest Journal" aria-label="Quest Journal">
+                  <span class="material-symbols-outlined">auto_stories</span>
+                </button>
+                <button class="icon-btn" (click)="openManual()" title="Manual" aria-label="Manual">
+                  <span class="material-symbols-outlined">menu_book</span>
+                </button>
+                <button class="icon-btn" routerLink="/admin" title="Admin" aria-label="Admin">
+                  <span class="material-symbols-outlined">shield_person</span>
+                </button>
+                <button class="icon-btn" (click)="onLogout()" title="Logout" aria-label="Logout">
+                  <span class="material-symbols-outlined">logout</span>
+                </button>
+              </div>
+            </div>
+
             <!-- Tab Navigation -->
             <div class="sidebar-nav">
               <button

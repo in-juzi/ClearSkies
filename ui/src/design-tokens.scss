@@ -76,15 +76,18 @@
 
    /* --- TEXT COLORS --- */
 
-   /* Main text - moon yellow variants */
-   --color-text-primary: #f4e99b;
-   /* Moon yellow */
-   --color-text-secondary: #e0d4bc;
-   /* Softer yellow */
-   --color-text-tertiary: #c7bda0;
+   /* Main text - starlight treatment (v2): near-white primary, cool
+      grey-blue secondaries. Moon yellow is reserved for accents
+      (--color-primary / --color-gold / active indicators), not body text.
+      The prior warm/moon-yellow text values are the "moonlit" treatment. */
+   --color-text-primary: #eef1fb;
+   /* Near-white starlight */
+   --color-text-secondary: #b4bedd;
+   /* Cool starlight secondary */
+   --color-text-tertiary: #9aa6c9;
    --color-text-accent-secondary: var(--color-starlight);
-   /* Muted yellow */
-   --color-text-muted: #a89e8a;
+   /* Muted grey-blue */
+   --color-text-muted: #7f8bb0;
    /* Very muted */
    --color-text-disabled: #6a6a6a;
    /* Disabled state */
