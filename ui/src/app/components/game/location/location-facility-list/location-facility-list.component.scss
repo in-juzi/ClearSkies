@@ -6,7 +6,9 @@
 
   .facilities-list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(var(--spacing-7xl), 1fr));
+    // Pack multiple cards per row; ~200px min fits 2-up in the ~450px
+    // location panel and more on wider layouts.
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: var(--spacing-l);
     margin-bottom: var(--spacing-4xl);
   }
@@ -64,7 +66,7 @@
 
 .navigation-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(var(--spacing-7xl), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(var(--container-xs), 1fr));
   gap: var(--spacing-l);
 }
 
