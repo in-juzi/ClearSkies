@@ -41,7 +41,11 @@ export class VendorComponent {
   constructor() {
     this.hoverSubject.pipe(
       debounceTime(150),
-      distinctUntilChanged((a, b) => a?.item.instanceId === b?.item.instanceId),
+      // Key on instanceId (real items) falling back to itemId (vendor stock has
+      // no instance, so all synthesized buy items share instanceId '').
+      distinctUntilChanged((a, b) =>
+        (a?.item.instanceId || a?.item.itemId || null) ===
+        (b?.item.instanceId || b?.item.itemId || null)),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe(payload => {
       this.hoveredItem.set(payload?.item ?? null);
@@ -56,6 +60,38 @@ export class VendorComponent {
     }
     const anchorRect = (event.currentTarget as HTMLElement).getBoundingClientRect();
     this.hoverSubject.next({ item, anchorRect });
+  }
+
+  /** Hover handler for Buy rows: synthesize a preview item from vendor stock. */
+  onBuyItemHover(event: MouseEvent | null, stock: VendorStockItem | null): void {
+    const item = stock ? this.buyStockToItemDetails(stock) : null;
+    this.onItemHover(item ? event : null, item);
+  }
+
+  /**
+   * Build a minimal, read-only ItemDetails from vendor stock so the shared
+   * preview can render it. Stock is unrolled (no quality/trait modifiers) and
+   * has no item instance; the empty instanceId makes the panel skip the
+   * combat-stats fetch, and stats-display falls back to base `properties`.
+   */
+  private buyStockToItemDetails(stock: VendorStockItem): ItemDetails | null {
+    const definition = stock.itemDefinition;
+    if (!definition) return null;
+    return {
+      instanceId: '',
+      itemId: stock.itemId,
+      quantity: 1,
+      qualities: {},
+      traits: {},
+      equipped: false,
+      acquiredAt: new Date(),
+      sockets: [],
+      definition,
+      subcategories: definition.subcategories ? [...definition.subcategories] : undefined,
+      vendorPrice: stock.buyPrice,
+      qualityDetails: {},
+      traitDetails: {},
+    };
   }
 
   // Signals — existing
@@ -164,6 +200,9 @@ export class VendorComponent {
     this.expandedSellId.set(null);
     this.stepQty.set(1);
     this.hint.set(tab === 'buy' ? 'Select an item to buy' : 'Select an item to sell');
+    // Clear any lingering preview: the hovered row is removed with the old tab,
+    // so its mouseleave never fires.
+    this.onItemHover(null, null);
   }
 
   /**

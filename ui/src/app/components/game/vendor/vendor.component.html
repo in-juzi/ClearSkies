@@ -77,7 +77,9 @@
                  [ngClass]="'rc-' + (s.itemDefinition?.rarity || 'common')"
                  [class.sel]="expandedBuyId() === s.itemId"
                  [class.poor]="!canAfford(s)">
-              <div class="rmain" (click)="toggleBuy(s)">
+              <div class="rmain" (click)="toggleBuy(s)"
+                   (mouseenter)="onBuyItemHover($event, s)"
+                   (mouseleave)="onBuyItemHover(null, null)">
                 <div class="ic">
                   @if (s.itemDefinition?.icon; as icon) {
                     <app-icon [path]="icon.path" [material]="icon.material" [size]="30"></app-icon>

@@ -15,16 +15,25 @@ test.describe('Vendor hover preview', () => {
 
     const vendor = page.locator('app-vendor');
     await expect(vendor).toBeVisible();
-
-    // Switch to the Sell tab (populated from inventory), hover the first item.
-    await vendor.getByRole('button', { name: 'Sell', exact: true }).click();
-    const firstRow = vendor.locator('.sell-list .row').first();
-    await expect(firstRow).toBeVisible();
-    await firstRow.hover();
-
     const preview = vendor.locator('app-item-details-panel .item-details-panel.preview');
-    await expect(preview).toBeVisible({ timeout: 5000 });
 
-    await page.screenshot({ path: 'e2e/screenshots/vendor-hover-preview.png' });
+    // Buy tab (vendor stock, synthesized from the item definition). The preview
+    // header should match the hovered stock item.
+    const buyRow = vendor.locator('.list .row .rmain').first();
+    await expect(buyRow).toBeVisible();
+    const buyName = (await buyRow.locator('.nm').innerText()).trim();
+    await buyRow.hover();
+    await expect(preview.locator('h3')).toHaveText(buyName, { timeout: 5000 });
+    await page.screenshot({ path: 'e2e/screenshots/vendor-hover-preview-buy.png' });
+
+    // Switch to the Sell tab (real inventory instances). The preview must
+    // update to the hovered sell item, not linger on the old buy item.
+    await vendor.getByRole('button', { name: 'Sell', exact: true }).click();
+    const sellRow = vendor.locator('.sell-list .row').first();
+    await expect(sellRow).toBeVisible();
+    const sellName = (await sellRow.locator('.nm').innerText()).trim();
+    await sellRow.hover();
+    await expect(preview.locator('h3')).toHaveText(sellName, { timeout: 5000 });
+    await page.screenshot({ path: 'e2e/screenshots/vendor-hover-preview-sell.png' });
   });
 });
