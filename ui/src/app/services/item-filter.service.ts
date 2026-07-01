@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { ItemDetails } from '../models/inventory.model';
-import type { ItemGroup } from '../components/game/inventory/inventory-grouped-view/inventory-grouped-view.component';
 
 /**
  * Centralized service for filtering item collections.
@@ -138,36 +137,6 @@ export class ItemFilterService {
    */
   filterByItemId(items: ItemDetails[], itemId: string): ItemDetails[] {
     return items.filter(item => item.itemId === itemId);
-  }
-
-  /**
-   * Group items by itemId into expandable groups (for the grouped inventory view).
-   * Each group collects all instances of an itemId with a summed quantity.
-   * @param items - Array of items to group
-   * @returns Array of item groups sorted alphabetically by name
-   */
-  groupByItemId(items: ItemDetails[]): ItemGroup[] {
-    const groups = new Map<string, ItemGroup>();
-
-    for (const item of items) {
-      if (!groups.has(item.itemId)) {
-        groups.set(item.itemId, {
-          itemId: item.itemId,
-          definition: item.definition,
-          instances: [],
-          totalQuantity: 0,
-          isExpanded: true // Default to expanded
-        });
-      }
-
-      const group = groups.get(item.itemId)!;
-      group.instances.push(item);
-      group.totalQuantity += item.quantity;
-    }
-
-    return Array.from(groups.values()).sort((a, b) =>
-      a.definition.name.localeCompare(b.definition.name)
-    );
   }
 
   /**

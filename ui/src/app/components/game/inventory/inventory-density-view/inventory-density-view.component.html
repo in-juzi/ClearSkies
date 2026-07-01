@@ -1,0 +1,111 @@
+@if (items.length === 0) {
+  <div class="empty-message">
+    <p>No items in this category</p>
+  </div>
+} @else if (density === 'grid') {
+  <!-- ===== Icon grid (flat) ===== -->
+  <div class="dv-scroll">
+    <div class="grid">
+      @for (item of items; track item.instanceId) {
+        <div
+          class="cell"
+          [class.equipped]="item.equipped"
+          [class.alt-sell-mode]="isAltKeyHeld && isVendorOpen"
+          [class.alt-drop-mode]="isAltKeyHeld && !isVendorOpen"
+          [style.border-color]="rarityColor(item)"
+          draggable="true"
+          (click)="onItemClick($event, item)"
+          (contextmenu)="onItemRightClick($event, item)"
+          (dragstart)="onItemDragStart($event, item)"
+          (dragend)="onItemDragEnd($event)"
+          [title]="getItemTooltip(item)"
+        >
+          @if (item.definition.icon) {
+            <app-icon [icon]="item.definition.icon" [size]="26"></app-icon>
+          } @else {
+            <span class="tier">T{{ item.definition.properties.tier }}</span>
+          }
+          @if (item.quantity > 1) { <span class="n">{{ item.quantity }}</span> }
+          @if (hasModifiers(item)) { <span class="moddot"></span> }
+        </div>
+      }
+    </div>
+  </div>
+} @else {
+  <!-- ===== Row densities (category-grouped) ===== -->
+  <div class="dv-scroll">
+    @for (group of categoryGroups; track group.key) {
+      <div class="ghead">
+        <span class="lbl">{{ group.label }}</span>
+        <span class="cnt">{{ group.items.length }}</span>
+        <span class="rule"></span>
+      </div>
+
+      <div class="rows" [class.comfortable]="density === 'comfortable'" [class.compact]="density === 'compact'">
+        @for (item of group.items; track item.instanceId) {
+          @if (density === 'comfortable') {
+            <div
+              class="row"
+              [class.equipped]="item.equipped"
+              [class.alt-sell-mode]="isAltKeyHeld && isVendorOpen"
+              [class.alt-drop-mode]="isAltKeyHeld && !isVendorOpen"
+              [style.border-left-color]="rarityColor(item)"
+              draggable="true"
+              (click)="onItemClick($event, item)"
+              (contextmenu)="onItemRightClick($event, item)"
+              (dragstart)="onItemDragStart($event, item)"
+              (dragend)="onItemDragEnd($event)"
+              [title]="getItemTooltip(item)"
+            >
+              <div class="ico">
+                @if (item.definition.icon) {
+                  <app-icon [icon]="item.definition.icon" [size]="26"></app-icon>
+                } @else {
+                  <span class="tier">T{{ item.definition.properties.tier }}</span>
+                }
+              </div>
+              <div class="mid">
+                <span class="nm" [style.color]="rarityColor(item)">{{ item.definition.name }}</span>
+                <span class="badges">
+                  <app-item-modifiers [item]="item" displayMode="badge-name" size="mini"></app-item-modifiers>
+                  @if (item.equipped) { <span class="eqtag">EQ</span> }
+                </span>
+              </div>
+              <span class="qty">@if (item.quantity > 1) { ×{{ item.quantity }} }</span>
+            </div>
+          } @else {
+            <div
+              class="row"
+              [class.equipped]="item.equipped"
+              [class.alt-sell-mode]="isAltKeyHeld && isVendorOpen"
+              [class.alt-drop-mode]="isAltKeyHeld && !isVendorOpen"
+              draggable="true"
+              (click)="onItemClick($event, item)"
+              (contextmenu)="onItemRightClick($event, item)"
+              (dragstart)="onItemDragStart($event, item)"
+              (dragend)="onItemDragEnd($event)"
+              [title]="getItemTooltip(item)"
+            >
+              <span class="dot" [style.background]="rarityColor(item)"></span>
+              <div class="ico">
+                @if (item.definition.icon) {
+                  <app-icon [icon]="item.definition.icon" [size]="18"></app-icon>
+                } @else {
+                  <span class="tier">T{{ item.definition.properties.tier }}</span>
+                }
+              </div>
+              <span class="nm" [style.color]="rarityColor(item)">
+                {{ item.definition.name }}
+                @if (item.equipped) { <span class="eqtag">EQ</span> }
+              </span>
+              <span class="cbadges">
+                <app-item-modifiers [item]="item" displayMode="badge-name" size="mini" [showTraits]="false"></app-item-modifiers>
+              </span>
+              <span class="qty">@if (item.quantity > 1) { ×{{ item.quantity }} }</span>
+            </div>
+          }
+        }
+      </div>
+    }
+  </div>
+}

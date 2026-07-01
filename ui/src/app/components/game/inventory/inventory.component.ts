@@ -12,14 +12,13 @@ import { ItemDetails } from '../../../models/inventory.model';
 import { ItemDetailsPanelComponent } from '../../shared/item-details-panel/item-details-panel.component';
 import { isEquipmentItem, isConsumableItem } from '@shared/types';
 import { InventoryHeaderComponent } from './inventory-header/inventory-header.component';
-import { InventoryListViewComponent } from './inventory-list-view/inventory-list-view.component';
-import { InventoryGroupedViewComponent, ItemGroup } from './inventory-grouped-view/inventory-grouped-view.component';
+import { InventoryDensityViewComponent, InventoryDensity } from './inventory-density-view/inventory-density-view.component';
 import { InventoryStatsComponent } from './inventory-stats/inventory-stats.component';
 
 @Component({
   selector: 'app-inventory',
   standalone: true,
-  imports: [CommonModule, FormsModule, ItemDetailsPanelComponent, InventoryHeaderComponent, InventoryListViewComponent, InventoryGroupedViewComponent, InventoryStatsComponent],
+  imports: [CommonModule, FormsModule, ItemDetailsPanelComponent, InventoryHeaderComponent, InventoryDensityViewComponent, InventoryStatsComponent],
   templateUrl: './inventory.component.html',
   styleUrl: './inventory.component.scss'
 })
@@ -35,7 +34,7 @@ export class InventoryComponent implements OnInit {
   selectedCategory: string = 'all';
   searchQuery: string = ''; // Search filter
   isAltKeyHeld: boolean = false; // Track Alt key state for visual feedback
-  viewMode: 'list' | 'grouped' = 'list'; // Toggle between list and grouped view
+  viewMode: InventoryDensity = this.loadDensity(); // Information density: comfortable | compact | grid
 
   categories = [
     { value: 'all', label: 'All Items', shortLabel: 'All' },
@@ -98,24 +97,27 @@ export class InventoryComponent implements OnInit {
   }
 
   /**
-   * Toggle between list and grouped view modes
+   * Set the inventory information density and persist the choice.
    */
-  toggleViewMode(): void {
-    this.viewMode = this.viewMode === 'list' ? 'grouped' : 'list';
+  setViewMode(mode: InventoryDensity): void {
+    this.viewMode = mode;
+    try {
+      localStorage.setItem('inventory-density', mode);
+    } catch {
+      // localStorage unavailable — non-fatal
+    }
   }
 
-  /**
-   * Get grouped inventory items organized by item definition
-   */
-  getGroupedInventory(): ItemGroup[] {
-    return this.itemFilter.groupByItemId(this.getFilteredInventory());
-  }
-
-  /**
-   * Toggle expansion state of a group
-   */
-  toggleGroup(group: ItemGroup): void {
-    group.isExpanded = !group.isExpanded;
+  private loadDensity(): InventoryDensity {
+    try {
+      const saved = localStorage.getItem('inventory-density');
+      if (saved === 'comfortable' || saved === 'compact' || saved === 'grid') {
+        return saved;
+      }
+    } catch {
+      // localStorage unavailable — fall through to default
+    }
+    return 'comfortable';
   }
 
   /**

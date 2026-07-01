@@ -1,8 +1,7 @@
 // Parent container styles only
 // Child component styles are in their respective SCSS files:
-// - inventory-header.component.scss (header, filters)
-// - inventory-list-view.component.scss (list view items)
-// - inventory-grouped-view.component.scss (grouped view)
+// - inventory-header.component.scss (header, filters, density toggle)
+// - inventory-density-view.component.scss (comfortable / compact / grid views)
 // - inventory-stats.component.scss (stats display)
 
 .inventory-container {
@@ -16,10 +15,10 @@
   min-height: 0;
 }
 
-app-inventory-list-view, app-inventory-grouped-view {
+app-inventory-density-view {
   flex: 1;
-  overflow: auto;
-  overflow-x: hidden;
+  min-height: 0;
+  overflow: hidden;
 }
 
 /* Item Details Panel - Shared component styles */

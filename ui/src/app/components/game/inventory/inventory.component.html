@@ -7,37 +7,22 @@
     [selectedCategory]="selectedCategory"
     [searchQuery]="searchQuery"
     [categories]="categories"
-    (viewModeChange)="viewMode = $event"
+    (viewModeChange)="setViewMode($event)"
     (categoryChange)="selectedCategory = $event"
     (searchQueryChange)="searchQuery = $event">
   </app-inventory-header>
 
-  <!-- List View (Decomposed Component) -->
-  @if (viewMode === 'list') {
-    <app-inventory-list-view
-      [items]="getFilteredInventory()"
-      [isAltKeyHeld]="isAltKeyHeld"
-      [isVendorOpen]="vendorService.isVendorOpen()"
-      (itemClick)="onItemClick($event.event, $event.item)"
-      (itemRightClick)="onItemRightClick($event.event, $event.item)"
-      (itemDragStart)="onItemDragStart($event.event, $event.item)"
-      (itemDragEnd)="onItemDragEnd($event)">
-    </app-inventory-list-view>
-  }
-
-  <!-- Grouped View (Decomposed Component) -->
-  @if (viewMode === 'grouped') {
-    <app-inventory-grouped-view
-      [groups]="getGroupedInventory()"
-      [isAltKeyHeld]="isAltKeyHeld"
-      [isVendorOpen]="vendorService.isVendorOpen()"
-      (groupToggle)="toggleGroup($event)"
-      (itemClick)="onItemClick($event.event, $event.item)"
-      (itemRightClick)="onItemRightClick($event.event, $event.item)"
-      (itemDragStart)="onItemDragStart($event.event, $event.item)"
-      (itemDragEnd)="onItemDragEnd($event)">
-    </app-inventory-grouped-view>
-  }
+  <!-- Density View (comfortable | compact | grid) -->
+  <app-inventory-density-view
+    [items]="getFilteredInventory()"
+    [density]="viewMode"
+    [isAltKeyHeld]="isAltKeyHeld"
+    [isVendorOpen]="vendorService.isVendorOpen()"
+    (itemClick)="onItemClick($event.event, $event.item)"
+    (itemRightClick)="onItemRightClick($event.event, $event.item)"
+    (itemDragStart)="onItemDragStart($event.event, $event.item)"
+    (itemDragEnd)="onItemDragEnd($event)">
+  </app-inventory-density-view>
 
   <!-- Item Details Panel (Shared Component) -->
   @if (selectedItem) {
